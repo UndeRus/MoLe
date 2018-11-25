@@ -9,4 +9,6 @@
     <string name="nav_latest_transactions_title">Latest transactions</string>
     <string name="nav_reports_title">Reports</string>
     <string name="nav_exit_title">Exit</string>
+    <string name="nav_drawer_system_menu">System</string>
+    <string name="nav_drawer_system_title_condensed">Sys</string>
 </resources>

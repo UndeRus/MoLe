@@ -17,4 +17,14 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="nav_button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:drawablePadding">32dp</item>
+        <item name="android:focusable">auto</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
+    </style>
+
 </resources>

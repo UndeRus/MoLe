@@ -3,10 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:checkableBehavior="single"
+        android:menuCategory="container">
         <item
             android:id="@+id/nav_latest_transactions"
-            android:icon="@android:drawable/ic_menu_agenda"
+            android:icon="@android:drawable/ic_menu_sort_by_size"
             android:title="@string/nav_latest_transactions_title" />
         <item
             android:id="@+id/nav_reports"
@@ -14,17 +16,21 @@
             android:title="@string/nav_reports_title" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@drawable/ic_menu_manage"
-                android:title="@string/action_settings" />
-            <item
-                android:id="@+id/nav_exit"
-                android:icon="@drawable/ic_menu_send"
-                android:title="@string/nav_exit_title" />
-        </menu>
+    <item
+        android:menuCategory="secondary"
+        android:title="@string/nav_drawer_system_menu"
+        android:titleCondensed="@string/nav_drawer_system_title_condensed">
+        <menu></menu>
     </item>
+    <group android:menuCategory="system">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@android:drawable/ic_menu_preferences"
+            android:title="@string/action_settings" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@android:drawable/ic_lock_power_off"
+            android:title="@string/nav_exit_title" />
+    </group>
 
 </menu>
