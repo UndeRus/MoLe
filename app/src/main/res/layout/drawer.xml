@@ -83,10 +83,11 @@
             android:text="@string/action_settings" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/nav_exit"
             style="@style/nav_button"
             android:layout_weight="1"
             android:drawableStart="@drawable/ic_exit_to_app_black_24dp"
+            android:onClick="nav_exit_clicked"
             android:text="@string/nav_exit_title" />
 
     </LinearLayout>
