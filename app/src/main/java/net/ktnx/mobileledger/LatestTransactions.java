@@ -3,7 +3,6 @@ package net.ktnx.mobileledger;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,8 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class LatestTransactions extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class LatestTransactions extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +37,6 @@ public class LatestTransactions extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         android.widget.TextView ver = drawer.findViewById(R.id.drawer_version_text);
 
@@ -90,24 +85,4 @@ public class LatestTransactions extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_latest_transactions) {
-            // Handle the camera action
-        } else if (id == R.id.nav_reports) {
-
-        } else if (id == R.id.nav_settings) {
-
-        } else if (id == R.id.nav_exit) {
-
-        }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }
