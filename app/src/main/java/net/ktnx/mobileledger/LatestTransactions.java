@@ -1,5 +1,6 @@
 package net.ktnx.mobileledger;
 
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -40,6 +41,15 @@ public class LatestTransactions extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        android.widget.TextView ver = drawer.findViewById(R.id.drawer_version_text);
+
+        try {
+            PackageInfo pi = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+            ver.setText(pi.versionName);
+        } catch (Exception e) {
+            ver.setText("version");
+        }
     }
 
     @Override
