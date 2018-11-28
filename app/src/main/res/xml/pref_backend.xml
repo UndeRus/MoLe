@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:id="@+id/pref_backend_url"
+        android:capitalize="words"
+        android:defaultValue="@string/pref_default_backend_url"
+        android:inputType="textUri"
+        android:key="backend_url"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_backend_url" />
+
+    <SwitchPreference
+        android:id="@+id/pref_backend_use_http_auth"
+        android:defaultValue="false"
+        android:disableDependentsState="false"
+        android:key="backend_use_http_auth"
+        android:summaryOff="@string/pref_description_use_http_auth_off"
+        android:summaryOn="@string/pref_description_use_http_auth_on"
+        android:title="@string/pref_title_use_http_auth" />
+
+    <EditTextPreference
+        android:id="@+id/pref_backend_auth_user"
+        android:dependency="backend_use_http_auth"
+        android:inputType="text"
+        android:key="backend_auth_user"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_backend_auth_user" />
+
+    <EditTextPreference
+        android:id="@+id/pref_backend_auth_password"
+        android:dependency="backend_use_http_auth"
+        android:inputType="textPassword"
+        android:key="backend_auth_password"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_backend_auth_password" />
+
+</PreferenceScreen>

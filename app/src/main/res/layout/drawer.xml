@@ -80,6 +80,7 @@
             style="@style/nav_button"
             android:layout_weight="1"
             android:drawableStart="@drawable/ic_settings_black_24dp"
+            android:onClick="nav_settings_clicked"
             android:text="@string/action_settings" />
 
         <TextView

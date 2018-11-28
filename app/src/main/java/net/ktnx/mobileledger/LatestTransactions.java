@@ -1,5 +1,6 @@
 package net.ktnx.mobileledger;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -51,6 +52,11 @@ public class LatestTransactions extends AppCompatActivity {
     public void nav_exit_clicked(View view) {
         Log.w("mobileledger", "exiting");
         finish();
+    }
+
+    public void nav_settings_clicked(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     @Override
