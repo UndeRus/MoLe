@@ -2,15 +2,12 @@
     <string name="app_name">Mobile Ledger</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Mobile ledger</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="nav_header_subtitle" translatable="false">dam+google@ktnx.net</string>
     <string name="nav_latest_transactions_title">Latest transactions</string>
     <string name="nav_reports_title">Reports</string>
     <string name="nav_exit_title">Exit</string>
-    <string name="nav_drawer_system_menu">System</string>
-    <string name="nav_drawer_system_title_condensed">Sys</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
@@ -24,18 +21,6 @@
 
     <string name="pref_title_backend_url">Backend URL</string>
     <string name="pref_default_backend_url">https://server/loc</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
@@ -57,20 +42,6 @@
         <item>360</item>
         <item>-1</item>
     </string-array>
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
