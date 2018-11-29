@@ -14,41 +14,17 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <include
+                layout="@layout/nav_header_latest_transactions"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/colorPrimary"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:paddingLeft="16dp">
-
-                    <TextView
-                        android:id="@+id/textView6"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingTop="32dp"
-                        android:text="@string/app_name"
-                        android:textColor="@android:color/white" />
-
-                    <TextView
-                        android:id="@+id/drawer_version_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="v1.1.1"
-                        android:textColor="@android:color/white" />
-                </LinearLayout>
-
-            </LinearLayout>
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingLeft="16dp">
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
 
                 <TextView
                     android:id="@+id/textView4"
