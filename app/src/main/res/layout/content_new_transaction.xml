@@ -28,6 +28,7 @@
                 android:textAlignment="center" />
 
             <TableLayout
+                android:id="@+id/new_transaction_accounts_table"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -45,14 +46,11 @@
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
                         android:layout_weight="1"
                         android:width="0dp"
-                        android:minWidth="36pt"
-                        android:ems="10"
-                        android:gravity="end"
                         android:hint="@string/new_transaction_amount_hint"
                         android:inputType="numberDecimal|numberSigned"
+                        android:minWidth="24pt"
                         android:textAlignment="viewEnd" />
                 </TableRow>
 
@@ -70,14 +68,11 @@
                     <EditText
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
                         android:layout_weight="1"
                         android:width="0dp"
-                        android:minWidth="36pt"
-                        android:ems="10"
-                        android:gravity="end"
                         android:hint="@string/new_transaction_amount_hint"
                         android:inputType="numberDecimal|numberSigned"
+                        android:minWidth="24pt"
                         android:textAlignment="viewEnd" />
                 </TableRow>
 
