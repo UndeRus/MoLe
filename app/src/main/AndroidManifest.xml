@@ -30,6 +30,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.ktnx.mobileledger.LatestTransactions" />
         </activity>
+        <activity
+            android:name=".NewTransactionActivity"
+            android:label="@string/title_activity_new_transaction"
+            android:parentActivityName=".LatestTransactions"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.ktnx.mobileledger.LatestTransactions" />
+        </activity>
     </application>
 
 </manifest>
