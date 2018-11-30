@@ -28,12 +28,12 @@
                 android:textAlignment="center" />
 
             <LinearLayout
+                android:id="@+id/new_transaction_accounts"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
                 <AutoCompleteTextView
-                    android:id="@+id/autoCompleteTextView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -41,7 +41,29 @@
                     android:text="" />
 
                 <EditText
-                    android:id="@+id/editText4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="@string/new_transaction_amount_hint"
+                    android:inputType="numberSigned|numberDecimal"
+                    android:textAlignment="viewEnd" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/new_transaction_accounts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/new_transaction_account_label"
+                    android:text="" />
+
+                <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
