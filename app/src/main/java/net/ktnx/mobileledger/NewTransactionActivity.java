@@ -71,6 +71,8 @@ public class NewTransactionActivity extends AppCompatActivity {
         row.addView(acc);
         row.addView(amt);
         table.addView(row);
+
+        acc.requestFocus();
     }
 
 }
