@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -18,6 +19,7 @@ import android.widget.TableRow;
 import java.util.Objects;
 
 public class NewTransactionActivity extends AppCompatActivity {
+    private TableLayout table;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,34 @@ public class NewTransactionActivity extends AppCompatActivity {
             }
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        table = findViewById(R.id.new_transaction_accounts_table);
+        for (int i = 0; i < table.getChildCount(); i++) {
+            hook_swipe_listener((TableRow)table.getChildAt(i));
+//            Log.d("swipe", "hooked to row "+i);
+        }
+    }
+
+    private void hook_swipe_listener(final TableRow row) {
+        row.getChildAt(0).setOnTouchListener(new OnSwipeTouchListener(this) {
+            public void onSwipeLeft() {
+//                Log.d("swipe", "LEFT" + row.getId());
+                if (table.getChildCount() > 2) {
+                    table.removeView(row);
+//                    Toast.makeText(NewTransactionActivity.this, "LEFT", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Snackbar.make(table, R.string.msg_at_least_two_accounts_are_required, Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            }
+//            @Override
+//            public boolean performClick(View view, MotionEvent m) {
+//                return true;
+//            }
+            public boolean onTouch(View view, MotionEvent m) {
+                return gestureDetector.onTouchEvent(m);
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -65,7 +95,6 @@ public class NewTransactionActivity extends AppCompatActivity {
         amt.setMinWidth(64);
         amt.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
 
-        final TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         final TableRow row = new TableRow(this);
         row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
         row.addView(acc);
@@ -73,6 +102,8 @@ public class NewTransactionActivity extends AppCompatActivity {
         table.addView(row);
 
         acc.requestFocus();
+
+        hook_swipe_listener(row);
     }
 
 }

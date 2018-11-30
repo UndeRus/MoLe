@@ -59,4 +59,5 @@
     <string name="new_transaction_date_hint">Transaction date</string>
     <string name="new_transaction_amount_hint">amount</string>
     <string name="menu_add_account">Add another acount</string>
+    <string name="msg_at_least_two_accounts_are_required">At least two accounts are required</string>
 </resources>
