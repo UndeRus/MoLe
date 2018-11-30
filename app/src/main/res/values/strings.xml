@@ -55,7 +55,7 @@
     <string name="pref_title_backend_auth_user">Username</string>
     <string name="pref_title_backend_auth_password">Password</string>
     <string name="title_activity_new_transaction">New Transaction</string>
-    <string name="new_transaction_account_label">Account</string>
+    <string name="new_transaction_account_hint">Account</string>
     <string name="new_transaction_date_hint">Transaction date</string>
     <string name="new_transaction_amount_hint">amount</string>
     <string name="menu_add_account">Add another acount</string>
