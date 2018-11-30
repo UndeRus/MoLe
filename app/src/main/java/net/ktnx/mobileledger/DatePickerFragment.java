@@ -35,14 +35,14 @@ implements DatePickerDialog.OnDateSetListener
         Matcher m_mon_day = re_mon_day.matcher(present);
 
         if (m_mon_day.matches()) {
-            month = Integer.parseInt(m_mon_day.group(0));
-            day = Integer.parseInt(m_mon_day.group(1));
+            month = Integer.parseInt(m_mon_day.group(1))-1;
+            day = Integer.parseInt(m_mon_day.group(2));
         }
         else {
             Pattern re_day = Pattern.compile("^\\s*(\\d{1,2})\\s*$");
             Matcher m_day = re_day.matcher(present);
             if (m_day.matches()) {
-                day = Integer.parseInt(m_day.group(0));
+                day = Integer.parseInt(m_day.group(1));
             }
         }
 
@@ -58,7 +58,7 @@ implements DatePickerDialog.OnDateSetListener
             date.setText(String.format(Locale.US, "%d", day));
         }
         else {
-            date.setText(String.format(Locale.US, "%d/%d", month, day));
+            date.setText(String.format(Locale.US, "%d/%d", month+1, day));
         }
     }
 }
