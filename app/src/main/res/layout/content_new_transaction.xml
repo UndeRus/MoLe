@@ -27,51 +27,61 @@
                 android:onClick="pickTransactionDate"
                 android:textAlignment="center" />
 
-            <LinearLayout
-                android:id="@+id/new_transaction_accounts"
+            <TableLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <AutoCompleteTextView
+                <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/new_transaction_account_label"
-                    android:text="" />
+                    android:layout_height="match_parent">
 
-                <EditText
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:width="0dp"
+                        android:hint="@string/new_transaction_account_label" />
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_weight="1"
+                        android:width="0dp"
+                        android:minWidth="36pt"
+                        android:ems="10"
+                        android:gravity="end"
+                        android:hint="@string/new_transaction_amount_hint"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:textAlignment="viewEnd" />
+                </TableRow>
+
+                <TableRow
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="@string/new_transaction_amount_hint"
-                    android:inputType="numberSigned|numberDecimal"
-                    android:textAlignment="viewEnd" />
-            </LinearLayout>
+                    android:layout_height="match_parent">
 
-            <LinearLayout
-                android:id="@+id/new_transaction_accounts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                    <AutoCompleteTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="9"
+                        android:width="0dp"
+                        android:hint="@string/new_transaction_account_label" />
 
-                <AutoCompleteTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="@string/new_transaction_account_label"
-                    android:text="" />
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_weight="1"
+                        android:width="0dp"
+                        android:minWidth="36pt"
+                        android:ems="10"
+                        android:gravity="end"
+                        android:hint="@string/new_transaction_amount_hint"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:textAlignment="viewEnd" />
+                </TableRow>
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="@string/new_transaction_amount_hint"
-                    android:inputType="numberSigned|numberDecimal"
-                    android:textAlignment="viewEnd" />
-            </LinearLayout>
+            </TableLayout>
 
         </LinearLayout>
     </ScrollView>
