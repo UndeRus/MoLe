@@ -31,16 +31,4 @@
         app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@android:drawable/ic_menu_send" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginBottom="80dp"
-        android:clickable="true"
-        android:focusable="auto"
-        app:layout_anchor="@id/fab"
-        app:layout_anchorGravity="top"
-        app:srcCompat="@drawable/svg_thick_plus_white" />
-
 </android.support.design.widget.CoordinatorLayout>

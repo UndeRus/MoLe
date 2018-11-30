@@ -58,4 +58,5 @@
     <string name="new_transaction_account_label">Account</string>
     <string name="new_transaction_date_hint">Transaction date</string>
     <string name="new_transaction_amount_hint">amount</string>
+    <string name="menu_add_account">Add another acount</string>
 </resources>
