@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -81,6 +82,9 @@ public class NewTransactionActivity extends AppCompatActivity {
 //                .setAction("Action", null).show();
     }
 
+    public int dp2px(float dp) {
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
+    }
     public void addTransactionAccountFromMenu(MenuItem item) {
         final AutoCompleteTextView acc = new AutoCompleteTextView(this);
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 9f));
@@ -92,7 +96,7 @@ public class NewTransactionActivity extends AppCompatActivity {
         amt.setHint(R.string.new_transaction_amount_hint);
         amt.setWidth(0);
         amt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL );
-        amt.setMinWidth(64);
+        amt.setMinWidth(dp2px(40));
         amt.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
 
         final TableRow row = new TableRow(this);

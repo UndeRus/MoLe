@@ -55,7 +55,7 @@
                         android:width="0dp"
                         android:hint="@string/new_transaction_amount_hint"
                         android:inputType="numberDecimal|numberSigned"
-                        android:minWidth="24pt"
+                        android:minWidth="40dp"
                         android:nextFocusDown="@id/new_transaction_acc_2"
                         android:nextFocusForward="@id/new_transaction_acc_2"
                         android:textAlignment="viewEnd" />
@@ -83,7 +83,7 @@
                         android:width="0dp"
                         android:hint="@string/new_transaction_amount_hint"
                         android:inputType="numberDecimal|numberSigned"
-                        android:minWidth="24pt"
+                        android:minWidth="40dp"
                         android:textAlignment="viewEnd" />
                 </TableRow>
 
