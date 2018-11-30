@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LatestTransactions">
+    tools:context=".NewTransactionActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -20,16 +20,27 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_latest_transactions" />
+    <include layout="@layout/content_new_transaction" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_add_transaction"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:onClick="fab_new_transaction_clicked"
         app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@android:drawable/ic_menu_send" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginBottom="80dp"
+        android:clickable="true"
+        android:focusable="auto"
+        app:layout_anchor="@id/fab"
+        app:layout_anchorGravity="top"
         app:srcCompat="@drawable/svg_thick_plus_white" />
 
 </android.support.design.widget.CoordinatorLayout>
