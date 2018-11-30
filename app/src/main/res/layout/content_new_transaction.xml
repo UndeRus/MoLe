@@ -30,20 +30,25 @@
             <TableLayout
                 android:id="@+id/new_transaction_accounts_table"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                >
 
                 <TableRow
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                     <AutoCompleteTextView
+                        android:id="@+id/new_transaction_acc_1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:width="0dp"
-                        android:hint="@string/new_transaction_account_hint" />
+                        android:hint="@string/new_transaction_account_hint"
+                        android:nextFocusDown="@id/new_transaction_amt_1"
+                        android:nextFocusForward="@id/new_transaction_amt_1" />
 
                     <EditText
+                        android:id="@+id/new_transaction_amt_1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -51,6 +56,8 @@
                         android:hint="@string/new_transaction_amount_hint"
                         android:inputType="numberDecimal|numberSigned"
                         android:minWidth="24pt"
+                        android:nextFocusDown="@id/new_transaction_acc_2"
+                        android:nextFocusForward="@id/new_transaction_acc_2"
                         android:textAlignment="viewEnd" />
                 </TableRow>
 
@@ -59,13 +66,17 @@
                     android:layout_height="match_parent">
 
                     <AutoCompleteTextView
+                        android:id="@+id/new_transaction_acc_2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
                         android:width="0dp"
-                        android:hint="@string/new_transaction_account_hint" />
+                        android:hint="@string/new_transaction_account_hint"
+                        android:nextFocusDown="@id/new_transaction_amt_2"
+                        android:nextFocusForward="@id/new_transaction_amt_2" />
 
                     <EditText
+                        android:id="@+id/new_transaction_amt_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
