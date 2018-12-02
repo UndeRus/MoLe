@@ -1,9 +1,11 @@
 package net.ktnx.mobileledger;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,9 +15,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.Date;
 
+import static android.view.View.GONE;
 import static net.ktnx.mobileledger.MobileLedgerDB.db;
 
 public class LatestTransactions extends AppCompatActivity {
@@ -105,7 +110,29 @@ public class LatestTransactions extends AppCompatActivity {
     private void update_accounts() {
         prepare_db();
 
-        RetrieveAccountsTask task = new RetrieveAccountsTask();
+        Activity activity = this;
+
+        ProgressBar pb = findViewById(R.id.progressBar);
+        TextView pt = findViewById(R.id.textProgress);
+        pb.setIndeterminate(true);
+
+        RetrieveAccountsTask task = new RetrieveAccountsTask() {
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                if ( values[0] == 0 )
+                    pt.setText(R.string.progress_connecting);
+                else
+                    pt.setText(String.format(getResources().getString(R.string.progress_N_accounts_loaded), values[0]));
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                pb.setVisibility(GONE);
+                pt.setVisibility(GONE);
+                if (this.error != 0)
+                    Snackbar.make(drawer, activity.getResources().getString(this.error), Snackbar.LENGTH_LONG );
+            }
+        };
 
         task.setPref(PreferenceManager.getDefaultSharedPreferences(this));
         task.execute(db);

@@ -17,8 +17,8 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, Void, Void> {
-    private int error;
+abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, Integer, Void> {
+    protected int error;
 
     SharedPreferences pref;
     public void setPref(SharedPreferences pref) {
@@ -49,8 +49,9 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, V
 //                http.setRequestProperty("Authorization", basic_auth);
                 Log.d("update_accounts", "Will auth as "+auth_user+" with password of "+auth_password.length()+" characters");
             }
-            http.setAllowUserInteraction(true);
+            http.setAllowUserInteraction(false);
             http.setRequestProperty("Accept-Charset", "UTF-8");
+            publishProgress(0);
             InputStream resp = http.getInputStream();
             try {
                 Log.d("update_accounts", String.valueOf(http.getResponseCode()));
@@ -66,6 +67,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, V
                         BufferedReader buf = new BufferedReader(new InputStreamReader(resp, "UTF-8"));
                         // %3A is '='
                         Pattern re = Pattern.compile('"' + backend_url + "/register\\?q=inacct%3A([a-zA-Z0-9%]+)\\\"");
+                        int count = 0;
                         while ((line = buf.readLine()) != null) {
                             Matcher m = re.matcher(line);
                             while (m.find()) {
@@ -75,6 +77,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, V
                                 Log.d("account-parser", acct_name);
 
                                 db.execSQL("insert into accounts(name) values(?)", new Object[]{acct_name} );
+                                publishProgress(++count);
                             }
                         }
 
@@ -104,10 +107,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, V
         return null;
     }
 
-    protected void onPostExecute(Void result) {
-        if (error != 0)
-            Log.e("async-http", String.valueOf(error));
-        else
-            Log.d("async-http", "Accounts updated successfuly");
-    }
+    abstract protected void onProgressUpdate(Integer... values);
+
+    abstract protected void onPostExecute(Void result);
 }
