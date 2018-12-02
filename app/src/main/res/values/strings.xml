@@ -60,4 +60,8 @@
     <string name="new_transaction_amount_hint">amount</string>
     <string name="menu_add_account">Add another acount</string>
     <string name="msg_at_least_two_accounts_are_required">At least two accounts are required</string>
+    <string name="err_bad_backend_url">Invalid backend URL</string>
+    <string name="err_net_io_error">Network I/O error</string>
+    <string name="err_http_error">HTTP error</string>
+    <string name="err_net_error">Network error</string>
 </resources>
