@@ -3,6 +3,7 @@ package net.ktnx.mobileledger;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,7 +14,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.Date;
+
+import static net.ktnx.mobileledger.MobileLedgerDB.db;
+
 public class LatestTransactions extends AppCompatActivity {
+    DrawerLayout drawer;
+
+    private static Date account_list_last_updated;
+    private static boolean account_list_needs_update = true;
+    public static void preferences_changed() {
+        account_list_needs_update = true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +34,7 @@ public class LatestTransactions extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -35,6 +47,8 @@ public class LatestTransactions extends AppCompatActivity {
             ver.setText(pi.versionName);
         } catch (Exception e) {
         }
+
+        update_accounts();
     }
 
     public void fab_new_transaction_clicked(View view) {
@@ -84,4 +98,17 @@ public class LatestTransactions extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void prepare_db() {
+        MobileLedgerDB.setDb_filename(this.getApplicationInfo().deviceProtectedDataDir + "/" + MobileLedgerDB.DATABASE_NAME);
+        MobileLedgerDB.initDB();
+    }
+    private void update_accounts() {
+        prepare_db();
+
+        RetrieveAccountsTask task = new RetrieveAccountsTask();
+
+        task.setPref(PreferenceManager.getDefaultSharedPreferences(this));
+        task.execute(db);
+
+    }
 }
