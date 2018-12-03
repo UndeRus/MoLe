@@ -30,6 +30,21 @@ import android.widget.TextView;
 
 import java.util.Objects;
 
+/*
+ * TODO: auto-fill of transaction description
+ *       if Android O's implementation won't work, add a custom one
+ * TODO: nicer progress while transaction is submitted
+ * TODO: periodic and manual refresh of available accounts
+ *         (now done forcibly each time the main activity is started)
+ * TODO: latest transactions, maybe with browsing further in the past?
+ * TODO: reports
+ * TODO: get rid of the custom session/cookie and auth code?
+ *         (the last problem with the POST was the missing content-length header)
+ * TODO: app icon
+ * TODO: nicer swiping removal with visual feedback
+ * TODO: activity with current balance
+ *  */
+
 public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
     private TableLayout table;
     private FloatingActionButton fab;
