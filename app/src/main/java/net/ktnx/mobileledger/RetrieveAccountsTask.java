@@ -8,19 +8,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, Integer, Void> {
-    protected int error;
+    int error;
 
-    SharedPreferences pref;
+    private SharedPreferences pref;
     public void setPref(SharedPreferences pref) {
         this.pref = pref;
     }
@@ -29,26 +26,9 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
     }
 
     protected Void doInBackground(SQLiteDatabase... sqLiteDatabases) {
-        final String backend_url = pref.getString("backend_url", "");
-        final boolean use_auth = pref.getBoolean("backend_use_http_auth", false);
         final SQLiteDatabase db = sqLiteDatabases[0];
         try {
-            Log.d("update_accounts", "Connecting to "+backend_url);
-            HttpURLConnection http = (HttpURLConnection) new URL(backend_url + "/journal").openConnection();
-            if (use_auth) {
-                final String auth_user = pref.getString("backend_auth_user", "");
-                final String auth_password = pref.getString("backend_auth_password", "");
-                Authenticator.setDefault(new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        Log.d("http-auth", "called");
-                        return new PasswordAuthentication(auth_user, auth_password.toCharArray());
-                    }
-                });
-//                final String basic_auth = String.format("Basic %s:%s", auth_user, auth_password);
-//                http.setRequestProperty("Authorization", basic_auth);
-                Log.d("update_accounts", "Will auth as "+auth_user+" with password of "+auth_password.length()+" characters");
-            }
+            HttpURLConnection http = NetworkUtil.prepare_connection( pref, "add");
             http.setAllowUserInteraction(false);
             http.setRequestProperty("Accept-Charset", "UTF-8");
             publishProgress(0);
@@ -56,7 +36,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
             try {
                 Log.d("update_accounts", String.valueOf(http.getResponseCode()));
                 if (http.getResponseCode() != 200) {
-                    error = R.string.err_http_error;
+                    throw new IOException(String.valueOf(R.string.err_http_error));
                 }
                 else {
                     db.beginTransaction();
@@ -66,7 +46,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                         String line;
                         BufferedReader buf = new BufferedReader(new InputStreamReader(resp, "UTF-8"));
                         // %3A is '='
-                        Pattern re = Pattern.compile('"' + backend_url + "/register\\?q=inacct%3A([a-zA-Z0-9%]+)\\\"");
+                        Pattern re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
                         int count = 0;
                         while ((line = buf.readLine()) != null) {
                             Matcher m = re.matcher(line);
