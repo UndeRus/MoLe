@@ -66,4 +66,5 @@
     <string name="err_net_error">Network error</string>
     <string name="progress_connecting">Connecting…</string>
     <string name="progress_N_accounts_loaded">%d accounts loaded</string>
+    <string name="new_transaction_description_hint">Description</string>
 </resources>

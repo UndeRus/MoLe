@@ -6,6 +6,7 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.FontsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -25,11 +26,16 @@ import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 import java.util.Objects;
 
-public class NewTransactionActivity extends AppCompatActivity {
+public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
     private TableLayout table;
+    private FloatingActionButton fab;
+    private TextView text_date;
+    private TextView text_descr;
+    private static SaveTransactionTask saver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +44,18 @@ public class NewTransactionActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        text_date = findViewById(R.id.new_transaction_date);
+        text_descr = findViewById(R.id.new_transaction_description);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            text_descr.setAutofillHints("");
+        }
+
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                new_transaction_save_clicked(view);
             }
         });
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -55,6 +67,28 @@ public class NewTransactionActivity extends AppCompatActivity {
         }
     }
 
+    public void new_transaction_save_clicked(View view) {
+        fab.setEnabled(false);
+
+        saver = new SaveTransactionTask(this);
+
+        saver.setPref(PreferenceManager.getDefaultSharedPreferences(this));
+        LedgerTransaction tr = new LedgerTransaction(text_date.getText().toString(), text_descr.getText().toString());
+
+        TableLayout table = findViewById(R.id.new_transaction_accounts_table);
+        for ( int i = 0; i < table.getChildCount(); i++ ) {
+            TableRow row = (TableRow) table.getChildAt(i);
+            String acc = ((TextView) row.getChildAt(0)).getText().toString();
+            String amt = ((TextView) row.getChildAt(1)).getText().toString();
+            LedgerTransactionItem item =
+                    amt.length() > 0
+                    ? new LedgerTransactionItem( acc, Float.parseFloat(amt))
+                    : new LedgerTransactionItem( acc );
+
+            tr.add_item(item);
+        }
+        saver.execute(tr);
+    }
     private void hook_swipe_listener(final TableRow row) {
         row.getChildAt(0).setOnTouchListener(new OnSwipeTouchListener(this) {
             public void onSwipeLeft() {
@@ -132,13 +166,12 @@ public class NewTransactionActivity extends AppCompatActivity {
     public void pickTransactionDate(View view) {
         DialogFragment picker = new DatePickerFragment();
         picker.show(getSupportFragmentManager(), "datePicker");
-//        Snackbar.make(view, "Date editing not yet ready", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show();
     }
 
     public int dp2px(float dp) {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
     }
+
     public void addTransactionAccountFromMenu(MenuItem item) {
         final AutoCompleteTextView acc = new AutoCompleteTextView(this);
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 9f));
@@ -165,4 +198,26 @@ public class NewTransactionActivity extends AppCompatActivity {
         hook_autocompletion_adapter(row);
     }
 
+    @Override
+    public void done() {
+        fab.setEnabled(true);
+        reset_form();
+    }
+
+    private void reset_form() {
+        text_date.setText("");
+        text_descr.setText("");
+        while(table.getChildCount() > 2) {
+            table.removeViewAt(2);
+        }
+        for( int i = 0; i < 2; i++ ) {
+            TableRow tr = (TableRow) table.getChildAt(i);
+            if ( tr == null) break;
+
+            ((TextView)tr.getChildAt(0)).setText("");
+            ((TextView)tr.getChildAt(1)).setText("");
+        }
+
+        text_descr.requestFocus();
+    }
 }
