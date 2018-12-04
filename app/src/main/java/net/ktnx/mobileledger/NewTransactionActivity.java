@@ -43,6 +43,8 @@ import java.util.Objects;
  * TODO: app icon
  * TODO: nicer swiping removal with visual feedback
  * TODO: activity with current balance
+ * TODO: setup wizard
+ * TODO: update accounts/check settings upon change of backend settings
  *  */
 
 public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
