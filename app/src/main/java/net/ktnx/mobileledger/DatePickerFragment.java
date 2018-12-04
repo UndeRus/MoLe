@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DatePickerFragment extends AppCompatDialogFragment
-implements DatePickerDialog.OnDateSetListener
+implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
 {
     @NonNull
     @Override
@@ -46,7 +46,15 @@ implements DatePickerDialog.OnDateSetListener
             }
         }
 
-        return new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
+        DatePickerDialog dpd =  new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
+
+        // quicker date selection available in API 26
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            DatePicker dp = dpd.getDatePicker();
+            dp.setOnDateChangedListener(this);
+        }
+
+        return dpd;
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -60,5 +68,20 @@ implements DatePickerDialog.OnDateSetListener
         else {
             date.setText(String.format(Locale.US, "%d/%d", month+1, day));
         }
+    }
+
+    @Override
+    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+        TextView date = Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
+
+        final Calendar c = GregorianCalendar.getInstance();
+        if ( c.get(GregorianCalendar.YEAR) == year && c.get(GregorianCalendar.MONTH) == monthOfYear) {
+            date.setText(String.format(Locale.US, "%d", dayOfMonth));
+        }
+        else {
+            date.setText(String.format(Locale.US, "%d/%d", monthOfYear+1, dayOfMonth));
+        }
+
+        this.dismiss();
     }
 }
