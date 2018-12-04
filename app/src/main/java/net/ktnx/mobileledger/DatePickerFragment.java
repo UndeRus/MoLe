@@ -27,7 +27,7 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
         int year = c.get(GregorianCalendar.YEAR);
         int month = c.get(GregorianCalendar.MONTH);
         int day = c.get(GregorianCalendar.DAY_OF_MONTH);
-        TextView date = getActivity().findViewById(R.id.new_transaction_date);
+        TextView date = Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
         CharSequence present = date.getText();
 
@@ -59,7 +59,7 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
 
     @TargetApi(Build.VERSION_CODES.O)
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        TextView date = getActivity().findViewById(R.id.new_transaction_date);
+        TextView date = Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
         final Calendar c = GregorianCalendar.getInstance();
         if ( c.get(GregorianCalendar.YEAR) == year && c.get(GregorianCalendar.MONTH) == month) {
