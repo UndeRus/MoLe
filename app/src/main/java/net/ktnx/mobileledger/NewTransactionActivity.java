@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -50,6 +51,7 @@ import java.util.Objects;
 public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
     private TableLayout table;
     private FloatingActionButton fab;
+    private ProgressBar progress;
     private TextView text_date;
     private TextView text_descr;
     private static SaveTransactionTask saver;
@@ -75,6 +77,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 new_transaction_save_clicked(view);
             }
         });
+        progress = findViewById(R.id.save_transaction_progress);
+
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
@@ -86,6 +90,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
     public void new_transaction_save_clicked(View view) {
         fab.setEnabled(false);
+        progress.setVisibility(View.VISIBLE);
 
         saver = new SaveTransactionTask(this);
 
@@ -218,6 +223,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     @Override
     public void done() {
         fab.setEnabled(true);
+        progress.setVisibility(View.INVISIBLE);
         reset_form();
     }
 
