@@ -6,6 +6,7 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.FontsContract;
 import android.support.design.widget.FloatingActionButton;
@@ -223,8 +224,17 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     @Override
     public void done() {
         fab.setEnabled(true);
+
+        fab.setImageResource(R.drawable.ic_thick_check_white);
         progress.setVisibility(View.INVISIBLE);
         reset_form();
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fab.setImageResource(R.drawable.ic_save_white_24dp);
+            }
+        }, 1500);
     }
 
     private void reset_form() {
