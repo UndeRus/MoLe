@@ -1,5 +1,7 @@
 package net.ktnx.mobileledger;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -225,16 +227,26 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     public void done() {
         fab.setEnabled(true);
 
-        fab.setImageResource(R.drawable.ic_thick_check_white);
-        progress.setVisibility(View.INVISIBLE);
-        reset_form();
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.new_trans_animation);
+        set.setTarget(fab);
+        set.start();
+        final Handler at_fade_out = new Handler();
+        at_fade_out.postDelayed(new Runnable() {
             @Override
             public void run() {
-                fab.setImageResource(R.drawable.ic_save_white_24dp);
+                fab.setImageResource(R.drawable.ic_thick_check_white);
+
+                final Handler at_fade_in = new Handler();
+                at_fade_in.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        fab.setImageResource(R.drawable.ic_save_white_24dp);
+                    }
+                }, 1000);
             }
-        }, 1500);
+        }, 500);
+        progress.setVisibility(View.INVISIBLE);
+        reset_form();
     }
 
     private void reset_form() {
