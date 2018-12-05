@@ -41,7 +41,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:foregroundTint="@android:color/white"
             android:padding="@dimen/fab_margin"
             android:tint="@android:color/white"
             app:backgroundTint="@color/colorPrimary"
@@ -49,7 +48,7 @@
             app:layout_constraintEnd_toEndOf="@id/save_transaction_progress"
             app:layout_constraintStart_toStartOf="@id/save_transaction_progress"
             app:layout_constraintTop_toTopOf="@id/save_transaction_progress"
-            app:srcCompat="@android:drawable/ic_menu_save" />
+            app:srcCompat="@drawable/ic_save_white_24dp" />
 
     </android.support.constraint.ConstraintLayout>
 
