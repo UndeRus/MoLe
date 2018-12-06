@@ -111,7 +111,7 @@ public class LatestTransactions extends AppCompatActivity {
     private void update_accounts() {
         prepare_db();
 
-        Activity activity = this;
+        Resources rm = getResources();
 
         ProgressBar pb = findViewById(R.id.progressBar);
         TextView pt = findViewById(R.id.textProgress);
@@ -131,7 +131,7 @@ public class LatestTransactions extends AppCompatActivity {
                 pb.setVisibility(GONE);
                 pt.setVisibility(GONE);
                 if (this.error != 0)
-                    Snackbar.make(drawer, activity.getResources().getString(this.error), Snackbar.LENGTH_LONG );
+                    Snackbar.make(drawer, rm.getString(this.error), Snackbar.LENGTH_LONG );
             }
         };
 
