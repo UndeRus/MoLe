@@ -40,15 +40,19 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                 }
                 else {
                     db.beginTransaction();
+                    db.execSQL("delete from account_values;");
                     db.execSQL("delete from accounts;");
 
                     try {
                         String line;
+                        String last_account_name = null;
                         BufferedReader buf = new BufferedReader(new InputStreamReader(resp, "UTF-8"));
                         // %3A is '='
                         Pattern re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
+                        Pattern value_re = Pattern.compile("<span class=\"[^\"]*\\bamount\\b[^\"]*\">([\\d.,]+)(?:\\s+(\\S+))?</span>");
                         int count = 0;
                         while ((line = buf.readLine()) != null) {
+
                             Matcher m = re.matcher(line);
                             while (m.find()) {
                                 String acct_encoded = m.group(1);
@@ -58,6 +62,21 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
 
                                 db.execSQL("insert into accounts(name) values(?)", new Object[]{acct_name} );
                                 publishProgress(++count);
+
+                                last_account_name = acct_name;
+                            }
+
+                            if (last_account_name == null) continue;
+
+                            m = value_re.matcher(line);
+                            while (m.find()) {
+                                String value = m.group(1);
+                                String currency = m.group(2);
+                                if(currency == null) currency="";
+                                value = value.replace(',', '.');
+                                Log.d("db", "curr="+currency+", value="+value);
+                                db.execSQL("insert into account_values(account, currency, value) values(?, ?, ?);",
+                                        new Object[]{last_account_name, currency, Float.valueOf(value)});
                             }
                         }
 
