@@ -263,7 +263,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
     }
 
-    public void addTransactionAccountFromMenu(MenuItem item) {
+    private void do_add_account_row(boolean focus) {
         final AutoCompleteTextView acc = new AutoCompleteTextView(this);
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 9f));
         acc.setHint(R.string.new_transaction_account_hint);
@@ -283,7 +283,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         row.addView(amt);
         table.addView(row);
 
-        acc.requestFocus();
+        if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
         hook_autocompletion_adapter(row);
@@ -291,11 +291,16 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         hook_text_change_listener(amt);
     }
 
+    public void addTransactionAccountFromMenu(MenuItem item) {
+        do_add_account_row(true);
+    }
+
     private void check_transaction_submittable() {
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         int accounts = 0;
         int accounts_with_values = 0;
-        for( int i = 0; i < table.getChildCount(); i++ ) {
+        int empty_rows = 0;
+        for(int i = 0; i < table.getChildCount(); i++ ) {
             TableRow row = (TableRow) table.getChildAt(i);
 
             TextView acc_name_v = (TextView) row.getChildAt(0);
@@ -309,15 +314,16 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 String amt = String.valueOf(amount_v.getText());
 
                 if (!amt.isEmpty()) accounts_with_values++;
-            }
-
-            if ((accounts >= 2) && (accounts_with_values >= (accounts - 1))) {
-                show_fab();
-                return;
-            }
+            } else empty_rows++;
         }
 
-        hide_fab();
+        if (accounts_with_values == accounts && empty_rows == 0) {
+            do_add_account_row(false);
+        }
+
+        if ((accounts >= 2) && (accounts_with_values >= (accounts - 1))) {
+            show_fab();
+        } else hide_fab();
     }
 
     @Override
