@@ -7,15 +7,15 @@ class MobileLedgerDB {
     private static String db_filename;
     static SQLiteDatabase db;
 
-    public static String getDb_filename() {
+    static String getDb_filename() {
         return db_filename;
     }
 
-    public static void setDb_filename(String db_filename) {
+    static void setDb_filename(String db_filename) {
         MobileLedgerDB.db_filename = db_filename;
     }
 
-    public static void initDB() {
+    static void initDB() {
         db = SQLiteDatabase.openOrCreateDatabase( db_filename, null );
 
         db.execSQL("create table if not exists accounts(name varchar);");
