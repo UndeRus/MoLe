@@ -1,7 +1,5 @@
 package net.ktnx.mobileledger;
 
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -16,7 +14,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -54,10 +54,50 @@ import java.util.Objects;
 public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
     private TableLayout table;
     private FloatingActionButton fab;
+    boolean fab_should_be_visible;
     private ProgressBar progress;
     private TextView text_date;
     private TextView text_descr;
     private static SaveTransactionTask saver;
+    FloatingActionButton.OnVisibilityChangedListener fab_visibility_changed_listener = new FloatingActionButton.OnVisibilityChangedListener() {
+        @Override
+        public void onShown(FloatingActionButton fab) {
+            Log.d("visuals", "FAB shown");
+            super.onShown(fab);
+            if (!fab_should_be_visible) fab.hide();
+        }
+
+        @Override
+        public void onHidden(FloatingActionButton fab) {
+            Log.d("visuals", "FAB hidden");
+            fab.setImageResource(R.drawable.ic_save_white_24dp);
+            fab.setEnabled(true);
+//            super.onHidden(fab);
+            if (fab_should_be_visible) fab.show();
+        }
+    };
+
+    private void hide_fab() {
+        hide_fab(false);
+    }
+
+    private void hide_fab(boolean force) {
+        if (!fab_should_be_visible && !force) return;
+
+        fab_should_be_visible = false;
+        fab.hide(fab_visibility_changed_listener);
+    }
+
+    private void show_fab() {
+        show_fab(false);
+    }
+
+    private void show_fab(boolean force) {
+        if (fab_should_be_visible && !force) return;
+
+        fab_should_be_visible = true;
+        fab.show(fab_visibility_changed_listener);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +125,13 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
-            hook_swipe_listener((TableRow)table.getChildAt(i));
-            hook_autocompletion_adapter((TableRow)table.getChildAt(i));
+            TableRow row = (TableRow) table.getChildAt(i);
+            TextView acc_name_view = (TextView) row.getChildAt(0);
+            TextView amount_view = (TextView) row.getChildAt(1);
+            hook_swipe_listener(row);
+            hook_autocompletion_adapter(row);
+            hook_text_change_listener(acc_name_view);
+            hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
         }
     }
@@ -135,6 +180,27 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 return gestureDetector.onTouchEvent(m);
             }
         });
+    }
+
+    private void hook_text_change_listener(final TextView view) {
+        view.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+//                Log.d("input", "text changed");
+                check_transaction_submittable();
+            }
+        });
+
     }
 
     @TargetApi(Build.VERSION_CODES.N)
@@ -221,31 +287,55 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         hook_swipe_listener(row);
         hook_autocompletion_adapter(row);
+        hook_text_change_listener(acc);
+        hook_text_change_listener(amt);
+    }
+
+    private void check_transaction_submittable() {
+        TableLayout table = findViewById(R.id.new_transaction_accounts_table);
+        int accounts = 0;
+        int accounts_with_values = 0;
+        for( int i = 0; i < table.getChildCount(); i++ ) {
+            TableRow row = (TableRow) table.getChildAt(i);
+
+            TextView acc_name_v = (TextView) row.getChildAt(0);
+
+            String acc_name = String.valueOf(acc_name_v.getText());
+            acc_name = acc_name.trim();
+            if (!acc_name.isEmpty()) {
+                accounts++;
+
+                TextView amount_v = (TextView) row.getChildAt(1);
+                String amt = String.valueOf(amount_v.getText());
+
+                if (!amt.isEmpty()) accounts_with_values++;
+            }
+
+            if ((accounts >= 2) && (accounts_with_values >= (accounts - 1))) {
+                show_fab();
+                return;
+            }
+        }
+
+        hide_fab();
     }
 
     @Override
     public void done() {
         fab.setImageResource(R.drawable.ic_check_white_24dp);
-        fab.setEnabled(true);
+        progress.setVisibility(View.INVISIBLE);
+        Log.d("visuals", "hiding progress");
 
-        AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.new_trans_animation);
-        set.setTarget(fab);
-        set.start();
-        final Handler at_fade_out = new Handler();
-        at_fade_out.postDelayed(new Runnable() {
+        fab_should_be_visible = false;
+        final Handler fade_out = new Handler();
+        fade_out.postDelayed(new Runnable() {
             @Override
             public void run() {
+                Log.d("visuals", "hiding FAB");
 
-                final Handler at_fade_in = new Handler();
-                at_fade_in.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        fab.setImageResource(R.drawable.ic_save_white_24dp);
-                    }
-                }, 1000);
+                hide_fab(true);
             }
-        }, 500);
-        progress.setVisibility(View.INVISIBLE);
+        }, 1000);
         reset_form();
     }
 
