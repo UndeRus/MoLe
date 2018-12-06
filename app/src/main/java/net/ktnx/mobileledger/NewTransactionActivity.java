@@ -225,6 +225,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
     @Override
     public void done() {
+        fab.setImageResource(R.drawable.ic_check_white_24dp);
         fab.setEnabled(true);
 
         AnimatorSet set = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.new_trans_animation);
@@ -234,7 +235,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         at_fade_out.postDelayed(new Runnable() {
             @Override
             public void run() {
-                fab.setImageResource(R.drawable.ic_thick_check_white);
 
                 final Handler at_fade_in = new Handler();
                 at_fade_in.postDelayed(new Runnable() {
