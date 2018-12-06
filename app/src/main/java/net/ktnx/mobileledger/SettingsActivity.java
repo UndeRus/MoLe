@@ -42,7 +42,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
         String stringValue = value.toString();
 
-        LatestTransactions.preferences_changed();
+        AccountSummary.preferences_changed();
 
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in

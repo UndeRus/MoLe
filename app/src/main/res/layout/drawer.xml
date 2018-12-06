@@ -27,9 +27,15 @@
                 android:paddingEnd="16dp">
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/nav_account_summary"
                     style="@style/nav_button"
                     android:drawableStart="@drawable/ic_home_black_24dp"
+                    android:text="@string/account_summary_title" />
+
+                <TextView
+                    android:id="@+id/nav_latest_transactions"
+                    style="@style/nav_button"
+                    android:drawableStart="@drawable/ic_event_note_black_24dp"
                     android:text="@string/nav_latest_transactions_title" />
 
                 <TextView
@@ -37,6 +43,7 @@
                     style="@style/nav_button"
                     android:drawableStart="@drawable/ic_assignment_black_24dp"
                     android:text="@string/nav_reports_title" />
+
             </LinearLayout>
 
         </LinearLayout>

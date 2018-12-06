@@ -25,7 +25,7 @@ import static android.view.View.GONE;
 import static net.ktnx.mobileledger.MobileLedgerDB.db;
 import static net.ktnx.mobileledger.MobileLedgerDB.set_option_value;
 
-public class LatestTransactions extends AppCompatActivity {
+public class AccountSummary extends AppCompatActivity {
     DrawerLayout drawer;
 
     private static long account_list_last_updated;
