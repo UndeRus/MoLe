@@ -16,7 +16,7 @@ class MobileLedgerDB {
     }
 
     static void initDB() {
-        db = SQLiteDatabase.openOrCreateDatabase( db_filename, null );
+        db = SQLiteDatabase.openOrCreateDatabase(db_filename, null);
 
         db.execSQL("create table if not exists accounts(name varchar);");
         db.execSQL("create index if not exists idx_accounts_name on accounts(name);");
