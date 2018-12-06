@@ -138,6 +138,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
     public void new_transaction_save_clicked(View view) {
         fab.setEnabled(false);
+        toggle_all_editing(false);
         progress.setVisibility(View.VISIBLE);
 
         saver = new SaveTransactionTask(this);
@@ -159,6 +160,17 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
         saver.execute(tr);
     }
+
+    private void toggle_all_editing(boolean enabled) {
+        TableLayout table = findViewById(R.id.new_transaction_accounts_table);
+        for (int i = 0; i < table.getChildCount(); i++) {
+            TableRow row = (TableRow) table.getChildAt(i);
+            for (int j = 0; j < row.getChildCount(); j++) {
+                row.getChildAt(j).setEnabled(enabled);
+            }
+        }
+    }
+
     private void hook_swipe_listener(final TableRow row) {
         row.getChildAt(0).setOnTouchListener(new OnSwipeTouchListener(this) {
             public void onSwipeLeft() {
@@ -343,6 +355,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             }
         }, 1000);
         reset_form();
+        toggle_all_editing(true);
     }
 
     private void reset_form() {
