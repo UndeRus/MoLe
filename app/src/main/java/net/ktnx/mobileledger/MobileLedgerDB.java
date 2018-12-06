@@ -1,7 +1,13 @@
 package net.ktnx.mobileledger;
 
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 class MobileLedgerDB {
     static final String DATABASE_NAME = "accounts";
@@ -23,6 +29,35 @@ class MobileLedgerDB {
         db.execSQL("create index if not exists idx_accounts_name on accounts(name);");
         db.execSQL("create table if not exists options(name varchar, value varchar);");
         db.execSQL("create unique index if not exists idx_options_name on options(name);");
+    }
+
+    static void applyRevisions(Resources rm) {
+        int next_ver = Integer.parseInt(get_option_value("db_version", "0")) + 1;
+
+        while (applyRevision(rm, next_ver)) {
+            next_ver++;
+        }
+    }
+    private static boolean applyRevision(Resources rm, int next_ver) {
+        try (InputStream res = rm.openRawResource(next_ver)) {
+            Log.d("db", "Applying revision " + String.valueOf(next_ver));
+            InputStreamReader isr = new InputStreamReader(res);
+            BufferedReader reader = new BufferedReader(isr);
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                db.execSQL(line);
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            return false;
+        }
+        finally {
+            db.endTransaction();
+        }
+
+        return true;
     }
 
     static int get_option_value(String name, int default_value) {
