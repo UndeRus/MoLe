@@ -127,7 +127,7 @@ class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
             while (! send_ok() ) {
                 try {
                     tried++;
-                    if (tried >= 3)
+                    if (tried >= 2)
                         throw new IOException(String.format("aborting after %d tries", tried));
                     sleep(100);
                 } catch (InterruptedException e) {
