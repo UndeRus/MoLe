@@ -6,10 +6,8 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.FontsContract;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -53,51 +51,11 @@ import java.util.Objects;
 
 public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
     private TableLayout table;
-    private FloatingActionButton fab;
-    boolean fab_should_be_visible;
     private ProgressBar progress;
     private TextView text_date;
     private TextView text_descr;
     private static SaveTransactionTask saver;
-    FloatingActionButton.OnVisibilityChangedListener fab_visibility_changed_listener = new FloatingActionButton.OnVisibilityChangedListener() {
-        @Override
-        public void onShown(FloatingActionButton fab) {
-            Log.d("visuals", "FAB shown");
-            super.onShown(fab);
-            if (!fab_should_be_visible) fab.hide();
-        }
-
-        @Override
-        public void onHidden(FloatingActionButton fab) {
-            Log.d("visuals", "FAB hidden");
-            fab.setImageResource(R.drawable.ic_save_white_24dp);
-            fab.setEnabled(true);
-//            super.onHidden(fab);
-            if (fab_should_be_visible) fab.show();
-        }
-    };
-
-    private void hide_fab() {
-        hide_fab(false);
-    }
-
-    private void hide_fab(boolean force) {
-        if (!fab_should_be_visible && !force) return;
-
-        fab_should_be_visible = false;
-        fab.hide(fab_visibility_changed_listener);
-    }
-
-    private void show_fab() {
-        show_fab(false);
-    }
-
-    private void show_fab(boolean force) {
-        if (fab_should_be_visible && !force) return;
-
-        fab_should_be_visible = true;
-        fab.show(fab_visibility_changed_listener);
-    }
+    private MenuItem mSave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,13 +71,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             text_descr.setAutofillHints("");
         }
 
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new_transaction_save_clicked(view);
-            }
-        });
         progress = findViewById(R.id.save_transaction_progress);
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -136,8 +87,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
     }
 
-    public void new_transaction_save_clicked(View view) {
-        fab.setEnabled(false);
+    public void save_transaction() {
+        mSave.setVisible(false);
         toggle_all_editing(false);
         progress.setVisibility(View.VISIBLE);
 
@@ -262,6 +213,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
+        mSave = menu.findItem(R.id.action_submit_transaction);
+        assert mSave != null;
 
         return true;
     }
@@ -307,6 +260,10 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         do_add_account_row(true);
     }
 
+    public void saveTransactionFromMenu(MenuItem item) {
+        save_transaction();
+    }
+
     private void check_transaction_submittable() {
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         int accounts = 0;
@@ -334,26 +291,17 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
 
         if ((accounts >= 2) && (accounts_with_values >= (accounts - 1))) {
-            show_fab();
-        } else hide_fab();
+            mSave.setVisible(true);
+        } else {
+            mSave.setVisible(false);
+        }
     }
 
     @Override
     public void done() {
-        fab.setImageResource(R.drawable.ic_check_white_24dp);
         progress.setVisibility(View.INVISIBLE);
         Log.d("visuals", "hiding progress");
 
-        fab_should_be_visible = false;
-        final Handler fade_out = new Handler();
-        fade_out.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Log.d("visuals", "hiding FAB");
-
-                hide_fab(true);
-            }
-        }, 1000);
         reset_form();
         toggle_all_editing(true);
     }

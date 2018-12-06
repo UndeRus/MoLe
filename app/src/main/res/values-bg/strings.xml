@@ -23,4 +23,5 @@
     <string name="progress_connecting">Свързване…</string>
     <string name="new_transaction_description_hint">Описание</string>
     <string name="progress_N_accounts_loaded">Заредени са %d сметки</string>
+    <string name="action_submit_transaction_title">Запазване</string>
 </resources>
