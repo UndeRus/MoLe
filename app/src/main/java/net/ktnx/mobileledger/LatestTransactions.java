@@ -1,8 +1,9 @@
 package net.ktnx.mobileledger;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
@@ -22,11 +23,12 @@ import java.util.Date;
 
 import static android.view.View.GONE;
 import static net.ktnx.mobileledger.MobileLedgerDB.db;
+import static net.ktnx.mobileledger.MobileLedgerDB.set_option_value;
 
 public class LatestTransactions extends AppCompatActivity {
     DrawerLayout drawer;
 
-    private static Date account_list_last_updated;
+    private static long account_list_last_updated;
     private static boolean account_list_needs_update = true;
     public static void preferences_changed() {
         account_list_needs_update = true;
@@ -54,7 +56,8 @@ public class LatestTransactions extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        update_accounts();
+        prepare_db();
+        update_accounts(false);
     }
 
     public void fab_new_transaction_clicked(View view) {
@@ -105,16 +108,33 @@ public class LatestTransactions extends AppCompatActivity {
     }
 
     private void prepare_db() {
-        MobileLedgerDB.setDb_filename(this.getApplicationInfo().deviceProtectedDataDir + "/" + MobileLedgerDB.DATABASE_NAME);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            MobileLedgerDB.setDb_filename(this.getApplicationInfo().deviceProtectedDataDir + "/" + MobileLedgerDB.DATABASE_NAME);
+        }
+        else {
+            MobileLedgerDB.setDb_filename(MobileLedgerDB.DATABASE_NAME);
+        }
         MobileLedgerDB.initDB();
-    }
-    private void update_accounts() {
-        prepare_db();
 
+        account_list_last_updated = MobileLedgerDB.get_option_value("last_refresh", (long) 0);
+
+    }
+
+    private void update_accounts(boolean force) {
+        long now = new Date().getTime();
+        if ((now > (account_list_last_updated + (24 * 3600*1000))) || force) {
+            Log.d("db", "accounts last updated at " + account_list_last_updated+" and now is " + now+". re-fetching");
+            update_accounts();
+        }
+    }
+
+    private void update_accounts() {
         Resources rm = getResources();
 
         ProgressBar pb = findViewById(R.id.progressBar);
+        pb.setVisibility(View.VISIBLE);
         TextView pt = findViewById(R.id.textProgress);
+        pt.setVisibility(View.VISIBLE);
         pb.setIndeterminate(true);
 
         RetrieveAccountsTask task = new RetrieveAccountsTask() {
@@ -132,6 +152,8 @@ public class LatestTransactions extends AppCompatActivity {
                 pt.setVisibility(GONE);
                 if (this.error != 0)
                     Snackbar.make(drawer, rm.getString(this.error), Snackbar.LENGTH_LONG );
+                else
+                    set_option_value("last_refresh", new Date().getTime() );
             }
         };
 
