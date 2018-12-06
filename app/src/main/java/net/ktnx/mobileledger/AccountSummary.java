@@ -33,6 +33,7 @@ public class AccountSummary extends AppCompatActivity {
     public static void preferences_changed() {
         account_list_needs_update = true;
     }
+    MenuItem mRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +89,9 @@ public class AccountSummary extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.latest_transactions, menu);
+        getMenuInflater().inflate(R.menu.account_summary, menu);
+        mRefresh = (MenuItem) menu.findItem(R.id.menu_acc_summary_refresh);
+        assert mRefresh != null;
         return true;
     }
 
@@ -105,6 +108,10 @@ public class AccountSummary extends AppCompatActivity {
         // }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onRefreshAccountSummaryClicked(MenuItem mi) {
+        update_accounts(true);
     }
 
     private void prepare_db() {
@@ -129,6 +136,7 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     private void update_accounts() {
+        mRefresh.setVisible(false);
         Resources rm = getResources();
 
         ProgressBar pb = findViewById(R.id.progressBar);
@@ -150,6 +158,7 @@ public class AccountSummary extends AppCompatActivity {
             protected void onPostExecute(Void result) {
                 pb.setVisibility(GONE);
                 pt.setVisibility(GONE);
+                mRefresh.setVisible(true);
                 if (this.error != 0)
                     Snackbar.make(drawer, rm.getString(this.error), Snackbar.LENGTH_LONG );
                 else

@@ -69,4 +69,5 @@
     <string name="new_transaction_description_hint">Description</string>
     <string name="action_submit_transaction_title">Save</string>
     <string name="account_summary_title">Account Summary</string>
+    <string name="menu_acc_summary_refresh_title">Refresh</string>
 </resources>
