@@ -20,5 +20,7 @@ class MobileLedgerDB {
 
         db.execSQL("create table if not exists accounts(name varchar);");
         db.execSQL("create index if not exists idx_accounts_name on accounts(name);");
+        db.execSQL("create table if not exists options(name varchar, value varchar);");
+        db.execSQL("create unique index if not exists idx_options_name on options(name);");
     }
 }
