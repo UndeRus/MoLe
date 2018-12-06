@@ -51,6 +51,7 @@ public class LatestTransactions extends AppCompatActivity {
             PackageInfo pi = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             ver.setText(pi.versionName);
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
         update_accounts();
