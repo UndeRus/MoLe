@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mobile Ledger</string>
+    <string name="nav_exit_title">Изход</string>
+    <string name="title_activity_settings">Настройки</string>
+    <string name="pref_header_backend">Сървър</string>
+    <string name="pref_title_use_http_auth">Удостоверяване</string>
+    <string name="pref_description_use_http_auth_on">Използване на удостоверяване при свързване със сървъра</string>
+    <string name="pref_description_use_http_auth_off">Без използване на удостоверяване при свързване със сървъра</string>
+    <string name="pref_title_backend_url">Адрес на сървъра</string>
+    <string name="nav_reports_title">Справки</string>
+    <string name="nav_latest_transactions_title">Последни движения</string>
+    <string name="action_settings">Настройки</string>
+    <string name="pref_title_backend_auth_user">Потребител</string>
+    <string name="pref_title_backend_auth_password">Парола</string>
+    <string name="title_activity_new_transaction">Нова трансакция</string>
+    <string name="new_transaction_account_hint">Сметка</string>
+    <string name="new_transaction_date_hint">дата</string>
+    <string name="menu_add_account">Добавяне на сметка</string>
+    <string name="msg_at_least_two_accounts_are_required">Задължително е използването на поне две сметки</string>
+    <string name="err_net_io_error">Мрежова грешка</string>
+    <string name="err_bad_backend_url">Неправилен адрес на сървър</string>
+    <string name="progress_connecting">Свързване…</string>
+    <string name="new_transaction_description_hint">Описание</string>
+    <string name="progress_N_accounts_loaded">Заредени са %d сметки</string>
+</resources>
