@@ -39,6 +39,8 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                     throw new IOException(String.valueOf(R.string.err_http_error));
                 }
                 else {
+                    if (db.inTransaction()) throw new AssertionError();
+
                     db.beginTransaction();
 
                     try {
