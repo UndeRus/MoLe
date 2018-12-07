@@ -29,6 +29,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.view.View.GONE;
 import static net.ktnx.mobileledger.MobileLedgerDB.db;
@@ -192,10 +194,27 @@ public class AccountSummary extends AppCompatActivity {
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
     }
 
+    Pattern higher_account = Pattern.compile("^[^:]+:");
+
+    private String strip_higher_accounts(String acc_name, int[] count) {
+        count[0] = 0;
+        while (true) {
+            Matcher m = higher_account.matcher(acc_name);
+            if (m.find()) {
+                count[0]++;
+                acc_name = m.replaceFirst("");
+            }
+            else break;
+        }
+
+        return acc_name;
+    }
+
     @SuppressLint("DefaultLocale")
     private void update_account_table() {
         LinearLayout root = findViewById(R.id.account_root);
         root.removeAllViewsInLayout();
+
 
         try (Cursor cursor = db.rawQuery("SELECT name FROM accounts ORDER BY name;", null)) {
             boolean even = false;
@@ -206,14 +225,17 @@ public class AccountSummary extends AppCompatActivity {
                 TableRow r = new TableRow(this);
                 r.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 r.setGravity(Gravity.CENTER_VERTICAL);
-                r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
+                r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(2), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
                 if (even)
                     r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
                 even = !even;
 
                 TextView acc_tv = new TextView(this, null, R.style.account_summary_account_name);
                 acc_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 9f));
-                acc_tv.setText(acc_name);
+                int[] indent_level = new int[]{0};
+                String short_acc_name = strip_higher_accounts(acc_name, indent_level);
+                acc_tv.setPadding(indent_level[0] * getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2, 0, 0, 0);
+                acc_tv.setText(short_acc_name);
                 r.addView(acc_tv);
 
                 TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
