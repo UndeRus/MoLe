@@ -22,7 +22,6 @@ import android.widget.TextView;
 import java.util.Date;
 
 import static android.view.View.GONE;
-import static net.ktnx.mobileledger.MobileLedgerDB.db;
 import static net.ktnx.mobileledger.MobileLedgerDB.set_option_value;
 
 public class AccountSummary extends AppCompatActivity {
@@ -171,7 +170,7 @@ public class AccountSummary extends AppCompatActivity {
         };
 
         task.setPref(PreferenceManager.getDefaultSharedPreferences(this));
-        task.execute(db);
+        task.execute();
 
     }
 }

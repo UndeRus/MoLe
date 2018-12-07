@@ -1,7 +1,6 @@
 package net.ktnx.mobileledger;
 
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -14,7 +13,9 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDatabase, Integer, Void> {
+import static net.ktnx.mobileledger.MobileLedgerDB.db;
+
+abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
     int error;
 
     private SharedPreferences pref;
@@ -25,8 +26,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
         error = 0;
     }
 
-    protected Void doInBackground(SQLiteDatabase... sqLiteDatabases) {
-        final SQLiteDatabase db = sqLiteDatabases[0];
+    protected Void doInBackground(Void... params) {
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection( pref, "add");
             http.setAllowUserInteraction(false);
