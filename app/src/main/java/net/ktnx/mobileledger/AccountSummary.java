@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -204,6 +205,7 @@ public class AccountSummary extends AppCompatActivity {
                 TableLayout t = new TableLayout(this);
                 TableRow r = new TableRow(this);
                 r.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
                 if (even)
                     r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
@@ -217,6 +219,7 @@ public class AccountSummary extends AppCompatActivity {
                 TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
                 amt_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
                 amt_tv.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
+                amt_tv.setGravity(Gravity.CENTER);
                 amt_tv.setMinWidth(dp2px(40f));
                 StringBuilder amt_text = new StringBuilder();
                 try (Cursor cAmounts = db.rawQuery("SELECT currency, value FROM account_values WHERE account = ?", new String[]{acc_name})) {

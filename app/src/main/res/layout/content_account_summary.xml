@@ -52,6 +52,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/table_row_even_bg"
+                    android:gravity="center"
                     android:paddingStart="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin">
 
@@ -63,7 +64,7 @@
                     <TextView
                         android:id="@+id/textView2"
                         style="@style/account_summary_amounts"
-                        android:text="123.45" />
+                        android:text="123,45\n678,90" />
                 </TableRow>
 
             </TableLayout>
