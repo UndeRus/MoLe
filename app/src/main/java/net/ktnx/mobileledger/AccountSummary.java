@@ -123,6 +123,8 @@ public class AccountSummary extends AppCompatActivity {
         }
         MobileLedgerDB.initDB();
 
+        MobileLedgerDB.applyRevisions(getResources(), getPackageName());
+
         account_list_last_updated = MobileLedgerDB.get_option_value("last_refresh", (long) 0);
 
     }
