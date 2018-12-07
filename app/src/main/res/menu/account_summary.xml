@@ -10,5 +10,9 @@
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_acc_summary_show_hidden"
-        android:title="@string/menu_acc_summary_show_hidden_accounts_title" />
+        android:checkable="true"
+        android:checked="false"
+        android:title="@string/menu_acc_summary_show_hidden_accounts_title"
+        app:actionLayout="@layout/switch_item"
+        app:showAsAction="never" />
 </menu>
