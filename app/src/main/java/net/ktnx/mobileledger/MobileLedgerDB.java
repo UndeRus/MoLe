@@ -2,15 +2,18 @@ package net.ktnx.mobileledger;
 
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 
 class MobileLedgerDB {
     static final String DATABASE_NAME = "accounts";
+    static final String OPT_DB_REVISION = "db_revision";
     private static String db_filename;
     static SQLiteDatabase db;
 
@@ -34,16 +37,28 @@ class MobileLedgerDB {
         db.execSQL("create unique index if not exists un_account_values on account_values(account,currency);");
     }
 
-    static void applyRevisions(Resources rm) {
-        int next_ver = Integer.parseInt(get_option_value("db_version", "0")) + 1;
+    static void applyRevisions(Resources rm, String pkg_name) {
+        int cur_ver = Integer.parseInt(get_option_value(OPT_DB_REVISION, "0"));
 
-        while (applyRevision(rm, next_ver)) {
-            next_ver++;
+        Log.d("db", "Current DB revision is "+String.valueOf(cur_ver));
+
+        while (applyRevision(rm, pkg_name, cur_ver+1)) {
+            cur_ver++;
         }
+
+        Log.d("db", "Database revision is "+String.valueOf(cur_ver)+" now");
     }
-    private static boolean applyRevision(Resources rm, int next_ver) {
-        try (InputStream res = rm.openRawResource(next_ver)) {
-            Log.d("db", "Applying revision " + String.valueOf(next_ver));
+    private static boolean applyRevision(Resources rm, String pkg_name, int rev_no) {
+        String rev_file = String.format(Locale.US, "sql_%d", rev_no);
+
+        db.beginTransaction();
+        int res_id = rm.getIdentifier(rev_file, "raw", pkg_name);
+        if (res_id == 0) {
+            Log.d("db", String.format(Locale.US, "No resource for revision %d", rev_no));
+            return false;
+        }
+        try (InputStream res = rm.openRawResource(res_id)) {
+            Log.d("db", "Applying revision " + String.valueOf(rev_no));
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 
@@ -52,8 +67,18 @@ class MobileLedgerDB {
                 db.execSQL(line);
             }
 
+            set_option_value(OPT_DB_REVISION, rev_no);
             db.setTransactionSuccessful();
-        } catch (Exception e) {
+        } catch (Resources.NotFoundException e) {
+            Log.d("db", "SQL revision "+String.valueOf(rev_no)+" not found");
+            return false;
+        }
+        catch (SQLException e) {
+            Log.e("db", String.format(Locale.US, "Error applying revision %d: %s", rev_no, e.getMessage()));
+            return false;
+        }
+        catch (Exception e) {
+            Log.w("db", "Error reading revision" + String.valueOf(rev_no)+": "+e.getMessage());
             return false;
         }
         finally {
