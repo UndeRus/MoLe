@@ -161,9 +161,11 @@ public class AccountSummary extends AppCompatActivity {
                 pb.setVisibility(GONE);
                 pt.setVisibility(GONE);
                 mRefresh.setVisible(true);
-                if (this.error != 0)
-                    Snackbar.make(drawer, rm.getString(this.error), Snackbar.LENGTH_LONG );
-                else
+                if (this.error != 0) {
+                    String err_text = rm.getString(this.error);
+                    Log.d("visual", String.format("showing snackbar: %s", err_text));
+                    Snackbar.make(drawer, err_text, Snackbar.LENGTH_LONG ).show();
+                } else
                     set_option_value("last_refresh", new Date().getTime() );
             }
         };
