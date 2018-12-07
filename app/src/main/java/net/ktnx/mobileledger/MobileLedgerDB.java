@@ -51,12 +51,12 @@ class MobileLedgerDB {
     private static boolean applyRevision(Resources rm, String pkg_name, int rev_no) {
         String rev_file = String.format(Locale.US, "sql_%d", rev_no);
 
-        db.beginTransaction();
         int res_id = rm.getIdentifier(rev_file, "raw", pkg_name);
         if (res_id == 0) {
             Log.d("db", String.format(Locale.US, "No resource for revision %d", rev_no));
             return false;
         }
+        db.beginTransaction();
         try (InputStream res = rm.openRawResource(res_id)) {
             Log.d("db", "Applying revision " + String.valueOf(rev_no));
             InputStreamReader isr = new InputStreamReader(res);
