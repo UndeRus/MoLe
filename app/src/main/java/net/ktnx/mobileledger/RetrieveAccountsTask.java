@@ -64,7 +64,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                                 acct_name = acct_name.replace("\"", "");
                                 Log.d("account-parser", acct_name);
 
-                                db.execSQL("insert into accounts(name) values(?)", new Object[]{acct_name} );
+                                db.execSQL("insert or replace into accounts(name, keep) values(?, 1)", new Object[]{acct_name} );
                                 publishProgress(++count);
 
                                 last_account_name = acct_name;
@@ -87,11 +87,13 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                                 if(currency == null) currency="";
                                 value = value.replace(',', '.');
                                 Log.d("db", "curr="+currency+", value="+value);
-                                db.execSQL("insert into account_values(account, currency, value) values(?, ?, ?);",
+                                db.execSQL("insert or replace into account_values(account, currency, value, keep) values(?, ?, ?, 1);",
                                         new Object[]{last_account_name, currency, Float.valueOf(value)});
                             }
                         }
 
+                        db.execSQL("delete from account_values where keep=0;");
+                        db.execSQL("delete from accounts where keep=0;");
                         db.setTransactionSuccessful();
                     }
                     finally {
