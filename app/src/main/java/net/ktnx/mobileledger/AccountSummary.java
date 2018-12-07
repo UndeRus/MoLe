@@ -66,6 +66,7 @@ public class AccountSummary extends AppCompatActivity {
         }
 
         prepare_db();
+        update_account_table();
         update_accounts(false);
     }
 
