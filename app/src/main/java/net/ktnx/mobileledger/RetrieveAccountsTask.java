@@ -49,12 +49,13 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                         BufferedReader buf = new BufferedReader(new InputStreamReader(resp, "UTF-8"));
                         // %3A is '='
                         Pattern re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
-                        Pattern value_re = Pattern.compile("<span class=\"[^\"]*\\bamount\\b[^\"]*\">([\\d.,]+)(?:\\s+(\\S+))?</span>");
+                        Pattern value_re = Pattern.compile("<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
+                        Pattern tr_re = Pattern.compile("</tr>");
                         int count = 0;
                         while ((line = buf.readLine()) != null) {
 
                             Matcher m = re.matcher(line);
-                            while (m.find()) {
+                            if (m.find()) {
                                 String acct_encoded = m.group(1);
                                 String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
                                 acct_name = acct_name.replace("\"", "");
@@ -64,6 +65,14 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                                 publishProgress(++count);
 
                                 last_account_name = acct_name;
+
+                                continue;
+                            }
+
+                            Matcher tr_m = tr_re.matcher(line);
+                            if (tr_m.find()) {
+                                last_account_name = null;
+                                continue;
                             }
 
                             if (last_account_name == null) continue;
