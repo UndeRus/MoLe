@@ -204,6 +204,7 @@ public class AccountSummary extends AppCompatActivity {
                 TableLayout t = new TableLayout(this);
                 TableRow r = new TableRow(this);
                 r.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
                 if (even)
                     r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
                 even = !even;
