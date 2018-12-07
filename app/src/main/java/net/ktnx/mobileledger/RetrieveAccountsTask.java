@@ -40,10 +40,11 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<SQLiteDa
                 }
                 else {
                     db.beginTransaction();
-                    db.execSQL("delete from account_values;");
-                    db.execSQL("delete from accounts;");
 
                     try {
+                        db.execSQL("update account_values set keep=0;");
+                        db.execSQL("update accounts set keep=0;");
+
                         String line;
                         String last_account_name = null;
                         BufferedReader buf = new BufferedReader(new InputStreamReader(resp, "UTF-8"));
