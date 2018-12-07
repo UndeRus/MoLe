@@ -1,8 +1,10 @@
 package net.ktnx.mobileledger;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,15 +15,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.Date;
 
 import static android.view.View.GONE;
+import static net.ktnx.mobileledger.MobileLedgerDB.db;
 import static net.ktnx.mobileledger.MobileLedgerDB.set_option_value;
 
 public class AccountSummary extends AppCompatActivity {
@@ -89,7 +98,7 @@ public class AccountSummary extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.account_summary, menu);
-        mRefresh = (MenuItem) menu.findItem(R.id.menu_acc_summary_refresh);
+        mRefresh = menu.findItem(R.id.menu_acc_summary_refresh);
         assert mRefresh != null;
         return true;
     }
@@ -164,13 +173,66 @@ public class AccountSummary extends AppCompatActivity {
                     String err_text = rm.getString(this.error);
                     Log.d("visual", String.format("showing snackbar: %s", err_text));
                     Snackbar.make(drawer, err_text, Snackbar.LENGTH_LONG ).show();
-                } else
+                }
+                else {
                     set_option_value("last_refresh", new Date().getTime() );
+                    update_account_table();
+                }
             }
         };
 
         task.setPref(PreferenceManager.getDefaultSharedPreferences(this));
         task.execute();
 
+    }
+
+    public int dp2px(float dp) {
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void update_account_table() {
+        LinearLayout root = findViewById(R.id.account_root);
+        root.removeAllViewsInLayout();
+
+        try (Cursor cursor = db.rawQuery("SELECT name FROM accounts ORDER BY name;", null)) {
+            boolean even = false;
+            while (cursor.moveToNext()) {
+                String acc_name = cursor.getString(0);
+
+                TableLayout t = new TableLayout(this);
+                TableRow r = new TableRow(this);
+                r.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                if (even)
+                    r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
+                even = !even;
+
+                TextView acc_tv = new TextView(this, null, R.style.account_summary_account_name);
+                acc_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 9f));
+                acc_tv.setText(acc_name);
+                r.addView(acc_tv);
+
+                TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
+                amt_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+                amt_tv.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
+                amt_tv.setMinWidth(dp2px(40f));
+                StringBuilder amt_text = new StringBuilder();
+                try (Cursor cAmounts = db.rawQuery("SELECT currency, value FROM account_values WHERE account = ?", new String[]{acc_name})) {
+                    while (cAmounts.moveToNext()) {
+                        String curr = cAmounts.getString(0);
+                        Float amt = cAmounts.getFloat(1);
+                        if (amt_text.length() != 0) amt_text.append('\n');
+                        amt_text.append(String.format("%s %1.2f", curr, amt));
+                    }
+                }
+                amt_tv.setText(amt_text.toString());
+
+                r.addView(amt_tv);
+
+                t.addView(r);
+
+                root.addView(t);
+            }
+        }
     }
 }
