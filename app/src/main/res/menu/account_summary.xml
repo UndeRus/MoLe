@@ -8,4 +8,7 @@
         android:title="@string/menu_acc_summary_refresh_title"
         android:onClick="onRefreshAccountSummaryClicked"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_acc_summary_show_hidden"
+        android:title="@string/menu_acc_summary_show_hidden_accounts_title" />
 </menu>

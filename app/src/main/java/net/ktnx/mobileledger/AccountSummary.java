@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +28,7 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -41,6 +43,8 @@ public class AccountSummary extends AppCompatActivity {
 
     private static long account_list_last_updated;
     private static boolean account_list_needs_update = true;
+    private TableRow clickedAccountRow;
+
     public static void preferences_changed() {
         account_list_needs_update = true;
     }
@@ -210,11 +214,23 @@ public class AccountSummary extends AppCompatActivity {
         return acc_name;
     }
 
+    public void hideAccountClicked(MenuItem item) {
+        TextView textView = (TextView) clickedAccountRow.getChildAt(0);
+        Toast.makeText(this, textView.getText(), Toast.LENGTH_SHORT).show();
+    }
+
     @SuppressLint("DefaultLocale")
     private void update_account_table() {
         LinearLayout root = findViewById(R.id.account_root);
         root.removeAllViewsInLayout();
 
+        View.OnCreateContextMenuListener ccml = new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                clickedAccountRow = (TableRow) v;
+                getMenuInflater().inflate(R.menu.account_summary_account_menu, menu);
+            }
+        };
 
         try (Cursor cursor = db.rawQuery("SELECT name FROM accounts ORDER BY name;", null)) {
             boolean even = false;
@@ -225,10 +241,13 @@ public class AccountSummary extends AppCompatActivity {
                 TableRow r = new TableRow(this);
                 r.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 r.setGravity(Gravity.CENTER_VERTICAL);
-                r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(2), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
+                r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
                 if (even)
                     r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
                 even = !even;
+                r.setContextClickable(true);
+                r.setOnCreateContextMenuListener(ccml);
+
 
                 TextView acc_tv = new TextView(this, null, R.style.account_summary_account_name);
                 acc_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 9f));
