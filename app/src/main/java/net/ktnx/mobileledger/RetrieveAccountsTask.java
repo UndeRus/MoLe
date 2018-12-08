@@ -68,7 +68,9 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
                                 acct_name = acct_name.replace("\"", "");
                                 Log.d("account-parser", acct_name);
 
-                                db.execSQL("insert or replace into accounts(name, keep) values(?, 1)", new Object[]{acct_name} );
+                                db.execSQL("insert or replace into accounts(name, name_upper, " +
+                                                "keep) values(?, ?, 1)",
+                                        new Object[]{acct_name, acct_name.toUpperCase()});
                                 publishProgress(++count);
 
                                 last_account_name = acct_name;
@@ -109,7 +111,10 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
                                     if (description.isEmpty()) continue;
 
                                     Log.d("db", String.format("Stored description: %s", description));
-                                    db.execSQL("insert or replace into description_history(description, keep) values(?, 1);", new Object[]{description});
+                                    db.execSQL("insert or replace into description_history" +
+                                                    "(description, description_upper, keep) " +
+                                                    "values(?, ?, 1);",
+                                            new Object[]{description, description.toUpperCase()});
                                 }
                             }
                         }
