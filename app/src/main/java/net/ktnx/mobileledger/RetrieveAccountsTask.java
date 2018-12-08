@@ -19,10 +19,8 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
     int error;
 
     private SharedPreferences pref;
-    public void setPref(SharedPreferences pref) {
-        this.pref = pref;
-    }
-    public RetrieveAccountsTask() {
+
+    RetrieveAccountsTask() {
         error = 0;
     }
 
