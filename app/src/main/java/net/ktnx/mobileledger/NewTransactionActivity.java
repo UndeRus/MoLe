@@ -104,7 +104,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     public void save_transaction() {
-        mSave.setVisible(false);
+        if (mSave != null) mSave.setVisible(false);
         toggle_all_editing(false);
         progress.setVisibility(View.VISIBLE);
 
@@ -307,9 +307,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
 
         if ((accounts >= 2) && (accounts_with_values >= (accounts - 1))) {
-            mSave.setVisible(true);
+            if (mSave != null) mSave.setVisible(true);
         } else {
-            mSave.setVisible(false);
+            if (mSave != null) mSave.setVisible(false);
         }
     }
 
