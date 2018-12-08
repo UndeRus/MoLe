@@ -56,7 +56,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
                         Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
                         Pattern value_re = Pattern.compile("<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
                         Pattern tr_re = Pattern.compile("</tr>");
-                        Pattern descriptions_line_re = Pattern.compile("\\bdescriptionsSuggester\\b");
+                        Pattern descriptions_line_re = Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
                         Pattern description_items_re = Pattern.compile("\"value\":\"([^\"]+)\"");
                         int count = 0;
                         while ((line = buf.readLine()) != null) {
@@ -115,7 +115,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
 
                         db.execSQL("delete from account_values where keep=0;");
                         db.execSQL("delete from accounts where keep=0;");
-                        db.execSQL("delete from description_history where keep=0;");
+//                        db.execSQL("delete from description_history where keep=0;");
                         db.setTransactionSuccessful();
                     }
                     finally {

@@ -53,7 +53,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private TableLayout table;
     private ProgressBar progress;
     private TextView text_date;
-    private TextView text_descr;
+    private AutoCompleteTextView text_descr;
     private static SaveTransactionTask saver;
     private MenuItem mSave;
 
@@ -66,10 +66,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         text_date = findViewById(R.id.new_transaction_date);
         text_descr = findViewById(R.id.new_transaction_description);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            text_descr.setAutofillHints("");
-        }
+        hook_autocompletion_adapter(text_descr, MobileLedgerDB.DESCRIPTION_HISTORY_TABLE, "description");
 
         progress = findViewById(R.id.save_transaction_progress);
 
@@ -77,10 +74,10 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
             TableRow row = (TableRow) table.getChildAt(i);
-            TextView acc_name_view = (TextView) row.getChildAt(0);
+            AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
             TextView amount_view = (TextView) row.getChildAt(1);
             hook_swipe_listener(row);
-            hook_autocompletion_adapter(row);
+            hook_autocompletion_adapter(acc_name_view, MobileLedgerDB.ACCOUNTS_TABLE, "name");
             hook_text_change_listener(acc_name_view);
             hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
@@ -183,12 +180,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     @TargetApi(Build.VERSION_CODES.N)
-    private void hook_autocompletion_adapter(final TableRow row) {
-        String[] from = {"name"};
+    private void hook_autocompletion_adapter(final AutoCompleteTextView view, final String table, final String field) {
+        String[] from = {field};
         int[] to = {android.R.id.text1};
         SQLiteDatabase db = MobileLedgerDB.db;
 
-        AutoCompleteTextView acc = (AutoCompleteTextView) row.getChildAt(0);
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_dropdown_item_1line, null, from, to, 0);
         adapter.setStringConversionColumn(1);
 
@@ -199,17 +195,17 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
                 String str = constraint.toString().toUpperCase();
                 Log.d("autocompletion", "Looking for "+str);
-                String[] col_names = {FontsContract.Columns._ID, "name"};
+                String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
-                Cursor matches = db.rawQuery("SELECT name FROM accounts WHERE UPPER(name) LIKE '%'||?||'%' ORDER BY name;", new String[]{str});
+                Cursor matches = db.rawQuery(String.format("SELECT %s FROM %s WHERE UPPER(%s) LIKE '%%'||?||'%%' ORDER BY 1;", field, table, field), new String[]{str});
 
                 try {
                     int i = 0;
                     while (matches.moveToNext()) {
-                        String name = matches.getString(0);
-                        Log.d("autocompletion-match", name);
-                        c.newRow().add(i++).add(name);
+                        String match = matches.getString(0);
+                        Log.d("autocompletion", String.format("match: %s", match));
+                        c.newRow().add(i++).add(match);
                     }
                 }
                 finally {
@@ -223,7 +219,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         adapter.setFilterQueryProvider(provider);
 
-        acc.setAdapter(adapter);
+        view.setAdapter(adapter);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -267,7 +263,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
-        hook_autocompletion_adapter(row);
+        hook_autocompletion_adapter(acc, MobileLedgerDB.ACCOUNTS_TABLE, "name");
         hook_text_change_listener(acc);
         hook_text_change_listener(amt);
     }

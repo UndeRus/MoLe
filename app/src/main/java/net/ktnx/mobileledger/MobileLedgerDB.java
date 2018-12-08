@@ -14,6 +14,8 @@ import java.util.Locale;
 class MobileLedgerDB {
     static final String DATABASE_NAME = "accounts";
     static final String OPT_DB_REVISION = "db_revision";
+    static final String ACCOUNTS_TABLE = "accounts";
+    static final String DESCRIPTION_HISTORY_TABLE = "description_history";
     private static String db_filename;
     static SQLiteDatabase db;
 
