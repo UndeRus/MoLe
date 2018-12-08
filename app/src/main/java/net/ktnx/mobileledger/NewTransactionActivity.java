@@ -230,7 +230,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
         mSave = menu.findItem(R.id.action_submit_transaction);
-        assert mSave != null;
+        if (mSave == null) throw new AssertionError();
 
         return true;
     }
