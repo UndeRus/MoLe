@@ -25,8 +25,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +41,7 @@ public class AccountSummary extends AppCompatActivity {
 
     private static long account_list_last_updated;
     private static boolean account_list_needs_update = true;
-    private TableRow clickedAccountRow;
+    private LinearLayout clickedAccountRow;
 
     public static void preferences_changed() {
         account_list_needs_update = true;
@@ -107,7 +105,7 @@ public class AccountSummary extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.account_summary, menu);
         mRefresh = menu.findItem(R.id.menu_acc_summary_refresh);
-        assert mRefresh != null;
+        if (mRefresh == null) throw new AssertionError();
         return true;
     }
 
@@ -154,7 +152,7 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     private void update_accounts() {
-        mRefresh.setVisible(false);
+        if (mRefresh != null) mRefresh.setVisible(false);
         Resources rm = getResources();
 
         ProgressBar pb = findViewById(R.id.progressBar);
@@ -176,7 +174,7 @@ public class AccountSummary extends AppCompatActivity {
             protected void onPostExecute(Void result) {
                 pb.setVisibility(GONE);
                 pt.setVisibility(GONE);
-                mRefresh.setVisible(true);
+                if (mRefresh != null) mRefresh.setVisible(true);
                 if (this.error != 0) {
                     String err_text = rm.getString(this.error);
                     Log.d("visual", String.format("showing snackbar: %s", err_text));
@@ -227,7 +225,7 @@ public class AccountSummary extends AppCompatActivity {
         View.OnCreateContextMenuListener ccml = new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                clickedAccountRow = (TableRow) v;
+                clickedAccountRow = (LinearLayout) v;
                 getMenuInflater().inflate(R.menu.account_summary_account_menu, menu);
             }
         };
@@ -237,9 +235,8 @@ public class AccountSummary extends AppCompatActivity {
             while (cursor.moveToNext()) {
                 String acc_name = cursor.getString(0);
 
-                TableLayout t = new TableLayout(this);
-                TableRow r = new TableRow(this);
-                r.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                LinearLayout r = new LinearLayout(this);
+                r.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
                 if (even)
@@ -250,7 +247,8 @@ public class AccountSummary extends AppCompatActivity {
 
 
                 TextView acc_tv = new TextView(this, null, R.style.account_summary_account_name);
-                acc_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 9f));
+                acc_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 5f));
+                acc_tv.setGravity(Gravity.CENTER_VERTICAL);
                 int[] indent_level = new int[]{0};
                 String short_acc_name = strip_higher_accounts(acc_name, indent_level);
                 acc_tv.setPadding(indent_level[0] * getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2, 0, 0, 0);
@@ -258,10 +256,11 @@ public class AccountSummary extends AppCompatActivity {
                 r.addView(acc_tv);
 
                 TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
-                amt_tv.setLayoutParams(new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+                amt_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
                 amt_tv.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
-                amt_tv.setGravity(Gravity.CENTER);
-                amt_tv.setMinWidth(dp2px(40f));
+                amt_tv.setGravity(Gravity.CENTER_VERTICAL);
+//                amt_tv.setGravity(Gravity.CENTER);
+                amt_tv.setMinWidth(dp2px(60f));
                 StringBuilder amt_text = new StringBuilder();
                 try (Cursor cAmounts = db.rawQuery("SELECT currency, value FROM account_values WHERE account = ?", new String[]{acc_name})) {
                     while (cAmounts.moveToNext()) {
@@ -275,9 +274,7 @@ public class AccountSummary extends AppCompatActivity {
 
                 r.addView(amt_tv);
 
-                t.addView(r);
-
-                root.addView(t);
+                root.addView(r);
             }
         }
     }

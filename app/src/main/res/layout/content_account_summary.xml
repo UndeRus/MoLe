@@ -46,28 +46,41 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TableLayout style="@style/account_summary_account_entry_table">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TableRow
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/table_row_even_bg"
-                    android:gravity="center"
-                    android:paddingStart="@dimen/activity_horizontal_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin">
+                <TextView
+                    android:id="@+id/textView"
+                    style="@style/account_summary_account_name"
+                    android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more." />
 
-                    <TextView
-                        android:id="@+id/textView"
-                        style="@style/account_summary_account_name"
-                        android:text="TextView" />
+                <TextView
+                    android:id="@+id/textView2"
+                    style="@style/account_summary_amounts"
+                    android:text="123,45\n678,90" />
+            </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/textView2"
-                        style="@style/account_summary_amounts"
-                        android:text="123,45\n678,90" />
-                </TableRow>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            </TableLayout>
+                <TextView
+                    android:id="@+id/textView3"
+                    style="@style/account_summary_account_name"
+                    android:text="TextView" />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    style="@style/account_summary_amounts"
+                    android:text="123,45\n678,90" />
+
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
