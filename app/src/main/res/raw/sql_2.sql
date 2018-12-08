@@ -1,0 +1,1 @@
+create table description_history(description varchar not null primary key, keep boolean);
