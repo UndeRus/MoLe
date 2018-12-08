@@ -26,6 +26,10 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
         error = 0;
     }
 
+    void setPref(SharedPreferences pref) {
+        this.pref = pref;
+    }
+
     protected Void doInBackground(Void... params) {
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection( pref, "add");
@@ -36,7 +40,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
             try {
                 Log.d("update_accounts", String.valueOf(http.getResponseCode()));
                 if (http.getResponseCode() != 200) {
-                    throw new IOException(String.valueOf(R.string.err_http_error));
+                    throw new IOException(String.format("HTTP error: %d %s", http.getResponseCode(), http.getResponseMessage()));
                 }
                 else {
                     if (db.inTransaction()) throw new AssertionError();
