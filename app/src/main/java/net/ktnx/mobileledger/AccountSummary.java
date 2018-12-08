@@ -75,6 +75,15 @@ public class AccountSummary extends AppCompatActivity {
         update_accounts(false);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LinearLayout grp = drawer.findViewById(R.id.nav_actions);
+        for (int i = 0; i < grp.getChildCount(); i++)
+            grp.getChildAt(i).setBackgroundColor(getResources().getColor(R.color.drawer_background, getTheme()));
+        drawer.findViewById(R.id.nav_account_summary).setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
+    }
+
     public void fab_new_transaction_clicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);

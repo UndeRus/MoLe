@@ -70,7 +70,8 @@
                         android:width="0dp"
                         android:hint="@string/new_transaction_account_hint"
                         android:nextFocusDown="@id/new_transaction_amt_1"
-                        android:nextFocusForward="@id/new_transaction_amt_1" />
+                        android:nextFocusForward="@id/new_transaction_amt_1"
+                        android:textColorLink="@android:color/background_light" />
 
                     <EditText
                         android:id="@+id/new_transaction_amt_1"

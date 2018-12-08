@@ -24,6 +24,8 @@
         <item name="android:drawablePadding">32dp</item>
         <item name="android:focusable">auto</item>
         <item name="android:gravity">center_vertical|start</item>
+        <item name="android:paddingStart">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingEnd">@dimen/activity_horizontal_margin</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
     </style>
 

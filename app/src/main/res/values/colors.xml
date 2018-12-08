@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#4a148c</color>
     <color name="colorAccent">#4db6ac</color>
     <color name="table_row_even_bg">#289d29b1</color>
+    <color name="drawer_background">#ffffffff</color>
 </resources>
