@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -130,7 +131,12 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
         } catch (MalformedURLException e) {
             error = R.string.err_bad_backend_url;
             e.printStackTrace();
-        } catch (IOException e) {
+        }
+        catch (FileNotFoundException e) {
+            error = R.string.err_bad_auth;
+            e.printStackTrace();
+        }
+        catch (IOException e) {
             error = R.string.err_net_io_error;
             e.printStackTrace();
         }
