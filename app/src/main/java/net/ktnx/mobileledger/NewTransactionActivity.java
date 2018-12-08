@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.FontsContract;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -202,7 +203,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                         "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
                                 "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
                                 "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
-                                "FROM %s " + "WHERE %s_upper LIKE " + "'%%'||?||'%%' " +
+                                "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " +
                                 "ORDER BY 2, 1;", field, field, field, field, table, field),
                         new String[]{str, str, str, str});
 
@@ -317,12 +318,17 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     @Override
-    public void done() {
+    public
+    void done(String error) {
         progress.setVisibility(View.INVISIBLE);
         Log.d("visuals", "hiding progress");
 
-        reset_form();
+        if (error == null) reset_form();
+        else Snackbar.make(findViewById(R.id.new_transaction_accounts_table), error,
+                BaseTransientBottomBar.LENGTH_LONG).show();
+
         toggle_all_editing(true);
+        check_transaction_submittable();
     }
 
     private void reset_form() {

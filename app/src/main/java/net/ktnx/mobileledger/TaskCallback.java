@@ -1,5 +1,5 @@
 package net.ktnx.mobileledger;
 
 interface TaskCallback {
-    abstract void done();
+    void done(String error);
 }

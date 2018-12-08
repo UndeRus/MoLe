@@ -25,6 +25,7 @@ class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private String session;
     private String backend_url;
     private LedgerTransaction ltr;
+    protected String error;
 
     private SharedPreferences pref;
     void setPref(SharedPreferences pref) {
@@ -120,23 +121,27 @@ class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
 
     @Override
     protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
-        backend_url = pref.getString("backend_url", "");
-        ltr = ledgerTransactions[0];
+        error = null;
         try {
+            backend_url = pref.getString("backend_url", "");
+            ltr = ledgerTransactions[0];
+
             int tried = 0;
-            while (! send_ok() ) {
+            while (!send_ok()) {
                 try {
                     tried++;
                     if (tried >= 2)
                         throw new IOException(String.format("aborting after %d tries", tried));
                     sleep(100);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
+            error = e.getMessage();
         }
 
         return null;
@@ -145,6 +150,6 @@ class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        task_callback.done();
+        task_callback.done(error);
     }
 }
