@@ -198,13 +198,20 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
-                Cursor matches = db.rawQuery(String.format("SELECT %s FROM %s WHERE UPPER(%s) LIKE '%%'||?||'%%' ORDER BY 1;", field, table, field), new String[]{str});
+                Cursor matches = db.rawQuery(String.format(
+                        "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                                "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                                "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
+                                "FROM %s " + "WHERE %s_upper LIKE " + "'%%'||?||'%%' " +
+                                "ORDER BY 2, 1;", field, field, field, field, table, field),
+                        new String[]{str, str, str, str});
 
                 try {
                     int i = 0;
                     while (matches.moveToNext()) {
                         String match = matches.getString(0);
-                        Log.d("autocompletion", String.format("match: %s", match));
+                        int order = matches.getInt(1);
+                        Log.d("autocompletion", String.format("match: %s |%d", match, order));
                         c.newRow().add(i++).add(match);
                     }
                 }
