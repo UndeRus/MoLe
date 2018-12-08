@@ -145,9 +145,7 @@ public class AccountSummary extends AppCompatActivity {
         else {
             MobileLedgerDB.setDb_filename(MobileLedgerDB.DATABASE_NAME);
         }
-        MobileLedgerDB.initDB();
-
-        MobileLedgerDB.applyRevisions(getResources(), getPackageName());
+        MobileLedgerDB.initDB(getResources(), getPackageName());
 
         account_list_last_updated = MobileLedgerDB.get_option_value("last_refresh", (long) 0);
 
