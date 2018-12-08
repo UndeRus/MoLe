@@ -87,6 +87,22 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.dummy, R.anim.slide_out_right);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void save_transaction() {
         mSave.setVisible(false);
         toggle_all_editing(false);

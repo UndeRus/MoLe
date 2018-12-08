@@ -87,6 +87,7 @@ public class AccountSummary extends AppCompatActivity {
     public void fab_new_transaction_clicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.dummy);
     }
 
     public void nav_exit_clicked(View view) {
