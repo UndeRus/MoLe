@@ -403,6 +403,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private void reset_form() {
         text_date.setText("");
         text_descr.setText("");
+
+        text_descr.requestFocus();
+
         while(table.getChildCount() > 2) {
             table.removeViewAt(2);
         }
@@ -413,7 +416,5 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             ((TextView)tr.getChildAt(0)).setText("");
             ((TextView)tr.getChildAt(1)).setText("");
         }
-
-        text_descr.requestFocus();
     }
 }
