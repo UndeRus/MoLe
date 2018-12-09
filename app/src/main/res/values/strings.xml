@@ -75,4 +75,5 @@
     <string name="menu_acc_summary_show_hidden_accounts_title">Show hidden accounts</string>
     <string name="err_bad_auth">Invalid username or password</string>
     <string name="action_reset_new_transaction_activity_title">Reset</string>
+    <string name="ime_action_next_title">Next</string>
 </resources>

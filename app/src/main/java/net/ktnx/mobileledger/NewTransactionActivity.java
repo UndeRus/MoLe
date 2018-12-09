@@ -299,7 +299,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 9f));
         acc.setHint(R.string.new_transaction_account_hint);
         acc.setWidth(0);
-        acc.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        acc.setImeOptions(EditorInfo.IME_ACTION_NEXT | EditorInfo.IME_FLAG_NO_ENTER_ACTION
+                | EditorInfo.IME_FLAG_NAVIGATE_NEXT);
+        acc.setSingleLine(true);
 
         final EditText amt = new EditText(this);
         amt.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
