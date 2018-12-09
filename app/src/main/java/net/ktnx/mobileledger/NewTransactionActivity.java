@@ -348,6 +348,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         save_transaction();
     }
 
+    private
+    boolean is_zero(float f) {
+        return (f < 0.005) && (f > -0.005);
+    }
+
     // rules:
     // 1) at least two account names
     // 2) each amount must have account name
@@ -365,6 +370,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         int empty_rows = 0;
         TextView empty_amount = null;
         boolean single_empty_amount = false;
+        boolean single_empty_amount_has_account = false;
         float running_total = 0f;
         boolean have_description =
                 !((TextView) findViewById(R.id.new_transaction_description)).getText().toString()
@@ -394,6 +400,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                     if (empty_amount == null) {
                         empty_amount = amount_v;
                         single_empty_amount = true;
+                        single_empty_amount_has_account = !acc_name.isEmpty();
                     }
                     else if (!acc_name.isEmpty()) single_empty_amount = false;
                 }
@@ -410,8 +417,16 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 do_add_account_row(false);
             }
 
+            Log.d("submittable", String.format("accounts=%d, accounts_with_values=%s, "
+                            + "amounts_with_accounts=%d, amounts=%d, running_total=%1.2f, "
+                            + "single_empty_with_acc=%s", accounts, accounts_with_values,
+                    amounts_with_accounts, amounts, running_total,
+                    (single_empty_amount && single_empty_amount_has_account) ? "true" : "false"));
+
             if (have_description && (accounts >= 2) && (accounts_with_values >= (accounts - 1)) && (
-                    amounts_with_accounts == amounts))
+                    amounts_with_accounts == amounts) && (
+                    single_empty_amount && single_empty_amount_has_account || is_zero(
+                            running_total)))
             {
                 if (mSave != null) mSave.setVisible(true);
             }
@@ -421,6 +436,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 empty_amount
                         .setHint(String.format("%1.2f", (running_total > 0) ? -running_total : 0f));
             }
+
         }
         catch (NumberFormatException e) {
             if (mSave != null) mSave.setVisible(false);
