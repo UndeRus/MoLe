@@ -31,7 +31,11 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/new_transaction_date_hint"
+                    android:imeOptions="actionNext"
                     android:inputType="date"
+                    android:accessibilityTraversalBefore="@+id/new_transaction_description"
+                    android:nextFocusDown="@+id/new_transaction_acc_1"
+                    android:nextFocusForward="@+id/new_transaction_description"
                     android:onClick="pickTransactionDate"
                     android:textAlignment="center"
                     app:layout_constraintHorizontal_weight="8"
@@ -43,9 +47,17 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:accessibilityTraversalAfter="@+id/new_transaction_date"
+                    android:accessibilityTraversalBefore="@+id/new_transaction_acc_1"
                     android:ems="10"
                     android:hint="@string/new_transaction_description_hint"
+                    android:imeOptions="actionNext"
                     android:inputType="textPersonName"
+                    android:nextFocusLeft="@+id/new_transaction_date"
+                    android:nextFocusRight="@+id/new_transaction_acc_1"
+                    android:nextFocusUp="@+id/new_transaction_date"
+                    android:nextFocusDown="@+id/new_transaction_acc_1"
+                    android:nextFocusForward="@+id/new_transaction_acc_1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_weight="30"
                     app:layout_constraintStart_toEndOf="@+id/new_transaction_date"
@@ -68,10 +80,15 @@
                         android:layout_gravity="bottom"
                         android:layout_weight="9"
                         android:width="0dp"
+                        android:accessibilityTraversalAfter="@+id/new_transaction_description"
+                        android:accessibilityTraversalBefore="@+id/new_transaction_amt_2"
                         android:hint="@string/new_transaction_account_hint"
-                        android:nextFocusDown="@id/new_transaction_amt_1"
-                        android:nextFocusForward="@id/new_transaction_amt_1"
-                        android:text="This is a sample account name, deliberately long" />
+                        android:imeOptions="actionNext"
+                        android:nextFocusLeft="@+id/new_transaction_description"
+                        android:nextFocusRight="@+id/new_transaction_amt_1"
+                        android:nextFocusUp="@+id/new_transaction_description"
+                        android:nextFocusDown="@+id/new_transaction_amt_1"
+                        android:nextFocusForward="@+id/new_transaction_amt_1" />
 
                     <EditText
                         android:id="@+id/new_transaction_amt_1"
@@ -81,10 +98,16 @@
                         android:layout_weight="1"
                         android:width="0dp"
                         android:hint="@string/new_transaction_amount_hint"
+                        android:imeOptions="actionNext"
                         android:inputType="numberDecimal|numberSigned"
                         android:minWidth="40dp"
-                        android:nextFocusDown="@id/new_transaction_acc_2"
-                        android:nextFocusForward="@id/new_transaction_acc_2"
+                        android:accessibilityTraversalAfter="@+id/new_transaction_acc_1"
+                        android:accessibilityTraversalBefore="@+id/new_transaction_acc_2"
+                        android:nextFocusLeft="@+id/new_transaction_acc_1"
+                        android:nextFocusRight="@+id/new_transaction_acc_2"
+                        android:nextFocusUp="@+id/new_transaction_acc_1"
+                        android:nextFocusDown="@+id/new_transaction_acc_2"
+                        android:nextFocusForward="@+id/new_transaction_acc_2"
                         android:textAlignment="viewEnd" />
                 </TableRow>
 
@@ -100,8 +123,14 @@
                         android:layout_weight="9"
                         android:width="0dp"
                         android:hint="@string/new_transaction_account_hint"
-                        android:nextFocusDown="@id/new_transaction_amt_2"
-                        android:nextFocusForward="@id/new_transaction_amt_2" />
+                        android:imeOptions="actionNext"
+                        android:accessibilityTraversalAfter="@+id/new_transaction_amt_1"
+                        android:accessibilityTraversalBefore="@+id/new_transaction_amt_2"
+                        android:nextFocusLeft="@+id/new_transaction_amt_1"
+                        android:nextFocusRight="@+id/new_transaction_amt_2"
+                        android:nextFocusUp="@+id/new_transaction_acc_1"
+                        android:nextFocusDown="@+id/new_transaction_amt_2"
+                        android:nextFocusForward="@+id/new_transaction_amt_2" />
 
                     <EditText
                         android:id="@+id/new_transaction_amt_2"
@@ -111,8 +140,12 @@
                         android:layout_weight="1"
                         android:width="0dp"
                         android:hint="@string/new_transaction_amount_hint"
+                        android:imeOptions="actionDone"
                         android:inputType="numberDecimal|numberSigned"
                         android:minWidth="40dp"
+                        android:accessibilityTraversalAfter="@+id/new_transaction_acc_1"
+                        android:nextFocusLeft="@+id/new_transaction_acc_2"
+                        android:nextFocusUp="@+id/new_transaction_amt_1"
                         android:textAlignment="viewEnd" />
                 </TableRow>
 
