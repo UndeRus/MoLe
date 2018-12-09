@@ -74,6 +74,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         });
         text_descr = findViewById(R.id.new_transaction_description);
         hook_autocompletion_adapter(text_descr, MobileLedgerDB.DESCRIPTION_HISTORY_TABLE, "description");
+        hook_text_change_listener(text_descr);
 
         progress = findViewById(R.id.save_transaction_progress);
 
