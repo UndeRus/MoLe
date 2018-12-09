@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
@@ -151,6 +152,24 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             public void onSwipeLeft() {
 //                Log.d("swipe", "LEFT" + row.getId());
                 if (table.getChildCount() > 2) {
+                    TableRow prev_row = (TableRow) table.getChildAt(table.indexOfChild(row) - 1);
+                    TableRow next_row = (TableRow) table.getChildAt(table.indexOfChild(row) + 1);
+                    TextView prev_amt =
+                            (prev_row != null) ? (TextView) prev_row.getChildAt(1) : text_descr;
+                    TextView next_acc =
+                            (next_row != null) ? (TextView) next_row.getChildAt(0) : null;
+
+                    if (next_acc == null) {
+                        prev_amt.setNextFocusRightId(R.id.none);
+                        prev_amt.setNextFocusForwardId(R.id.none);
+                        prev_amt.setImeOptions(EditorInfo.IME_ACTION_DONE);
+                    }
+                    else {
+                        prev_amt.setNextFocusRightId(next_acc.getId());
+                        prev_amt.setNextFocusForwardId(next_acc.getId());
+                        prev_amt.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+                    }
+
                     table.removeView(row);
 //                    Toast.makeText(NewTransactionActivity.this, "LEFT", Toast.LENGTH_LONG).show();
                 }
@@ -265,6 +284,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 9f));
         acc.setHint(R.string.new_transaction_account_hint);
         acc.setWidth(0);
+        acc.setImeOptions(EditorInfo.IME_ACTION_NEXT);
 
         final EditText amt = new EditText(this);
         amt.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
@@ -274,6 +294,16 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         amt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL );
         amt.setMinWidth(dp2px(40));
         amt.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
+        amt.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        // forward navigation support
+        final TableRow last_row = (TableRow) table.getChildAt(table.getChildCount() - 1);
+        final TextView last_amt = (TextView) last_row.getChildAt(1);
+        last_amt.setNextFocusForwardId(acc.getId());
+        last_amt.setNextFocusRightId(acc.getId());
+        last_amt.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        acc.setNextFocusForwardId(amt.getId());
+        acc.setNextFocusRightId(amt.getId());
 
         final TableRow row = new TableRow(this);
         row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
