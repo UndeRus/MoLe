@@ -145,6 +145,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     private void toggle_all_editing(boolean enabled) {
+        text_date.setEnabled(enabled);
+        text_descr.setEnabled(enabled);
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
             TableRow row = (TableRow) table.getChildAt(i);
