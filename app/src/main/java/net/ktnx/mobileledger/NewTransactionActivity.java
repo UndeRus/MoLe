@@ -95,6 +95,13 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     @Override
+    protected
+    void onStart() {
+        super.onStart();
+        if (text_descr.getText().toString().isEmpty()) text_descr.requestFocus();
+    }
+
+    @Override
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.dummy, R.anim.slide_out_right);
