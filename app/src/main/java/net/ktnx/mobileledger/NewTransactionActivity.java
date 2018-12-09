@@ -1,5 +1,6 @@
 package net.ktnx.mobileledger;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -286,35 +287,85 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         save_transaction();
     }
 
+    // rules:
+    // 1) at least two account names
+    // 2) each amount must have account name
+    // 3) amounts must balance to 0, or
+    // 3a) there must be exactly one empty amount
+    // 4) empty accounts with empty amounts are ignored
+    // 5) a row with an empty account name or empty amount is guaranteed to exist
+    @SuppressLint("DefaultLocale")
     private void check_transaction_submittable() {
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         int accounts = 0;
         int accounts_with_values = 0;
+        int amounts = 0;
+        int amounts_with_accounts = 0;
         int empty_rows = 0;
-        for(int i = 0; i < table.getChildCount(); i++ ) {
-            TableRow row = (TableRow) table.getChildAt(i);
+        TextView empty_amount = null;
+        boolean single_empty_amount = false;
+        float running_total = 0f;
+        boolean have_description =
+                !((TextView) findViewById(R.id.new_transaction_description)).getText().toString()
+                        .isEmpty();
 
-            TextView acc_name_v = (TextView) row.getChildAt(0);
+        try {
+            for (int i = 0; i < table.getChildCount(); i++) {
+                TableRow row = (TableRow) table.getChildAt(i);
 
-            String acc_name = String.valueOf(acc_name_v.getText());
-            acc_name = acc_name.trim();
-            if (!acc_name.isEmpty()) {
-                accounts++;
-
+                TextView acc_name_v = (TextView) row.getChildAt(0);
                 TextView amount_v = (TextView) row.getChildAt(1);
                 String amt = String.valueOf(amount_v.getText());
+                String acc_name = String.valueOf(acc_name_v.getText());
+                acc_name = acc_name.trim();
 
-                if (!amt.isEmpty()) accounts_with_values++;
-            } else empty_rows++;
+                if (!acc_name.isEmpty()) {
+                    accounts++;
+
+                    if (!amt.isEmpty()) {
+                        accounts_with_values++;
+                    }
+                }
+                else empty_rows++;
+
+                if (amt.isEmpty()) {
+                    amount_v.setHint(String.format("%1.2f", 0f));
+                    if (empty_amount == null) {
+                        empty_amount = amount_v;
+                        single_empty_amount = true;
+                    }
+                    else if (!acc_name.isEmpty()) single_empty_amount = false;
+                }
+                else {
+                    amounts++;
+                    if (!acc_name.isEmpty()) amounts_with_accounts++;
+                    running_total += Float.valueOf(amt);
+                }
+            }
+
+            if ((empty_rows == 0) && ((table.getChildCount() == accounts) || (table.getChildCount()
+                    == amounts)))
+            {
+                do_add_account_row(false);
+            }
+
+            if (have_description && (accounts >= 2) && (accounts_with_values >= (accounts - 1)) && (
+                    amounts_with_accounts == amounts))
+            {
+                if (mSave != null) mSave.setVisible(true);
+            }
+            else if (mSave != null) mSave.setVisible(false);
+
+            if (single_empty_amount) {
+                empty_amount
+                        .setHint(String.format("%1.2f", (running_total > 0) ? -running_total : 0f));
+            }
         }
-
-        if (accounts_with_values == accounts && empty_rows == 0) {
-            do_add_account_row(false);
+        catch (NumberFormatException e) {
+            if (mSave != null) mSave.setVisible(false);
         }
-
-        if ((accounts >= 2) && (accounts_with_values >= (accounts - 1))) {
-            if (mSave != null) mSave.setVisible(true);
-        } else {
+        catch (Exception e) {
+            e.printStackTrace();
             if (mSave != null) mSave.setVisible(false);
         }
     }
