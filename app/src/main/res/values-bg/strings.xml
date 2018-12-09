@@ -24,7 +24,7 @@
     <string name="new_transaction_description_hint">Описание</string>
     <string name="progress_N_accounts_loaded">Заредени са %d сметки</string>
     <string name="action_submit_transaction_title">Запазване</string>
-    <string name="account_summary_title">Сметките накратко</string>
+    <string name="account_summary_title">Сметки</string>
     <string name="menu_hide_acc_condensed_title">Скриване</string>
     <string name="menu_hide_acc_title">Скриване на сметката</string>
     <string name="menu_acc_summary_refresh_title">Обновяване</string>
