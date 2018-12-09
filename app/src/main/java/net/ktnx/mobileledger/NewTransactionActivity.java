@@ -18,6 +18,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -252,7 +253,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         acc.setWidth(0);
 
         final EditText amt = new EditText(this);
-        amt.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        amt.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.MATCH_PARENT, 1f));
         amt.setHint(R.string.new_transaction_amount_hint);
         amt.setWidth(0);
         amt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL );
@@ -261,6 +263,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         final TableRow row = new TableRow(this);
         row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+        row.setGravity(Gravity.BOTTOM);
         row.addView(acc);
         row.addView(amt);
         table.addView(row);
