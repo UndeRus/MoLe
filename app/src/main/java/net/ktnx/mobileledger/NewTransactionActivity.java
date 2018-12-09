@@ -78,16 +78,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         table = findViewById(R.id.new_transaction_accounts_table);
-        for (int i = 0; i < table.getChildCount(); i++) {
-            TableRow row = (TableRow) table.getChildAt(i);
-            AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
-            TextView amount_view = (TextView) row.getChildAt(1);
-            hook_swipe_listener(row);
-            hook_autocompletion_adapter(acc_name_view, MobileLedgerDB.ACCOUNTS_TABLE, "name");
-            hook_text_change_listener(acc_name_view);
-            hook_text_change_listener(amount_view);
-//            Log.d("swipe", "hooked to row "+i);
-        }
+        table.removeAllViews();
+        do_add_account_row(false);
+        do_add_account_row(false);
     }
 
     @Override
