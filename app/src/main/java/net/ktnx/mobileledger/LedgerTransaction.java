@@ -12,7 +12,7 @@ class LedgerTransaction {
     LedgerTransaction(String date, String description) {
         this.date = date;
         this.description = description;
-        this.items = new ArrayList<LedgerTransactionItem>();
+        this.items = new ArrayList<>();
     }
 
     void add_item(LedgerTransactionItem item) {
@@ -35,7 +35,7 @@ class LedgerTransaction {
         this.description = description;
     }
 
-    public Iterator<LedgerTransactionItem> getItemsIterator() {
+    Iterator<LedgerTransactionItem> getItemsIterator() {
         return new Iterator<LedgerTransactionItem>() {
             private int pointer = 0;
             @Override

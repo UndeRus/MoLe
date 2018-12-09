@@ -12,7 +12,7 @@ class UrlEncodedFormData {
     private List<AbstractMap.SimpleEntry<String,String>> pairs;
 
     UrlEncodedFormData() {
-        pairs = new ArrayList<AbstractMap.SimpleEntry<String, String>>();
+        pairs = new ArrayList<>();
     }
 
     void add_pair(String name, String value) {

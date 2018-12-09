@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
-import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
