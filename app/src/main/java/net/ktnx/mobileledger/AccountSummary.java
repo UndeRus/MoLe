@@ -79,9 +79,24 @@ public class AccountSummary extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         LinearLayout grp = drawer.findViewById(R.id.nav_actions);
-        for (int i = 0; i < grp.getChildCount(); i++)
-            grp.getChildAt(i).setBackgroundColor(getResources().getColor(R.color.drawer_background, getTheme()));
-        drawer.findViewById(R.id.nav_account_summary).setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
+        for (int i = 0; i < grp.getChildCount(); i++) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                grp.getChildAt(i).setBackgroundColor(
+                        getResources().getColor(R.color.drawer_background, getTheme()));
+            }
+            else {
+                grp.getChildAt(i)
+                        .setBackgroundColor(getResources().getColor(R.color.drawer_background));
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            drawer.findViewById(R.id.nav_account_summary).setBackgroundColor(
+                    getResources().getColor(R.color.table_row_even_bg, getTheme()));
+        }
+        else {
+            drawer.findViewById(R.id.nav_account_summary)
+                    .setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
+        }
     }
 
     public void fab_new_transaction_clicked(View view) {
@@ -143,7 +158,8 @@ public class AccountSummary extends AppCompatActivity {
             MobileLedgerDB.setDb_filename(this.getApplicationInfo().deviceProtectedDataDir + "/" + MobileLedgerDB.DATABASE_NAME);
         }
         else {
-            MobileLedgerDB.setDb_filename(MobileLedgerDB.DATABASE_NAME);
+            MobileLedgerDB.setDb_filename(
+                    this.getApplicationInfo().dataDir + "/" + MobileLedgerDB.DATABASE_NAME);
         }
         MobileLedgerDB.initDB(getResources(), getPackageName());
 
@@ -247,10 +263,19 @@ public class AccountSummary extends AppCompatActivity {
                 r.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
-                if (even)
-                    r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
+                if (even) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        r.setBackgroundColor(
+                                getResources().getColor(R.color.table_row_even_bg, getTheme()));
+                    }
+                    else {
+                        r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
+                    }
+                }
                 even = !even;
-                r.setContextClickable(true);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    r.setContextClickable(true);
+                }
                 r.setOnCreateContextMenuListener(ccml);
 
 
