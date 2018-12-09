@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
+import android.util.Log;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
@@ -47,7 +48,6 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
         }
 
         DatePickerDialog dpd =  new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
-
         // quicker date selection available in API 26
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DatePicker dp = dpd.getDatePicker();
@@ -68,6 +68,10 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
         else {
             date.setText(String.format(Locale.US, "%d/%d", month+1, day));
         }
+
+        TextView description = Objects.requireNonNull(getActivity())
+                .findViewById(R.id.new_transaction_description);
+        description.requestFocus();
     }
 
     @Override
@@ -81,6 +85,10 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
         else {
             date.setText(String.format(Locale.US, "%d/%d", monthOfYear+1, dayOfMonth));
         }
+
+        TextView description = Objects.requireNonNull(getActivity())
+                .findViewById(R.id.new_transaction_description);
+        description.requestFocus();
 
         this.dismiss();
     }
