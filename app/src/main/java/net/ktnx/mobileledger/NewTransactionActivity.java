@@ -171,6 +171,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                     }
 
                     table.removeView(row);
+                    check_transaction_submittable();
 //                    Toast.makeText(NewTransactionActivity.this, "LEFT", Toast.LENGTH_LONG).show();
                 }
                 else {
