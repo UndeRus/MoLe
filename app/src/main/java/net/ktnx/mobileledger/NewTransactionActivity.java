@@ -64,6 +64,13 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         setSupportActionBar(toolbar);
 
         text_date = findViewById(R.id.new_transaction_date);
+        text_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public
+            void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) pickTransactionDate(v);
+            }
+        });
         text_descr = findViewById(R.id.new_transaction_description);
         hook_autocompletion_adapter(text_descr, MobileLedgerDB.DESCRIPTION_HISTORY_TABLE, "description");
 
