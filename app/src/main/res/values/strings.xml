@@ -56,7 +56,7 @@
     <string name="pref_title_backend_auth_password">Password</string>
     <string name="title_activity_new_transaction">New Transaction</string>
     <string name="new_transaction_account_hint">Account</string>
-    <string name="new_transaction_date_hint">date</string>
+    <string name="new_transaction_date_hint">today</string>
     <string name="new_transaction_amount_hint" translatable="false">0.00</string>
     <string name="menu_add_account">Add another acount</string>
     <string name="msg_at_least_two_accounts_are_required">At least two accounts are required</string>

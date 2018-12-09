@@ -33,6 +33,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.util.Date;
 import java.util.Objects;
 
 /*
@@ -109,7 +110,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         saver = new SaveTransactionTask(this);
 
         saver.setPref(PreferenceManager.getDefaultSharedPreferences(this));
-        LedgerTransaction tr = new LedgerTransaction(text_date.getText().toString(), text_descr.getText().toString());
+        String date = text_date.getText().toString();
+        if (date.isEmpty()) date = String.valueOf(new Date().getDate());
+        LedgerTransaction tr = new LedgerTransaction(date, text_descr.getText().toString());
 
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         for ( int i = 0; i < table.getChildCount(); i++ ) {

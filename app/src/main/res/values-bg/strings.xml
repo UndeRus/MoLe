@@ -15,7 +15,7 @@
     <string name="pref_title_backend_auth_password">Парола</string>
     <string name="title_activity_new_transaction">Нова трансакция</string>
     <string name="new_transaction_account_hint">Сметка</string>
-    <string name="new_transaction_date_hint">дата</string>
+    <string name="new_transaction_date_hint">днес</string>
     <string name="menu_add_account">Добавяне на сметка</string>
     <string name="msg_at_least_two_accounts_are_required">Задължително е използването на поне две сметки</string>
     <string name="err_net_io_error">Мрежова грешка</string>
