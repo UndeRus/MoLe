@@ -234,6 +234,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         mSave = menu.findItem(R.id.action_submit_transaction);
         if (mSave == null) throw new AssertionError();
 
+        check_transaction_submittable();
+
         return true;
     }
 
