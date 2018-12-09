@@ -179,6 +179,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                         prev_amt.setImeOptions(EditorInfo.IME_ACTION_NEXT);
                     }
 
+                    if (row.hasFocus()) {
+                        if (next_acc != null) next_acc.requestFocus();
+                        else prev_amt.requestFocus();
+                    }
+
                     table.removeView(row);
                     check_transaction_submittable();
 //                    Toast.makeText(NewTransactionActivity.this, "LEFT", Toast.LENGTH_LONG).show();
