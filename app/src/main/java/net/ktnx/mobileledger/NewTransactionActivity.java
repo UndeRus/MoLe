@@ -283,6 +283,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         do_add_account_row(true);
     }
 
+    public
+    void resetTransactionFromMenu(MenuItem item) {
+        reset_form();
+    }
+
     public void saveTransactionFromMenu(MenuItem item) {
         save_transaction();
     }

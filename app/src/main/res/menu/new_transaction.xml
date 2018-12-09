@@ -16,4 +16,10 @@
             android:title="@string/menu_add_account"
             android:visible="false"
             app:showAsAction="never|ifRoom" />
-    </menu>
+    <item
+        android:id="@+id/action_reset_new_transaction_activity"
+        android:icon="@drawable/ic_refresh_white_24dp"
+        android:onClick="resetTransactionFromMenu"
+        android:title="@string/action_reset_new_transaction_activity_title"
+        app:showAsAction="ifRoom|withText" />
+</menu>

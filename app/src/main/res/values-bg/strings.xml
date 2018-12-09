@@ -30,4 +30,5 @@
     <string name="menu_acc_summary_refresh_title">Обновяване</string>
     <string name="err_net_error">Мрежова грешка</string>
     <string name="menu_acc_summary_show_hidden_accounts_title">Показване на скритите сметки</string>
+    <string name="action_reset_new_transaction_activity_title">Отначало</string>
 </resources>
