@@ -254,6 +254,10 @@ public class AccountSummary extends AppCompatActivity {
             }
         };
 
+        int actionBarHeight =
+                getTheme().obtainStyledAttributes(new int[]{android.R.attr.actionBarSize})
+                        .getDimensionPixelSize(0, dp2px(56));
+
         try (Cursor cursor = db.rawQuery("SELECT name FROM accounts ORDER BY name;", null)) {
             boolean even = false;
             while (cursor.moveToNext()) {
@@ -263,6 +267,8 @@ public class AccountSummary extends AppCompatActivity {
                 r.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
+                r.setMinimumHeight(actionBarHeight);
+
                 if (even) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         r.setBackgroundColor(
