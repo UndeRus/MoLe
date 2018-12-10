@@ -6,6 +6,10 @@
         android:fragment="net.ktnx.mobileledger.SettingsActivity$BackendPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_backend" />
+    <header
+        android:fragment="net.ktnx.mobileledger.SettingsActivity$InterfacePreferenceFragment"
+        android:icon="@drawable/ic_info_black_24dp"
+        android:title="@string/interface_pref_header_title" />
 <!--
     <header
         android:fragment="net.ktnx.mobileledger.SettingsActivity$NotificationPreferenceFragment"

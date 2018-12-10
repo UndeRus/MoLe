@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:id="@+id/pref_show_hidden_accounts"
+        android:defaultValue="false"
+        android:key="show_hidden_accounts"
+        android:summaryOff="@string/pref_show_hidden_accounts_off_summary"
+        android:summaryOn="@string/pref_show_hidden_accounts_on_summary"
+        android:title="@string/menu_acc_summary_show_hidden_accounts_title" />
+</PreferenceScreen>

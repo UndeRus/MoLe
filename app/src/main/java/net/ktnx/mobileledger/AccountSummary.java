@@ -2,9 +2,11 @@ package net.ktnx.mobileledger;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -26,7 +28,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -41,7 +42,9 @@ public class AccountSummary extends AppCompatActivity {
 
     private static long account_list_last_updated;
     private static boolean account_list_needs_update = true;
-    private LinearLayout clickedAccountRow;
+    MenuItem mShowHiddenAccounts;
+    SharedPreferences.OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener;
+    private AccountRowLayout clickedAccountRow;
 
     public static void preferences_changed() {
         account_list_needs_update = true;
@@ -131,6 +134,24 @@ public class AccountSummary extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.account_summary, menu);
         mRefresh = menu.findItem(R.id.menu_acc_summary_refresh);
         if (mRefresh == null) throw new AssertionError();
+
+        mShowHiddenAccounts = menu.findItem(R.id.menu_acc_summary_show_hidden);
+        if (mShowHiddenAccounts == null) throw new AssertionError();
+
+        sBindPreferenceSummaryToValueListener =
+                new SharedPreferences.OnSharedPreferenceChangeListener() {
+                    @Override
+                    public
+                    void onSharedPreferenceChanged(SharedPreferences preference, String value) {
+                        mShowHiddenAccounts
+                                .setChecked(preference.getBoolean("show_hidden_accounts", false));
+                    }
+                };
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+        mShowHiddenAccounts.setChecked(pref.getBoolean("show_hidden_accounts", false));
+
         return true;
     }
 
@@ -151,6 +172,19 @@ public class AccountSummary extends AppCompatActivity {
 
     public void onRefreshAccountSummaryClicked(MenuItem mi) {
         update_accounts(true);
+    }
+
+    public
+    void onShowHiddenAccountsClicked(MenuItem mi) {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean flag = pref.getBoolean("show_hidden_accounts", false);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean("show_hidden_accounts", !flag);
+        Log.d("pref", "Setting show_hidden_accounts to " + (flag ? "false" : "true"));
+        editor.apply();
+
+        update_account_table();
     }
 
     private void prepare_db() {
@@ -237,8 +271,9 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     public void hideAccountClicked(MenuItem item) {
-        TextView textView = (TextView) clickedAccountRow.getChildAt(0);
-        Toast.makeText(this, textView.getText(), Toast.LENGTH_SHORT).show();
+        db.execSQL("update accounts set hidden=1 where name=?",
+                new Object[]{clickedAccountRow.getAccountName()});
+        update_account_table();
     }
 
     @SuppressLint("DefaultLocale")
@@ -249,25 +284,44 @@ public class AccountSummary extends AppCompatActivity {
         View.OnCreateContextMenuListener ccml = new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                clickedAccountRow = (LinearLayout) v;
+                clickedAccountRow = (AccountRowLayout) v;
                 getMenuInflater().inflate(R.menu.account_summary_account_menu, menu);
             }
         };
 
-        int actionBarHeight =
-                getTheme().obtainStyledAttributes(new int[]{android.R.attr.actionBarSize})
-                        .getDimensionPixelSize(0, dp2px(56));
+        int rowHeight =
+                (int) (getTheme().obtainStyledAttributes(new int[]{android.R.attr.actionBarSize})
+                        .getDimensionPixelSize(0, dp2px(56)) * 0.75);
 
-        try (Cursor cursor = db.rawQuery("SELECT name FROM accounts ORDER BY name;", null)) {
+        boolean showingHiddenAccounts = PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("show_hidden_accounts", false);
+        Log.d("pref", "show_hidden_accounts is " + (showingHiddenAccounts ? "true" : "false"));
+
+        try (Cursor cursor = db
+                .rawQuery("SELECT name, hidden FROM accounts ORDER BY name;", null))
+        {
             boolean even = false;
+            String skippingAccountName = null;
             while (cursor.moveToNext()) {
                 String acc_name = cursor.getString(0);
+                if (skippingAccountName != null) {
+                    if (acc_name.startsWith(skippingAccountName + ":")) continue;
 
-                LinearLayout r = new LinearLayout(this);
+                    skippingAccountName = null;
+                }
+
+                boolean is_hidden = cursor.getInt(1) == 1;
+
+                if (!showingHiddenAccounts && is_hidden) {
+                    skippingAccountName = acc_name;
+                    continue;
+                }
+
+                LinearLayout r = new AccountRowLayout(this, acc_name);
                 r.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 r.setGravity(Gravity.CENTER_VERTICAL);
                 r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
-                r.setMinimumHeight(actionBarHeight);
+                r.setMinimumHeight(rowHeight);
 
                 if (even) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -292,6 +346,7 @@ public class AccountSummary extends AppCompatActivity {
                 String short_acc_name = strip_higher_accounts(acc_name, indent_level);
                 acc_tv.setPadding(indent_level[0] * getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2, 0, 0, 0);
                 acc_tv.setText(short_acc_name);
+                if (is_hidden) acc_tv.setTypeface(null, Typeface.ITALIC);
                 r.addView(acc_tv);
 
                 TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
@@ -310,6 +365,7 @@ public class AccountSummary extends AppCompatActivity {
                     }
                 }
                 amt_tv.setText(amt_text.toString());
+                if (is_hidden) amt_tv.setTypeface(null, Typeface.ITALIC);
 
                 r.addView(amt_tv);
 

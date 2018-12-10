@@ -14,5 +14,6 @@
         android:checked="false"
         android:title="@string/menu_acc_summary_show_hidden_accounts_title"
         app:actionLayout="@layout/switch_item"
+        android:onClick="onShowHiddenAccountsClicked"
         app:showAsAction="never" />
 </menu>
