@@ -361,7 +361,7 @@ public class AccountSummary extends AppCompatActivity {
                         String curr = cAmounts.getString(0);
                         Float amt = cAmounts.getFloat(1);
                         if (amt_text.length() != 0) amt_text.append('\n');
-                        amt_text.append(String.format("%s %1.2f", curr, amt));
+                        amt_text.append(String.format("%s %,1.2f", curr, amt));
                     }
                 }
                 amt_tv.setText(amt_text.toString());
