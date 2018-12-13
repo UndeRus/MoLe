@@ -7,6 +7,8 @@ import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -97,6 +99,13 @@ public class AccountSummary extends AppCompatActivity {
             }
         }));
 
+        root.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (dy < 0) ((FloatingActionButton) findViewById(R.id.btn_add_transaction)).show();
+                if (dy > 0) ((FloatingActionButton) findViewById(R.id.btn_add_transaction)).hide();
+            }
+        });
         ((SwipeRefreshLayout) findViewById(R.id.account_swiper)).setOnRefreshListener(() -> {
             Log.d("ui", "refreshing accounts via swipe");
             update_accounts(true);
