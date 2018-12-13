@@ -162,7 +162,7 @@ public class AccountSummary extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.account_summary, menu);
         optMenu = menu;
 
-        mShowHiddenAccounts = menu.findItem(R.id.menu_acc_summary_show_hidden);
+        mShowHiddenAccounts = menu.findItem(R.id.menu_acc_summary_only_starred);
         if (mShowHiddenAccounts == null) throw new AssertionError();
 
         sBindPreferenceSummaryToValueListener = (preference, value) -> mShowHiddenAccounts
@@ -195,7 +195,7 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     public
-    void onShowHiddenAccountsClicked(MenuItem mi) {
+    void onShowOnlyStarredClicked(MenuItem mi) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean flag = pref.getBoolean("show_hidden_accounts", false);
 

@@ -5,7 +5,7 @@
         android:id="@+id/pref_show_hidden_accounts"
         android:defaultValue="false"
         android:key="show_hidden_accounts"
-        android:summaryOff="@string/pref_show_hidden_accounts_off_summary"
-        android:summaryOn="@string/pref_show_hidden_accounts_on_summary"
-        android:title="@string/menu_acc_summary_show_hidden_accounts_title" />
+        android:summaryOff="@string/pref_show_only_starred_off_summary"
+        android:summaryOn="@string/pref_show_only_starred_on_summary"
+        android:title="@string/menu_acc_summary_show_only_starred_title" />
 </PreferenceScreen>

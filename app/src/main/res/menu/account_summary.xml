@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_acc_summary_show_hidden"
+        android:id="@+id/menu_acc_summary_only_starred"
         android:checkable="true"
         android:checked="false"
-        android:title="@string/menu_acc_summary_show_hidden_accounts_title"
+        android:title="@string/menu_acc_summary_show_only_starred_title"
         app:actionLayout="@layout/switch_item"
-        android:onClick="onShowHiddenAccountsClicked"
+        android:onClick="onShowOnlyStarredClicked"
         app:showAsAction="never" />
     <item android:id="@+id/menu_acc_summary_hide_selected"
         android:icon="@drawable/ic_star_white_24dp"

@@ -29,7 +29,13 @@
     <string name="menu_hide_acc_title">Скриване на сметката</string>
     <string name="menu_acc_summary_refresh_title">Обновяване</string>
     <string name="err_net_error">Мрежова грешка</string>
-    <string name="menu_acc_summary_show_hidden_accounts_title">Показване на скритите сметки</string>
+    <string name="menu_acc_summary_show_only_starred_title">Показване само на любимите</string>
     <string name="action_reset_new_transaction_activity_title">Отначало</string>
     <string name="ime_action_next_title">Следващ</string>
+    <string name="interface_pref_header_title">Интерфейс</string>
+    <string name="pref_show_only_starred_off_summary">Списъкът на сметките съдържа всички сметки</string>
+    <string name="pref_show_only_starred_on_summary">Показват се само отбелязаните със звезда</string>
+    <string name="menu_acc_summary_cancel_selection_title">Отказ</string>
+    <string name="err_bad_auth">Грешно потребителско име или парола</string>
+    <string name="new_transaction_amount_hint">0,00</string>
 </resources>
