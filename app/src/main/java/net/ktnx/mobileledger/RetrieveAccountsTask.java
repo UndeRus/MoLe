@@ -1,6 +1,5 @@
 package net.ktnx.mobileledger;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -10,19 +9,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
+class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
     int error;
 
     private SharedPreferences pref;
-    private final Context mContext;
+    WeakReference<AccountSummary> mContext;
 
-    RetrieveAccountsTask(Context context) {
+    RetrieveAccountsTask(WeakReference<AccountSummary> context) {
         mContext = context;
         error = 0;
     }
@@ -37,7 +37,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
             http.setAllowUserInteraction(false);
             http.setRequestProperty("Accept-Charset", "UTF-8");
             publishProgress(0);
-            try(MobileLedgerDatabase dbh = new MobileLedgerDatabase(mContext)) {
+            try(MobileLedgerDatabase dbh = new MobileLedgerDatabase(mContext.get())) {
                 try(SQLiteDatabase db = dbh.getWritableDatabase()) {
                     try (InputStream resp = http.getInputStream()) {
                         Log.d("update_accounts", String.valueOf(http.getResponseCode()));
@@ -74,10 +74,7 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
                                         acct_name = acct_name.replace("\"", "");
                                         Log.d("account-parser", acct_name);
 
-                                        db.execSQL(
-                                                "insert or replace into accounts(name, name_upper, "
-                                                        + "keep) values(?, ?, 1)",
-                                                new Object[]{acct_name, acct_name.toUpperCase()});
+                                        addAccount(db, acct_name);
                                         publishProgress(++count);
 
                                         last_account_name = acct_name;
@@ -162,7 +159,21 @@ abstract public class RetrieveAccountsTask extends android.os.AsyncTask<Void, In
         return null;
     }
 
-    abstract protected void onProgressUpdate(Integer... values);
+    private void addAccount(SQLiteDatabase db, String name) {
+        do {
+            LedgerAccount acc = new LedgerAccount(name);
+            db.execSQL(
+                    "insert or replace into accounts(name, name_upper, level, parent_name, keep) "
+                            + "values(?, ?, ?, ?, 1)",
+                    new Object[]{name, name.toUpperCase(), acc.getLevel(), acc.getParentName()});
+            name = acc.getParentName();
+        } while (name != null);
+    }
+    @Override
+    protected void onPostExecute(Void result) {
+        AccountSummary ctx = mContext.get();
+        if (ctx == null) return;
+        ctx.onAccountRefreshDone(this.error);
+    }
 
-    abstract protected void onPostExecute(Void result);
 }

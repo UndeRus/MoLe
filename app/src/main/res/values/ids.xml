@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="VH" type="id" />
+    <item name="POS" type="id" />
+    <item name="SELECTING" type="id" />
+</resources>

@@ -18,7 +18,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     static final String DB_NAME = "mobile-ledger.db";
     static final String ACCOUNTS_TABLE = "accounts";
     static final String DESCRIPTION_HISTORY_TABLE = "description_history";
-    static final int LATEST_REVISION = 4;
+    static final int LATEST_REVISION = 6;
 
     final Context mContext;
 

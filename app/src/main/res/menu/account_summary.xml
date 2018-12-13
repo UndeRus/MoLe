@@ -3,12 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_acc_summary_refresh"
-        android:icon="@drawable/ic_refresh_white_24dp"
-        android:title="@string/menu_acc_summary_refresh_title"
-        android:onClick="onRefreshAccountSummaryClicked"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/menu_acc_summary_show_hidden"
         android:checkable="true"
         android:checked="false"
@@ -16,4 +10,16 @@
         app:actionLayout="@layout/switch_item"
         android:onClick="onShowHiddenAccountsClicked"
         app:showAsAction="never" />
+    <item android:id="@+id/menu_acc_summary_hide_selected"
+        android:icon="@drawable/ic_star_white_24dp"
+        android:title="@string/menu_acc_summary_hide_selected_title"
+        app:showAsAction="always"
+        android:visible="false"
+        />
+    <item android:id="@+id/menu_acc_summary_cancel_selection"
+        android:title="@string/menu_acc_summary_cancel_selection_title"
+        app:showAsAction="always"
+        android:visible="false"
+        android:onClick="onCancelAccSelection"
+        android:icon="@drawable/ic_cancel_white_24dp" />
 </menu>

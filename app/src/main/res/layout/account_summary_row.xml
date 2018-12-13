@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/account_summary_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="36dp"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    tools:showIn="@layout/content_account_summary">
+
+    <CheckBox
+        android:id="@+id/account_row_check"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/account_row_acc_name"
+        style="@style/account_summary_account_name"
+        android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more." />
+
+    <TextView
+        android:id="@+id/account_row_acc_amounts"
+        style="@style/account_summary_amounts"
+        android:text="123,45\n678,90" />
+</LinearLayout>

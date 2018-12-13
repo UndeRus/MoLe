@@ -79,4 +79,6 @@
     <string name="interface_pref_header_title">Interface</string>
     <string name="pref_show_hidden_accounts_off_summary">Hidden accounts are not visible in the account list</string>
     <string name="pref_show_hidden_accounts_on_summary">Hidden accounts are shown in the account list</string>
+    <string name="menu_acc_summary_hide_selected_title">Hide selected accounts</string>
+    <string name="menu_acc_summary_cancel_selection_title">Cancel selection</string>
 </resources>
