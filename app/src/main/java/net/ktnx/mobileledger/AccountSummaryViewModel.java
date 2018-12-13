@@ -149,95 +149,10 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
         accounts.get(position).toggleSelected();
         notifyItemChanged(position);
     }
-
-//    @NonNull
-//    @Override
-//    public View getView(int position, @Nullable View row, @NonNull ViewGroup parent) {
-//        LedgerAccount acc = getItem(position);
-//        LedgerRowHolder holder;
-//        if (row == null) {
-//            holder = new LedgerRowHolder();
-//            LayoutInflater vi = getSystemService(this.getContext(), LayoutInflater.class);
-//            MenuInflater mi = getSystemService(this.getContext(), MenuInflater.class);
-//
-//            if (vi == null)
-//                throw new IllegalStateException("Unable to instantiate the inflater " + "service");
-//            row = vi.inflate(R.layout.account_summary_row, parent, false);
-//            holder.tvAccountName = row.findViewById(R.id.account_row_acc_name);
-//            holder.tvAccountAmounts = row.findViewById(R.id.account_row_acc_amounts);
-//            row.setTag(R.id.VH, holder);
-//
-//            row.setPadding(context.getResources()
-//                            .getDimensionPixelSize(R.dimen.activity_horizontal_margin)/2, dp2px
-//                            (context, 3),
-//                    context.getResources()
-//                            .getDimensionPixelSize(R.dimen.activity_horizontal_margin)/2,
-//                    dp2px(context, 4));
-//            View.OnCreateContextMenuListener ccml = new View.OnCreateContextMenuListener() {
-//                @Override
-//                public void onCreateContextMenu(ContextMenu menu, View v,
-//                                                ContextMenu.ContextMenuInfo menuInfo) {
-//                    final ListView parent = (ListView) v.getParent();
-//                    int pos = parent.getPositionForView(v);
-//                    parent.setItemChecked(pos, true);
-//                    Log.d("list", String.format("checking pos %d", pos));
-//                }
-//            };
-//            row.setOnCreateContextMenuListener(ccml);
-//
-//        }
-//        else holder = (LedgerRowHolder) row.getTag(R.id.VH);
-//
-//        holder.tvAccountName.setText(acc.getShortName());
-//        holder.tvAccountName.setPadding(acc.getLevel() * context.getResources()
-//                .getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, 0, 0);
-//        holder.tvAccountAmounts.setText(acc.getAmountsString());
-//
-//        if (acc.isHidden()) {
-//            holder.tvAccountName.setTypeface(null, Typeface.ITALIC);
-//            holder.tvAccountAmounts.setTypeface(null, Typeface.ITALIC);
-//        }
-//        else {
-//            holder.tvAccountName.setTypeface(null, Typeface.NORMAL);
-//            holder.tvAccountAmounts.setTypeface(null, Typeface.NORMAL);
-//        }
-//
-//        int real_pos = ((ListView)parent).getPositionForView(row);
-//        Log.d("model", String.format("%s: real_pos=%d, position=%d", acc.getName(), real_pos,
-//                position));
-//        if (real_pos == -1) real_pos = position+1;
-//        else real_pos = real_pos + 1;
-//
-//        if ( real_pos % 2 == 0) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                row.setBackgroundColor(context.getResources()
-//                        .getColor(R.color.table_row_even_bg, context.getTheme()));
-//            }
-//            else {
-//                row.setBackgroundColor(
-//                        context.getResources().getColor(R.color.table_row_even_bg));
-//            }
-//        }
-//        else {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                row.setBackgroundColor(context.getResources()
-//                        .getColor(R.color.drawer_background, context.getTheme()));
-//            }
-//            else {
-//                row.setBackgroundColor(context.getResources().getColor(R.color.drawer_background));
-//            }
-//        }
-//
-//        row.setTag(R.id.POS, position);
-//
-//        return row;
-//    }
-
     class LedgerRowHolder extends RecyclerView.ViewHolder {
         CheckBox selectionCb;
         TextView tvAccountName, tvAccountAmounts;
         LinearLayout row;
-
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
             this.row = (LinearLayout) itemView;
