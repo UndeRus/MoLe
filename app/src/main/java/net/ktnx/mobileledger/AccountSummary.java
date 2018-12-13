@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,8 +35,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.view.View.GONE;
-import static net.ktnx.mobileledger.MobileLedgerDB.db;
-import static net.ktnx.mobileledger.MobileLedgerDB.set_option_value;
 
 public class AccountSummary extends AppCompatActivity {
     DrawerLayout drawer;
@@ -45,6 +44,7 @@ public class AccountSummary extends AppCompatActivity {
     MenuItem mShowHiddenAccounts;
     SharedPreferences.OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener;
     private AccountRowLayout clickedAccountRow;
+    private MobileLedgerDatabase dbh;
 
     public static void preferences_changed() {
         account_list_needs_update = true;
@@ -57,6 +57,8 @@ public class AccountSummary extends AppCompatActivity {
         setContentView(R.layout.activity_account_summary);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        dbh = new MobileLedgerDatabase(this);
 
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -188,17 +190,7 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     private void prepare_db() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            MobileLedgerDB.setDb_filename(this.getApplicationInfo().deviceProtectedDataDir + "/" + MobileLedgerDB.DATABASE_NAME);
-        }
-        else {
-            MobileLedgerDB.setDb_filename(
-                    this.getApplicationInfo().dataDir + "/" + MobileLedgerDB.DATABASE_NAME);
-        }
-        MobileLedgerDB.initDB(getResources(), getPackageName());
-
-        account_list_last_updated = MobileLedgerDB.get_option_value("last_refresh", (long) 0);
-
+        account_list_last_updated = dbh.get_option_value("last_refresh", (long) 0);
     }
 
     private void update_accounts(boolean force) {
@@ -239,7 +231,7 @@ public class AccountSummary extends AppCompatActivity {
                     Snackbar.make(drawer, err_text, Snackbar.LENGTH_LONG ).show();
                 }
                 else {
-                    set_option_value("last_refresh", new Date().getTime() );
+                    dbh.set_option_value("last_refresh", new Date().getTime() );
                     update_account_table();
                 }
             }
@@ -271,8 +263,9 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     public void hideAccountClicked(MenuItem item) {
-        db.execSQL("update accounts set hidden=1 where name=?",
-                new Object[]{clickedAccountRow.getAccountName()});
+        try(SQLiteDatabase db = dbh.getWritableDatabase()) {
+            db.execSQL("update accounts set hidden=1 where name=?", new Object[]{clickedAccountRow.getAccountName()});
+        }
         update_account_table();
     }
 
@@ -297,79 +290,89 @@ public class AccountSummary extends AppCompatActivity {
                 .getBoolean("show_hidden_accounts", false);
         Log.d("pref", "show_hidden_accounts is " + (showingHiddenAccounts ? "true" : "false"));
 
-        try (Cursor cursor = db
-                .rawQuery("SELECT name, hidden FROM accounts ORDER BY name;", null))
-        {
-            boolean even = false;
-            String skippingAccountName = null;
-            while (cursor.moveToNext()) {
-                String acc_name = cursor.getString(0);
-                if (skippingAccountName != null) {
-                    if (acc_name.startsWith(skippingAccountName + ":")) continue;
+        try(SQLiteDatabase db = dbh.getReadableDatabase()) {
+            try (Cursor cursor = db
+                    .rawQuery("SELECT name, hidden FROM accounts ORDER BY name;", null))
+            {
+                boolean even = false;
+                String skippingAccountName = null;
+                while (cursor.moveToNext()) {
+                    String acc_name = cursor.getString(0);
+                    if (skippingAccountName != null) {
+                        if (acc_name.startsWith(skippingAccountName + ":")) continue;
 
-                    skippingAccountName = null;
-                }
+                        skippingAccountName = null;
+                    }
 
-                boolean is_hidden = cursor.getInt(1) == 1;
+                    boolean is_hidden = cursor.getInt(1) == 1;
 
-                if (!showingHiddenAccounts && is_hidden) {
-                    skippingAccountName = acc_name;
-                    continue;
-                }
+                    if (!showingHiddenAccounts && is_hidden) {
+                        skippingAccountName = acc_name;
+                        continue;
+                    }
 
-                LinearLayout r = new AccountRowLayout(this, acc_name);
-                r.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                r.setGravity(Gravity.CENTER_VERTICAL);
-                r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3), getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(4));
-                r.setMinimumHeight(rowHeight);
+                    LinearLayout r = new AccountRowLayout(this, acc_name);
+                    r.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+                    r.setGravity(Gravity.CENTER_VERTICAL);
+                    r.setPadding(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), dp2px(3),
+                            getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin),
+                            dp2px(4));
+                    r.setMinimumHeight(rowHeight);
 
-                if (even) {
+                    if (even) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            r.setBackgroundColor(
+                                    getResources().getColor(R.color.table_row_even_bg, getTheme()));
+                        }
+                        else {
+                            r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
+                        }
+                    }
+                    even = !even;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        r.setBackgroundColor(
-                                getResources().getColor(R.color.table_row_even_bg, getTheme()));
+                        r.setContextClickable(true);
                     }
-                    else {
-                        r.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
-                    }
-                }
-                even = !even;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    r.setContextClickable(true);
-                }
-                r.setOnCreateContextMenuListener(ccml);
+                    r.setOnCreateContextMenuListener(ccml);
 
 
-                TextView acc_tv = new TextView(this, null, R.style.account_summary_account_name);
-                acc_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 5f));
-                acc_tv.setGravity(Gravity.CENTER_VERTICAL);
-                int[] indent_level = new int[]{0};
-                String short_acc_name = strip_higher_accounts(acc_name, indent_level);
-                acc_tv.setPadding(indent_level[0] * getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2, 0, 0, 0);
-                acc_tv.setText(short_acc_name);
-                if (is_hidden) acc_tv.setTypeface(null, Typeface.ITALIC);
-                r.addView(acc_tv);
+                    TextView acc_tv = new TextView(this, null, R.style.account_summary_account_name);
+                    acc_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT, 5f));
+                    acc_tv.setGravity(Gravity.CENTER_VERTICAL);
+                    int[] indent_level = new int[]{0};
+                    String short_acc_name = strip_higher_accounts(acc_name, indent_level);
+                    acc_tv.setPadding(indent_level[0] * getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2, 0, 0,
+                            0);
+                    acc_tv.setText(short_acc_name);
+                    if (is_hidden) acc_tv.setTypeface(null, Typeface.ITALIC);
+                    r.addView(acc_tv);
 
-                TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
-                amt_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
-                amt_tv.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
-                amt_tv.setGravity(Gravity.CENTER_VERTICAL);
+                    TextView amt_tv = new TextView(this, null, R.style.account_summary_amounts);
+                    amt_tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT, 1f));
+                    amt_tv.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
+                    amt_tv.setGravity(Gravity.CENTER_VERTICAL);
 //                amt_tv.setGravity(Gravity.CENTER);
-                amt_tv.setMinWidth(dp2px(60f));
-                StringBuilder amt_text = new StringBuilder();
-                try (Cursor cAmounts = db.rawQuery("SELECT currency, value FROM account_values WHERE account = ?", new String[]{acc_name})) {
-                    while (cAmounts.moveToNext()) {
-                        String curr = cAmounts.getString(0);
-                        Float amt = cAmounts.getFloat(1);
-                        if (amt_text.length() != 0) amt_text.append('\n');
-                        amt_text.append(String.format("%s %,1.2f", curr, amt));
+                    amt_tv.setMinWidth(dp2px(60f));
+                    StringBuilder amt_text = new StringBuilder();
+                    try (Cursor cAmounts = db.rawQuery(
+                            "SELECT currency, value FROM account_values WHERE account = ?", new String[]{acc_name}))
+                    {
+                        while (cAmounts.moveToNext()) {
+                            String curr = cAmounts.getString(0);
+                            Float amt = cAmounts.getFloat(1);
+                            if (amt_text.length() != 0) amt_text.append('\n');
+                            amt_text.append(String.format("%s %,1.2f", curr, amt));
+                        }
                     }
+                    amt_tv.setText(amt_text.toString());
+                    if (is_hidden) amt_tv.setTypeface(null, Typeface.ITALIC);
+
+                    r.addView(amt_tv);
+
+                    root.addView(r);
                 }
-                amt_tv.setText(amt_text.toString());
-                if (is_hidden) amt_tv.setTypeface(null, Typeface.ITALIC);
-
-                r.addView(amt_tv);
-
-                root.addView(r);
             }
         }
     }

@@ -58,6 +58,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private AutoCompleteTextView text_descr;
     private static SaveTransactionTask saver;
     private MenuItem mSave;
+    private MobileLedgerDatabase dbh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         setContentView(R.layout.activity_new_transaction);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        dbh = new MobileLedgerDatabase(this);
 
         text_date = findViewById(R.id.new_transaction_date);
         text_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -75,7 +78,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             }
         });
         text_descr = findViewById(R.id.new_transaction_description);
-        hook_autocompletion_adapter(text_descr, MobileLedgerDB.DESCRIPTION_HISTORY_TABLE, "description");
+        hook_autocompletion_adapter(text_descr, MobileLedgerDatabase
+                .DESCRIPTION_HISTORY_TABLE, "description");
         hook_text_change_listener(text_descr);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -87,7 +91,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
             TextView amount_view = (TextView) row.getChildAt(1);
             hook_swipe_listener(row);
-            hook_autocompletion_adapter(acc_name_view, MobileLedgerDB.ACCOUNTS_TABLE, "name");
+            hook_autocompletion_adapter(acc_name_view, MobileLedgerDatabase.ACCOUNTS_TABLE, "name");
             hook_text_change_listener(acc_name_view);
             hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
@@ -228,43 +232,43 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private void hook_autocompletion_adapter(final AutoCompleteTextView view, final String table, final String field) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
-        SQLiteDatabase db = MobileLedgerDB.db;
-
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_dropdown_item_1line, null, from, to, 0);
+        SimpleCursorAdapter adapter =
+                new SimpleCursorAdapter(this, android.R.layout.simple_dropdown_item_1line, null,
+                        from, to, 0);
         adapter.setStringConversionColumn(1);
 
         FilterQueryProvider provider = new FilterQueryProvider() {
             @Override
-            public Cursor runQuery(CharSequence constraint) {
+            public
+            Cursor runQuery(CharSequence constraint) {
                 if (constraint == null) return null;
 
                 String str = constraint.toString().toUpperCase();
-                Log.d("autocompletion", "Looking for "+str);
+                Log.d("autocompletion", "Looking for " + str);
                 String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
-                Cursor matches = db.rawQuery(String.format(
-                        "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                                "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                                "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
-                                "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " +
-                                "ORDER BY 2, 1;", field, field, field, field, table, field),
-                        new String[]{str, str, str, str});
+                try (SQLiteDatabase db = dbh.getReadableDatabase()) {
 
-                try {
-                    int i = 0;
-                    while (matches.moveToNext()) {
-                        String match = matches.getString(0);
-                        int order = matches.getInt(1);
-                        Log.d("autocompletion", String.format("match: %s |%d", match, order));
-                        c.newRow().add(i++).add(match);
+                    try (Cursor matches = db.rawQuery(String.format(
+                            "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 "
+                                    + "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 "
+                                    + "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end "
+                                    + "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' "
+                                    + "ORDER BY 2, 1;", field, field, field, field, table, field),
+                            new String[]{str, str, str, str}))
+                    {
+                        int i = 0;
+                        while (matches.moveToNext()) {
+                            String match = matches.getString(0);
+                            int order = matches.getInt(1);
+                            Log.d("autocompletion", String.format("match: %s |%d", match, order));
+                            c.newRow().add(i++).add(match);
+                        }
                     }
-                }
-                finally {
-                    matches.close();
-                }
 
-                return c;
+                    return c;
+                }
 
             }
         };
@@ -332,7 +336,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
-        hook_autocompletion_adapter(acc, MobileLedgerDB.ACCOUNTS_TABLE, "name");
+        hook_autocompletion_adapter(acc, MobileLedgerDatabase.ACCOUNTS_TABLE, "name");
         hook_text_change_listener(acc);
         hook_text_change_listener(amt);
     }
