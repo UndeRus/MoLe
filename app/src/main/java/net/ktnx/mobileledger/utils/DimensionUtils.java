@@ -15,8 +15,15 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.utils;
 
-interface TaskCallback {
-    void done(String error);
+import android.content.Context;
+import android.util.TypedValue;
+
+public class DimensionUtils {
+    public static int dp2px(Context context, float dp) {
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+               context.getResources().getDisplayMetrics()));
+    }
+
 }

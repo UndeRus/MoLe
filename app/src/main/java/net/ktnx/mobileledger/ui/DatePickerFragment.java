@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
@@ -26,6 +26,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.widget.DatePicker;
 import android.widget.TextView;
+
+import net.ktnx.mobileledger.R;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

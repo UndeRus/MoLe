@@ -15,11 +15,17 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.async;
 
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import net.ktnx.mobileledger.AccountSummary;
+import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -33,18 +39,18 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
+public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
     int error;
 
     private SharedPreferences pref;
     WeakReference<AccountSummary> mContext;
 
-    RetrieveAccountsTask(WeakReference<AccountSummary> context) {
+    public RetrieveAccountsTask(WeakReference<AccountSummary> context) {
         mContext = context;
         error = 0;
     }
 
-    void setPref(SharedPreferences pref) {
+    public void setPref(SharedPreferences pref) {
         this.pref = pref;
     }
 

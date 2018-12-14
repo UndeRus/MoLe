@@ -15,18 +15,18 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.model;
 
-class LedgerTransactionItem {
+public class LedgerTransactionItem {
     private String accountName;
     private float amount;
     private boolean amountSet;
     private String currency;
 
-    LedgerTransactionItem(String accountName, float amount) {
+    public LedgerTransactionItem(String accountName, float amount) {
         this(accountName, amount, null);
     }
-    LedgerTransactionItem(String accountName, float amount, String currency) {
+    public LedgerTransactionItem(String accountName, float amount, String currency) {
         this.accountName = accountName;
         this.amount = amount;
         this.amountSet = true;

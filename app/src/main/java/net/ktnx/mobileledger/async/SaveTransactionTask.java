@@ -15,11 +15,16 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.async;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.utils.NetworkUtil;
+import net.ktnx.mobileledger.utils.UrlEncodedFormData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +41,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.Thread.sleep;
 
-class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
+public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private final TaskCallback task_callback;
     private String token;
     private String session;
@@ -45,11 +50,11 @@ class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     protected String error;
 
     private SharedPreferences pref;
-    void setPref(SharedPreferences pref) {
+    public void setPref(SharedPreferences pref) {
         this.pref = pref;
     }
 
-    SaveTransactionTask(TaskCallback callback) {
+    public SaveTransactionTask(TaskCallback callback) {
         task_callback = callback;
     }
     private boolean send_ok() throws IOException {

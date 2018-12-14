@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.model;
 
 import android.support.annotation.NonNull;
 
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class LedgerAccount {
+public class LedgerAccount {
     private String name;
     private String shortName;
     private int level;
@@ -34,7 +34,7 @@ class LedgerAccount {
     private List<LedgerAmount> amounts;
     static Pattern higher_account = Pattern.compile("^[^:]+:");
 
-    LedgerAccount(String name) {
+    public LedgerAccount(String name) {
         this.setName(name);
         hidden = false;
     }
@@ -47,7 +47,7 @@ class LedgerAccount {
         this.hidden = hidden;
     }
 
-    LedgerAccount(String name, float amount) {
+    public LedgerAccount(String name, float amount) {
         this.setName(name);
         this.hidden = false;
         this.amounts = new ArrayList<LedgerAmount>();
@@ -77,19 +77,19 @@ class LedgerAccount {
         else parentName = null;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    void addAmount(float amount, String currency) {
+    public void addAmount(float amount, String currency) {
         if (amounts == null ) amounts = new ArrayList<>();
         amounts.add(new LedgerAmount(amount, currency));
     }
-    void addAmount(float amount) {
+    public void addAmount(float amount) {
         this.addAmount(amount, null);
     }
 
-    String getAmountsString() {
+    public String getAmountsString() {
         if ((amounts == null) || amounts.isEmpty()) return "";
 
         StringBuilder builder = new StringBuilder();

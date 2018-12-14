@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.utils;
 
 import android.support.annotation.NonNull;
 
@@ -25,14 +25,14 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 
-class UrlEncodedFormData {
+public class UrlEncodedFormData {
     private List<AbstractMap.SimpleEntry<String,String>> pairs;
 
-    UrlEncodedFormData() {
+    public UrlEncodedFormData() {
         pairs = new ArrayList<>();
     }
 
-    void add_pair(String name, String value) {
+    public void add_pair(String name, String value) {
         pairs.add(new AbstractMap.SimpleEntry<String,String>(name, value));
     }
 

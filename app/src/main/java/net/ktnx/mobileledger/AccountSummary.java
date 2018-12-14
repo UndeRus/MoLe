@@ -41,6 +41,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import net.ktnx.mobileledger.async.RetrieveAccountsTask;
+import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
@@ -259,7 +263,7 @@ public class AccountSummary extends AppCompatActivity {
         task.execute();
 
     }
-    void onAccountRefreshDone(int error) {
+    public void onAccountRefreshDone(int error) {
         SwipeRefreshLayout srl = findViewById(R.id.account_swiper);
         srl.setRefreshing(false);
         if (error != 0) {

@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -31,13 +31,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
-class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
-    static final String DB_NAME = "mobile-ledger.db";
-    static final String ACCOUNTS_TABLE = "accounts";
-    static final String DESCRIPTION_HISTORY_TABLE = "description_history";
-    static final int LATEST_REVISION = 7;
+public class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
+    public static final String DB_NAME = "mobile-ledger.db";
+    public static final String ACCOUNTS_TABLE = "accounts";
+    public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
+    public static final int LATEST_REVISION = 7;
 
-    final Context mContext;
+    private final Context mContext;
 
     public
     MobileLedgerDatabase(Context context) {
@@ -89,7 +89,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
             db.endTransaction();
         }
     }
-    int get_option_value(String name, int default_value) {
+    public int get_option_value(String name, int default_value) {
         String s = get_option_value(name, String.valueOf(default_value));
         try {
             return Integer.parseInt(s);
@@ -99,7 +99,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
         }
     }
 
-    long get_option_value(String name, long default_value) {
+    public long get_option_value(String name, long default_value) {
         String s = get_option_value(name, String.valueOf(default_value));
         try {
             return Long.parseLong(s);
@@ -110,7 +110,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
         }
     }
 
-    String get_option_value(String name, String default_value) {
+    public String get_option_value(String name, String default_value) {
         Log.d("db", "about to fetch option "+name);
         try(SQLiteDatabase db = getReadableDatabase()) {
             try (Cursor cursor = db
@@ -133,7 +133,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
         }
     }
 
-     void set_option_value(String name, String value) {
+     public void set_option_value(String name, String value) {
         Log.d("db", "setting option "+name+"="+value);
         try(SQLiteDatabase db = getWritableDatabase()) {
             db.execSQL("insert or replace into options(name, value) values(?, ?);",
@@ -141,15 +141,15 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
         }
     }
 
-    void set_option_value(String name, long value) {
+    public void set_option_value(String name, long value) {
         set_option_value(name, String.valueOf(value));
     }
-    static long get_option_value(Context context, String name, long default_value) {
+    public static long get_option_value(Context context, String name, long default_value) {
         try(MobileLedgerDatabase db = new MobileLedgerDatabase(context)) {
             return db.get_option_value(name, default_value);
         }
     }
-    static void set_option_value(Context context, String name, String value) {
+    public static void set_option_value(Context context, String name, String value) {
         try(MobileLedgerDatabase db = new MobileLedgerDatabase(context)) {
             db.set_option_value(name, value);
         }

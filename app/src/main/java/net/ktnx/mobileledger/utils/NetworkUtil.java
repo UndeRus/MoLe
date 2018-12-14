@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.utils;
 
 import android.content.SharedPreferences;
 import android.util.Base64;
@@ -25,8 +25,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-final class NetworkUtil {
-    static HttpURLConnection prepare_connection(SharedPreferences pref, String path) throws IOException {
+public final class NetworkUtil {
+    public static HttpURLConnection prepare_connection(SharedPreferences pref, String path) throws
+            IOException {
         final String backend_url = pref.getString("backend_url", "");
         final boolean use_auth = pref.getBoolean("backend_use_http_auth", false);
         Log.d("network", "Connecting to "+backend_url + "/" + path);

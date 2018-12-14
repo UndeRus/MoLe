@@ -15,12 +15,12 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.model;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
-class LedgerAmount {
+public class LedgerAmount {
     private String currency;
     private float amount;
 

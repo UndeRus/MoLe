@@ -36,6 +36,9 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+
 import java.util.ArrayList;
 import java.util.List;
 

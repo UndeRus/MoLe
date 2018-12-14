@@ -15,12 +15,18 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.async;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+
+import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -33,37 +39,37 @@ import java.net.MalformedURLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class Params {
-    static final int DEFAULT_LIMIT = 100;
-    private SharedPreferences backendPref;
-    private String accountsRoot;
-    private int limit;
 
-    Params(SharedPreferences backendPref) {
-        this.backendPref = backendPref;
-        this.accountsRoot = null;
-        this.limit = DEFAULT_LIMIT;
-    }
-    Params(SharedPreferences backendPref, String accountsRoot) {
-        this(backendPref, accountsRoot, DEFAULT_LIMIT);
-    }
-    Params(SharedPreferences backendPref, String accountsRoot, int limit) {
-        this.backendPref = backendPref;
-        this.accountsRoot = accountsRoot;
-        this.limit = limit;
-    }
-    String getAccountsRoot() {
-        return accountsRoot;
-    }
-    SharedPreferences getBackendPref() {
-        return backendPref;
-    }
-    int getLimit() {
-        return limit;
-    }
-}
+class RetrieveTransactionsTask extends AsyncTask<RetrieveTransactionsTask.Params, Integer, Void> {
+    class Params {
+        static final int DEFAULT_LIMIT = 100;
+        private SharedPreferences backendPref;
+        private String accountsRoot;
+        private int limit;
 
-class RetrieveTransactionsTask extends AsyncTask<Params, Integer, Void> {
+        Params(SharedPreferences backendPref) {
+            this.backendPref = backendPref;
+            this.accountsRoot = null;
+            this.limit = DEFAULT_LIMIT;
+        }
+        Params(SharedPreferences backendPref, String accountsRoot) {
+            this(backendPref, accountsRoot, DEFAULT_LIMIT);
+        }
+        Params(SharedPreferences backendPref, String accountsRoot, int limit) {
+            this.backendPref = backendPref;
+            this.accountsRoot = accountsRoot;
+            this.limit = limit;
+        }
+        String getAccountsRoot() {
+            return accountsRoot;
+        }
+        SharedPreferences getBackendPref() {
+            return backendPref;
+        }
+        int getLimit() {
+            return limit;
+        }
+    }
     private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" "
             + "id=\"transaction-(\\d+)\"><td class=\"date\"[^\\\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =

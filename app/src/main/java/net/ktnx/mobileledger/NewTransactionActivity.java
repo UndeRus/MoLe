@@ -51,12 +51,17 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import net.ktnx.mobileledger.async.SaveTransactionTask;
+import net.ktnx.mobileledger.async.TaskCallback;
+import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.ui.DatePickerFragment;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+
 import java.util.Date;
 import java.util.Objects;
 
 /*
- * TODO: auto-fill of transaction description
- *       if Android O's implementation won't work, add a custom one
  * TODO: nicer progress while transaction is submitted
  * TODO: latest transactions, maybe with browsing further in the past?
  * TODO: reports
