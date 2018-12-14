@@ -28,6 +28,8 @@ import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
 
+import static net.ktnx.mobileledger.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
+
 public class AccountSummary extends AppCompatActivity {
     DrawerLayout drawer;
 
@@ -94,7 +96,12 @@ public class AccountSummary extends AppCompatActivity {
                 modelAdapter.startSelection();
                 if (optMenu != null) {
                     optMenu.findItem(R.id.menu_acc_summary_cancel_selection).setVisible(true);
-                    optMenu.findItem(R.id.menu_acc_summary_hide_selected).setVisible(true);
+                    optMenu.findItem(R.id.menu_acc_summary_confirm_selection).setVisible(true);
+                    optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(false);
+                }
+                {
+                    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.btn_add_transaction);
+                    if (fab != null) fab.hide();
                 }
             }
         }));
@@ -175,11 +182,11 @@ public class AccountSummary extends AppCompatActivity {
         if (mShowHiddenAccounts == null) throw new AssertionError();
 
         sBindPreferenceSummaryToValueListener = (preference, value) -> mShowHiddenAccounts
-                .setChecked(preference.getBoolean("show_hidden_accounts", false));
+                .setChecked(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         pref.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
-        mShowHiddenAccounts.setChecked(pref.getBoolean("show_hidden_accounts", false));
+        mShowHiddenAccounts.setChecked(pref.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
 
         return true;
     }
@@ -206,11 +213,11 @@ public class AccountSummary extends AppCompatActivity {
     public
     void onShowOnlyStarredClicked(MenuItem mi) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean flag = pref.getBoolean("show_hidden_accounts", false);
+        boolean flag = pref.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
 
         SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean("show_hidden_accounts", !flag);
-        Log.d("pref", "Setting show_hidden_accounts to " + (flag ? "false" : "true"));
+        editor.putBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, !flag);
+        Log.d("pref", "Setting show only starred accounts pref to " + (flag ? "false" : "true"));
         editor.apply();
 
         update_account_table();
@@ -252,11 +259,23 @@ public class AccountSummary extends AppCompatActivity {
         model.reloadAccounts();
         modelAdapter.notifyDataSetChanged();
     }
-    public void onCancelAccSelection(MenuItem item) {
+    void stopSelection() {
         modelAdapter.stopSelection();
         if (optMenu != null) {
             optMenu.findItem(R.id.menu_acc_summary_cancel_selection).setVisible(false);
-            optMenu.findItem(R.id.menu_acc_summary_hide_selected).setVisible(false);
+            optMenu.findItem(R.id.menu_acc_summary_confirm_selection).setVisible(false);
+            optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(true);
         }
+        {
+            FloatingActionButton fab = findViewById(R.id.btn_add_transaction);
+            if (fab != null) fab.show();
+        }
+    }
+    public void onCancelAccSelection(MenuItem item) {
+        stopSelection();
+    }
+    public void onConfirmAccSelection(MenuItem item) {
+        model.commitSelections();
+        stopSelection();
     }
 }

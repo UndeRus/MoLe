@@ -34,6 +34,7 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+    public static String PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS = "pref_show_only_starred_accounts";
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -224,7 +225,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-//            bindPreferenceSummaryToValue(findPreference("show_hidden_accounts"));
 
         }
 

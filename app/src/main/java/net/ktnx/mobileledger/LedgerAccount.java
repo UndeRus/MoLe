@@ -13,14 +13,13 @@ class LedgerAccount {
     private int level;
     private String parentName;
     private boolean hidden;
+    private boolean hiddenToBe;
     private List<LedgerAmount> amounts;
-    private boolean selected;
     static Pattern higher_account = Pattern.compile("^[^:]+:");
 
     LedgerAccount(String name) {
         this.setName(name);
         hidden = false;
-        selected = false;
     }
 
     public boolean isHidden() {
@@ -98,16 +97,17 @@ class LedgerAccount {
     public String getParentName() {
         return parentName;
     }
-
-    public boolean isSelected() {
-        return selected;
+    public void togglehidden() {
+        hidden = !hidden;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public boolean isHiddenToBe() {
+        return hiddenToBe;
     }
-
-    public void toggleSelected() {
-        selected = !selected;
+    public void setHiddenToBe(boolean hiddenToBe) {
+        this.hiddenToBe = hiddenToBe;
+    }
+    public void toggleHiddenToBe() {
+        setHiddenToBe(!hiddenToBe);
     }
 }

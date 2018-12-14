@@ -22,4 +22,10 @@
         android:visible="false"
         android:onClick="onCancelAccSelection"
         android:icon="@drawable/ic_cancel_white_24dp" />
+    <item android:id="@+id/menu_acc_summary_confirm_selection"
+        android:title="@string/menu_acc_summary_confirm_selection_title"
+        app:showAsAction="always"
+        android:visible="false"
+        android:onClick="onConfirmAccSelection"
+        android:icon="@drawable/ic_check_white_24dp" />
 </menu>
