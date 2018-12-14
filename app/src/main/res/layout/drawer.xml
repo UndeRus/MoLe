@@ -53,6 +53,7 @@
                     android:id="@+id/nav_latest_transactions"
                     style="@style/nav_button"
                     android:drawableStart="@drawable/ic_event_note_black_24dp"
+                    android:onClick="onLatestTransactionsClicked"
                     android:text="@string/nav_latest_transactions_title" />
 
                 <TextView

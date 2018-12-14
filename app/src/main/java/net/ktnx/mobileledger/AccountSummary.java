@@ -182,7 +182,10 @@ public class AccountSummary extends AppCompatActivity {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
-
+    public void onLatestTransactionsClicked(View view) {
+        Intent intent = new Intent(this, TransactionListActivity.class);
+        startActivity(intent);
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
