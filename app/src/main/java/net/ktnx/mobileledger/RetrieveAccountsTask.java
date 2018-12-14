@@ -180,9 +180,11 @@ class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
         do {
             LedgerAccount acc = new LedgerAccount(name);
             db.execSQL(
-                    "insert or replace into accounts(name, name_upper, level, parent_name, keep) "
-                            + "values(?, ?, ?, ?, 1)",
-                    new Object[]{name, name.toUpperCase(), acc.getLevel(), acc.getParentName()});
+                    "update accounts set level = ?, keep = 1 where name = ?",
+                    new Object[]{acc.getLevel(), name});
+            db.execSQL("insert into accounts(name, name_upper, parent_name, level) select ?,?,"
+                            + "?,? " + "where (select changes() = 0)",
+                    new Object[]{name, name.toUpperCase(), acc.getParentName(), acc.getLevel()});
             name = acc.getParentName();
         } while (name != null);
     }
