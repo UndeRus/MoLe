@@ -1,0 +1,2 @@
+create table transactions(id varchar primary key, date varchar, description varchar);
+create table transaction_accounts(transaction_id integer not null, account_name varchar not null, amount float, currency varchar, foreign key (transaction_id) references transactions(id), foreign key(account_name) references accounts(name));

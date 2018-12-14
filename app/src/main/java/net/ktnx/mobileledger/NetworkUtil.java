@@ -39,6 +39,7 @@ final class NetworkUtil {
             http.setRequestProperty("Authorization", "Basic " + value);
         }
         http.setAllowUserInteraction(false);
+        http.setRequestProperty("Accept-Charset", "UTF-8");
         http.setInstanceFollowRedirects(false);
         http.setUseCaches(false);
 

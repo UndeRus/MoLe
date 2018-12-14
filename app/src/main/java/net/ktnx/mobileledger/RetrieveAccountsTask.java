@@ -51,8 +51,6 @@ class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
     protected Void doInBackground(Void... params) {
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection( pref, "add");
-            http.setAllowUserInteraction(false);
-            http.setRequestProperty("Accept-Charset", "UTF-8");
             publishProgress(0);
             try(MobileLedgerDatabase dbh = new MobileLedgerDatabase(mContext.get())) {
                 try(SQLiteDatabase db = dbh.getWritableDatabase()) {

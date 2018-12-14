@@ -72,9 +72,9 @@ class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
             Iterator<LedgerTransactionItem> items = ltr.getItemsIterator();
             while (items.hasNext()) {
                 LedgerTransactionItem item = items.next();
-                params.add_pair("account", item.get_account_name());
-                if (item.is_amount_set())
-                    params.add_pair("amount", String.format(Locale.US, "%1.2f", item.get_amount()));
+                params.add_pair("account", item.getAccountName());
+                if (item.isAmountSet())
+                    params.add_pair("amount", String.format(Locale.US, "%1.2f", item.getAmount()));
                 else params.add_pair("amount", "");
             }
         }

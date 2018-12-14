@@ -17,21 +17,27 @@
 
 package net.ktnx.mobileledger;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 class LedgerTransaction {
+    private String id;
     private String date;
     private String description;
     private List<LedgerTransactionItem> items;
 
-    LedgerTransaction(String date, String description) {
+    LedgerTransaction(String id, String date, String description) {
+        this.id = id;
         this.date = date;
         this.description = description;
         this.items = new ArrayList<>();
     }
-
+    LedgerTransaction(String date, String description) {
+        this(null, date, description);
+    }
     void add_item(LedgerTransactionItem item) {
         items.add(item);
     }
@@ -65,5 +71,19 @@ class LedgerTransaction {
                 return hasNext() ? items.get(pointer++) : null;
             }
         };
+    }
+    public String getId() {
+        return id;
+    }
+
+    void insertInto(SQLiteDatabase db) {
+        db.execSQL("INSERT INTO transactions(id, date, " + "description) values(?, ?, ?)",
+                new String[]{id, date, description});
+
+        for(LedgerTransactionItem item : items) {
+            db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, "
+                    + "currency) values(?, ?, ?, ?)", new Object[]{id, item.getAccountName(),
+                                                                   item.getAmount(), item.getCurrency()});
+        }
     }
 }

@@ -18,45 +18,53 @@
 package net.ktnx.mobileledger;
 
 class LedgerTransactionItem {
-    private String account_name;
+    private String accountName;
     private float amount;
-    private boolean amount_set;
+    private boolean amountSet;
+    private String currency;
 
-    LedgerTransactionItem(String account_name, float amount) {
-        this.account_name = account_name;
+    LedgerTransactionItem(String accountName, float amount) {
+        this(accountName, amount, null);
+    }
+    LedgerTransactionItem(String accountName, float amount, String currency) {
+        this.accountName = accountName;
         this.amount = amount;
-        this.amount_set = true;
+        this.amountSet = true;
+        this.currency = currency;
     }
 
-    public LedgerTransactionItem(String account_name) {
-        this.account_name = account_name;
+    public LedgerTransactionItem(String accountName) {
+        this.accountName = accountName;
     }
 
-    public String get_account_name() {
-        return account_name;
+    public String getAccountName() {
+        return accountName;
     }
 
-    public void set_account_name(String account_name) {
-        this.account_name = account_name;
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
-    public float get_amount() {
-        if (!amount_set)
+    public float getAmount() {
+        if (!amountSet)
             throw new IllegalStateException("Account amount is not set");
 
         return amount;
     }
 
-    public void set_amount(float account_amount) {
+    public void setAmount(float account_amount) {
         this.amount = account_amount;
-        this.amount_set = true;
+        this.amountSet = true;
     }
 
-    public void reset_amount() {
-        this.amount_set = false;
+    public void resetAmount() {
+        this.amountSet = false;
     }
 
-    public boolean is_amount_set() {
-        return amount_set;
+    public boolean isAmountSet() {
+        return amountSet;
+    }
+    public String getCurrency() {
+        return currency;
     }
 }
