@@ -17,12 +17,15 @@
 
 package net.ktnx.mobileledger.async;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.TransactionListActivity;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionItem;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
@@ -40,51 +43,55 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-class RetrieveTransactionsTask extends AsyncTask<RetrieveTransactionsTask.Params, Integer, Void> {
-    class Params {
-        static final int DEFAULT_LIMIT = 100;
-        private SharedPreferences backendPref;
-        private String accountsRoot;
-        private int limit;
-
-        Params(SharedPreferences backendPref) {
-            this.backendPref = backendPref;
-            this.accountsRoot = null;
-            this.limit = DEFAULT_LIMIT;
-        }
-        Params(SharedPreferences backendPref, String accountsRoot) {
-            this(backendPref, accountsRoot, DEFAULT_LIMIT);
-        }
-        Params(SharedPreferences backendPref, String accountsRoot, int limit) {
-            this.backendPref = backendPref;
-            this.accountsRoot = accountsRoot;
-            this.limit = limit;
-        }
-        String getAccountsRoot() {
-            return accountsRoot;
-        }
-        SharedPreferences getBackendPref() {
-            return backendPref;
-        }
-        int getLimit() {
-            return limit;
-        }
-    }
-    private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" "
-            + "id=\"transaction-(\\d+)\"><td class=\"date\"[^\\\"]*>([\\d.-]+)</td>");
+public class RetrieveTransactionsTask extends
+        AsyncTask<RetrieveTransactionsTask.Params, RetrieveTransactionsTask.Progress, Void> {
+    private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
+                                                                           "id=\"transaction-(\\d+)\"><td class=\"date\"[^\\\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
     private static final Pattern transactionDetailsPattern =
             Pattern.compile("^\\s+" + "(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)");
-    protected WeakReference<Context> contextRef;
+    private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
+    protected WeakReference<TransactionListActivity> contextRef;
     protected int error;
+    private boolean success;
+    public RetrieveTransactionsTask(WeakReference<TransactionListActivity> contextRef) {
+        this.contextRef = contextRef;
+    }
+    private static final void L(String msg) {
+        Log.d("transaction-parser", msg);
+    }
+    @Override
+    protected void onProgressUpdate(Progress... values) {
+        super.onProgressUpdate(values);
+        TransactionListActivity context = getContext();
+        if (context == null) return;
+        context.onRetrieveProgress(values[0]);
+    }
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        TransactionListActivity context = getContext();
+        if (context == null) return;
+        context.onRetrieveStart();
+    }
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        TransactionListActivity context = getContext();
+        if (context == null) return;
+        context.onRetrieveDone(success);
+    }
+    @SuppressLint("DefaultLocale")
     @Override
     protected Void doInBackground(Params... params) {
+        Progress progress = new Progress();
+        success = false;
         try {
             HttpURLConnection http =
                     NetworkUtil.prepare_connection(params[0].getBackendPref(), "journal");
             http.setAllowUserInteraction(false);
-            publishProgress(0);
+            publishProgress(progress);
             Context ctx = contextRef.get();
             if (ctx == null) return null;
             try (MobileLedgerDatabase dbh = new MobileLedgerDatabase(ctx)) {
@@ -95,18 +102,7 @@ class RetrieveTransactionsTask extends AsyncTask<RetrieveTransactionsTask.Params
                         db.beginTransaction();
                         try {
                             String root = params[0].getAccountsRoot();
-                            if (root == null) db.execSQL("DELETE FROM transaction_history;");
-                            else {
-                                StringBuilder sql = new StringBuilder();
-                                sql.append("DELETE FROM transaction_history ");
-                                sql.append(
-                                        "where id in (select transactions.id from transactions ");
-                                sql.append("join transaction_accounts ");
-                                sql.append(
-                                        "on transactions.id=transaction_accounts.transaction_id ");
-                                sql.append("where transaction_accounts.account_name like ?||'%'");
-                                db.execSQL(sql.toString(), new String[]{root});
-                            }
+                            db.execSQL("DELETE FROM transactions;");
 
                             int state = ParserState.EXPECTING_JOURNAL;
                             String line;
@@ -114,48 +110,66 @@ class RetrieveTransactionsTask extends AsyncTask<RetrieveTransactionsTask.Params
                                     new BufferedReader(new InputStreamReader(resp, "UTF-8"));
 
                             int transactionCount = 0;
-                            String transactionId = null;
+                            int transactionId = 0;
                             LedgerTransaction transaction = null;
+                            LINES:
                             while ((line = buf.readLine()) != null) {
+                                Matcher m;
+                                L(String.format("State is %d", state));
                                 switch (state) {
-                                    case ParserState.EXPECTING_JOURNAL: {
-                                        if (line.equals("<h2>General Journal</h2>"))
+                                    case ParserState.EXPECTING_JOURNAL:
+                                        if (line.equals("<h2>General Journal</h2>")) {
                                             state = ParserState.EXPECTING_TRANSACTION;
-                                        continue;
-                                    }
-                                    case ParserState.EXPECTING_TRANSACTION: {
-                                        Matcher m = transactionStartPattern.matcher(line);
-                                        if (m.find()) {
-                                            transactionId = m.group(1);
-                                            state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
+                                            L("→ expecting transaction");
                                         }
-                                    }
-                                    case ParserState.EXPECTING_TRANSACTION_DESCRIPTION: {
-                                        Matcher m = transactionDescriptionPattern.matcher(line);
+                                        break;
+                                    case ParserState.EXPECTING_TRANSACTION:
+                                        m = transactionStartPattern.matcher(line);
                                         if (m.find()) {
-                                            if (transactionId == null)
+                                            transactionId = Integer.valueOf(m.group(1));
+                                            state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
+                                            L(String.format("found transaction %d → expecting " +
+                                                            "description", transactionId));
+                                            progress.setProgress(++transactionCount);
+                                            if (progress.getTotal() == Progress.INDETERMINATE)
+                                                progress.setTotal(transactionId);
+                                            publishProgress(progress);
+                                        }
+                                        m = endPattern.matcher(line);
+                                        if (m.find()) {
+                                            L("--- transaction list complete ---");
+                                            success = true;
+                                            break LINES;
+                                        }
+                                        break;
+                                    case ParserState.EXPECTING_TRANSACTION_DESCRIPTION:
+                                        m = transactionDescriptionPattern.matcher(line);
+                                        if (m.find()) {
+                                            if (transactionId == 0)
                                                 throw new TransactionParserException(
-                                                        "Transaction Id is null while expecting description");
+                                                        "Transaction Id is 0 while expecting " +
+                                                        "description");
 
                                             transaction =
                                                     new LedgerTransaction(transactionId, m.group(1),
                                                             m.group(2));
                                             state = ParserState.EXPECTING_TRANSACTION_DETAILS;
+                                            L(String.format("transaction %d created for %s (%s) →" +
+                                                            " expecting details", transactionId,
+                                                    m.group(1), m.group(2)));
                                         }
-                                    }
-                                    case ParserState.EXPECTING_TRANSACTION_DETAILS: {
-                                        if (transaction == null)
-                                            throw new TransactionParserException(
-                                                    "Transaction is null while expecting details");
+                                        break;
+                                    case ParserState.EXPECTING_TRANSACTION_DETAILS:
                                         if (line.isEmpty()) {
                                             // transaction data collected
                                             transaction.insertInto(db);
 
                                             state = ParserState.EXPECTING_TRANSACTION;
-                                            publishProgress(++transactionCount);
+                                            L(String.format("transaction %s saved → expecting " +
+                                                            "transaction", transaction.getId()));
                                         }
                                         else {
-                                            Matcher m = transactionDetailsPattern.matcher(line);
+                                            m = transactionDetailsPattern.matcher(line);
                                             if (m.find()) {
                                                 String acc_name = m.group(1);
                                                 String amount = m.group(2);
@@ -163,11 +177,12 @@ class RetrieveTransactionsTask extends AsyncTask<RetrieveTransactionsTask.Params
                                                 transaction.add_item(
                                                         new LedgerTransactionItem(acc_name,
                                                                 Float.valueOf(amount)));
+                                                L(String.format("%s = %s", acc_name, amount));
                                             }
                                             else throw new IllegalStateException(String.format(
-                                                    "Can't" + " parse transaction details"));
+                                                    "Can't parse transaction details"));
                                         }
-                                    }
+                                        break;
                                     default:
                                         throw new RuntimeException(
                                                 String.format("Unknown " + "parser state %d",
@@ -197,8 +212,63 @@ class RetrieveTransactionsTask extends AsyncTask<RetrieveTransactionsTask.Params
         }
         return null;
     }
-    WeakReference<Context> getContextRef() {
-        return contextRef;
+    TransactionListActivity getContext() {
+        return contextRef.get();
+    }
+
+    public static class Params {
+        static final int DEFAULT_LIMIT = 100;
+        private SharedPreferences backendPref;
+        private String accountsRoot;
+        private int limit;
+
+        public Params(SharedPreferences backendPref) {
+            this.backendPref = backendPref;
+            this.accountsRoot = null;
+            this.limit = DEFAULT_LIMIT;
+        }
+        Params(SharedPreferences backendPref, String accountsRoot) {
+            this(backendPref, accountsRoot, DEFAULT_LIMIT);
+        }
+        Params(SharedPreferences backendPref, String accountsRoot, int limit) {
+            this.backendPref = backendPref;
+            this.accountsRoot = accountsRoot;
+            this.limit = limit;
+        }
+        String getAccountsRoot() {
+            return accountsRoot;
+        }
+        SharedPreferences getBackendPref() {
+            return backendPref;
+        }
+        int getLimit() {
+            return limit;
+        }
+    }
+
+    public class Progress {
+        public static final int INDETERMINATE = -1;
+        private int progress;
+        private int total;
+        Progress() {
+            this(INDETERMINATE, INDETERMINATE);
+        }
+        Progress(int progress, int total) {
+            this.progress = progress;
+            this.total = total;
+        }
+        public int getProgress() {
+            return progress;
+        }
+        protected void setProgress(int progress) {
+            this.progress = progress;
+        }
+        public int getTotal() {
+            return total;
+        }
+        protected void setTotal(int total) {
+            this.total = total;
+        }
     }
 
     private class TransactionParserException extends IllegalStateException {

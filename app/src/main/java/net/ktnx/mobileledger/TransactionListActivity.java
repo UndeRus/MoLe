@@ -17,28 +17,90 @@
 
 package net.ktnx.mobileledger;
 
+import android.arch.lifecycle.ViewModelProviders;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
+import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+
+import java.lang.ref.WeakReference;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.List;
 
 public class TransactionListActivity extends AppCompatActivity {
-
+    private SwipeRefreshLayout swiper;
+    private RecyclerView root;
+    private ProgressBar progressBar;
+    private TransactionListViewModel model;
+    private TextView tvLastUpdate;
+    private TransactionListAdapter modelAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.transaction_list_activity);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, TransactionListFragment.newInstance()).commitNow();
-        }
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         setupActionBar();
+
+        swiper = findViewById(R.id.transaction_swipe);
+        if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
+        root = findViewById(R.id.transaction_root);
+        if (root == null) throw new RuntimeException("Can't get hold on the transaction list view");
+        progressBar = findViewById(R.id.transaction_progress_bar);
+        if (progressBar == null)
+            throw new RuntimeException("Can't get hold on the transaction list progress bar");
+        tvLastUpdate = findViewById(R.id.transactions_last_update);
+        {
+            long last_update = (new MobileLedgerDatabase(this))
+                    .get_option_value("transaction_list_last_update", 0);
+            if (last_update == 0) tvLastUpdate.setText("never");
+            else {
+                Date date = new Date(last_update);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                }
+                else {
+                    tvLastUpdate.setText(date.toLocaleString());
+                }
+            }
+        }
+        model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
+        List<LedgerTransaction> transactions =
+                model.getTransactions(new MobileLedgerDatabase(this));
+        modelAdapter = new TransactionListAdapter(transactions);
+
+        RecyclerView root = findViewById(R.id.transaction_root);
+        root.setAdapter(modelAdapter);
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        root.setLayoutManager(llm);
+
+        ((SwipeRefreshLayout) findViewById(R.id.transaction_swipe)).setOnRefreshListener(() -> {
+            Log.d("ui", "refreshing transactions via swipe");
+            update_transactions();
+        });
+
+//        update_transactions();
     }
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -52,5 +114,56 @@ public class TransactionListActivity extends AppCompatActivity {
         super.finish();
         Log.d("visuals", "finishing");
         overridePendingTransition(R.anim.dummy, R.anim.slide_out_right);
+    }
+    private void update_transactions() {
+        RetrieveTransactionsTask task = new RetrieveTransactionsTask(new WeakReference<>(this));
+
+        RetrieveTransactionsTask.Params params = new RetrieveTransactionsTask.Params(
+                PreferenceManager.getDefaultSharedPreferences(this));
+
+        task.execute(params);
+    }
+
+    public void onRetrieveStart() {
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+    public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
+        if ((progress.getTotal() == RetrieveTransactionsTask.Progress.INDETERMINATE) ||
+            (progress.getTotal() == 0))
+        {
+            progressBar.setIndeterminate(true);
+        }
+        else {
+            progressBar.setIndeterminate(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                progressBar.setMin(0);
+            }
+            progressBar.setMax(progress.getTotal());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                progressBar.setProgress(progress.getProgress(), true);
+            }
+            else progressBar.setProgress(progress.getProgress());
+        }
+    }
+
+    public void onRetrieveDone(boolean success) {
+        progressBar.setVisibility(View.GONE);
+        SwipeRefreshLayout srl = findViewById(R.id.transaction_swipe);
+        srl.setRefreshing(false);
+        if (success) {
+            MobileLedgerDatabase dbh = new MobileLedgerDatabase(this);
+            Date now = new Date();
+            dbh.set_option_value("transaction_list_last_update", now.getTime());
+            updateLastUpdateText(now);
+        }
+    }
+    private void updateLastUpdateText(Date now) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            tvLastUpdate.setText(now.toInstant().atZone(ZoneId.systemDefault()).toString());
+        }
+        else {
+            tvLastUpdate.setText(now.toLocaleString());
+        }
     }
 }

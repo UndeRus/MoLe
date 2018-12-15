@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!--
+  ~ Copyright © 2018 Damyan Ivanov.
+  ~ This file is part of Mobile-Ledger.
+  ~ Mobile-Ledger is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ Mobile-Ledger is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/transaction_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="36dp"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    tools:showIn="@layout/transaction_list_fragment">
+
+    <!--android:button="@drawable/checkbox_star_black"-->
+
+    <TextView
+        android:id="@+id/transaction_row_description"
+        style="@style/account_summary_account_name"
+        android:text="Sample description goes here."
+        tools:ignore="HardcodedText" />
+
+    <TableLayout
+        android:id="@+id/transaction_row_acc_amounts"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TableRow>
+
+            <TextView
+                style="@style/account_summary_amounts"
+                android:text="Sample account name"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                style="@style/account_summary_amounts"
+                android:text="123,45\n678,90"
+                tools:ignore="HardcodedText" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                style="@style/account_summary_amounts"
+                android:text="Sample account name"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                style="@style/account_summary_amounts"
+                android:text="123,45\n678,90"
+                tools:ignore="HardcodedText" />
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

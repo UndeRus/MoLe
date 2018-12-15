@@ -18,7 +18,43 @@
 package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.arch.lifecycle.ViewModel;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionListViewModel extends ViewModel {
-    // TODO: Implement the ViewModel
+
+    private List<LedgerTransaction> transactions;
+
+    public List<LedgerTransaction> getTransactions(MobileLedgerDatabase dbh) {
+        if (transactions == null) {
+            transactions = new ArrayList<>();
+            reloadTransactions(dbh);
+        }
+
+        return transactions;
+    }
+    private void reloadTransactions(MobileLedgerDatabase dbh) {
+        transactions.clear();
+        String sql = "SELECT id, date, description FROM transactions";
+        sql += " ORDER BY date desc, id desc";
+
+        try (SQLiteDatabase db = dbh.getReadableDatabase()) {
+            try (Cursor cursor = db.rawQuery(sql, null)) {
+                while (cursor.moveToNext()) {
+                    LedgerTransaction tr =
+                            new LedgerTransaction(cursor.getString(0), cursor.getString(1),
+                                    cursor.getString(2));
+                    // TODO: fill accounts and amounts
+                    transactions.add(tr);
+                }
+            }
+        }
+
+    }
 }

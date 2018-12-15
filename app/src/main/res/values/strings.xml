@@ -100,4 +100,5 @@
     <string name="menu_acc_summary_cancel_selection_title">Cancel selection</string>
     <string name="menu_acc_summary_confirm_selection_title">Confirm selectin</string>
     <string name="title_activity_transaction_list">Transactions</string>
+    <string name="transactions_last_update_label">Last update:</string>
 </resources>

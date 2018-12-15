@@ -19,45 +19,63 @@ package net.ktnx.mobileledger.model;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import net.ktnx.mobileledger.utils.Digest;
+
+import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 
 public class LedgerTransaction {
+    private static final String DIGEST_TYPE = "SHA-256";
+    public final Comparator<LedgerTransactionItem> comparator =
+            new Comparator<LedgerTransactionItem>() {
+                @Override
+                public int compare(LedgerTransactionItem o1, LedgerTransactionItem o2) {
+                    int res = o1.getAccountName().compareTo(o2.getAccountName());
+                    if (res != 0) return res;
+                    res = o1.getCurrency().compareTo(o2.getCurrency());
+                    if (res != 0) return res;
+                    return Float.compare(o1.getAmount(), o2.getAmount());
+                }
+            };
     private String id;
     private String date;
     private String description;
-    private List<LedgerTransactionItem> items;
-
+    private ArrayList<LedgerTransactionItem> items;
+    private String dataHash;
     public LedgerTransaction(String id, String date, String description) {
         this.id = id;
         this.date = date;
         this.description = description;
         this.items = new ArrayList<>();
+        this.dataHash = null;
+    }
+    public LedgerTransaction(int id, String date, String description) {
+        this(String.valueOf(id), date, description);
     }
     public LedgerTransaction(String date, String description) {
         this(null, date, description);
     }
     public void add_item(LedgerTransactionItem item) {
         items.add(item);
+        dataHash = null;
     }
-
     public String getDate() {
         return date;
     }
-
     public void setDate(String date) {
         this.date = date;
+        dataHash = null;
     }
-
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
+        dataHash = null;
     }
-
     public Iterator<LedgerTransactionItem> getItemsIterator() {
         return new Iterator<LedgerTransactionItem>() {
             private int pointer = 0;
@@ -75,15 +93,39 @@ public class LedgerTransaction {
     public String getId() {
         return id;
     }
-
     public void insertInto(SQLiteDatabase db) {
-        db.execSQL("INSERT INTO transactions(id, date, " + "description) values(?, ?, ?)",
+        fillDataHash();
+        db.execSQL("INSERT INTO transactions(id, date, description, data_hash) values(?,?,?,?)",
                 new String[]{id, date, description});
 
-        for(LedgerTransactionItem item : items) {
-            db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, "
-                    + "currency) values(?, ?, ?, ?)", new Object[]{id, item.getAccountName(),
-                                                                   item.getAmount(), item.getCurrency()});
+        for (LedgerTransactionItem item : items) {
+            db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, " +
+                       "currency) values(?, ?, ?, ?)",
+                    new Object[]{id, item.getAccountName(), item.getAmount(), item.getCurrency()});
+        }
+    }
+    private void fillDataHash() {
+        if (dataHash != null) return;
+        try {
+            Digest sha = new Digest(DIGEST_TYPE);
+            StringBuilder data = new StringBuilder();
+            data.append(getId());
+            data.append('\0');
+            data.append(getDescription());
+            data.append('\0');
+            for (LedgerTransactionItem item : items) {
+                data.append(item.getAccountName());
+                data.append('\0');
+                data.append(item.getCurrency());
+                data.append('\0');
+                data.append(item.getAmount());
+            }
+            sha.update(data.toString().getBytes(Charset.forName("UTF-8")));
+            dataHash = sha.digestToHexString();
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(
+                    String.format("Unable to get instance of %s digest", DIGEST_TYPE), e);
         }
     }
 }
