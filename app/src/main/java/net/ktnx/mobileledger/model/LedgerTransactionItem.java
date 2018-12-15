@@ -51,8 +51,7 @@ public class LedgerTransactionItem {
     }
 
     public float getAmount() {
-        if (!amountSet)
-            throw new IllegalStateException("Account amount is not set");
+        if (!amountSet) throw new IllegalStateException("Account amount is not set");
 
         return amount;
     }
