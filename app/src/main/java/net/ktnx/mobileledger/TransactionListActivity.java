@@ -60,6 +60,8 @@ public class TransactionListActivity extends AppCompatActivity {
 
         setupActionBar();
 
+        MobileLedgerDatabase dbh = new MobileLedgerDatabase(this);
+
         swiper = findViewById(R.id.transaction_swipe);
         if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
         root = findViewById(R.id.transaction_root);
@@ -84,14 +86,14 @@ public class TransactionListActivity extends AppCompatActivity {
             }
         }
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
-        List<LedgerTransaction> transactions =
-                model.getTransactions(new MobileLedgerDatabase(this));
+        List<LedgerTransaction> transactions = model.getTransactions(dbh);
         modelAdapter = new TransactionListAdapter(transactions);
 
         RecyclerView root = findViewById(R.id.transaction_root);
         root.setAdapter(modelAdapter);
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
+
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         root.setLayoutManager(llm);
 
