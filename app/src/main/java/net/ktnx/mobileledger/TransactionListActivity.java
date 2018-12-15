@@ -69,8 +69,8 @@ public class TransactionListActivity extends AppCompatActivity {
             throw new RuntimeException("Can't get hold on the transaction list progress bar");
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         {
-            long last_update = (new MobileLedgerDatabase(this))
-                    .get_option_value("transaction_list_last_update", 0);
+            long last_update = dbh.get_option_value("transaction_list_last_update", 0L);
+            Log.d("transactions", String.format("Last update = %d", last_update));
             if (last_update == 0) tvLastUpdate.setText("never");
             else {
                 Date date = new Date(last_update);
