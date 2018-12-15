@@ -95,6 +95,7 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoClosea
             return Integer.parseInt(s);
         }
         catch (Exception e) {
+            Log.d("db", "returning default int value of "+name, e);
             return default_value;
         }
     }
