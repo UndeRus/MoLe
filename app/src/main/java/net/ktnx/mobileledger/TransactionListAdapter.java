@@ -47,7 +47,19 @@ class TransactionListAdapter
         Resources rm = ctx.getResources();
 
         holder.tvDescription.setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
-//        holder.tableAccounts.setText(acc.getAmountsString());
+        TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
+        tbl.removeAllViews();
+        for (Iterator<LedgerTransactionItem> it = tr.getItemsIterator(); it.hasNext(); ) {
+            LedgerTransactionItem acc = it.next();
+            TableRow row = new TableRow(holder.row.getContext());
+            TextView child = new TextView(ctx);
+            child.setText(acc.getShortAccountName());
+            row.addView(child);
+            child = new TextView(ctx);
+            child.setText(acc.toString());
+            row.addView(child);
+            tbl.addView(row);
+        }
 
         if (position % 2 == 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
