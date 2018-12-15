@@ -40,6 +40,11 @@ public class LedgerTransactionItem {
     public String getAccountName() {
         return accountName;
     }
+    public String getShortAccountName() {
+        String result = accountName;
+        result = result.replaceAll("(?<=^|:)(.)[^:]+(?=:)", "$1");
+        return result;
+    }
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
