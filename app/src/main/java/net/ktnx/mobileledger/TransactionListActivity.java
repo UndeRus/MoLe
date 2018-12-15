@@ -95,10 +95,12 @@ public class TransactionListActivity extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         root.setLayoutManager(llm);
 
-        ((SwipeRefreshLayout) findViewById(R.id.transaction_swipe)).setOnRefreshListener(() -> {
+        swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing transactions via swipe");
             update_transactions();
         });
+
+        swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 
 //        update_transactions();
     }
@@ -149,8 +151,7 @@ public class TransactionListActivity extends AppCompatActivity {
 
     public void onRetrieveDone(boolean success) {
         progressBar.setVisibility(View.GONE);
-        SwipeRefreshLayout srl = findViewById(R.id.transaction_swipe);
-        srl.setRefreshing(false);
+        swiper.setRefreshing(false);
         if (success) {
             MobileLedgerDatabase dbh = new MobileLedgerDatabase(this);
             Date now = new Date();
