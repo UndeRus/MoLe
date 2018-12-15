@@ -58,6 +58,7 @@
         android:indeterminate="true"
         android:indeterminateBehavior="cycle"
         android:progress="40"
+        android:progressTint="@color/colorPrimary"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
