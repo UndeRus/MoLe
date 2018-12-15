@@ -103,6 +103,7 @@ public class RetrieveTransactionsTask extends
                         try {
                             String root = params[0].getAccountsRoot();
                             db.execSQL("DELETE FROM transactions;");
+                            db.execSQL("DELETE FROM transaction_accounts");
 
                             int state = ParserState.EXPECTING_JOURNAL;
                             String line;
