@@ -157,6 +157,7 @@ public class TransactionListActivity extends AppCompatActivity {
             Date now = new Date();
             dbh.set_option_value("transaction_list_last_update", now.getTime());
             updateLastUpdateText(now);
+            modelAdapter.notifyDataSetChanged();
         }
     }
     private void updateLastUpdateText(Date now) {
