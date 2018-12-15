@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.model;
 
+import android.support.annotation.NonNull;
+
 public class LedgerTransactionItem {
     private String accountName;
     private float amount;
@@ -70,5 +72,18 @@ public class LedgerTransactionItem {
     }
     public String getCurrency() {
         return currency;
+    }
+    @NonNull
+    public String toString() {
+        if (!amountSet) return "";
+
+        StringBuilder sb = new StringBuilder();
+        if (currency != null) {
+            sb.append(currency);
+            sb.append(' ');
+        }
+        sb.append(String.format("%,1.2f", amount));
+
+        return sb.toString();
     }
 }
