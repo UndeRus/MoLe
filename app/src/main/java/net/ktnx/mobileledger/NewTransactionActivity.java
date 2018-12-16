@@ -74,11 +74,11 @@ import java.util.Objects;
  *  */
 
 public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
+    private static SaveTransactionTask saver;
     private TableLayout table;
     private ProgressBar progress;
     private TextView text_date;
     private AutoCompleteTextView text_descr;
-    private static SaveTransactionTask saver;
     private MenuItem mSave;
 
     @Override
@@ -91,8 +91,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         text_date = findViewById(R.id.new_transaction_date);
         text_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public
-            void onFocusChange(View v, boolean hasFocus) {
+            public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) pickTransactionDate(v);
             }
         });
@@ -117,8 +116,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     @Override
-    protected
-    void onStart() {
+    protected void onStart() {
         super.onStart();
         if (text_descr.getText().toString().isEmpty()) text_descr.requestFocus();
     }
@@ -152,14 +150,13 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         LedgerTransaction tr = new LedgerTransaction(date, text_descr.getText().toString());
 
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
-        for ( int i = 0; i < table.getChildCount(); i++ ) {
+        for (int i = 0; i < table.getChildCount(); i++) {
             TableRow row = (TableRow) table.getChildAt(i);
             String acc = ((TextView) row.getChildAt(0)).getText().toString();
             String amt = ((TextView) row.getChildAt(1)).getText().toString();
             LedgerTransactionItem item =
-                    amt.length() > 0
-                    ? new LedgerTransactionItem( acc, Float.parseFloat(amt))
-                    : new LedgerTransactionItem( acc );
+                    amt.length() > 0 ? new LedgerTransactionItem(acc, Float.parseFloat(amt))
+                                     : new LedgerTransactionItem(acc);
 
             tr.add_item(item);
         }
@@ -211,11 +208,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 //                    Toast.makeText(NewTransactionActivity.this, "LEFT", Toast.LENGTH_LONG).show();
                 }
                 else {
-                    Snackbar.make(table, R.string.msg_at_least_two_accounts_are_required, Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
+                    Snackbar.make(table, R.string.msg_at_least_two_accounts_are_required,
+                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
             }
-//            @Override
+            //            @Override
 //            public boolean performClick(View view, MotionEvent m) {
 //                return true;
 //            }
@@ -247,7 +244,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     @TargetApi(Build.VERSION_CODES.N)
-    private void hook_autocompletion_adapter(final AutoCompleteTextView view, final String table, final String field) {
+    private void hook_autocompletion_adapter(final AutoCompleteTextView view, final String table,
+                                             final String field) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
         SimpleCursorAdapter adapter =
@@ -257,8 +255,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         FilterQueryProvider provider = new FilterQueryProvider() {
             @Override
-            public
-            Cursor runQuery(CharSequence constraint) {
+            public Cursor runQuery(CharSequence constraint) {
                 if (constraint == null) return null;
 
                 String str = constraint.toString().toUpperCase();
@@ -269,11 +266,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 try (SQLiteDatabase db = MLDB.getReadableDatabase(getApplicationContext())) {
 
                     try (Cursor matches = db.rawQuery(String.format(
-                            "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 "
-                                    + "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 "
-                                    + "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end "
-                                    + "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' "
-                                    + "ORDER BY 2, 1;", field, field, field, field, table, field),
+                            "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                            "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                            "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
+                            "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;",
+                            field, field, field, field, table, field),
                             new String[]{str, str, str, str}))
                     {
                         int i = 0;
@@ -313,16 +310,18 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     public int dp2px(float dp) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics()));
+        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
+                getResources().getDisplayMetrics()));
     }
 
     private void do_add_account_row(boolean focus) {
         final AutoCompleteTextView acc = new AutoCompleteTextView(this);
-        acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 9f));
+        acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT, 9f));
         acc.setHint(R.string.new_transaction_account_hint);
         acc.setWidth(0);
-        acc.setImeOptions(EditorInfo.IME_ACTION_NEXT | EditorInfo.IME_FLAG_NO_ENTER_ACTION
-                | EditorInfo.IME_FLAG_NAVIGATE_NEXT);
+        acc.setImeOptions(EditorInfo.IME_ACTION_NEXT | EditorInfo.IME_FLAG_NO_ENTER_ACTION |
+                          EditorInfo.IME_FLAG_NAVIGATE_NEXT);
         acc.setSingleLine(true);
 
         final EditText amt = new EditText(this);
@@ -330,7 +329,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 TableRow.LayoutParams.MATCH_PARENT, 1f));
         amt.setHint(R.string.new_transaction_amount_hint);
         amt.setWidth(0);
-        amt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL );
+        amt.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED |
+                         InputType.TYPE_NUMBER_FLAG_DECIMAL);
         amt.setMinWidth(dp2px(40));
         amt.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
         amt.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -345,7 +345,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         acc.setNextFocusRightId(amt.getId());
 
         final TableRow row = new TableRow(this);
-        row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.MATCH_PARENT));
+        row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.MATCH_PARENT));
         row.setGravity(Gravity.BOTTOM);
         row.addView(acc);
         row.addView(amt);
@@ -363,8 +364,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         do_add_account_row(true);
     }
 
-    public
-    void resetTransactionFromMenu(MenuItem item) {
+    public void resetTransactionFromMenu(MenuItem item) {
         reset_form();
     }
 
@@ -372,8 +372,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         save_transaction();
     }
 
-    private
-    boolean is_zero(float f) {
+    private boolean is_zero(float f) {
         return (f < 0.005) && (f > -0.005);
     }
 
@@ -435,22 +434,21 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 }
             }
 
-            if ((empty_rows == 0) && ((table.getChildCount() == accounts) || (table.getChildCount()
-                    == amounts)))
+            if ((empty_rows == 0) &&
+                ((table.getChildCount() == accounts) || (table.getChildCount() == amounts)))
             {
                 do_add_account_row(false);
             }
 
-            Log.d("submittable", String.format("accounts=%d, accounts_with_values=%s, "
-                            + "amounts_with_accounts=%d, amounts=%d, running_total=%1.2f, "
-                            + "single_empty_with_acc=%s", accounts, accounts_with_values,
-                    amounts_with_accounts, amounts, running_total,
+            Log.d("submittable", String.format("accounts=%d, accounts_with_values=%s, " +
+                                               "amounts_with_accounts=%d, amounts=%d, running_total=%1.2f, " +
+                                               "single_empty_with_acc=%s", accounts,
+                    accounts_with_values, amounts_with_accounts, amounts, running_total,
                     (single_empty_amount && single_empty_amount_has_account) ? "true" : "false"));
 
-            if (have_description && (accounts >= 2) && (accounts_with_values >= (accounts - 1)) && (
-                    amounts_with_accounts == amounts) && (
-                    single_empty_amount && single_empty_amount_has_account || is_zero(
-                            running_total)))
+            if (have_description && (accounts >= 2) && (accounts_with_values >= (accounts - 1)) &&
+                (amounts_with_accounts == amounts) &&
+                (single_empty_amount && single_empty_amount_has_account || is_zero(running_total)))
             {
                 if (mSave != null) mSave.setVisible(true);
             }
@@ -472,8 +470,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     }
 
     @Override
-    public
-    void done(String error) {
+    public void done(String error) {
         progress.setVisibility(View.INVISIBLE);
         Log.d("visuals", "hiding progress");
 
@@ -491,15 +488,15 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         text_descr.requestFocus();
 
-        while(table.getChildCount() > 2) {
+        while (table.getChildCount() > 2) {
             table.removeViewAt(2);
         }
-        for( int i = 0; i < 2; i++ ) {
+        for (int i = 0; i < 2; i++) {
             TableRow tr = (TableRow) table.getChildAt(i);
-            if ( tr == null) break;
+            if (tr == null) break;
 
-            ((TextView)tr.getChildAt(0)).setText("");
-            ((TextView)tr.getChildAt(1)).setText("");
+            ((TextView) tr.getChildAt(0)).setText("");
+            ((TextView) tr.getChildAt(1)).setText("");
         }
     }
 }

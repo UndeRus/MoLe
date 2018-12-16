@@ -95,79 +95,83 @@ public class RetrieveTransactionsTask extends
             Context ctx = contextRef.get();
             if (ctx == null) return null;
             try (SQLiteDatabase db = MLDB.getWritableDatabase(ctx)) {
-                    try (InputStream resp = http.getInputStream()) {
-                        if (http.getResponseCode() != 200) throw new IOException(
-                                String.format("HTTP error %d", http.getResponseCode()));
-                        db.beginTransaction();
-                        try {
-                            db.execSQL("DELETE FROM transactions;");
-                            db.execSQL("DELETE FROM transaction_accounts");
+                try (InputStream resp = http.getInputStream()) {
+                    if (http.getResponseCode() != 200) throw new IOException(
+                            String.format("HTTP error %d", http.getResponseCode()));
+                    db.beginTransaction();
+                    try {
+                        db.execSQL("DELETE FROM transactions;");
+                        db.execSQL("DELETE FROM transaction_accounts");
 
-                            int state = ParserState.EXPECTING_JOURNAL;
-                            String line;
-                            BufferedReader buf =
-                                    new BufferedReader(new InputStreamReader(resp, "UTF-8"));
+                        int state = ParserState.EXPECTING_JOURNAL;
+                        String line;
+                        BufferedReader buf =
+                                new BufferedReader(new InputStreamReader(resp, "UTF-8"));
 
-                            int transactionCount = 0;
-                            int transactionId = 0;
-                            LedgerTransaction transaction = null;
-                            LINES:
-                            while ((line = buf.readLine()) != null) {
-                                if (isCancelled()) break;
-                                if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
-                                Matcher m;
-                                //L(String.format("State is %d", state));
-                                switch (state) {
-                                    case ParserState.EXPECTING_JOURNAL:
-                                        if (line.equals("<h2>General Journal</h2>")) {
-                                            state = ParserState.EXPECTING_TRANSACTION;
-                                            L("→ expecting transaction");
-                                        }
-                                        break;
-                                    case ParserState.EXPECTING_TRANSACTION:
-                                        m = transactionStartPattern.matcher(line);
-                                        if (m.find()) {
-                                            transactionId = Integer.valueOf(m.group(1));
-                                            state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
-                                            L(String.format("found transaction %d → expecting " +
-                                                            "description", transactionId));
-                                            progress.setProgress(++transactionCount);
-                                            if (progress.getTotal() == Progress.INDETERMINATE)
-                                                progress.setTotal(transactionId);
-                                            publishProgress(progress);
-                                        }
-                                        m = endPattern.matcher(line);
-                                        if (m.find()) {
-                                            L("--- transaction list complete ---");
-                                            success = true;
-                                            break LINES;
-                                        }
-                                        break;
-                                    case ParserState.EXPECTING_TRANSACTION_DESCRIPTION:
-                                        m = transactionDescriptionPattern.matcher(line);
-                                        if (m.find()) {
-                                            if (transactionId == 0)
-                                                throw new TransactionParserException(
-                                                        "Transaction Id is 0 while expecting " +
-                                                        "description");
+                        int transactionCount = 0;
+                        int transactionId = 0;
+                        LedgerTransaction transaction = null;
+                        LINES:
+                        while ((line = buf.readLine()) != null) {
+                            if (isCancelled()) break;
+                            Matcher m;
+                            //L(String.format("State is %d", state));
+                            switch (state) {
+                                case ParserState.EXPECTING_JOURNAL:
+                                    if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                                    if (line.equals("<h2>General Journal</h2>")) {
+                                        state = ParserState.EXPECTING_TRANSACTION;
+                                        L("→ expecting transaction");
+                                    }
+                                    break;
+                                case ParserState.EXPECTING_TRANSACTION:
+                                    if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                                    m = transactionStartPattern.matcher(line);
+                                    if (m.find()) {
+                                        transactionId = Integer.valueOf(m.group(1));
+                                        state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
+                                        L(String.format(
+                                                "found transaction %d → expecting " + "description",
+                                                transactionId));
+                                        progress.setProgress(++transactionCount);
+                                        if (progress.getTotal() == Progress.INDETERMINATE)
+                                            progress.setTotal(transactionId);
+                                        publishProgress(progress);
+                                    }
+                                    m = endPattern.matcher(line);
+                                    if (m.find()) {
+                                        L("--- transaction list complete ---");
+                                        success = true;
+                                        break LINES;
+                                    }
+                                    break;
+                                case ParserState.EXPECTING_TRANSACTION_DESCRIPTION:
+                                    if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                                    m = transactionDescriptionPattern.matcher(line);
+                                    if (m.find()) {
+                                        if (transactionId == 0)
+                                            throw new TransactionParserException(
+                                                    "Transaction Id is 0 while expecting " +
+                                                    "description");
 
-                                            transaction =
-                                                    new LedgerTransaction(transactionId, m.group(1),
-                                                            m.group(2));
-                                            state = ParserState.EXPECTING_TRANSACTION_DETAILS;
-                                            L(String.format("transaction %d created for %s (%s) →" +
-                                                            " expecting details", transactionId,
-                                                    m.group(1), m.group(2)));
-                                        }
-                                        break;
-                                    case ParserState.EXPECTING_TRANSACTION_DETAILS:
-                                        if (line.isEmpty()) {
-                                            // transaction data collected
-                                            transaction.insertInto(db);
+                                        transaction =
+                                                new LedgerTransaction(transactionId, m.group(1),
+                                                        m.group(2));
+                                        state = ParserState.EXPECTING_TRANSACTION_DETAILS;
+                                        L(String.format("transaction %d created for %s (%s) →" +
+                                                        " expecting details", transactionId,
+                                                m.group(1), m.group(2)));
+                                    }
+                                    break;
+                                case ParserState.EXPECTING_TRANSACTION_DETAILS:
+                                    if (line.isEmpty()) {
+                                        // transaction data collected
+                                        transaction.insertInto(db);
 
-                                            state = ParserState.EXPECTING_TRANSACTION;
-                                            L(String.format("transaction %s saved → expecting " +
-                                                            "transaction", transaction.getId()));
+                                        state = ParserState.EXPECTING_TRANSACTION;
+                                        L(String.format(
+                                                "transaction %s saved → expecting " + "transaction",
+                                                transaction.getId()));
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
 // for example, when you add the initial seeding transaction after entering some others
@@ -176,33 +180,30 @@ public class RetrieveTransactionsTask extends
 //                                                  "parser");
 //                                                break LINES;
 //                                            }
+                                    }
+                                    else {
+                                        m = transactionDetailsPattern.matcher(line);
+                                        if (m.find()) {
+                                            String acc_name = m.group(1);
+                                            String amount = m.group(2);
+                                            amount = amount.replace(',', '.');
+                                            transaction.add_item(new LedgerTransactionItem(acc_name,
+                                                    Float.valueOf(amount)));
+                                            L(String.format("%s = %s", acc_name, amount));
                                         }
-                                        else {
-                                            m = transactionDetailsPattern.matcher(line);
-                                            if (m.find()) {
-                                                String acc_name = m.group(1);
-                                                String amount = m.group(2);
-                                                amount = amount.replace(',', '.');
-                                                transaction.add_item(
-                                                        new LedgerTransactionItem(acc_name,
-                                                                Float.valueOf(amount)));
-                                                L(String.format("%s = %s", acc_name, amount));
-                                            }
-                                            else throw new IllegalStateException(String.format(
-                                                    "Can't parse transaction details"));
-                                        }
-                                        break;
-                                    default:
-                                        throw new RuntimeException(
-                                                String.format("Unknown " + "parser state %d",
-                                                        state));
-                                }
+                                        else throw new IllegalStateException(
+                                                String.format("Can't parse transaction details"));
+                                    }
+                                    break;
+                                default:
+                                    throw new RuntimeException(
+                                            String.format("Unknown " + "parser state %d", state));
                             }
-                            if (!isCancelled()) db.setTransactionSuccessful();
                         }
-                        finally {
-                            db.endTransaction();
-                        }
+                        if (!isCancelled()) db.setTransactionSuccessful();
+                    }
+                    finally {
+                        db.endTransaction();
                     }
                 }
             }

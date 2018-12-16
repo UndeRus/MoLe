@@ -53,37 +53,34 @@ class TransactionListAdapter
         try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx.getApplicationContext())) {
             tr.loadData(db);
 
-                holder.tvDescription
-                        .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
-                TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
-                tbl.removeAllViews();
-                for (Iterator<LedgerTransactionItem> it = tr.getItemsIterator(); it.hasNext(); ) {
-                    LedgerTransactionItem acc = it.next();
-                    TableRow row = new TableRow(holder.row.getContext());
-                    TextView child = new TextView(ctx);
-                    child.setText(acc.getShortAccountName());
-                    row.addView(child);
-                    child = new TextView(ctx);
-                    child.setText(acc.toString());
-                    row.addView(child);
-                    tbl.addView(row);
-                }
-
-                if (position % 2 == 0) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                            .setBackgroundColor(
-                                    rm.getColor(R.color.table_row_even_bg, ctx.getTheme()));
-                    else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_even_bg));
-                }
-                else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                            .setBackgroundColor(
-                                    rm.getColor(R.color.drawer_background, ctx.getTheme()));
-                    else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
-                }
-
-                holder.row.setTag(R.id.POS, position);
+            holder.tvDescription
+                    .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
+            TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
+            tbl.removeAllViews();
+            for (Iterator<LedgerTransactionItem> it = tr.getItemsIterator(); it.hasNext(); ) {
+                LedgerTransactionItem acc = it.next();
+                TableRow row = new TableRow(holder.row.getContext());
+                TextView child = new TextView(ctx);
+                child.setText(acc.getShortAccountName());
+                row.addView(child);
+                child = new TextView(ctx);
+                child.setText(acc.toString());
+                row.addView(child);
+                tbl.addView(row);
             }
+
+            if (position % 2 == 0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
+                        .setBackgroundColor(rm.getColor(R.color.table_row_even_bg, ctx.getTheme()));
+                else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_even_bg));
+            }
+            else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
+                        .setBackgroundColor(rm.getColor(R.color.drawer_background, ctx.getTheme()));
+                else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
+            }
+
+            holder.row.setTag(R.id.POS, position);
         }
     }
 

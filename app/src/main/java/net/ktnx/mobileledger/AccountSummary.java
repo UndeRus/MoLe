@@ -52,10 +52,9 @@ import java.util.List;
 import static net.ktnx.mobileledger.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
 public class AccountSummary extends AppCompatActivity {
-    DrawerLayout drawer;
-
     private static long account_list_last_updated;
     private static boolean account_list_needs_update = true;
+    DrawerLayout drawer;
     MenuItem mShowHiddenAccounts;
     SharedPreferences.OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener;
     private AccountSummaryViewModel model;
@@ -74,17 +73,20 @@ public class AccountSummary extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle =
+                new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
+                        R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         android.widget.TextView ver = drawer.findViewById(R.id.drawer_version_text);
 
         try {
-            PackageInfo pi = getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageInfo pi =
+                    getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
             ver.setText(pi.versionName);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -99,30 +101,33 @@ public class AccountSummary extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         root.setLayoutManager(llm);
 
-        root.addOnItemTouchListener(new RecyclerItemListener(this, root, new RecyclerItemListener.RecyclerTouchListener() {
-            @Override
-            public void onClickItem(View v, int position) {
-                Log.d("list", String.format("item %d clicked", position));
-                if (modelAdapter.isSelectionActive()) {
-                    modelAdapter.selectItem(position);
-                }
-            }
+        root.addOnItemTouchListener(new RecyclerItemListener(this, root,
+                new RecyclerItemListener.RecyclerTouchListener() {
+                    @Override
+                    public void onClickItem(View v, int position) {
+                        Log.d("list", String.format("item %d clicked", position));
+                        if (modelAdapter.isSelectionActive()) {
+                            modelAdapter.selectItem(position);
+                        }
+                    }
 
-            @Override
-            public void onLongClickItem(View v, int position) {
-                Log.d("list", String.format("item %d long-clicked", position));
-                modelAdapter.startSelection();
-                if (optMenu != null) {
-                    optMenu.findItem(R.id.menu_acc_summary_cancel_selection).setVisible(true);
-                    optMenu.findItem(R.id.menu_acc_summary_confirm_selection).setVisible(true);
-                    optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(false);
-                }
-                {
-                    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.btn_add_transaction);
-                    if (fab != null) fab.hide();
-                }
-            }
-        }));
+                    @Override
+                    public void onLongClickItem(View v, int position) {
+                        Log.d("list", String.format("item %d long-clicked", position));
+                        modelAdapter.startSelection();
+                        if (optMenu != null) {
+                            optMenu.findItem(R.id.menu_acc_summary_cancel_selection)
+                                    .setVisible(true);
+                            optMenu.findItem(R.id.menu_acc_summary_confirm_selection)
+                                    .setVisible(true);
+                            optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(false);
+                        }
+                        {
+                            FloatingActionButton fab = findViewById(R.id.btn_add_transaction);
+                            if (fab != null) fab.hide();
+                        }
+                    }
+                }));
 
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -190,7 +195,8 @@ public class AccountSummary extends AppCompatActivity {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else {
+        }
+        else {
             super.onBackPressed();
         }
     }
@@ -233,8 +239,7 @@ public class AccountSummary extends AppCompatActivity {
         update_accounts(true);
     }
 
-    public
-    void onShowOnlyStarredClicked(MenuItem mi) {
+    public void onShowOnlyStarredClicked(MenuItem mi) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean flag = pref.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
 
@@ -252,8 +257,10 @@ public class AccountSummary extends AppCompatActivity {
 
     private void update_accounts(boolean force) {
         long now = new Date().getTime();
-        if ((now > (account_list_last_updated + (24 * 3600*1000))) || force) {
-            Log.d("db", "accounts last updated at " + account_list_last_updated+" and now is " + now+". re-fetching");
+        if ((now > (account_list_last_updated + (24 * 3600 * 1000))) || force) {
+            Log.d("db",
+                    "accounts last updated at " + account_list_last_updated + " and now is " + now +
+                    ". re-fetching");
             update_accounts();
         }
     }
@@ -271,7 +278,7 @@ public class AccountSummary extends AppCompatActivity {
         if (error != 0) {
             String err_text = getResources().getString(error);
             Log.d("visual", String.format("showing snackbar: %s", err_text));
-            Snackbar.make(drawer, err_text, Snackbar.LENGTH_LONG ).show();
+            Snackbar.make(drawer, err_text, Snackbar.LENGTH_LONG).show();
         }
         else {
             MLDB.set_option_value(this, "last_refresh", new Date().getTime());
