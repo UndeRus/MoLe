@@ -35,7 +35,8 @@ import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.READ;
 import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.WRITE;
 
 public final class MLDB {
-    public enum DatabaseMode { READ, WRITE };
+    public enum DatabaseMode {READ, WRITE}
+
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
@@ -124,6 +125,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
         super(context, DB_NAME, null, LATEST_REVISION);
         Log.d("db", "creating helper instance");
         mContext = context;
+        super.setWriteAheadLoggingEnabled(true);
     }
 
     @Override
