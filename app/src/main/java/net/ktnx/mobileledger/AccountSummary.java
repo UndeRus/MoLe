@@ -134,7 +134,9 @@ public class AccountSummary extends AppCompatActivity {
                 if (dy > 0) ((FloatingActionButton) findViewById(R.id.btn_add_transaction)).hide();
             }
         });
-        ((SwipeRefreshLayout) findViewById(R.id.account_swiper)).setOnRefreshListener(() -> {
+        SwipeRefreshLayout swiper = findViewById(R.id.account_swiper);
+        swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+        swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing accounts via swipe");
             update_accounts(true);
         });
