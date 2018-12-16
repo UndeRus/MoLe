@@ -50,6 +50,13 @@
             android:text="TextView" />
     </LinearLayout>
 
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="6dp"
+        android:background="@drawable/drop_shadow"
+        app:layout_constraintTop_toBottomOf="@+id/last_update_row" />
+
     <ProgressBar
         android:id="@+id/transaction_progress_bar"
         style="?android:attr/progressBarStyleHorizontal"

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2018 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
@@ -16,11 +15,10 @@
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<resources>
-    <color name="colorPrimary">#9c27b0</color>
-    <color name="colorPrimaryDark">#4a148c</color>
-    <color name="colorAccent">#4db6ac</color>
-    <color name="table_row_even_bg">#289d29b1</color>
-    <color name="drawer_background">#ffffffff</color>
-    <color name="table_row_odd_bg">#28fae0ff</color>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#80000000"
+        android:endColor="#00000000"
+        android:angle="270"
+        />
+</shape>

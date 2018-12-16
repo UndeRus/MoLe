@@ -76,8 +76,9 @@ class TransactionListAdapter
             }
             else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                        .setBackgroundColor(rm.getColor(R.color.drawer_background, ctx.getTheme()));
-                else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
+                        .setBackgroundColor(rm.getColor(R.color.table_row_odd_bg, ctx
+                                .getTheme()));
+                else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_odd_bg));
             }
 
             holder.row.setTag(R.id.POS, position);
