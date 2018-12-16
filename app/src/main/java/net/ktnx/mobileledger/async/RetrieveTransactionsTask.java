@@ -114,6 +114,7 @@ public class RetrieveTransactionsTask extends
                             LedgerTransaction transaction = null;
                             LINES:
                             while ((line = buf.readLine()) != null) {
+                                if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                 Matcher m;
                                 L(String.format("State is %d", state));
                                 switch (state) {
@@ -167,6 +168,14 @@ public class RetrieveTransactionsTask extends
                                             state = ParserState.EXPECTING_TRANSACTION;
                                             L(String.format("transaction %s saved → expecting " +
                                                             "transaction", transaction.getId()));
+
+// sounds like a good idea, but transaction-1 may not be the first one chronologically
+// for example, when you add the initial seeding transaction after entering some others
+//                                            if (transactionId == 1) {
+//                                                L("This was the initial transaction. Terminating " +
+//                                                  "parser");
+//                                                break LINES;
+//                                            }
                                         }
                                         else {
                                             m = transactionDetailsPattern.matcher(line);
