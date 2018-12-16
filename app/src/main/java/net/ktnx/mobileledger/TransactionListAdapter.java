@@ -19,6 +19,7 @@ package net.ktnx.mobileledger;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -27,10 +28,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
+import java.util.Iterator;
 import java.util.List;
 
 class TransactionListAdapter
@@ -45,34 +50,42 @@ class TransactionListAdapter
         LedgerTransaction tr = transactions.get(position);
         Context ctx = holder.row.getContext();
         Resources rm = ctx.getResources();
+        try (MobileLedgerDatabase dbh = new MobileLedgerDatabase(ctx)) {
+            try (SQLiteDatabase db = dbh.getReadableDatabase()) {
+                tr.loadData(db);
 
-        holder.tvDescription.setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
-        TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
-        tbl.removeAllViews();
-        for (Iterator<LedgerTransactionItem> it = tr.getItemsIterator(); it.hasNext(); ) {
-            LedgerTransactionItem acc = it.next();
-            TableRow row = new TableRow(holder.row.getContext());
-            TextView child = new TextView(ctx);
-            child.setText(acc.getShortAccountName());
-            row.addView(child);
-            child = new TextView(ctx);
-            child.setText(acc.toString());
-            row.addView(child);
-            tbl.addView(row);
-        }
+                holder.tvDescription
+                        .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
+                TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
+                tbl.removeAllViews();
+                for (Iterator<LedgerTransactionItem> it = tr.getItemsIterator(); it.hasNext(); ) {
+                    LedgerTransactionItem acc = it.next();
+                    TableRow row = new TableRow(holder.row.getContext());
+                    TextView child = new TextView(ctx);
+                    child.setText(acc.getShortAccountName());
+                    row.addView(child);
+                    child = new TextView(ctx);
+                    child.setText(acc.toString());
+                    row.addView(child);
+                    tbl.addView(row);
+                }
 
-        if (position % 2 == 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                    .setBackgroundColor(rm.getColor(R.color.table_row_even_bg, ctx.getTheme()));
-            else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_even_bg));
-        }
-        else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                    .setBackgroundColor(rm.getColor(R.color.drawer_background, ctx.getTheme()));
-            else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
-        }
+                if (position % 2 == 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
+                            .setBackgroundColor(
+                                    rm.getColor(R.color.table_row_even_bg, ctx.getTheme()));
+                    else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_even_bg));
+                }
+                else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
+                            .setBackgroundColor(
+                                    rm.getColor(R.color.drawer_background, ctx.getTheme()));
+                    else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
+                }
 
-        holder.row.setTag(R.id.POS, position);
+                holder.row.setTag(R.id.POS, position);
+            }
+        }
     }
 
     @NonNull

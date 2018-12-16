@@ -22,7 +22,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.LedgerTransactionItem;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 import java.util.ArrayList;
@@ -42,26 +41,12 @@ public class TransactionListViewModel extends ViewModel {
     }
     private void reloadTransactions(MobileLedgerDatabase dbh) {
         transactions.clear();
-        String sql = "SELECT id, date, description FROM transactions";
-        sql += " ORDER BY date desc, id desc";
+        String sql = "SELECT id FROM transactions ORDER BY date desc, id desc";
 
         try (SQLiteDatabase db = dbh.getReadableDatabase()) {
             try (Cursor cursor = db.rawQuery(sql, null)) {
                 while (cursor.moveToNext()) {
-                    LedgerTransaction tr =
-                            new LedgerTransaction(cursor.getString(0), cursor.getString(1),
-                                    cursor.getString(2));
-                    try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +
-                                                   "transaction_accounts WHERE transaction_id = ?",
-                            new String[]{tr.getId()}))
-                    {
-                        while (cAcc.moveToNext()) {
-                            tr.add_item(
-                                    new LedgerTransactionItem(cAcc.getString(0), cAcc.getFloat(1),
-                                            cAcc.getString(2)));
-                        }
-                    }
-                    transactions.add(tr);
+                    transactions.add(new LedgerTransaction(cursor.getInt(0)));
                 }
             }
         }

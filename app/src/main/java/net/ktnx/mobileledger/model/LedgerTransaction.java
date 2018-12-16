@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.model;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.utils.Digest;
@@ -45,18 +46,23 @@ public class LedgerTransaction {
     private String description;
     private ArrayList<LedgerTransactionItem> items;
     private String dataHash;
+    private boolean dataLoaded;
     public LedgerTransaction(String id, String date, String description) {
         this.id = id;
         this.date = date;
         this.description = description;
         this.items = new ArrayList<>();
         this.dataHash = null;
+        dataLoaded = false;
     }
     public LedgerTransaction(int id, String date, String description) {
         this(String.valueOf(id), date, description);
     }
     public LedgerTransaction(String date, String description) {
         this(null, date, description);
+    }
+    public LedgerTransaction(int id) {
+        this(id, null, null);
     }
     public void add_item(LedgerTransactionItem item) {
         items.add(item);
@@ -127,5 +133,28 @@ public class LedgerTransaction {
             throw new RuntimeException(
                     String.format("Unable to get instance of %s digest", DIGEST_TYPE), e);
         }
+    }
+    public void loadData(SQLiteDatabase db) {
+        if (dataLoaded) return;
+
+        try (Cursor cTr = db.rawQuery("SELECT date, description from transactions WHERE " +
+                                         "id=?",new String[]{id})) {
+            if (cTr.moveToFirst()) {
+                date = cTr.getString(0);
+                description = cTr.getString(1);
+
+                try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +
+                                               "transaction_accounts WHERE transaction_id = ?",
+                        new String[]{id}))
+                {
+                    while (cAcc.moveToNext()) {
+                        add_item(
+                                new LedgerTransactionItem(cAcc.getString(0), cAcc.getFloat(1),
+                                        cAcc.getString(2)));
+                    }
+                }
+            }
+        }
+
     }
 }
