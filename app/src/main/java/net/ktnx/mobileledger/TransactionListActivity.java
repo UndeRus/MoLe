@@ -35,7 +35,7 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.time.ZoneId;
@@ -60,8 +60,6 @@ public class TransactionListActivity extends AppCompatActivity {
 
         setupActionBar();
 
-        MobileLedgerDatabase dbh = new MobileLedgerDatabase(this);
-
         swiper = findViewById(R.id.transaction_swipe);
         if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
         root = findViewById(R.id.transaction_root);
@@ -71,7 +69,7 @@ public class TransactionListActivity extends AppCompatActivity {
             throw new RuntimeException("Can't get hold on the transaction list progress bar");
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         {
-            long last_update = dbh.get_option_value("transaction_list_last_update", 0L);
+            long last_update = MLDB.get_option_value(this, "transaction_list_last_update", 0L);
             Log.d("transactions", String.format("Last update = %d", last_update));
             if (last_update == 0) tvLastUpdate.setText("never");
             else {
@@ -86,7 +84,7 @@ public class TransactionListActivity extends AppCompatActivity {
             }
         }
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
-        List<LedgerTransaction> transactions = model.getTransactions(dbh);
+        List<LedgerTransaction> transactions = model.getTransactions(getApplicationContext());
         modelAdapter = new TransactionListAdapter(transactions);
 
         RecyclerView root = findViewById(R.id.transaction_root);
@@ -157,9 +155,9 @@ public class TransactionListActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         swiper.setRefreshing(false);
         if (success) {
-            MobileLedgerDatabase dbh = new MobileLedgerDatabase(this);
             Date now = new Date();
-            dbh.set_option_value("transaction_list_last_update", now.getTime());
+            MLDB.set_option_value(getApplicationContext(), "transaction_list_last_update",
+                    now.getTime());
             updateLastUpdateText(now);
             modelAdapter.notifyDataSetChanged();
         }

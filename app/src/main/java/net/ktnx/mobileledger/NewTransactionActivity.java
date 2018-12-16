@@ -56,7 +56,7 @@ import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionItem;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Date;
 import java.util.Objects;
@@ -80,7 +80,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private AutoCompleteTextView text_descr;
     private static SaveTransactionTask saver;
     private MenuItem mSave;
-    private MobileLedgerDatabase dbh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +87,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         setContentView(R.layout.activity_new_transaction);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        dbh = new MobileLedgerDatabase(this);
 
         text_date = findViewById(R.id.new_transaction_date);
         text_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -100,8 +97,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             }
         });
         text_descr = findViewById(R.id.new_transaction_description);
-        hook_autocompletion_adapter(text_descr, MobileLedgerDatabase
-                .DESCRIPTION_HISTORY_TABLE, "description");
+        hook_autocompletion_adapter(text_descr, MLDB.DESCRIPTION_HISTORY_TABLE, "description");
         hook_text_change_listener(text_descr);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -113,7 +109,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
             TextView amount_view = (TextView) row.getChildAt(1);
             hook_swipe_listener(row);
-            hook_autocompletion_adapter(acc_name_view, MobileLedgerDatabase.ACCOUNTS_TABLE, "name");
+            hook_autocompletion_adapter(acc_name_view, MLDB.ACCOUNTS_TABLE, "name");
             hook_text_change_listener(acc_name_view);
             hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
@@ -270,7 +266,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
-                try (SQLiteDatabase db = dbh.getReadableDatabase()) {
+                try (SQLiteDatabase db = MLDB.getReadableDatabase(getApplicationContext())) {
 
                     try (Cursor matches = db.rawQuery(String.format(
                             "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 "
@@ -358,7 +354,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
-        hook_autocompletion_adapter(acc, MobileLedgerDatabase.ACCOUNTS_TABLE, "name");
+        hook_autocompletion_adapter(acc, MLDB.ACCOUNTS_TABLE, "name");
         hook_text_change_listener(acc);
         hook_text_change_listener(amt);
     }

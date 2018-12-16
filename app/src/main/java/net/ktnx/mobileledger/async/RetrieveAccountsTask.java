@@ -24,7 +24,7 @@ import android.util.Log;
 import net.ktnx.mobileledger.AccountSummary;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -58,8 +58,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection( pref, "add");
             publishProgress(0);
-            try(MobileLedgerDatabase dbh = new MobileLedgerDatabase(mContext.get())) {
-                try(SQLiteDatabase db = dbh.getWritableDatabase()) {
+            try (SQLiteDatabase db = MLDB.getDatabase(mContext.get(), MLDB.DatabaseMode.WRITE)) {
                     try (InputStream resp = http.getInputStream()) {
                         Log.d("update_accounts", String.valueOf(http.getResponseCode()));
                         if (http.getResponseCode() != 200) {

@@ -33,7 +33,7 @@ import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionItem;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Iterator;
 import java.util.List;
@@ -50,9 +50,8 @@ class TransactionListAdapter
         LedgerTransaction tr = transactions.get(position);
         Context ctx = holder.row.getContext();
         Resources rm = ctx.getResources();
-        try (MobileLedgerDatabase dbh = new MobileLedgerDatabase(ctx)) {
-            try (SQLiteDatabase db = dbh.getReadableDatabase()) {
-                tr.loadData(db);
+        try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx.getApplicationContext())) {
+            tr.loadData(db);
 
                 holder.tvDescription
                         .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));

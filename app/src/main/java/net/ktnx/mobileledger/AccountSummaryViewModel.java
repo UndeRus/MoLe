@@ -37,7 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,24 +45,22 @@ import java.util.List;
 import static net.ktnx.mobileledger.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
 class AccountSummaryViewModel extends AndroidViewModel {
-    private MobileLedgerDatabase dbh;
     private List<LedgerAccount> accounts;
 
     public AccountSummaryViewModel(@NonNull Application application) {
         super(application);
-        dbh = new MobileLedgerDatabase(application);
     }
 
-    List<LedgerAccount> getAccounts() {
+    List<LedgerAccount> getAccounts(Context context) {
         if (accounts == null) {
             accounts = new ArrayList<>();
-            reloadAccounts();
+            reloadAccounts(context);
         }
 
         return accounts;
     }
 
-    void reloadAccounts() {
+    void reloadAccounts(Context context) {
         accounts.clear();
         boolean showingOnlyStarred =
                 PreferenceManager.getDefaultSharedPreferences(getApplication())
@@ -71,7 +69,7 @@ class AccountSummaryViewModel extends AndroidViewModel {
         if (showingOnlyStarred) sql += " WHERE hidden = 0";
         sql += " ORDER BY name";
 
-        try (SQLiteDatabase db = dbh.getReadableDatabase()) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
             try (Cursor cursor = db
                     .rawQuery(sql,null))
             {
@@ -91,8 +89,8 @@ class AccountSummaryViewModel extends AndroidViewModel {
             }
         }
     }
-    void commitSelections() {
-        try(SQLiteDatabase db = dbh.getWritableDatabase()) {
+    void commitSelections(Context context) {
+        try(SQLiteDatabase db = MLDB.getWritableDatabase(context)) {
             db.beginTransaction();
             try {
                 for (LedgerAccount acc : accounts) {

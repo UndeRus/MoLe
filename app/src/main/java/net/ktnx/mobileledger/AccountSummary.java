@@ -43,7 +43,7 @@ import android.widget.LinearLayout;
 
 import net.ktnx.mobileledger.async.RetrieveAccountsTask;
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
@@ -58,7 +58,6 @@ public class AccountSummary extends AppCompatActivity {
     private static boolean account_list_needs_update = true;
     MenuItem mShowHiddenAccounts;
     SharedPreferences.OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener;
-    private MobileLedgerDatabase dbh;
     private AccountSummaryViewModel model;
     private AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
@@ -73,8 +72,6 @@ public class AccountSummary extends AppCompatActivity {
         setContentView(R.layout.activity_account_summary);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        dbh = new MobileLedgerDatabase(this);
 
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -92,7 +89,7 @@ public class AccountSummary extends AppCompatActivity {
         }
 
         model = ViewModelProviders.of(this).get(AccountSummaryViewModel.class);
-        List<LedgerAccount> accounts = model.getAccounts();
+        List<LedgerAccount> accounts = model.getAccounts(getApplicationContext());
         modelAdapter = new AccountSummaryAdapter(accounts);
 
         RecyclerView root = findViewById(R.id.account_root);
@@ -250,7 +247,7 @@ public class AccountSummary extends AppCompatActivity {
     }
 
     private void prepare_db() {
-        account_list_last_updated = dbh.get_option_value("last_refresh", (long) 0);
+        account_list_last_updated = MLDB.get_option_value(this, "last_refresh", (long) 0);
     }
 
     private void update_accounts(boolean force) {
@@ -277,12 +274,12 @@ public class AccountSummary extends AppCompatActivity {
             Snackbar.make(drawer, err_text, Snackbar.LENGTH_LONG ).show();
         }
         else {
-            dbh.set_option_value("last_refresh", new Date().getTime() );
+            MLDB.set_option_value(this, "last_refresh", new Date().getTime());
             update_account_table();
         }
     }
     private void update_account_table() {
-        model.reloadAccounts();
+        model.reloadAccounts(getApplicationContext());
         modelAdapter.notifyDataSetChanged();
     }
     void stopSelection() {
@@ -301,7 +298,7 @@ public class AccountSummary extends AppCompatActivity {
         stopSelection();
     }
     public void onConfirmAccSelection(MenuItem item) {
-        model.commitSelections();
+        model.commitSelections(getApplicationContext());
         stopSelection();
     }
 }

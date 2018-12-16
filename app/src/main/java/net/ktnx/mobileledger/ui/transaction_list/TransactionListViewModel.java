@@ -18,11 +18,12 @@
 package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.arch.lifecycle.ViewModel;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +32,19 @@ public class TransactionListViewModel extends ViewModel {
 
     private List<LedgerTransaction> transactions;
 
-    public List<LedgerTransaction> getTransactions(MobileLedgerDatabase dbh) {
+    public List<LedgerTransaction> getTransactions(Context context) {
         if (transactions == null) {
             transactions = new ArrayList<>();
-            reloadTransactions(dbh);
+            reloadTransactions(context);
         }
 
         return transactions;
     }
-    private void reloadTransactions(MobileLedgerDatabase dbh) {
+    private void reloadTransactions(Context context) {
         transactions.clear();
         String sql = "SELECT id FROM transactions ORDER BY date desc, id desc";
 
-        try (SQLiteDatabase db = dbh.getReadableDatabase()) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
             try (Cursor cursor = db.rawQuery(sql, null)) {
                 while (cursor.moveToNext()) {
                     transactions.add(new LedgerTransaction(cursor.getInt(0)));

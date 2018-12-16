@@ -28,7 +28,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.TransactionListActivity;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionItem;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -94,8 +94,7 @@ public class RetrieveTransactionsTask extends
             publishProgress(progress);
             Context ctx = contextRef.get();
             if (ctx == null) return null;
-            try (MobileLedgerDatabase dbh = new MobileLedgerDatabase(ctx)) {
-                try (SQLiteDatabase db = dbh.getWritableDatabase()) {
+            try (SQLiteDatabase db = MLDB.getWritableDatabase(ctx)) {
                     try (InputStream resp = http.getInputStream()) {
                         if (http.getResponseCode() != 200) throw new IOException(
                                 String.format("HTTP error %d", http.getResponseCode()));
