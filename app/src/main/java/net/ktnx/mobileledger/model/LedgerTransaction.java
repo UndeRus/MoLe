@@ -152,6 +152,8 @@ public class LedgerTransaction {
                                 new LedgerTransactionItem(cAcc.getString(0), cAcc.getFloat(1),
                                         cAcc.getString(2)));
                     }
+
+                    dataLoaded = true;
                 }
             }
         }
