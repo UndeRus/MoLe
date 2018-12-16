@@ -130,6 +130,8 @@ public class TransactionListActivity extends AppCompatActivity {
 
     public void onRetrieveStart() {
         progressBar.setIndeterminate(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
+        else progressBar.setProgress(0);
         progressBar.setVisibility(View.VISIBLE);
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
@@ -139,7 +141,6 @@ public class TransactionListActivity extends AppCompatActivity {
             progressBar.setIndeterminate(true);
         }
         else {
-            progressBar.setIndeterminate(false);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 progressBar.setMin(0);
             }
@@ -148,6 +149,7 @@ public class TransactionListActivity extends AppCompatActivity {
                 progressBar.setProgress(progress.getProgress(), true);
             }
             else progressBar.setProgress(progress.getProgress());
+            progressBar.setIndeterminate(false);
         }
     }
 
