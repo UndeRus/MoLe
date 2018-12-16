@@ -117,7 +117,7 @@ public class RetrieveTransactionsTask extends
                                 if (isCancelled()) break;
                                 if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                 Matcher m;
-                                L(String.format("State is %d", state));
+                                //L(String.format("State is %d", state));
                                 switch (state) {
                                     case ParserState.EXPECTING_JOURNAL:
                                         if (line.equals("<h2>General Journal</h2>")) {
