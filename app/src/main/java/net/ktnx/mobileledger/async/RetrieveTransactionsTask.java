@@ -114,6 +114,7 @@ public class RetrieveTransactionsTask extends
                             LedgerTransaction transaction = null;
                             LINES:
                             while ((line = buf.readLine()) != null) {
+                                if (isCancelled()) break;
                                 if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                 Matcher m;
                                 L(String.format("State is %d", state));
@@ -198,7 +199,7 @@ public class RetrieveTransactionsTask extends
                                                         state));
                                 }
                             }
-                            db.setTransactionSuccessful();
+                            if (!isCancelled()) db.setTransactionSuccessful();
                         }
                         finally {
                             db.endTransaction();
