@@ -101,7 +101,6 @@ public class RetrieveTransactionsTask extends
                                 String.format("HTTP error %d", http.getResponseCode()));
                         db.beginTransaction();
                         try {
-                            String root = params[0].getAccountsRoot();
                             db.execSQL("DELETE FROM transactions;");
                             db.execSQL("DELETE FROM transaction_accounts");
 
