@@ -41,22 +41,19 @@ public class LedgerTransaction {
                     return Float.compare(o1.getAmount(), o2.getAmount());
                 }
             };
-    private String id;
+    private Integer id;
     private String date;
     private String description;
     private ArrayList<LedgerTransactionItem> items;
     private String dataHash;
     private boolean dataLoaded;
-    public LedgerTransaction(String id, String date, String description) {
+    public LedgerTransaction(Integer id, String date, String description) {
         this.id = id;
         this.date = date;
         this.description = description;
         this.items = new ArrayList<>();
         this.dataHash = null;
         dataLoaded = false;
-    }
-    public LedgerTransaction(int id, String date, String description) {
-        this(String.valueOf(id), date, description);
     }
     public LedgerTransaction(String date, String description) {
         this(null, date, description);
@@ -96,13 +93,13 @@ public class LedgerTransaction {
             }
         };
     }
-    public String getId() {
+    public int getId() {
         return id;
     }
     public void insertInto(SQLiteDatabase db) {
         fillDataHash();
         db.execSQL("INSERT INTO transactions(id, date, description, data_hash) values(?,?,?,?)",
-                new String[]{id, date, description});
+                new Object[]{id, date, description, dataHash});
 
         for (LedgerTransactionItem item : items) {
             db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, " +
@@ -137,20 +134,20 @@ public class LedgerTransaction {
     public void loadData(SQLiteDatabase db) {
         if (dataLoaded) return;
 
-        try (Cursor cTr = db.rawQuery("SELECT date, description from transactions WHERE " +
-                                         "id=?",new String[]{id})) {
+        try (Cursor cTr = db.rawQuery("SELECT date, description from transactions WHERE id=?",
+                new String[]{String.valueOf(id)}))
+        {
             if (cTr.moveToFirst()) {
                 date = cTr.getString(0);
                 description = cTr.getString(1);
 
                 try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +
                                                "transaction_accounts WHERE transaction_id = ?",
-                        new String[]{id}))
+                        new String[]{String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {
-                        add_item(
-                                new LedgerTransactionItem(cAcc.getString(0), cAcc.getFloat(1),
-                                        cAcc.getString(2)));
+                        add_item(new LedgerTransactionItem(cAcc.getString(0), cAcc.getFloat(1),
+                                cAcc.getString(2)));
                     }
 
                     dataLoaded = true;
