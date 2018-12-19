@@ -21,7 +21,6 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.TransactionListActivity;
@@ -58,7 +57,7 @@ public class RetrieveTransactionsTask extends
         this.contextRef = contextRef;
     }
     private static final void L(String msg) {
-        Log.d("transaction-parser", msg);
+//        Log.d("transaction-parser", msg);
     }
     @Override
     protected void onProgressUpdate(Progress... values) {
@@ -85,6 +84,7 @@ public class RetrieveTransactionsTask extends
     @Override
     protected Void doInBackground(Params... params) {
         Progress progress = new Progress();
+        int maxTransactionId = Progress.INDETERMINATE;
         success = false;
         try {
             HttpURLConnection http =
@@ -99,16 +99,16 @@ public class RetrieveTransactionsTask extends
                             String.format("HTTP error %d", http.getResponseCode()));
                     db.beginTransaction();
                     try {
-                        db.execSQL("DELETE FROM transactions;");
-                        db.execSQL("DELETE FROM transaction_accounts");
+                        db.execSQL("UPDATE transactions set keep=0");
 
                         int state = ParserState.EXPECTING_JOURNAL;
                         String line;
                         BufferedReader buf =
                                 new BufferedReader(new InputStreamReader(resp, "UTF-8"));
 
-                        int transactionCount = 0;
+                        int processedTransactionCount = 0;
                         int transactionId = 0;
+                        int matchedTransactionsCount = 0;
                         LedgerTransaction transaction = null;
                         LINES:
                         while ((line = buf.readLine()) != null) {
@@ -132,7 +132,9 @@ public class RetrieveTransactionsTask extends
                                         L(String.format(
                                                 "found transaction %d → expecting " + "description",
                                                 transactionId));
-                                        progress.setProgress(++transactionCount);
+                                        progress.setProgress(++processedTransactionCount);
+                                        if (maxTransactionId < transactionId)
+                                            maxTransactionId = transactionId;
                                         if ((progress.getTotal() == Progress.INDETERMINATE) ||
                                             (progress.getTotal() < transactionId))
                                             progress.setTotal(transactionId);
@@ -166,7 +168,30 @@ public class RetrieveTransactionsTask extends
                                 case ParserState.EXPECTING_TRANSACTION_DETAILS:
                                     if (line.isEmpty()) {
                                         // transaction data collected
-                                        transaction.insertInto(db);
+                                        if (transaction.existsInDb(db)) {
+                                            db.execSQL("UPDATE transactions SET keep = 1 WHERE id" +
+                                                       "=?", new Integer[]{transaction.getId()});
+                                            matchedTransactionsCount++;
+
+                                            if (matchedTransactionsCount == 100) {
+                                                db.execSQL("UPDATE transactions SET keep=1 WHERE " +
+                                                           "id < ?",
+                                                        new Integer[]{transaction.getId()});
+                                                progress.setTotal(progress.getProgress());
+                                                publishProgress(progress);
+                                                break LINES;
+                                            }
+                                        }
+                                        else {
+                                            db.execSQL("DELETE from transactions WHERE id=?",
+                                                    new Integer[]{transaction.getId()});
+                                            db.execSQL("DELETE from transaction_accounts WHERE " +
+                                                       "transaction_id=?",
+                                                    new Integer[]{transaction.getId()});
+                                            transaction.insertInto(db);
+                                            matchedTransactionsCount = 0;
+                                            progress.setTotal(maxTransactionId);
+                                        }
 
                                         state = ParserState.EXPECTING_TRANSACTION;
                                         L(String.format(
@@ -200,7 +225,10 @@ public class RetrieveTransactionsTask extends
                                             String.format("Unknown " + "parser state %d", state));
                             }
                         }
-                        if (!isCancelled()) db.setTransactionSuccessful();
+                        if (!isCancelled()) {
+                            db.execSQL("DELETE FROM transactions WHERE keep = 0");
+                            db.setTransactionSuccessful();
+                        }
                     }
                     finally {
                         db.endTransaction();

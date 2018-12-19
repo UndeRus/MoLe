@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import net.ktnx.mobileledger.utils.Digest;
 
@@ -129,6 +130,17 @@ public class LedgerTransaction {
         catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(
                     String.format("Unable to get instance of %s digest", DIGEST_TYPE), e);
+        }
+    }
+    public boolean existsInDb(SQLiteDatabase db) {
+        fillDataHash();
+        try (Cursor c = db
+                .rawQuery("SELECT 1 from transactions where data_hash = ?", new String[]{dataHash}))
+        {
+            boolean result = c.moveToFirst();
+            Log.d("transactions", String.format("Transaction %d (%s) %s", id, dataHash,
+                    result ? "already present" : "not present"));
+            return result;
         }
     }
     public void loadData(SQLiteDatabase db) {
