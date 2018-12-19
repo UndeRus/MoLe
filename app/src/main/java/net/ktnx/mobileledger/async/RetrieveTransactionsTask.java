@@ -133,7 +133,8 @@ public class RetrieveTransactionsTask extends
                                                 "found transaction %d → expecting " + "description",
                                                 transactionId));
                                         progress.setProgress(++transactionCount);
-                                        if (progress.getTotal() == Progress.INDETERMINATE)
+                                        if ((progress.getTotal() == Progress.INDETERMINATE) ||
+                                            (progress.getTotal() < transactionId))
                                             progress.setTotal(transactionId);
                                         publishProgress(progress);
                                     }
