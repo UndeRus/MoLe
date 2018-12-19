@@ -40,7 +40,7 @@ public class TransactionListViewModel extends ViewModel {
 
         return transactions;
     }
-    private void reloadTransactions(Context context) {
+    public void reloadTransactions(Context context) {
         transactions.clear();
         String sql = "SELECT id FROM transactions ORDER BY date desc, id desc";
 

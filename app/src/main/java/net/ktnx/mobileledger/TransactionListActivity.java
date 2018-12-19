@@ -47,7 +47,7 @@ public class TransactionListActivity extends AppCompatActivity {
     private SwipeRefreshLayout swiper;
     private RecyclerView root;
     private ProgressBar progressBar;
-    private TransactionListViewModel model;
+    public TransactionListViewModel model;
     private TextView tvLastUpdate;
     private TransactionListAdapter modelAdapter;
     @Override

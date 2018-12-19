@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.async;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -92,7 +91,7 @@ public class RetrieveTransactionsTask extends
                     NetworkUtil.prepare_connection(params[0].getBackendPref(), "journal");
             http.setAllowUserInteraction(false);
             publishProgress(progress);
-            Context ctx = contextRef.get();
+            TransactionListActivity ctx = contextRef.get();
             if (ctx == null) return null;
             try (SQLiteDatabase db = MLDB.getWritableDatabase(ctx)) {
                 try (InputStream resp = http.getInputStream()) {
@@ -207,6 +206,8 @@ public class RetrieveTransactionsTask extends
                     }
                 }
             }
+
+            if (success && !isCancelled()) ctx.model.reloadTransactions(ctx);
         }
         catch (MalformedURLException e) {
             error = R.string.err_bad_backend_url;
