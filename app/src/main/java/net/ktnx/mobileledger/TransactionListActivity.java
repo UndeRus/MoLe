@@ -44,10 +44,10 @@ import java.util.Date;
 import java.util.List;
 
 public class TransactionListActivity extends AppCompatActivity {
+    public TransactionListViewModel model;
     private SwipeRefreshLayout swiper;
     private RecyclerView root;
     private ProgressBar progressBar;
-    public TransactionListViewModel model;
     private TextView tvLastUpdate;
     private TransactionListAdapter modelAdapter;
     @Override
