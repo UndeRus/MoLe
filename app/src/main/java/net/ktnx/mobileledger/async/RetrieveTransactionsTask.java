@@ -222,7 +222,7 @@ public class RetrieveTransactionsTask extends
                                     break;
                                 default:
                                     throw new RuntimeException(
-                                            String.format("Unknown " + "parser state %d", state));
+                                            String.format("Unknown parser state %d", state));
                             }
                         }
                         if (!isCancelled()) {
