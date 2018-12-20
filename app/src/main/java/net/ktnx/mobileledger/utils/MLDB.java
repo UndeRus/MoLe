@@ -39,6 +39,7 @@ public final class MLDB {
 
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
+    public static final String OPT_TRANSACTION_LIST_STAMP = "transaction_list_last_update";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
 
     public static synchronized SQLiteDatabase getDatabase(Context context, DatabaseMode mode) {
