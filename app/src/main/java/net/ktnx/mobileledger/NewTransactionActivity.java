@@ -54,7 +54,7 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -154,11 +154,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             TableRow row = (TableRow) table.getChildAt(i);
             String acc = ((TextView) row.getChildAt(0)).getText().toString();
             String amt = ((TextView) row.getChildAt(1)).getText().toString();
-            LedgerTransactionItem item =
-                    amt.length() > 0 ? new LedgerTransactionItem(acc, Float.parseFloat(amt))
-                                     : new LedgerTransactionItem(acc);
+            LedgerTransactionAccount item =
+                    amt.length() > 0 ? new LedgerTransactionAccount(acc, Float.parseFloat(amt))
+                                     : new LedgerTransactionAccount(acc);
 
-            tr.add_item(item);
+            tr.addAccount(item);
         }
         saver.execute(tr);
     }

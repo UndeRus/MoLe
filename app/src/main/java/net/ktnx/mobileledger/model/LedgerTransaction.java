@@ -31,10 +31,10 @@ import java.util.Iterator;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
-    public final Comparator<LedgerTransactionItem> comparator =
-            new Comparator<LedgerTransactionItem>() {
+    public final Comparator<LedgerTransactionAccount> comparator =
+            new Comparator<LedgerTransactionAccount>() {
                 @Override
-                public int compare(LedgerTransactionItem o1, LedgerTransactionItem o2) {
+                public int compare(LedgerTransactionAccount o1, LedgerTransactionAccount o2) {
                     int res = o1.getAccountName().compareTo(o2.getAccountName());
                     if (res != 0) return res;
                     res = o1.getCurrency().compareTo(o2.getCurrency());
@@ -45,7 +45,7 @@ public class LedgerTransaction {
     private Integer id;
     private String date;
     private String description;
-    private ArrayList<LedgerTransactionItem> items;
+    private ArrayList<LedgerTransactionAccount> items;
     private String dataHash;
     private boolean dataLoaded;
     public LedgerTransaction(Integer id, String date, String description) {
@@ -62,7 +62,7 @@ public class LedgerTransaction {
     public LedgerTransaction(int id) {
         this(id, null, null);
     }
-    public void add_item(LedgerTransactionItem item) {
+    public void addAccount(LedgerTransactionAccount item) {
         items.add(item);
         dataHash = null;
     }
@@ -80,8 +80,8 @@ public class LedgerTransaction {
         this.description = description;
         dataHash = null;
     }
-    public Iterator<LedgerTransactionItem> getItemsIterator() {
-        return new Iterator<LedgerTransactionItem>() {
+    public Iterator<LedgerTransactionAccount> getAccountsIterator() {
+        return new Iterator<LedgerTransactionAccount>() {
             private int pointer = 0;
             @Override
             public boolean hasNext() {
@@ -89,7 +89,7 @@ public class LedgerTransaction {
             }
 
             @Override
-            public LedgerTransactionItem next() {
+            public LedgerTransactionAccount next() {
                 return hasNext() ? items.get(pointer++) : null;
             }
         };
@@ -102,7 +102,7 @@ public class LedgerTransaction {
         db.execSQL("INSERT INTO transactions(id, date, description, data_hash) values(?,?,?,?)",
                 new Object[]{id, date, description, dataHash});
 
-        for (LedgerTransactionItem item : items) {
+        for (LedgerTransactionAccount item : items) {
             db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, " +
                        "currency) values(?, ?, ?, ?)",
                     new Object[]{id, item.getAccountName(), item.getAmount(), item.getCurrency()});
@@ -117,7 +117,7 @@ public class LedgerTransaction {
             data.append('\0');
             data.append(getDescription());
             data.append('\0');
-            for (LedgerTransactionItem item : items) {
+            for (LedgerTransactionAccount item : items) {
                 data.append(item.getAccountName());
                 data.append('\0');
                 data.append(item.getCurrency());
@@ -158,7 +158,7 @@ public class LedgerTransaction {
                         new String[]{String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {
-                        add_item(new LedgerTransactionItem(cAcc.getString(0), cAcc.getFloat(1),
+                        addAccount(new LedgerTransactionAccount(cAcc.getString(0), cAcc.getFloat(1),
                                 cAcc.getString(2)));
                     }
 

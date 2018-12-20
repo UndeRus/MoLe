@@ -32,7 +32,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Iterator;
@@ -57,8 +57,8 @@ class TransactionListAdapter
                     .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
             TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
             tbl.removeAllViews();
-            for (Iterator<LedgerTransactionItem> it = tr.getItemsIterator(); it.hasNext(); ) {
-                LedgerTransactionItem acc = it.next();
+            for (Iterator<LedgerTransactionAccount> it = tr.getAccountsIterator(); it.hasNext(); ) {
+                LedgerTransactionAccount acc = it.next();
                 TableRow row = new TableRow(holder.row.getContext());
                 TextView child = new TextView(ctx);
                 child.setText(acc.getShortAccountName());

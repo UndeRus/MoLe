@@ -26,7 +26,7 @@ import android.util.Log;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.TransactionListActivity;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -215,8 +215,9 @@ public class RetrieveTransactionsTask extends
                                             String acc_name = m.group(1);
                                             String amount = m.group(2);
                                             amount = amount.replace(',', '.');
-                                            transaction.add_item(new LedgerTransactionItem(acc_name,
-                                                    Float.valueOf(amount)));
+                                            transaction.addAccount(
+                                                    new LedgerTransactionAccount(acc_name,
+                                                            Float.valueOf(amount)));
                                             L(String.format("%s = %s", acc_name, amount));
                                         }
                                         else throw new IllegalStateException(

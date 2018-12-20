@@ -22,7 +22,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.LedgerTransactionItem;
+import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
 
@@ -74,9 +74,9 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         params.add_pair("date", ltr.getDate());
         params.add_pair("description", ltr.getDescription());
         {
-            Iterator<LedgerTransactionItem> items = ltr.getItemsIterator();
+            Iterator<LedgerTransactionAccount> items = ltr.getAccountsIterator();
             while (items.hasNext()) {
-                LedgerTransactionItem item = items.next();
+                LedgerTransactionAccount item = items.next();
                 params.add_pair("account", item.getAccountName());
                 if (item.isAmountSet())
                     params.add_pair("amount", String.format(Locale.US, "%1.2f", item.getAmount()));

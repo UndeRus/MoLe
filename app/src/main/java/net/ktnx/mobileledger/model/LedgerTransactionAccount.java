@@ -19,23 +19,23 @@ package net.ktnx.mobileledger.model;
 
 import android.support.annotation.NonNull;
 
-public class LedgerTransactionItem {
+public class LedgerTransactionAccount {
     private String accountName;
     private float amount;
     private boolean amountSet;
     private String currency;
 
-    public LedgerTransactionItem(String accountName, float amount) {
+    public LedgerTransactionAccount(String accountName, float amount) {
         this(accountName, amount, null);
     }
-    public LedgerTransactionItem(String accountName, float amount, String currency) {
+    public LedgerTransactionAccount(String accountName, float amount, String currency) {
         this.accountName = accountName;
         this.amount = amount;
         this.amountSet = true;
         this.currency = currency;
     }
 
-    public LedgerTransactionItem(String accountName) {
+    public LedgerTransactionAccount(String accountName) {
         this.accountName = accountName;
     }
 
