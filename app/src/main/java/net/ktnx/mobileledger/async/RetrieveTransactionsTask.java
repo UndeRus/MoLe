@@ -21,6 +21,7 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.TransactionListActivity;
@@ -37,6 +38,7 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -177,6 +179,7 @@ public class RetrieveTransactionsTask extends
                                                 db.execSQL("UPDATE transactions SET keep=1 WHERE " +
                                                            "id < ?",
                                                         new Integer[]{transaction.getId()});
+                                                success = true;
                                                 progress.setTotal(progress.getProgress());
                                                 publishProgress(progress);
                                                 break LINES;
@@ -237,7 +240,11 @@ public class RetrieveTransactionsTask extends
                 }
             }
 
-            if (success && !isCancelled()) ctx.model.reloadTransactions(ctx);
+            if (success && !isCancelled()) {
+                Log.d("db", "Updating transaction list stamp");
+                MLDB.set_option_value(ctx, MLDB.OPT_TRANSACTION_LIST_STAMP, new Date().getTime());
+                ctx.model.reloadTransactions(ctx);
+            }
         }
         catch (MalformedURLException e) {
             error = R.string.err_bad_backend_url;
