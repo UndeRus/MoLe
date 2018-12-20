@@ -257,32 +257,13 @@ public class RetrieveTransactionsTask extends
     }
 
     public static class Params {
-        static final int DEFAULT_LIMIT = 100;
         private SharedPreferences backendPref;
-        private String accountsRoot;
-        private int limit;
 
         public Params(SharedPreferences backendPref) {
             this.backendPref = backendPref;
-            this.accountsRoot = null;
-            this.limit = DEFAULT_LIMIT;
-        }
-        Params(SharedPreferences backendPref, String accountsRoot) {
-            this(backendPref, accountsRoot, DEFAULT_LIMIT);
-        }
-        Params(SharedPreferences backendPref, String accountsRoot, int limit) {
-            this.backendPref = backendPref;
-            this.accountsRoot = accountsRoot;
-            this.limit = limit;
-        }
-        String getAccountsRoot() {
-            return accountsRoot;
         }
         SharedPreferences getBackendPref() {
             return backendPref;
-        }
-        int getLimit() {
-            return limit;
         }
     }
 
