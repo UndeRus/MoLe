@@ -68,21 +68,7 @@ public class TransactionListActivity extends AppCompatActivity {
         if (progressBar == null)
             throw new RuntimeException("Can't get hold on the transaction list progress bar");
         tvLastUpdate = findViewById(R.id.transactions_last_update);
-        {
-            long last_update = MLDB.get_option_value(this, "transaction_list_last_update", 0L);
-            Log.d("transactions", String.format("Last update = %d", last_update));
-            if (last_update == 0) tvLastUpdate.setText("never");
-            else {
-                Date date = new Date(last_update);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
-                            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                }
-                else {
-                    tvLastUpdate.setText(date.toLocaleString());
-                }
-            }
-        }
+        updateLastUpdateText();
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
         List<LedgerTransaction> transactions = model.getTransactions(getApplicationContext());
         modelAdapter = new TransactionListAdapter(transactions);
@@ -154,20 +140,26 @@ public class TransactionListActivity extends AppCompatActivity {
     public void onRetrieveDone(boolean success) {
         progressBar.setVisibility(View.GONE);
         swiper.setRefreshing(false);
+        updateLastUpdateText();
         if (success) {
-            Date now = new Date();
-            MLDB.set_option_value(getApplicationContext(), "transaction_list_last_update",
-                    now.getTime());
-            updateLastUpdateText(now);
             modelAdapter.notifyDataSetChanged();
         }
     }
-    private void updateLastUpdateText(Date now) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            tvLastUpdate.setText(now.toInstant().atZone(ZoneId.systemDefault()).toString());
-        }
-        else {
-            tvLastUpdate.setText(now.toLocaleString());
+    private void updateLastUpdateText() {
+        {
+            long last_update = MLDB.get_option_value(this, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
+            Log.d("transactions", String.format("Last update = %d", last_update));
+            if (last_update == 0) tvLastUpdate.setText("never");
+            else {
+                Date date = new Date(last_update);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                }
+                else {
+                    tvLastUpdate.setText(date.toLocaleString());
+                }
+            }
         }
     }
 }
