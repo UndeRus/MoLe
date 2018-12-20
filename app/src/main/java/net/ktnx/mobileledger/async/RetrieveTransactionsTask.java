@@ -217,7 +217,8 @@ public class RetrieveTransactionsTask extends
                                             L(String.format("%s = %s", acc_name, amount));
                                         }
                                         else throw new IllegalStateException(
-                                                String.format("Can't parse transaction details"));
+                                                String.format("Can't parse transaction %d details",
+                                                        transactionId));
                                     }
                                     break;
                                 default:
