@@ -50,7 +50,7 @@ public class RetrieveTransactionsTask extends
     private static final Pattern transactionDescriptionPattern =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
     private static final Pattern transactionDetailsPattern =
-            Pattern.compile("^\\s+" + "(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)");
+            Pattern.compile("^\\s+" + "(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
     protected WeakReference<TransactionListActivity> contextRef;
     protected int error;
@@ -214,10 +214,11 @@ public class RetrieveTransactionsTask extends
                                         if (m.find()) {
                                             String acc_name = m.group(1);
                                             String amount = m.group(2);
+                                            String currency = m.group(3);
                                             amount = amount.replace(',', '.');
                                             transaction.addAccount(
                                                     new LedgerTransactionAccount(acc_name,
-                                                            Float.valueOf(amount)));
+                                                            Float.valueOf(amount), currency));
                                             L(String.format("%s = %s", acc_name, amount));
                                         }
                                         else throw new IllegalStateException(
