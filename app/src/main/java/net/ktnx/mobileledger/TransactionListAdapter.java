@@ -67,7 +67,7 @@ class TransactionListAdapter
                                     LinearLayout.LayoutParams.WRAP_CONTENT));
                     row.setGravity(Gravity.CENTER_VERTICAL);
                     row.setOrientation(LinearLayout.HORIZONTAL);
-                    row.setPaddingRelative(dp2px(ctx, 8), 0, dp2px(ctx, 8), 0);
+                    row.setPaddingRelative(dp2px(ctx, 8), 0, 0, 8);
                     accName = new TextView(ctx);
                     accName.setLayoutParams(
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
