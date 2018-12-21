@@ -18,16 +18,16 @@
 package net.ktnx.mobileledger;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -35,8 +35,9 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
-import java.util.Iterator;
 import java.util.List;
+
+import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
 class TransactionListAdapter
         extends RecyclerView.Adapter<TransactionListAdapter.TransactionRowHolder> {
@@ -52,20 +53,48 @@ class TransactionListAdapter
 
         try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx)) {
             tr.loadData(db);
-
             holder.tvDescription
-                    .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
-            TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
-            tbl.removeAllViews();
+                    .setText(String.format("%s\t%s", tr.getDescription(), tr.getDate()));
+
+            int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
-                TableRow row = new TableRow(holder.row.getContext());
-                TextView child = new TextView(ctx);
-                child.setText(acc.getShortAccountName());
-                row.addView(child);
-                child = new TextView(ctx);
-                child.setText(acc.toString());
-                row.addView(child);
-                tbl.addView(row);
+                LinearLayout row = (LinearLayout) holder.tableAccounts.getChildAt(rowIndex++);
+                TextView accName, accAmount;
+                if (row == null) {
+                    row = new LinearLayout(ctx);
+                    row.setLayoutParams(
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT));
+                    row.setGravity(Gravity.CENTER_VERTICAL);
+                    row.setOrientation(LinearLayout.HORIZONTAL);
+                    row.setPaddingRelative(dp2px(ctx, 8), 0, dp2px(ctx, 8), 0);
+                    accName = new TextView(ctx);
+                    accName.setLayoutParams(
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT, 5f));
+                    accName.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+                    row.addView(accName);
+                    accAmount = new TextView(ctx);
+                    LinearLayout.LayoutParams llp =
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                    llp.setMarginEnd(0);
+                    accAmount.setLayoutParams(llp);
+                    accAmount.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
+                    accAmount.setMinWidth(dp2px(ctx, 60));
+                    row.addView(accAmount);
+                    holder.tableAccounts.addView(row);
+                }
+                else {
+                    accName = (TextView) row.getChildAt(0);
+                    accAmount = (TextView) row.getChildAt(1);
+                }
+                accName.setText(acc.getShortAccountName());
+                accAmount.setText(acc.toString());
+            }
+            if (holder.tableAccounts.getChildCount() > rowIndex) {
+                holder.tableAccounts
+                        .removeViews(rowIndex, holder.tableAccounts.getChildCount() - rowIndex);
             }
 
             if (position % 2 == 0) {
@@ -74,14 +103,13 @@ class TransactionListAdapter
             else {
                 holder.row.setBackgroundColor(Globals.table_row_odd_bg);
             }
-
-            holder.row.setTag(R.id.POS, position);
         }
     }
 
     @NonNull
     @Override
     public TransactionRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d("perf", "onCreateViewHolder called");
         View row = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.transaction_list_row, parent, false);
         return new TransactionRowHolder(row);
@@ -93,11 +121,11 @@ class TransactionListAdapter
     }
     class TransactionRowHolder extends RecyclerView.ViewHolder {
         TextView tvDescription;
-        TableLayout tableAccounts;
-        LinearLayout row;
+        LinearLayout tableAccounts;
+        ConstraintLayout row;
         public TransactionRowHolder(@NonNull View itemView) {
             super(itemView);
-            this.row = (LinearLayout) itemView;
+            this.row = (ConstraintLayout) itemView;
             this.tvDescription = itemView.findViewById(R.id.transaction_row_description);
             this.tableAccounts = itemView.findViewById(R.id.transaction_row_acc_amounts);
         }

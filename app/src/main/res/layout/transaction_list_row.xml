@@ -41,39 +41,35 @@
         android:text="Sample description goes here."
         tools:ignore="HardcodedText" />
 
-    <TableLayout
+    <LinearLayout
         android:id="@+id/transaction_row_acc_amounts"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_weight="5"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toEndOf="@id/transaction_row_description">
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/transaction_row_description">
 
-        <TableRow>
+        <LinearLayout
+            android:id="@+id/account_row_account_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <TextView
-                style="@style/account_summary_amounts"
-                android:text="Sample account name"
+                android:id="@+id/account_row_acc_name"
+                style="@style/account_summary_account_name"
+                android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
                 tools:ignore="HardcodedText" />
 
             <TextView
-                style="@style/account_summary_amounts"
-                android:text="123,45\n678,90"
-                tools:ignore="HardcodedText" />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                style="@style/account_summary_amounts"
-                android:text="Sample account name"
-                tools:ignore="HardcodedText" />
-
-            <TextView
+                android:id="@+id/account_row_acc_amounts"
                 style="@style/account_summary_amounts"
                 android:text="123,45\n678,90"
                 tools:ignore="HardcodedText" />
-        </TableRow>
-    </TableLayout>
+        </LinearLayout>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
