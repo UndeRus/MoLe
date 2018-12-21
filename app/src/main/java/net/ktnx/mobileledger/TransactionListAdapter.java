@@ -50,7 +50,7 @@ class TransactionListAdapter
         LedgerTransaction tr = transactions.get(position);
         Context ctx = holder.row.getContext();
 
-        try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx.getApplicationContext())) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx)) {
             tr.loadData(db);
 
             holder.tvDescription
