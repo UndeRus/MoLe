@@ -70,7 +70,7 @@ public class TransactionListActivity extends AppCompatActivity {
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         updateLastUpdateText();
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
-        List<LedgerTransaction> transactions = model.getTransactions(getApplicationContext());
+        List<LedgerTransaction> transactions = model.getTransactions(this);
         modelAdapter = new TransactionListAdapter(transactions);
 
         RecyclerView root = findViewById(R.id.transaction_root);
