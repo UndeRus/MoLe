@@ -77,7 +77,7 @@ class TransactionListAdapter
                     accAmount = new TextView(ctx);
                     LinearLayout.LayoutParams llp =
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
                     llp.setMarginEnd(0);
                     accAmount.setLayoutParams(llp);
                     accAmount.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
