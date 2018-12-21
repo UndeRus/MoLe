@@ -125,7 +125,7 @@ class TransactionListAdapter
         ConstraintLayout row;
         public TransactionRowHolder(@NonNull View itemView) {
             super(itemView);
-            this.row = (ConstraintLayout) itemView;
+            this.row = itemView.findViewById(R.id.transaction_row);
             this.tvDescription = itemView.findViewById(R.id.transaction_row_description);
             this.tvDate = itemView.findViewById(R.id.transaction_row_date);
             this.tableAccounts = itemView.findViewById(R.id.transaction_row_acc_amounts);
