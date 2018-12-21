@@ -95,7 +95,7 @@ class TransactionListAdapter
                     accName = (TextView) row.getChildAt(0);
                     accAmount = (TextView) row.getChildAt(1);
                 }
-                accName.setText(acc.getShortAccountName());
+                accName.setText(acc.getAccountName());
                 accAmount.setText(acc.toString());
             }
             if (holder.tableAccounts.getChildCount() > rowIndex) {
