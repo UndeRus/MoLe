@@ -59,13 +59,25 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/transaction_row_header_border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dashed_border_1dp"
+        android:minHeight="2dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/transaction_row_head"></LinearLayout>
+
+    <LinearLayout
         android:id="@+id/transaction_row_acc_amounts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_weight="5"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/transaction_row_description">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/transaction_row_header_border">
 
         <LinearLayout
             android:id="@+id/account_row_account_row"
@@ -74,18 +86,25 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="8dp"
-            android:paddingEnd="8dp">
+            android:paddingEnd="0dp">
 
             <TextView
                 android:id="@+id/account_row_acc_name"
-                style="@style/account_summary_account_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
                 android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
+                android:textAlignment="viewStart"
                 tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/account_row_acc_amounts"
-                style="@style/account_summary_amounts"
-                android:text="123,45\n678,90"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="0dp"
+                android:minWidth="60dp"
+                android:text="123,45\n-14 678,90"
+                android:textAlignment="viewEnd"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
     </LinearLayout>
