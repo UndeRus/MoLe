@@ -21,6 +21,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
@@ -73,14 +74,13 @@ class TransactionListAdapter
                                     LinearLayout.LayoutParams.WRAP_CONTENT));
                     row.setGravity(Gravity.CENTER_VERTICAL);
                     row.setOrientation(LinearLayout.HORIZONTAL);
-                    row.setPaddingRelative(dp2px(ctx, 8), 0, 0, 8);
-                    accName = new TextView(ctx);
-                    accName.setLayoutParams(
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    row.setPaddingRelative(dp2px(ctx, 8), 0, 0, 0);
+                    accName = new AppCompatTextView(ctx);
+                    accName.setLayoutParams(new LinearLayout.LayoutParams(0,
                                     LinearLayout.LayoutParams.WRAP_CONTENT, 5f));
                     accName.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                     row.addView(accName);
-                    accAmount = new TextView(ctx);
+                    accAmount = new AppCompatTextView(ctx);
                     LinearLayout.LayoutParams llp =
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                                     LinearLayout.LayoutParams.WRAP_CONTENT);
