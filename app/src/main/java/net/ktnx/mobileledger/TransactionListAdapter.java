@@ -20,7 +20,6 @@ package net.ktnx.mobileledger;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,6 +32,7 @@ import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Iterator;
@@ -49,7 +49,7 @@ class TransactionListAdapter
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
         LedgerTransaction tr = transactions.get(position);
         Context ctx = holder.row.getContext();
-        Resources rm = ctx.getResources();
+
         try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx.getApplicationContext())) {
             tr.loadData(db);
 
@@ -70,15 +70,10 @@ class TransactionListAdapter
             }
 
             if (position % 2 == 0) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                        .setBackgroundColor(rm.getColor(R.color.table_row_even_bg, ctx.getTheme()));
-                else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_even_bg));
+                holder.row.setBackgroundColor(Globals.table_row_even_bg);
             }
             else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                        .setBackgroundColor(rm.getColor(R.color.table_row_odd_bg, ctx
-                                .getTheme()));
-                else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_odd_bg));
+                holder.row.setBackgroundColor(Globals.table_row_odd_bg);
             }
 
             holder.row.setTag(R.id.POS, position);
