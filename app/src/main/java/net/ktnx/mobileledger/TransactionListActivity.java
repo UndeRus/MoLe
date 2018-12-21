@@ -149,7 +149,7 @@ public class TransactionListActivity extends AppCompatActivity {
         {
             long last_update = MLDB.get_option_value(this, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
             Log.d("transactions", String.format("Last update = %d", last_update));
-            if (last_update == 0) tvLastUpdate.setText("never");
+            if (last_update == 0) tvLastUpdate.setText(getString(R.string.transaction_last_update_never));
             else {
                 Date date = new Date(last_update);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
