@@ -41,14 +41,16 @@ public class TransactionListViewModel extends ViewModel {
         return transactions;
     }
     public void reloadTransactions(Context context) {
-        transactions.clear();
+        ArrayList<LedgerTransaction> newList = new ArrayList<>();
+
         String sql = "SELECT id FROM transactions ORDER BY date desc, id desc";
 
         try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
             try (Cursor cursor = db.rawQuery(sql, null)) {
                 while (cursor.moveToNext()) {
-                    transactions.add(new LedgerTransaction(cursor.getInt(0)));
+                    newList.add(new LedgerTransaction(cursor.getInt(0)));
                 }
+                transactions = newList;
             }
         }
 
