@@ -138,7 +138,7 @@ public class TransactionListActivity extends AppCompatActivity {
     }
 
     public void onRetrieveDone(boolean success) {
-        progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.INVISIBLE);
         swiper.setRefreshing(false);
         updateLastUpdateText();
         if (success) {
