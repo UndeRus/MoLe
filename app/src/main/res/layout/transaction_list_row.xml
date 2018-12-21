@@ -19,8 +19,8 @@
   -->
 
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/transaction_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/transaction_row_head"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/transaction_row_head" />
 
     <LinearLayout
         android:id="@+id/transaction_row_acc_amounts"
@@ -80,7 +80,6 @@
         app:layout_constraintTop_toBottomOf="@+id/transaction_row_header_border">
 
         <LinearLayout
-            android:id="@+id/account_row_account_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -89,7 +88,6 @@
             android:paddingEnd="0dp">
 
             <TextView
-                android:id="@+id/account_row_acc_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
@@ -98,7 +96,32 @@
                 tools:ignore="HardcodedText" />
 
             <TextView
-                android:id="@+id/account_row_acc_amounts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="0dp"
+                android:minWidth="60dp"
+                android:text="123,45\n-14 678,90"
+                android:textAlignment="viewEnd"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="0dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
+                android:textAlignment="viewStart"
+                tools:ignore="HardcodedText" />
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="0dp"
