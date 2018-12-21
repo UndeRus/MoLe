@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -45,16 +44,19 @@ public class LedgerTransaction {
     private Integer id;
     private String date;
     private String description;
-    private ArrayList<LedgerTransactionAccount> items;
-    private String dataHash;
-    private boolean dataLoaded;
+    private ArrayList<LedgerTransactionAccount> accounts;
     public LedgerTransaction(Integer id, String date, String description) {
         this.id = id;
         this.date = date;
         this.description = description;
-        this.items = new ArrayList<>();
+        this.accounts = new ArrayList<>();
         this.dataHash = null;
         dataLoaded = false;
+    }
+    private String dataHash;
+    private boolean dataLoaded;
+    public ArrayList<LedgerTransactionAccount> getAccounts() {
+        return accounts;
     }
     public LedgerTransaction(String date, String description) {
         this(null, date, description);
@@ -63,7 +65,7 @@ public class LedgerTransaction {
         this(id, null, null);
     }
     public void addAccount(LedgerTransactionAccount item) {
-        items.add(item);
+        accounts.add(item);
         dataHash = null;
     }
     public String getDate() {
@@ -80,20 +82,6 @@ public class LedgerTransaction {
         this.description = description;
         dataHash = null;
     }
-    public Iterator<LedgerTransactionAccount> getAccountsIterator() {
-        return new Iterator<LedgerTransactionAccount>() {
-            private int pointer = 0;
-            @Override
-            public boolean hasNext() {
-                return pointer < items.size();
-            }
-
-            @Override
-            public LedgerTransactionAccount next() {
-                return hasNext() ? items.get(pointer++) : null;
-            }
-        };
-    }
     public int getId() {
         return id;
     }
@@ -102,7 +90,7 @@ public class LedgerTransaction {
         db.execSQL("INSERT INTO transactions(id, date, description, data_hash) values(?,?,?,?)",
                 new Object[]{id, date, description, dataHash});
 
-        for (LedgerTransactionAccount item : items) {
+        for (LedgerTransactionAccount item : accounts) {
             db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, " +
                        "currency) values(?, ?, ?, ?)",
                     new Object[]{id, item.getAccountName(), item.getAmount(), item.getCurrency()});
@@ -117,7 +105,7 @@ public class LedgerTransaction {
             data.append('\0');
             data.append(getDescription());
             data.append('\0');
-            for (LedgerTransactionAccount item : items) {
+            for (LedgerTransactionAccount item : accounts) {
                 data.append(item.getAccountName());
                 data.append('\0');
                 data.append(item.getCurrency());

@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,15 +72,11 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         if (token != null) params.add_pair("_token", token);
         params.add_pair("date", ltr.getDate());
         params.add_pair("description", ltr.getDescription());
-        {
-            Iterator<LedgerTransactionAccount> items = ltr.getAccountsIterator();
-            while (items.hasNext()) {
-                LedgerTransactionAccount item = items.next();
-                params.add_pair("account", item.getAccountName());
-                if (item.isAmountSet())
-                    params.add_pair("amount", String.format(Locale.US, "%1.2f", item.getAmount()));
-                else params.add_pair("amount", "");
-            }
+        for (LedgerTransactionAccount acc : ltr.getAccounts()) {
+            params.add_pair("account", acc.getAccountName());
+            if (acc.isAmountSet())
+                params.add_pair("amount", String.format(Locale.US, "%1.2f", acc.getAmount()));
+            else params.add_pair("amount", "");
         }
 
         String body = params.toString();

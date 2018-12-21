@@ -57,8 +57,7 @@ class TransactionListAdapter
                     .setText(String.format("%s\n%s", tr.getDescription(), tr.getDate()));
             TableLayout tbl = holder.row.findViewById(R.id.transaction_row_acc_amounts);
             tbl.removeAllViews();
-            for (Iterator<LedgerTransactionAccount> it = tr.getAccountsIterator(); it.hasNext(); ) {
-                LedgerTransactionAccount acc = it.next();
+            for (LedgerTransactionAccount acc : tr.getAccounts()) {
                 TableRow row = new TableRow(holder.row.getContext());
                 TextView child = new TextView(ctx);
                 child.setText(acc.getShortAccountName());

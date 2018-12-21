@@ -18,8 +18,9 @@
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/transaction_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -27,21 +28,27 @@
     android:minHeight="36dp"
     android:orientation="horizontal"
     android:paddingStart="8dp"
-    android:paddingEnd="8dp"
-    tools:showIn="@layout/transaction_list_fragment">
+    android:paddingEnd="8dp">
 
     <!--android:button="@drawable/checkbox_star_black"-->
 
     <TextView
         android:id="@+id/transaction_row_description"
         style="@style/account_summary_account_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
         android:text="Sample description goes here."
         tools:ignore="HardcodedText" />
 
     <TableLayout
         android:id="@+id/transaction_row_acc_amounts"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="5"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@id/transaction_row_description">
 
         <TableRow>
 
@@ -69,4 +76,4 @@
                 tools:ignore="HardcodedText" />
         </TableRow>
     </TableLayout>
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
