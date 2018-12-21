@@ -32,14 +32,31 @@
 
     <!--android:button="@drawable/checkbox_star_black"-->
 
-    <TextView
-        android:id="@+id/transaction_row_description"
-        style="@style/account_summary_account_name"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/transaction_row_head"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="5"
-        android:text="Sample description goes here."
-        tools:ignore="HardcodedText" />
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/transaction_row_description"
+            style="@style/account_summary_account_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Sample description goes here."
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/transaction_row_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="0dp"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/transaction_row_acc_amounts"

@@ -53,8 +53,8 @@ class TransactionListAdapter
 
         try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx)) {
             tr.loadData(db);
-            holder.tvDescription
-                    .setText(String.format("%s\t%s", tr.getDescription(), tr.getDate()));
+            holder.tvDescription.setText(tr.getDescription());
+            holder.tvDate.setText(tr.getDate());
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
@@ -120,13 +120,14 @@ class TransactionListAdapter
         return transactions.size();
     }
     class TransactionRowHolder extends RecyclerView.ViewHolder {
-        TextView tvDescription;
+        TextView tvDescription, tvDate;
         LinearLayout tableAccounts;
         ConstraintLayout row;
         public TransactionRowHolder(@NonNull View itemView) {
             super(itemView);
             this.row = (ConstraintLayout) itemView;
             this.tvDescription = itemView.findViewById(R.id.transaction_row_description);
+            this.tvDate = itemView.findViewById(R.id.transaction_row_date);
             this.tableAccounts = itemView.findViewById(R.id.transaction_row_acc_amounts);
         }
     }
