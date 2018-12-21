@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 
 public class LedgerTransactionAccount {
     private String accountName;
+    private String shortAccountName;
     private float amount;
     private boolean amountSet;
     private String currency;
@@ -29,7 +30,7 @@ public class LedgerTransactionAccount {
         this(accountName, amount, null);
     }
     public LedgerTransactionAccount(String accountName, float amount, String currency) {
-        this.accountName = accountName;
+        this.setAccountName(accountName);
         this.amount = amount;
         this.amountSet = true;
         this.currency = currency;
@@ -43,13 +44,11 @@ public class LedgerTransactionAccount {
         return accountName;
     }
     public String getShortAccountName() {
-        String result = accountName;
-        result = result.replaceAll("(?<=^|:)(.)[^:]+(?=:)", "$1");
-        return result;
+        return shortAccountName;
     }
-
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+        shortAccountName = accountName.replaceAll("(?<=^|:)(.)[^:]+(?=:)", "$1");
     }
 
     public float getAmount() {
