@@ -48,6 +48,12 @@ class TransactionListAdapter
     }
 
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
+        // in a race when transaction list is reduced, but the model hasn't been notified yet
+        // the view will disappear when the notifications reaches the model, so by simply omitting
+        // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
+        // a bit longer
+        if (position >= transactions.size()) return;
+
         LedgerTransaction tr = transactions.get(position);
         Context ctx = holder.row.getContext();
 
