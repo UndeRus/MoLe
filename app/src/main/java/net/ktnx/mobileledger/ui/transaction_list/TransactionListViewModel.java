@@ -21,25 +21,17 @@ import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class TransactionListViewModel extends ViewModel {
 
-    private List<LedgerTransaction> transactions;
+    private ArrayList<LedgerTransaction> transactions;
 
-    public List<LedgerTransaction> getTransactions(Context context) {
-        if (transactions == null) {
-            transactions = new ArrayList<>();
-            reloadTransactions(context);
-        }
-
-        return transactions;
-    }
     public void reloadTransactions(Context context) {
         ArrayList<LedgerTransaction> newList = new ArrayList<>();
 
@@ -51,8 +43,17 @@ public class TransactionListViewModel extends ViewModel {
                     newList.add(new LedgerTransaction(cursor.getInt(0)));
                 }
                 transactions = newList;
+                Log.d("transactions", "transaction list updated");
             }
         }
 
+    }
+    public LedgerTransaction getTransaction(int position) {
+        if (position >= transactions.size()) return null;
+        return transactions.get(position);
+    }
+    public int getTransactionCount() {
+        if (transactions == null) return 0;
+        return transactions.size();
     }
 }
