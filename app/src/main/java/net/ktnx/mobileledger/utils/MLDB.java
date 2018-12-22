@@ -53,10 +53,10 @@ public final class MLDB {
         }
     }
     public static SQLiteDatabase getReadableDatabase(Context context) {
-        return getDatabase(context, READ);
+        return getDatabase(context.getApplicationContext(), READ);
     }
     public static SQLiteDatabase getWritableDatabase(Context context) {
-        return getDatabase(context, WRITE);
+        return getDatabase(context.getApplicationContext(), WRITE);
     }
     static public int get_option_value(Context context, String name, int default_value) {
         String s = get_option_value(context, name, String.valueOf(default_value));
