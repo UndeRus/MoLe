@@ -82,6 +82,13 @@ public class RetrieveTransactionsTask extends
         if (context == null) return;
         context.onRetrieveDone(success);
     }
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
+        TransactionListActivity context = getContext();
+        if (context == null) return;
+        context.onRetrieveDone(false);
+    }
     @SuppressLint("DefaultLocale")
     @Override
     protected Void doInBackground(Params... params) {

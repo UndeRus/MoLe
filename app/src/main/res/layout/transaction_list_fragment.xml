@@ -58,20 +58,37 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/transaction_progress_bar"
-            style="?android:attr/progressBarStyleHorizontal"
+        <LinearLayout
+            android:id="@+id/transaction_progress_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-8dp"
-            android:layout_marginBottom="-7dp"
-            android:indeterminate="true"
-            android:padding="0dp"
-            android:progressTint="@color/colorPrimary"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/last_update_row" />
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/transaction_list_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-8dp"
+                android:layout_marginBottom="-7dp"
+                android:layout_weight="1"
+                android:indeterminate="true"
+                android:padding="0dp"
+                android:progressTint="@color/colorPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/last_update_row" />
+
+            <TextView
+                android:id="@+id/transaction_list_cancel_download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_clear_black_24dp"
+                android:clickable="true"
+                android:onClick="onStopTransactionRefreshClick" />
+        </LinearLayout>
 
     </LinearLayout>
 

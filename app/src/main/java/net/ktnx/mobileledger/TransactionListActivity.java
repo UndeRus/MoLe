@@ -29,6 +29,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -46,8 +47,10 @@ public class TransactionListActivity extends AppCompatActivity {
     private SwipeRefreshLayout swiper;
     private RecyclerView root;
     private ProgressBar progressBar;
+    private LinearLayout progressLayout;
     private TextView tvLastUpdate;
     private TransactionListAdapter modelAdapter;
+    private RetrieveTransactionsTask retrieveTransactionsTask;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,9 +65,12 @@ public class TransactionListActivity extends AppCompatActivity {
         if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
         root = findViewById(R.id.transaction_root);
         if (root == null) throw new RuntimeException("Can't get hold on the transaction list view");
-        progressBar = findViewById(R.id.transaction_progress_bar);
+        progressBar = findViewById(R.id.transaction_list_progress_bar);
         if (progressBar == null)
             throw new RuntimeException("Can't get hold on the transaction list progress bar");
+        progressLayout = findViewById(R.id.transaction_progress_layout);
+        if (progressLayout == null) throw new RuntimeException(
+                "Can't get hold on the transaction list progress bar layout");
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         updateLastUpdateText();
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
@@ -106,19 +112,20 @@ public class TransactionListActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.dummy, R.anim.slide_out_right);
     }
     private void update_transactions() {
-        RetrieveTransactionsTask task = new RetrieveTransactionsTask(new WeakReference<>(this));
+        retrieveTransactionsTask = new RetrieveTransactionsTask(new WeakReference<>(this));
 
         RetrieveTransactionsTask.Params params = new RetrieveTransactionsTask.Params(
                 PreferenceManager.getDefaultSharedPreferences(this));
 
-        task.execute(params);
+        retrieveTransactionsTask.execute(params);
+        findViewById(R.id.transaction_list_cancel_download).setEnabled(true);
     }
 
     public void onRetrieveStart() {
         progressBar.setIndeterminate(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
         else progressBar.setProgress(0);
-        progressBar.setVisibility(View.VISIBLE);
+        progressLayout.setVisibility(View.VISIBLE);
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
         if ((progress.getTotal() == RetrieveTransactionsTask.Progress.INDETERMINATE) ||
@@ -140,7 +147,7 @@ public class TransactionListActivity extends AppCompatActivity {
     }
 
     public void onRetrieveDone(boolean success) {
-        progressBar.setVisibility(View.INVISIBLE);
+        progressLayout.setVisibility(View.GONE);
         swiper.setRefreshing(false);
         updateLastUpdateText();
         if (success) {
@@ -166,5 +173,10 @@ public class TransactionListActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+    public void onStopTransactionRefreshClick(View view) {
+        Log.d("interactive", "Cancelling transactions refresh");
+        if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
+        findViewById(R.id.transaction_list_cancel_download).setEnabled(false);
     }
 }
