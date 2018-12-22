@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public final class NetworkUtil {
+    private static final int thirtySeconds = 30000;
     public static HttpURLConnection prepare_connection(SharedPreferences pref, String path) throws
             IOException {
         final String backend_url = pref.getString("backend_url", "");
@@ -43,6 +44,8 @@ public final class NetworkUtil {
         http.setRequestProperty("Accept-Charset", "UTF-8");
         http.setInstanceFollowRedirects(false);
         http.setUseCaches(false);
+        http.setReadTimeout(thirtySeconds);
+        http.setConnectTimeout(thirtySeconds);
 
         return http;
     }
