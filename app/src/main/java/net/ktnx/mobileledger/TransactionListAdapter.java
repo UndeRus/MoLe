@@ -33,29 +33,26 @@ import android.widget.TextView;
 
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
-
-import java.util.List;
 
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
 class TransactionListAdapter
         extends RecyclerView.Adapter<TransactionListAdapter.TransactionRowHolder> {
-    private List<LedgerTransaction> transactions;
-
-    TransactionListAdapter(List<LedgerTransaction> transactions) {
-        this.transactions = transactions;
+    TransactionListViewModel model;
+    public TransactionListAdapter(TransactionListViewModel model) {
+        this.model = model;
     }
-
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
+        LedgerTransaction tr = model.getTransaction(position);
         // in a race when transaction list is reduced, but the model hasn't been notified yet
         // the view will disappear when the notifications reaches the model, so by simply omitting
         // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
         // a bit longer
-        if (position >= transactions.size()) return;
+        if (tr == null) return;
 
-        LedgerTransaction tr = transactions.get(position);
         Context ctx = holder.row.getContext();
 
         try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx)) {
@@ -109,6 +106,8 @@ class TransactionListAdapter
             else {
                 holder.row.setBackgroundColor(Globals.table_row_odd_bg);
             }
+
+            Log.d("transactions", String.format("Filled position %d", position));
         }
     }
 
@@ -122,8 +121,9 @@ class TransactionListAdapter
     }
 
     @Override
-    public int getItemCount() {
-        return transactions.size();
+    public int getItemCount()
+    {
+        return model.getTransactionCount();
     }
     class TransactionRowHolder extends RecyclerView.ViewHolder {
         TextView tvDescription, tvDate;

@@ -33,7 +33,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
-import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -41,7 +40,6 @@ import java.lang.ref.WeakReference;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
 
 public class TransactionListActivity extends AppCompatActivity {
     public TransactionListViewModel model;
@@ -70,8 +68,7 @@ public class TransactionListActivity extends AppCompatActivity {
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         updateLastUpdateText();
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
-        List<LedgerTransaction> transactions = model.getTransactions(this);
-        modelAdapter = new TransactionListAdapter(transactions);
+        modelAdapter = new TransactionListAdapter(model);
 
         RecyclerView root = findViewById(R.id.transaction_root);
         root.setAdapter(modelAdapter);
@@ -88,7 +85,12 @@ public class TransactionListActivity extends AppCompatActivity {
 
         swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 
-//        update_transactions();
+        updateLastUpdateText();
+        long last_update = MLDB.get_option_value(this, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
+        Log.d("transactions", String.format("Last update = %d", last_update));
+        if (last_update == 0) {
+            update_transactions();
+        }
     }
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
@@ -142,6 +144,7 @@ public class TransactionListActivity extends AppCompatActivity {
         swiper.setRefreshing(false);
         updateLastUpdateText();
         if (success) {
+            Log.d("transactions", "calling notifyDataSetChanged()");
             modelAdapter.notifyDataSetChanged();
         }
     }
@@ -149,7 +152,9 @@ public class TransactionListActivity extends AppCompatActivity {
         {
             long last_update = MLDB.get_option_value(this, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
             Log.d("transactions", String.format("Last update = %d", last_update));
-            if (last_update == 0) tvLastUpdate.setText(getString(R.string.transaction_last_update_never));
+            if (last_update == 0) {
+                tvLastUpdate.setText(getString(R.string.transaction_last_update_never));
+            }
             else {
                 Date date = new Date(last_update);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
