@@ -18,14 +18,8 @@
 package net.ktnx.mobileledger;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.FontsContract;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -44,9 +38,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.FilterQueryProvider;
 import android.widget.ProgressBar;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -96,7 +88,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             }
         });
         text_descr = findViewById(R.id.new_transaction_description);
-        hook_autocompletion_adapter(text_descr, MLDB.DESCRIPTION_HISTORY_TABLE, "description");
+        MLDB.hook_autocompletion_adapter(this, text_descr, MLDB.DESCRIPTION_HISTORY_TABLE,
+                "description");
         hook_text_change_listener(text_descr);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -108,7 +101,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
             TextView amount_view = (TextView) row.getChildAt(1);
             hook_swipe_listener(row);
-            hook_autocompletion_adapter(acc_name_view, MLDB.ACCOUNTS_TABLE, "name");
+            MLDB.hook_autocompletion_adapter(this, acc_name_view, MLDB.ACCOUNTS_TABLE, "name");
             hook_text_change_listener(acc_name_view);
             hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
@@ -243,56 +236,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
     }
 
-    @TargetApi(Build.VERSION_CODES.N)
-    private void hook_autocompletion_adapter(final AutoCompleteTextView view, final String table,
-                                             final String field) {
-        String[] from = {field};
-        int[] to = {android.R.id.text1};
-        SimpleCursorAdapter adapter =
-                new SimpleCursorAdapter(this, android.R.layout.simple_dropdown_item_1line, null,
-                        from, to, 0);
-        adapter.setStringConversionColumn(1);
-
-        FilterQueryProvider provider = new FilterQueryProvider() {
-            @Override
-            public Cursor runQuery(CharSequence constraint) {
-                if (constraint == null) return null;
-
-                String str = constraint.toString().toUpperCase();
-                Log.d("autocompletion", "Looking for " + str);
-                String[] col_names = {FontsContract.Columns._ID, field};
-                MatrixCursor c = new MatrixCursor(col_names);
-
-                try (SQLiteDatabase db = MLDB.getReadableDatabase(getApplicationContext())) {
-
-                    try (Cursor matches = db.rawQuery(String.format(
-                            "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                            "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                            "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
-                            "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;",
-                            field, field, field, field, table, field),
-                            new String[]{str, str, str, str}))
-                    {
-                        int i = 0;
-                        while (matches.moveToNext()) {
-                            String match = matches.getString(0);
-                            int order = matches.getInt(1);
-                            Log.d("autocompletion", String.format("match: %s |%d", match, order));
-                            c.newRow().add(i++).add(match);
-                        }
-                    }
-
-                    return c;
-                }
-
-            }
-        };
-
-        adapter.setFilterQueryProvider(provider);
-
-        view.setAdapter(adapter);
-    }
-
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
@@ -355,7 +298,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
-        hook_autocompletion_adapter(acc, MLDB.ACCOUNTS_TABLE, "name");
+        MLDB.hook_autocompletion_adapter(this, acc, MLDB.ACCOUNTS_TABLE, "name");
         hook_text_change_listener(acc);
         hook_text_change_listener(amt);
     }

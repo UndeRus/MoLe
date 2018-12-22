@@ -17,13 +17,20 @@
 
 package net.ktnx.mobileledger.utils;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
+import android.provider.FontsContract;
 import android.util.Log;
+import android.widget.AutoCompleteTextView;
+import android.widget.FilterQueryProvider;
+import android.widget.SimpleCursorAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -113,6 +120,56 @@ public final class MLDB {
 
     static public void set_option_value(Context context, String name, long value) {
         set_option_value(context, name, String.valueOf(value));
+    }
+    @TargetApi(Build.VERSION_CODES.N)
+    public static void hook_autocompletion_adapter(final Context context,
+                                                   final AutoCompleteTextView view,
+                                                   final String table, final String field) {
+        String[] from = {field};
+        int[] to = {android.R.id.text1};
+        SimpleCursorAdapter adapter =
+                new SimpleCursorAdapter(context, android.R.layout.simple_dropdown_item_1line, null,
+                        from, to, 0);
+        adapter.setStringConversionColumn(1);
+
+        FilterQueryProvider provider = new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence constraint) {
+                if (constraint == null) return null;
+
+                String str = constraint.toString().toUpperCase();
+                Log.d("autocompletion", "Looking for " + str);
+                String[] col_names = {FontsContract.Columns._ID, field};
+                MatrixCursor c = new MatrixCursor(col_names);
+
+                try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
+
+                    try (Cursor matches = db.rawQuery(String.format(
+                            "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                            "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                            "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
+                            "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;",
+                            field, field, field, field, table, field),
+                            new String[]{str, str, str, str}))
+                    {
+                        int i = 0;
+                        while (matches.moveToNext()) {
+                            String match = matches.getString(0);
+                            int order = matches.getInt(1);
+                            Log.d("autocompletion", String.format("match: %s |%d", match, order));
+                            c.newRow().add(i++).add(match);
+                        }
+                    }
+
+                    return c;
+                }
+
+            }
+        };
+
+        adapter.setFilterQueryProvider(provider);
+
+        view.setAdapter(adapter);
     }
 }
 
