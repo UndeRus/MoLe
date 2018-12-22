@@ -97,6 +97,9 @@ public class TransactionListActivity extends AppCompatActivity {
         if (last_update == 0) {
             update_transactions();
         }
+        else {
+            model.reloadTransactions(this);
+        }
     }
     private void setupActionBar() {
         ActionBar actionBar = getSupportActionBar();
