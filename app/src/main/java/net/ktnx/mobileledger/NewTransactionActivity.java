@@ -398,8 +398,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             else if (mSave != null) mSave.setVisible(false);
 
             if (single_empty_amount) {
-                empty_amount
-                        .setHint(String.format("%1.2f", (running_total > 0) ? -running_total : 0f));
+                empty_amount.setHint(String.format("%1.2f",
+                        (Math.abs(running_total) > 0.005) ? -running_total : 0f));
             }
 
         }
