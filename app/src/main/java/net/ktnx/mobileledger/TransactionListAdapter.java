@@ -19,6 +19,7 @@ package net.ktnx.mobileledger;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.AppCompatTextView;
@@ -42,6 +43,7 @@ import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 class TransactionListAdapter
         extends RecyclerView.Adapter<TransactionListAdapter.TransactionRowHolder> {
     TransactionListViewModel model;
+    private String boldAccountName;
     public TransactionListAdapter(TransactionListViewModel model) {
         this.model = model;
     }
@@ -73,8 +75,9 @@ class TransactionListAdapter
                     row.setOrientation(LinearLayout.HORIZONTAL);
                     row.setPaddingRelative(dp2px(ctx, 8), 0, 0, 0);
                     accName = new AppCompatTextView(ctx);
-                    accName.setLayoutParams(new LinearLayout.LayoutParams(0,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT, 5f));
+                    accName.setLayoutParams(
+                            new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    5f));
                     accName.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
                     row.addView(accName);
                     accAmount = new AppCompatTextView(ctx);
@@ -94,6 +97,20 @@ class TransactionListAdapter
                 }
                 accName.setText(acc.getAccountName());
                 accAmount.setText(acc.toString());
+
+                if ((boldAccountName != null) && boldAccountName.equals(acc.getAccountName())) {
+                    accName.setTypeface(null, Typeface.BOLD);
+                    accAmount.setTypeface(null, Typeface.BOLD);
+                    accName.setTextColor(Globals.primaryDark);
+                    accAmount.setTextColor(Globals.primaryDark);
+                }
+                else {
+                    accName.setTypeface(null, Typeface.NORMAL);
+                    accAmount.setTypeface(null, Typeface.NORMAL);
+                    accName.setTextColor(Globals.defaultTextColor);
+                    accAmount.setTextColor(Globals.defaultTextColor);
+                }
+
             }
             if (holder.tableAccounts.getChildCount() > rowIndex) {
                 holder.tableAccounts
@@ -121,9 +138,14 @@ class TransactionListAdapter
     }
 
     @Override
-    public int getItemCount()
-    {
+    public int getItemCount() {
         return model.getTransactionCount();
+    }
+    public void setBoldAccountName(String boldAccountName) {
+        this.boldAccountName = boldAccountName;
+    }
+    public void resetBoldAccountName() {
+        this.boldAccountName = null;
     }
     class TransactionRowHolder extends RecyclerView.ViewHolder {
         TextView tvDescription, tvDate;

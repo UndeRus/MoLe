@@ -42,10 +42,14 @@ public class MobileLedgerApplication extends Application {
             Resources.Theme theme = getTheme();
             Globals.table_row_odd_bg = rm.getColor(R.color.table_row_odd_bg, theme);
             Globals.table_row_even_bg = rm.getColor(R.color.table_row_even_bg, theme);
+            Globals.primaryDark = rm.getColor(R.color.design_default_color_primary_dark, theme);
+            Globals.defaultTextColor = rm.getColor(android.R.color.tab_indicator_text, theme);
         }
         else {
             Globals.table_row_odd_bg = rm.getColor(R.color.table_row_odd_bg);
             Globals.table_row_even_bg = rm.getColor(R.color.table_row_even_bg);
+            Globals.primaryDark = rm.getColor(R.color.design_default_color_primary_dark);
+            Globals.defaultTextColor = rm.getColor(android.R.color.tab_indicator_text);
         }
     }
 }

@@ -24,5 +24,7 @@ public final class Globals {
     public static int table_row_even_bg;
     @ColorInt
     public static int table_row_odd_bg;
+    @ColorInt
+    public static int primaryDark, defaultTextColor;
 
 }

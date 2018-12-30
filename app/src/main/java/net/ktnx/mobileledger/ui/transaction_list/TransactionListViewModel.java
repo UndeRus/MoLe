@@ -22,7 +22,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.view.View;
+import android.widget.AutoCompleteTextView;
 
+import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.TransactionListActivity;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -35,10 +39,33 @@ public class TransactionListViewModel extends ViewModel {
     public void reloadTransactions(Context context) {
         ArrayList<LedgerTransaction> newList = new ArrayList<>();
 
-        String sql = "SELECT id FROM transactions ORDER BY date desc, id desc";
+        TransactionListActivity act = (TransactionListActivity) context;
+        boolean hasFilter =
+                act.findViewById(R.id.transaction_list_account_name_filter).getVisibility() ==
+                View.VISIBLE;
 
+        String sql;
+        String[] params;
+
+        sql = "SELECT id FROM transactions  ORDER BY date desc, id desc";
+        params = null;
+
+        if (hasFilter) {
+            String filterAccName = String.valueOf(
+                    ((AutoCompleteTextView) act.findViewById(R.id.transaction_filter_account_name))
+                            .getText());
+
+            if (!filterAccName.isEmpty()) {
+                sql = "SELECT distinct tr.id from transactions tr JOIN transaction_accounts ta " +
+                      "ON ta.transaction_id=tr.id WHERE ta.account_name LIKE ?||'%' AND ta" +
+                      ".amount <> 0 ORDER BY tr.date desc, tr.id desc";
+                params = new String[]{filterAccName};
+            }
+        }
+
+        Log.d("tmp", sql);
         try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
-            try (Cursor cursor = db.rawQuery(sql, null)) {
+            try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
                     newList.add(new LedgerTransaction(cursor.getInt(0)));
                 }

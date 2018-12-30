@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.database.MatrixCursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -28,7 +29,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +50,9 @@ import java.util.Date;
 
 public class TransactionListActivity extends AppCompatActivity {
     public TransactionListViewModel model;
+    private View bTransactionListCancelDownload;
+    private MenuItem menuTransactionListFilter;
+    private View vAccountFilter;
     private SwipeRefreshLayout swiper;
     private RecyclerView root;
     private ProgressBar progressBar;
@@ -51,6 +60,7 @@ public class TransactionListActivity extends AppCompatActivity {
     private TextView tvLastUpdate;
     private TransactionListAdapter modelAdapter;
     private RetrieveTransactionsTask retrieveTransactionsTask;
+    private AutoCompleteTextView accNameFilter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +101,24 @@ public class TransactionListActivity extends AppCompatActivity {
 
         swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
 
+        vAccountFilter = findViewById(R.id.transaction_list_account_name_filter);
+        accNameFilter = findViewById(R.id.transaction_filter_account_name);
+        bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
+
+        MLDB.hook_autocompletion_adapter(this, accNameFilter, "accounts", "name");
+        TransactionListActivity me = this;
+        accNameFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("tmp", "direct onItemClick");
+                model.reloadTransactions(me);
+                MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
+                modelAdapter.setBoldAccountName(mc.getString(1));
+                modelAdapter.notifyDataSetChanged();
+                me.hideSoftKeyboard();
+            }
+        });
+
         updateLastUpdateText();
         long last_update = MLDB.get_option_value(this, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
         Log.d("transactions", String.format("Last update = %d", last_update));
@@ -121,7 +149,7 @@ public class TransactionListActivity extends AppCompatActivity {
                 PreferenceManager.getDefaultSharedPreferences(this));
 
         retrieveTransactionsTask.execute(params);
-        findViewById(R.id.transaction_list_cancel_download).setEnabled(true);
+        bTransactionListCancelDownload.setEnabled(true);
     }
 
     public void onRetrieveStart() {
@@ -129,6 +157,14 @@ public class TransactionListActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
         else progressBar.setProgress(0);
         progressLayout.setVisibility(View.VISIBLE);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.transaction_list, menu);
+        menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
+        if ((menuTransactionListFilter == null)) throw new AssertionError();
+
+        return true;
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
         if ((progress.getTotal() == RetrieveTransactionsTask.Progress.INDETERMINATE) ||
@@ -177,9 +213,33 @@ public class TransactionListActivity extends AppCompatActivity {
             }
         }
     }
+    public void onClearAccountNameClick(View view) {
+        vAccountFilter.setVisibility(View.GONE);
+        menuTransactionListFilter.setVisible(true);
+        accNameFilter.setText(null);
+        model.reloadTransactions(this);
+        modelAdapter.resetBoldAccountName();
+        modelAdapter.notifyDataSetChanged();
+        hideSoftKeyboard();
+    }
+    private void hideSoftKeyboard() {
+        // hide the keyboard
+        View v = getCurrentFocus();
+        if (v != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        }
+    }
+    public void onShowFilterClick(MenuItem menuItem) {
+        vAccountFilter.setVisibility(View.VISIBLE);
+        menuTransactionListFilter.setVisible(false);
+        accNameFilter.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(accNameFilter, 0);
+    }
     public void onStopTransactionRefreshClick(View view) {
         Log.d("interactive", "Cancelling transactions refresh");
         if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
-        findViewById(R.id.transaction_list_cancel_download).setEnabled(false);
+        bTransactionListCancelDownload.setEnabled(false);
     }
 }
