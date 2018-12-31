@@ -82,6 +82,8 @@ public class AccountSummaryFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        mActivity.markDrawerItemCurrent(R.id.nav_account_summary);
+
         model = ViewModelProviders.of(this).get(AccountSummaryViewModel.class);
         List<LedgerAccount> accounts = model.getAccounts(this.getContext());
         modelAdapter = new AccountSummaryAdapter(accounts);
@@ -102,6 +104,14 @@ public class AccountSummaryFragment extends Fragment {
                         Log.d("list", String.format("item %d clicked", position));
                         if (modelAdapter.isSelectionActive()) {
                             modelAdapter.selectItem(position);
+                        }
+                        else {
+                            List<LedgerAccount> accounts = model.getAccounts(mActivity);
+                            if (accounts != null) {
+                                LedgerAccount account = accounts.get(position);
+
+                                mActivity.showAccountTransactions(account);
+                            }
                         }
                     }
 

@@ -35,8 +35,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private AccountSummaryFragment accountSummaryFragment;
     private TransactionListFragment transactionListFragment;
     private Fragment currentFragment = null;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        fragmentManager = getSupportFragmentManager();
 
         onAccountSummaryClicked(null);
     }
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
-    private void markDrawerItemCurrent(int id) {
+    public void markDrawerItemCurrent(int id) {
         View item = drawer.findViewById(id);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
@@ -163,24 +167,50 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void onAccountSummaryClicked(View view) {
-        markDrawerItemCurrent(R.id.nav_account_summary);
         drawer.closeDrawers();
 
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        currentFragment = accountSummaryFragment = new AccountSummaryFragment();
+        resetFragmentBackStack();
+
+        showAccountSummaryFragment();
+    }
+    private void showAccountSummaryFragment() {
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        accountSummaryFragment = new AccountSummaryFragment();
         ft.replace(R.id.root_frame, accountSummaryFragment);
         ft.commit();
+        currentFragment = accountSummaryFragment;
     }
     public void onLatestTransactionsClicked(View view) {
-        markDrawerItemCurrent(R.id.nav_latest_transactions);
         drawer.closeDrawers();
 
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        currentFragment = transactionListFragment = new TransactionListFragment();
+        resetFragmentBackStack();
+
+        showTransactionsFragment(null);
+    }
+    private void resetFragmentBackStack() {
+//        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+    private void showTransactionsFragment(LedgerAccount account) {
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        if (transactionListFragment == null) {
+            Log.d("flow", "MainActivity creating TransactionListFragment");
+            transactionListFragment = new TransactionListFragment();
+        }
+        Bundle bundle = new Bundle();
+        if (account != null) {
+            bundle.putString(TransactionListFragment.BUNDLE_KEY_FILTER_ACCOUNT_NAME,
+                    account.getName());
+        }
+        transactionListFragment.setArguments(bundle);
         ft.replace(R.id.root_frame, transactionListFragment);
+        if (account != null)
+            ft.addToBackStack(getResources().getString(R.string.title_activity_transaction_list));
         ft.commit();
+
+        currentFragment = transactionListFragment;
+    }
+    public void showAccountTransactions(LedgerAccount account) {
+        showTransactionsFragment(account);
     }
     @Override
     public void onBackPressed() {
@@ -189,6 +219,9 @@ public class MainActivity extends AppCompatActivity {
             drawer.closeDrawer(GravityCompat.START);
         }
         else {
+            Log.d("fragments",
+                    String.format("manager stack: %d", fragmentManager.getBackStackEntryCount()));
+
             super.onBackPressed();
         }
     }

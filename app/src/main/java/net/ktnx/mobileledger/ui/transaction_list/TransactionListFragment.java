@@ -43,9 +43,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -57,7 +57,9 @@ import java.util.Date;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class TransactionListFragment extends Fragment {
+    public static final String BUNDLE_KEY_FILTER_ACCOUNT_NAME = "filter_account_name";
     public TransactionListViewModel model;
+    private String mShowOnlyAccountName;
     private MainActivity mActivity;
     private View bTransactionListCancelDownload;
     private MenuItem menuTransactionListFilter;
@@ -70,6 +72,25 @@ public class TransactionListFragment extends Fragment {
     private TransactionListAdapter modelAdapter;
     private RetrieveTransactionsTask retrieveTransactionsTask;
     private AutoCompleteTextView accNameFilter;
+    public void setShowOnlyAccountName(String mShowOnlyAccountName) {
+        this.mShowOnlyAccountName = mShowOnlyAccountName;
+        if (modelAdapter != null) {
+            modelAdapter.setBoldAccountName(mShowOnlyAccountName);
+        }
+        if (accNameFilter != null) {
+            accNameFilter.setText(mShowOnlyAccountName, false);
+        }
+        if (vAccountFilter != null) {
+            vAccountFilter.setVisibility(
+                    ((mShowOnlyAccountName != null) && !mShowOnlyAccountName.isEmpty())
+                    ? View.VISIBLE : View.GONE);
+        }
+    }
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        super.setArguments(args);
+        mShowOnlyAccountName = args.getString(BUNDLE_KEY_FILTER_ACCOUNT_NAME);
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +113,8 @@ public class TransactionListFragment extends Fragment {
         Log.d("flow", "TransactionListFragment.onActivityCreated called");
         super.onActivityCreated(savedInstanceState);
 
+        mActivity.markDrawerItemCurrent(R.id.nav_latest_transactions);
+
         swiper = mActivity.findViewById(R.id.transaction_swipe);
         if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
         root = mActivity.findViewById(R.id.transaction_root);
@@ -106,6 +129,8 @@ public class TransactionListFragment extends Fragment {
         updateLastUpdateText();
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
         modelAdapter = new TransactionListAdapter(model);
+
+        modelAdapter.setBoldAccountName(mShowOnlyAccountName);
 
         RecyclerView root = mActivity.findViewById(R.id.transaction_root);
         root.setAdapter(modelAdapter);
@@ -144,6 +169,13 @@ public class TransactionListFragment extends Fragment {
         updateLastUpdateText();
         long last_update = MLDB.get_option_value(mActivity, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
         Log.d("transactions", String.format("Last update = %d", last_update));
+
+        if (mShowOnlyAccountName != null) {
+            accNameFilter.setText(mShowOnlyAccountName, false);
+            onShowFilterClick(null);
+            Log.d("flow", String.format("Account filter set to '%s'", mShowOnlyAccountName));
+        }
+
         if (last_update == 0) {
             update_transactions();
         }
@@ -157,6 +189,10 @@ public class TransactionListFragment extends Fragment {
 
         menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
         if ((menuTransactionListFilter == null)) throw new AssertionError();
+
+        if (mShowOnlyAccountName != null) {
+            menuTransactionListFilter.setVisible(false);
+        }
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -225,8 +261,9 @@ public class TransactionListFragment extends Fragment {
     }
     public void onClearAccountNameClick(View view) {
         vAccountFilter.setVisibility(View.GONE);
-        menuTransactionListFilter.setVisible(true);
+        if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(true);
         accNameFilter.setText(null);
+        mShowOnlyAccountName = null;
         model.reloadTransactions(this);
         modelAdapter.resetBoldAccountName();
         modelAdapter.notifyDataSetChanged();
@@ -234,11 +271,13 @@ public class TransactionListFragment extends Fragment {
     }
     public void onShowFilterClick(MenuItem menuItem) {
         vAccountFilter.setVisibility(View.VISIBLE);
-        menuTransactionListFilter.setVisible(false);
-        accNameFilter.requestFocus();
-        InputMethodManager imm =
-                (InputMethodManager) mActivity.getSystemService(INPUT_METHOD_SERVICE);
-        imm.showSoftInput(accNameFilter, 0);
+        if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
+        if (menuItem != null) {
+            accNameFilter.requestFocus();
+            InputMethodManager imm =
+                    (InputMethodManager) mActivity.getSystemService(INPUT_METHOD_SERVICE);
+            imm.showSoftInput(accNameFilter, 0);
+        }
     }
     public void onStopTransactionRefreshClick(View view) {
         Log.d("interactive", "Cancelling transactions refresh");
