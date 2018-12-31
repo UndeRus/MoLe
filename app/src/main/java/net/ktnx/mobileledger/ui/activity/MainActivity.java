@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -100,11 +101,13 @@ public class MainActivity extends AppCompatActivity {
             item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
         }
 
+        @ColorInt int transparent = getResources().getColor(android.R.color.transparent);
+
         LinearLayout actions = drawer.findViewById(R.id.nav_actions);
         for (int i = 0; i < actions.getChildCount(); i++) {
             View view = actions.getChildAt(i);
             if (view.getId() != id) {
-                view.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+                view.setBackgroundColor(transparent);
             }
         }
     }
