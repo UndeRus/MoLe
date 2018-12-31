@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -132,8 +133,20 @@ public class TransactionListFragment extends Fragment {
 
         modelAdapter.setBoldAccountName(mShowOnlyAccountName);
 
+        FloatingActionButton fab = mActivity.findViewById(R.id.btn_add_transaction);
+
         RecyclerView root = mActivity.findViewById(R.id.transaction_root);
         root.setAdapter(modelAdapter);
+
+        root.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (fab != null) {
+                    if (dy < 0) fab.show();
+                    if (dy > 0) fab.hide();
+                }
+            }
+        });
 
         LinearLayoutManager llm = new LinearLayoutManager(mActivity);
 
