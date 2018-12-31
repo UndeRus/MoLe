@@ -47,6 +47,7 @@
                     android:id="@+id/nav_account_summary"
                     style="@style/nav_button"
                     android:drawableStart="@drawable/ic_home_black_24dp"
+                    android:onClick="onAccountSummaryClicked"
                     android:text="@string/account_summary_title" />
 
                 <TextView

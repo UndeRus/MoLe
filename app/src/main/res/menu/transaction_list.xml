@@ -17,12 +17,14 @@
   -->
 
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
+        tools:context="net.ktnx.mobileledger.ui.activity.MainActivity"
         android:id="@+id/menu_transaction_list_filter"
         android:icon="@drawable/ic_filter_list_white_24dp"
-        android:onClick="onShowFilterClick"
+        android:onClick="onOptionsMenuClicked"
         android:title="Filter"
         app:showAsAction="always" />
 </menu>

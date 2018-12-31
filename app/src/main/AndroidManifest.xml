@@ -31,7 +31,7 @@
         android:name="net.ktnx.mobileledger.MobileLedgerApplication"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".AccountSummary"
+            android:name=".ui.activity.MainActivity"
             android:label="@string/account_summary_title"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -40,34 +40,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".AccountSummary">
+            android:parentActivityName=".ui.activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.ktnx.mobileledger.AccountSummary" />
+                android:value="net.ktnx.mobileledger.ui.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".NewTransactionActivity"
+            android:name=".ui.activity.NewTransactionActivity"
             android:label="@string/title_activity_new_transaction"
-            android:parentActivityName=".AccountSummary"
+            android:parentActivityName=".ui.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.ktnx.mobileledger.AccountSummary" />
-        </activity>
-        <activity
-            android:name=".TransactionListActivity"
-            android:label="@string/title_activity_transaction_list"
-            android:parentActivityName=".AccountSummary"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="net.ktnx.mobileledger.AccountSummary" />
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                android:value="net.ktnx.mobileledger.ui.activity.MainActivity" />
         </activity>
     </application>
 

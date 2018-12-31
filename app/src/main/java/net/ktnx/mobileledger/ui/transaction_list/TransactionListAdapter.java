@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -32,15 +32,15 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
-class TransactionListAdapter
+public class TransactionListAdapter
         extends RecyclerView.Adapter<TransactionListAdapter.TransactionRowHolder> {
     TransactionListViewModel model;
     private String boldAccountName;

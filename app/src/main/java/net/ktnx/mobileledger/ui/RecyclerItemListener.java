@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -25,11 +25,11 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-class RecyclerItemListener implements OnItemTouchListener {
+public class RecyclerItemListener implements OnItemTouchListener {
     private RecyclerTouchListener listener;
     private GestureDetector gd;
 
-    interface RecyclerTouchListener {
+    public interface RecyclerTouchListener {
         void onClickItem(View v, int position);
         void onLongClickItem(View v, int position);
     }

@@ -17,8 +17,8 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
+import android.app.Activity;
 import android.arch.lifecycle.ViewModel;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -26,7 +26,6 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.TransactionListActivity;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -36,10 +35,11 @@ public class TransactionListViewModel extends ViewModel {
 
     private ArrayList<LedgerTransaction> transactions;
 
-    public void reloadTransactions(Context context) {
+    public void reloadTransactions(TransactionListFragment context) {
         ArrayList<LedgerTransaction> newList = new ArrayList<>();
 
-        TransactionListActivity act = (TransactionListActivity) context;
+        Activity act = context.getActivity();
+
         boolean hasFilter =
                 act.findViewById(R.id.transaction_list_account_name_filter).getVisibility() ==
                 View.VISIBLE;
@@ -64,7 +64,7 @@ public class TransactionListViewModel extends ViewModel {
         }
 
         Log.d("tmp", sql);
-        try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase(act)) {
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
                     newList.add(new LedgerTransaction(cursor.getInt(0)));

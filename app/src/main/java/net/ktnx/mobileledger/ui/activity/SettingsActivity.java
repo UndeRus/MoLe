@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -36,6 +36,8 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
+
+import net.ktnx.mobileledger.R;
 
 import java.util.List;
 
@@ -59,8 +61,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
         String stringValue = value.toString();
-
-        AccountSummary.preferences_changed();
 
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in

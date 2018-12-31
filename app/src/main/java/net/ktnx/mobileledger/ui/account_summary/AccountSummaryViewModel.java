@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui.account_summary;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -36,13 +36,14 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.ktnx.mobileledger.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
+import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
 class AccountSummaryViewModel extends AndroidViewModel {
     private List<LedgerAccount> accounts;
@@ -107,7 +108,8 @@ class AccountSummaryViewModel extends AndroidViewModel {
     }
 }
 
-class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
+class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter
+.LedgerRowHolder> {
     private List<LedgerAccount> accounts;
     private boolean selectionActive;
 
@@ -123,7 +125,7 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
 
         holder.tvAccountName.setText(acc.getShortName());
         holder.tvAccountName.setPadding(
-                acc.getLevel() * rm.getDimensionPixelSize(R.dimen.activity_horizontal_margin)/2,
+                acc.getLevel() * rm.getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2,
                 0, 0,
                 0);
         holder.tvAccountAmounts.setText(acc.getAmountsString());

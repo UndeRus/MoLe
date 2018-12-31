@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     app:layout_constraintBottom_toBottomOf="parent"
-    tools:context=".TransactionListActivity">
+    tools:context="net.ktnx.mobileledger.ui.activity.MainActivity">
 
     <LinearLayout
         android:id="@+id/last_update_row"
@@ -53,12 +53,13 @@
                 android:layout_weight="1" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/clearAccountNameFilter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_clear_black_24dp"
                 android:clickable="true"
-                android:onClick="onClearAccountNameClick" />
+                android:onClick="onViewClicked"
+                android:focusable="true" />
 
         </LinearLayout>
 

@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -43,6 +43,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.LedgerTransaction;

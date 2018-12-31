@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger;
+package net.ktnx.mobileledger.ui;
 
 import android.content.Context;
 import android.util.Log;
@@ -27,7 +27,7 @@ import android.view.View;
 public abstract class OnSwipeTouchListener implements View.OnTouchListener {
     public final GestureDetector gestureDetector;
 
-    OnSwipeTouchListener(Context ctx) {
+    protected OnSwipeTouchListener(Context ctx) {
         gestureDetector = new GestureDetector(ctx, new GestureListener() );
     }
 

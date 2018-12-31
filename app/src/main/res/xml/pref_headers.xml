@@ -20,21 +20,21 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="net.ktnx.mobileledger.SettingsActivity$BackendPreferenceFragment"
+        android:fragment="net.ktnx.mobileledger.ui.activity.SettingsActivity$BackendPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_backend" />
     <header
-        android:fragment="net.ktnx.mobileledger.SettingsActivity$InterfacePreferenceFragment"
+        android:fragment="net.ktnx.mobileledger.ui.activity.SettingsActivity$InterfacePreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/interface_pref_header_title" />
 <!--
     <header
-        android:fragment="net.ktnx.mobileledger.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="net.ktnx.mobileledger.ui.activity.SettingsActivity$NotificationPreferenceFragment"
         android:icon="@drawable/ic_notifications_black_24dp"
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="net.ktnx.mobileledger.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="net.ktnx.mobileledger.ui.activity.SettingsActivity$DataSyncPreferenceFragment"
         android:icon="@drawable/ic_sync_black_24dp"
         android:title="@string/pref_header_data_sync" />
 -->

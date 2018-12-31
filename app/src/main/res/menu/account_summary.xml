@@ -17,32 +17,35 @@
   -->
 
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="net.ktnx.mobileledger.ui.activity.MainActivity">
 
     <item
         android:id="@+id/menu_acc_summary_only_starred"
         android:checkable="true"
         android:checked="false"
+        android:onClick="onOptionsMenuClicked"
         android:title="@string/menu_acc_summary_show_only_starred_title"
         app:actionLayout="@layout/switch_item"
-        android:onClick="onShowOnlyStarredClicked"
         app:showAsAction="never" />
     <item android:id="@+id/menu_acc_summary_hide_selected"
         android:icon="@drawable/ic_star_white_24dp"
         android:title="@string/menu_acc_summary_hide_selected_title"
         app:showAsAction="always"
         android:visible="false"
+        android:onClick="onOptionsMenuClicked"
         />
     <item android:id="@+id/menu_acc_summary_cancel_selection"
         android:title="@string/menu_acc_summary_cancel_selection_title"
         app:showAsAction="always"
         android:visible="false"
-        android:onClick="onCancelAccSelection"
+        android:onClick="onOptionsMenuClicked"
         android:icon="@drawable/ic_cancel_white_24dp" />
     <item android:id="@+id/menu_acc_summary_confirm_selection"
         android:title="@string/menu_acc_summary_confirm_selection_title"
         app:showAsAction="always"
         android:visible="false"
-        android:onClick="onConfirmAccSelection"
+        android:onClick="onOptionsMenuClicked"
         android:icon="@drawable/ic_check_white_24dp" />
 </menu>

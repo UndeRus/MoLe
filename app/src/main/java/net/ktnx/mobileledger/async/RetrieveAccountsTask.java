@@ -21,7 +21,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import net.ktnx.mobileledger.AccountSummary;
+import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -41,10 +41,10 @@ import java.util.regex.Pattern;
 
 public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
     int error;
-    WeakReference<AccountSummary> mContext;
+    WeakReference<AccountSummaryFragment> mContext;
     private SharedPreferences pref;
 
-    public RetrieveAccountsTask(WeakReference<AccountSummary> context) {
+    public RetrieveAccountsTask(WeakReference<AccountSummaryFragment> context) {
         mContext = context;
         error = 0;
     }
@@ -57,7 +57,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection(pref, "add");
             publishProgress(0);
-            try (SQLiteDatabase db = MLDB.getWritableDatabase(mContext.get())) {
+            try (SQLiteDatabase db = MLDB.getWritableDatabase(mContext.get().getActivity())) {
                 try (InputStream resp = http.getInputStream()) {
                     Log.d("update_accounts", String.valueOf(http.getResponseCode()));
                     if (http.getResponseCode() != 200) {
@@ -197,7 +197,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
     }
     @Override
     protected void onPostExecute(Void result) {
-        AccountSummary ctx = mContext.get();
+        AccountSummaryFragment ctx = mContext.get();
         if (ctx == null) return;
         ctx.onAccountRefreshDone(this.error);
     }

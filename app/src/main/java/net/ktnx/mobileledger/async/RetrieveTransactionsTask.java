@@ -24,9 +24,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.TransactionListActivity;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -52,10 +52,10 @@ public class RetrieveTransactionsTask extends
     private static final Pattern transactionDetailsPattern =
             Pattern.compile("^\\s+" + "(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
-    protected WeakReference<TransactionListActivity> contextRef;
+    protected WeakReference<TransactionListFragment> contextRef;
     protected int error;
     private boolean success;
-    public RetrieveTransactionsTask(WeakReference<TransactionListActivity> contextRef) {
+    public RetrieveTransactionsTask(WeakReference<TransactionListFragment> contextRef) {
         this.contextRef = contextRef;
     }
     private static final void L(String msg) {
@@ -64,28 +64,28 @@ public class RetrieveTransactionsTask extends
     @Override
     protected void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
-        TransactionListActivity context = getContext();
+        TransactionListFragment context = getContext();
         if (context == null) return;
         context.onRetrieveProgress(values[0]);
     }
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        TransactionListActivity context = getContext();
+        TransactionListFragment context = getContext();
         if (context == null) return;
         context.onRetrieveStart();
     }
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        TransactionListActivity context = getContext();
+        TransactionListFragment context = getContext();
         if (context == null) return;
         context.onRetrieveDone(success);
     }
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        TransactionListActivity context = getContext();
+        TransactionListFragment context = getContext();
         if (context == null) return;
         context.onRetrieveDone(false);
     }
@@ -100,9 +100,9 @@ public class RetrieveTransactionsTask extends
                     NetworkUtil.prepare_connection(params[0].getBackendPref(), "journal");
             http.setAllowUserInteraction(false);
             publishProgress(progress);
-            TransactionListActivity ctx = contextRef.get();
+            TransactionListFragment ctx = getContext();
             if (ctx == null) return null;
-            try (SQLiteDatabase db = MLDB.getWritableDatabase(ctx)) {
+            try (SQLiteDatabase db = MLDB.getWritableDatabase(ctx.getActivity())) {
                 try (InputStream resp = http.getInputStream()) {
                     if (http.getResponseCode() != 200) throw new IOException(
                             String.format("HTTP error %d", http.getResponseCode()));
@@ -251,7 +251,8 @@ public class RetrieveTransactionsTask extends
 
             if (success && !isCancelled()) {
                 Log.d("db", "Updating transaction list stamp");
-                MLDB.set_option_value(ctx, MLDB.OPT_TRANSACTION_LIST_STAMP, new Date().getTime());
+                MLDB.set_option_value(ctx.getActivity(), MLDB.OPT_TRANSACTION_LIST_STAMP,
+                        new Date().getTime());
                 ctx.model.reloadTransactions(ctx);
             }
         }
@@ -269,7 +270,7 @@ public class RetrieveTransactionsTask extends
         }
         return null;
     }
-    TransactionListActivity getContext() {
+    TransactionListFragment getContext() {
         return contextRef.get();
     }
 
