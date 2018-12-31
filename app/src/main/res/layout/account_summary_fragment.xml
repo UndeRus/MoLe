@@ -30,8 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".ui.activity.MainActivity"
-        tools:showIn="@layout/app_bar_account_summary">
+        tools:context=".ui.activity.MainActivity">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/account_swiper"

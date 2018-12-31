@@ -28,7 +28,7 @@
     android:orientation="horizontal"
     android:paddingStart="8dp"
     android:paddingEnd="8dp"
-    tools:showIn="@layout/content_account_summary">
+    tools:showIn="@id/account_root">
 
     <CheckBox
         android:id="@+id/account_row_check"
