@@ -138,6 +138,7 @@ public class TransactionListFragment extends Fragment {
         RecyclerView root = mActivity.findViewById(R.id.transaction_root);
         root.setAdapter(modelAdapter);
 
+        fab.show();
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {

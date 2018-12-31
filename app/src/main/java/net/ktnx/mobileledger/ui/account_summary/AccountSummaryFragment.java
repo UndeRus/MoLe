@@ -132,6 +132,7 @@ public class AccountSummaryFragment extends Fragment {
                     }
                 }));
 
+        fab.show();
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
