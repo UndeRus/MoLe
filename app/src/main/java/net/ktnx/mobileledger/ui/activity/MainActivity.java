@@ -35,6 +35,7 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -93,13 +94,15 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void markDrawerItemCurrent(int id) {
-        View item = drawer.findViewById(id);
+        TextView item = drawer.findViewById(id);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
         }
         else {
             item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
         }
+
+        setTitle(item.getText());
 
         @ColorInt int transparent = getResources().getColor(android.R.color.transparent);
 
