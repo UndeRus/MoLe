@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2018 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
@@ -15,33 +14,166 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
   -->
-
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:orientation="vertical"
+    android:theme="@style/AppTheme.AppBarOverlay"
+    tools:context=".ui.activity.MainActivity">
 
-    <include
-        layout="@layout/app_bar_account_summary"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_gravity="start"
-        android:fitsSystemWindows="true">
+        tools:openDrawer="start">
 
-        <include
-            layout="@layout/drawer"
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/root_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent" >
 
-    </android.support.design.widget.NavigationView>
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/btn_add_transaction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/fab_margin"
+                android:onClick="fab_new_transaction_clicked"
+                app:backgroundTint="@color/colorPrimary"
+                app:srcCompat="@drawable/svg_thick_plus_white" />
+        </FrameLayout>
 
-</android.support.v4.widget.DrawerLayout>
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Light">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/nav_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/side_nav_bar"
+                        android:gravity="bottom"
+                        android:orientation="vertical"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_vertical_margin"
+                        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <ImageView
+                            android:id="@+id/imageView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="@string/nav_header_desc"
+                            android:paddingTop="@dimen/nav_header_vertical_spacing"
+                            app:srcCompat="@mipmap/ic_launcher_round" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="@dimen/nav_header_vertical_spacing"
+                            android:text="@string/app_name"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+                        <TextView
+                            android:id="@+id/drawer_version_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/nav_header_subtitle" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/nav_actions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_fixed_items"
+                        app:layout_constraintTop_toBottomOf="@+id/nav_header">
+
+                        <TextView
+                            android:id="@+id/nav_account_summary"
+                            style="@style/nav_button"
+                            android:drawableStart="@drawable/ic_home_black_24dp"
+                            android:onClick="onAccountSummaryClicked"
+                            android:text="@string/account_summary_title" />
+
+                        <TextView
+                            android:id="@+id/nav_latest_transactions"
+                            style="@style/nav_button"
+                            android:drawableStart="@drawable/ic_event_note_black_24dp"
+                            android:onClick="onLatestTransactionsClicked"
+                            android:text="@string/nav_latest_transactions_title" />
+
+                        <TextView
+                            android:id="@+id/textView5"
+                            style="@style/nav_button"
+                            android:drawableStart="@drawable/ic_assignment_black_24dp"
+                            android:text="@string/nav_reports_title" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/nav_fixed_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/list_divider"
+                        android:elevation="2dp"
+                        android:orientation="vertical"
+                        android:showDividers="beginning"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <TextView
+                            android:id="@+id/textView2"
+                            style="@style/nav_button"
+                            android:layout_weight="1"
+                            android:drawableStart="@drawable/ic_settings_black_24dp"
+                            android:onClick="nav_settings_clicked"
+                            android:text="@string/action_settings" />
+
+                        <TextView
+                            android:id="@+id/nav_exit"
+                            style="@style/nav_button"
+                            android:layout_weight="1"
+                            android:drawableStart="@drawable/ic_exit_to_app_black_24dp"
+                            android:onClick="nav_exit_clicked"
+                            android:text="@string/nav_exit_title" />
+
+                    </LinearLayout>
+
+                </android.support.constraint.ConstraintLayout>
+            </ScrollView>
+
+         </android.support.design.widget.NavigationView>
+
+    </android.support.v4.widget.DrawerLayout>
+</LinearLayout>
