@@ -70,7 +70,7 @@ class AccountSummaryViewModel extends AndroidViewModel {
         if (showingOnlyStarred) sql += " WHERE hidden = 0";
         sql += " ORDER BY name";
 
-        try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
             try (Cursor cursor = db
                     .rawQuery(sql,null))
             {

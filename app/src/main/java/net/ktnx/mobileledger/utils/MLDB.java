@@ -42,14 +42,18 @@ import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.READ;
 import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.WRITE;
 
 public final class MLDB {
-    public enum DatabaseMode {READ, WRITE}
-
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
     public static final String OPT_TRANSACTION_LIST_STAMP = "transaction_list_last_update";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
+    private static Context context;
+    private static void checkState() {
+        if (context == null)
+            throw new IllegalStateException("First call init with a valid context");
+    }
+    public static synchronized SQLiteDatabase getDatabase(DatabaseMode mode) {
+        checkState();
 
-    public static synchronized SQLiteDatabase getDatabase(Context context, DatabaseMode mode) {
         if (mode == READ) {
             if (helperForReading == null) helperForReading = new MobileLedgerDatabase(context);
             return helperForReading.getReadableDatabase();
@@ -59,11 +63,11 @@ public final class MLDB {
             return helperForWriting.getWritableDatabase();
         }
     }
-    public static SQLiteDatabase getReadableDatabase(Context context) {
-        return getDatabase(context.getApplicationContext(), READ);
+    public static SQLiteDatabase getReadableDatabase() {
+        return getDatabase(READ);
     }
     public static SQLiteDatabase getWritableDatabase(Context context) {
-        return getDatabase(context.getApplicationContext(), WRITE);
+        return getDatabase(WRITE);
     }
     static public int get_option_value(Context context, String name, int default_value) {
         String s = get_option_value(context, name, String.valueOf(default_value));
@@ -75,7 +79,6 @@ public final class MLDB {
             return default_value;
         }
     }
-
     static public long get_option_value(Context context, String name, long default_value) {
         String s = get_option_value(context, name, String.valueOf(default_value));
         try {
@@ -86,10 +89,9 @@ public final class MLDB {
             return default_value;
         }
     }
-
     static public String get_option_value(Context context, String name, String default_value) {
         Log.d("db", "about to fetch option " + name);
-        try (SQLiteDatabase db = getReadableDatabase(context)) {
+        try (SQLiteDatabase db = getReadableDatabase()) {
             try (Cursor cursor = db
                     .rawQuery("select value from options where name=?", new String[]{name}))
             {
@@ -109,7 +111,6 @@ public final class MLDB {
             }
         }
     }
-
     static public void set_option_value(Context context, String name, String value) {
         Log.d("db", "setting option " + name + "=" + value);
         try (SQLiteDatabase db = getWritableDatabase(context)) {
@@ -117,7 +118,6 @@ public final class MLDB {
                     new String[]{name, value});
         }
     }
-
     static public void set_option_value(Context context, String name, long value) {
         set_option_value(context, name, String.valueOf(value));
     }
@@ -142,7 +142,7 @@ public final class MLDB {
                 String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
-                try (SQLiteDatabase db = MLDB.getReadableDatabase(context)) {
+                try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
 
                     try (Cursor matches = db.rawQuery(String.format(
                             "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
@@ -171,6 +171,10 @@ public final class MLDB {
 
         view.setAdapter(adapter);
     }
+    public static void init(Context context) {
+        MLDB.context = context.getApplicationContext();
+    }
+    public enum DatabaseMode {READ, WRITE}
 }
 
 class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
@@ -203,8 +207,8 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
         String rev_file = String.format(Locale.US, "sql_%d", rev_no);
 
         int res_id = rm.getIdentifier(rev_file, "raw", mContext.getPackageName());
-        if (res_id == 0) throw new SQLException(
-                String.format(Locale.US, "No resource for revision %d", rev_no));
+        if (res_id == 0)
+            throw new SQLException(String.format(Locale.US, "No resource for revision %d", rev_no));
         db.beginTransaction();
         try (InputStream res = rm.openRawResource(res_id)) {
             Log.d("db", "Applying revision " + String.valueOf(rev_no));

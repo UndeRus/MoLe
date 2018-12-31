@@ -64,7 +64,7 @@ public class TransactionListViewModel extends ViewModel {
         }
 
         Log.d("tmp", sql);
-        try (SQLiteDatabase db = MLDB.getReadableDatabase(act)) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
                     newList.add(new LedgerTransaction(cursor.getInt(0)));

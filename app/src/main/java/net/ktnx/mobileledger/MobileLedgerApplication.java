@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.os.Build;
 
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.MLDB;
 
 public class MobileLedgerApplication extends Application {
 
@@ -30,6 +31,7 @@ public class MobileLedgerApplication extends Application {
     public void onCreate() {
         super.onCreate();
         updateColorValues();
+        MLDB.init(this);
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

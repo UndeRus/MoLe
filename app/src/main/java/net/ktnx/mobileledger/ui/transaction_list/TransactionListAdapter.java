@@ -57,7 +57,7 @@ public class TransactionListAdapter
 
         Context ctx = holder.row.getContext();
 
-        try (SQLiteDatabase db = MLDB.getReadableDatabase(ctx)) {
+        try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
             tr.loadData(db);
             holder.tvDescription.setText(tr.getDescription());
             holder.tvDate.setText(tr.getDate());
