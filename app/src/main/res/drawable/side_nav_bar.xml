@@ -21,6 +21,6 @@
         android:angle="135"
         android:centerColor="@color/colorPrimary"
         android:endColor="@color/colorPrimaryDark"
-        android:startColor="#b64db6"
+        android:startColor="#724db6"
         android:type="linear" />
 </shape>

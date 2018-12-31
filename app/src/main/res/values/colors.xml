@@ -17,11 +17,11 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#9c27b0</color>
-    <color name="colorPrimaryDark">#4a148c</color>
-    <color name="colorAccent">#4db6ac</color>
-    <color name="table_row_even_bg">#289d29b1</color>
+    <color name="colorPrimary">#935ff2</color>
+    <color name="colorPrimaryDark">#42148c</color>
+    <color name="colorAccent">#724db6</color>
     <color name="drawer_background">#ffffffff</color>
-    <color name="table_row_odd_bg">#28fae0ff</color>
+    <color name="table_row_even_bg">#286c33d4</color>
+    <color name="table_row_odd_bg">#28ddcbff</color>
     <color name="header_border">#804a148c</color>
 </resources>
