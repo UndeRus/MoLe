@@ -76,31 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
         onAccountSummaryClicked(null);
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        LinearLayout grp = drawer.findViewById(R.id.nav_actions);
-        for (int i = 0; i < grp.getChildCount(); i++) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                grp.getChildAt(i).setBackgroundColor(
-                        getResources().getColor(R.color.drawer_background, getTheme()));
-            }
-            else {
-                grp.getChildAt(i)
-                        .setBackgroundColor(getResources().getColor(R.color.drawer_background));
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            drawer.findViewById(R.id.nav_account_summary).setBackgroundColor(
-                    getResources().getColor(R.color.table_row_even_bg, getTheme()));
-        }
-        else {
-            drawer.findViewById(R.id.nav_account_summary)
-                    .setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
-        }
-    }
-
     public void fab_new_transaction_clicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);
