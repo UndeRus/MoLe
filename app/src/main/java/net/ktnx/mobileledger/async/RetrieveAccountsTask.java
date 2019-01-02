@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.async;
 
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.OperationCanceledException;
 import android.util.Log;
 
 import net.ktnx.mobileledger.R;
@@ -90,6 +91,8 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
                                     Pattern.compile("\"value\":\"([^\"]+)\"");
                             int count = 0;
                             while ((line = buf.readLine()) != null) {
+                                throwIfCancelled();
+
                                 Matcher m = account_name_re.matcher(line);
                                 if (m.find()) {
                                     String acct_encoded = m.group(1);
@@ -116,6 +119,8 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
                                     m = value_re.matcher(line);
                                     boolean match_found = false;
                                     while (m.find()) {
+                                        throwIfCancelled();
+
                                         match_found = true;
                                         String value = m.group(1);
                                         String currency = m.group(2);
@@ -137,6 +142,8 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
                                     db.execSQL("update description_history set keep=0;");
                                     m = description_items_re.matcher(line);
                                     while (m.find()) {
+                                        throwIfCancelled();
+
                                         String description = m.group(1);
                                         if (description.isEmpty()) continue;
 
@@ -153,13 +160,14 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
 
                             db.execSQL("delete from account_values where keep=0;");
                             db.execSQL("delete from accounts where keep=0;");
-//                        db.execSQL("delete from description_history where keep=0;");
                             db.setTransactionSuccessful();
+                        }
+                        catch (OperationCanceledException e) {
+                            Log.w("async", "Account retrieval cancelled");
                         }
                         finally {
                             db.endTransaction();
                         }
-
                     }
                 }
             }
@@ -182,6 +190,9 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
         }
 
         return null;
+    }
+    private void throwIfCancelled() {
+        if (isCancelled()) throw new OperationCanceledException(null);
     }
 
     private void addAccount(SQLiteDatabase db, String name) {
