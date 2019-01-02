@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -26,7 +26,7 @@
     tools:context="net.ktnx.mobileledger.ui.activity.MainActivity">
 
     <LinearLayout
-        android:id="@+id/last_update_row"
+        android:id="@+id/transaction_list_head"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -58,65 +58,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_clear_black_24dp"
                 android:clickable="true"
-                android:onClick="onViewClicked"
-                android:focusable="true" />
+                android:focusable="true"
+                android:onClick="onViewClicked" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="24dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/transaction_last_update_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingEnd="8dp"
-                android:text="@string/transactions_last_update_label"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/transactions_last_update"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="\?"
-                tools:ignore="HardcodedText" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/transaction_progress_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <ProgressBar
-                android:id="@+id/transaction_list_progress_bar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-8dp"
-                android:layout_marginBottom="-7dp"
-                android:layout_weight="1"
-                android:indeterminate="true"
-                android:padding="0dp"
-                android:progressTint="@color/colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/last_update_row" />
-
-            <TextView
-                android:id="@+id/transaction_list_cancel_download"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_clear_black_24dp"
-                android:clickable="true"
-                android:onClick="onStopTransactionRefreshClick" />
         </LinearLayout>
 
     </LinearLayout>
@@ -128,7 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/last_update_row">
+        app:layout_constraintTop_toBottomOf="@+id/transaction_list_head">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/transaction_root"
@@ -137,9 +81,4 @@
             android:scrollbars="vertical" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="4dp"
-        android:background="@drawable/drop_shadow"
-        app:layout_constraintTop_toBottomOf="@+id/last_update_row" />
 </android.support.constraint.ConstraintLayout>

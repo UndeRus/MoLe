@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -42,7 +42,6 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
@@ -51,9 +50,6 @@ import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -69,7 +65,6 @@ public class TransactionListFragment extends Fragment {
     private RecyclerView root;
     private ProgressBar progressBar;
     private LinearLayout progressLayout;
-    private TextView tvLastUpdate;
     private TransactionListAdapter modelAdapter;
     private RetrieveTransactionsTask retrieveTransactionsTask;
     private AutoCompleteTextView accNameFilter;
@@ -126,8 +121,6 @@ public class TransactionListFragment extends Fragment {
         progressLayout = mActivity.findViewById(R.id.transaction_progress_layout);
         if (progressLayout == null) throw new RuntimeException(
                 "Can't get hold on the transaction list progress bar layout");
-        tvLastUpdate = mActivity.findViewById(R.id.transactions_last_update);
-        updateLastUpdateText();
         model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
         modelAdapter = new TransactionListAdapter(model);
 
@@ -180,22 +173,13 @@ public class TransactionListFragment extends Fragment {
             }
         });
 
-        updateLastUpdateText();
-        long last_update = MLDB.get_option_value(mActivity, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
-        Log.d("transactions", String.format("Last update = %d", last_update));
-
         if (mShowOnlyAccountName != null) {
             accNameFilter.setText(mShowOnlyAccountName, false);
             onShowFilterClick(null);
             Log.d("flow", String.format("Account filter set to '%s'", mShowOnlyAccountName));
         }
 
-        if (last_update == 0) {
-            update_transactions();
-        }
-        else {
-            model.reloadTransactions(this);
-        }
+        model.reloadTransactions(this);
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -247,30 +231,10 @@ public class TransactionListFragment extends Fragment {
     public void onRetrieveDone(boolean success) {
         progressLayout.setVisibility(View.GONE);
         swiper.setRefreshing(false);
-        updateLastUpdateText();
+        mActivity.updateLastUpdateText();
         if (success) {
             Log.d("transactions", "calling notifyDataSetChanged()");
             modelAdapter.notifyDataSetChanged();
-        }
-    }
-    private void updateLastUpdateText() {
-        {
-            long last_update =
-                    MLDB.get_option_value(mActivity, MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
-            Log.d("transactions", String.format("Last update = %d", last_update));
-            if (last_update == 0) {
-                tvLastUpdate.setText(getString(R.string.transaction_last_update_never));
-            }
-            else {
-                Date date = new Date(last_update);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
-                            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                }
-                else {
-                    tvLastUpdate.setText(date.toLocaleString());
-                }
-            }
         }
     }
     public void onClearAccountNameClick(View view) {

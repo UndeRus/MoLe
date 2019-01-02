@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -41,6 +41,11 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
+import net.ktnx.mobileledger.utils.MLDB;
+
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     DrawerLayout drawer;
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private TransactionListFragment transactionListFragment;
     private Fragment currentFragment = null;
     private FragmentManager fragmentManager;
+    private TextView tvLastUpdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +79,12 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+
+        tvLastUpdate = findViewById(R.id.transactions_last_update);
+        updateLastUpdateText();
+        long last_update = MLDB.get_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
+        Log.d("transactions", String.format("Last update = %d", last_update));
+
 
         fragmentManager = getSupportFragmentManager();
 
@@ -204,6 +216,25 @@ public class MainActivity extends AppCompatActivity {
                     String.format("manager stack: %d", fragmentManager.getBackStackEntryCount()));
 
             super.onBackPressed();
+        }
+    }
+    public void updateLastUpdateText() {
+        {
+            long last_update = MLDB.get_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
+            Log.d("transactions", String.format("Last update = %d", last_update));
+            if (last_update == 0) {
+                tvLastUpdate.setText(getString(R.string.transaction_last_update_never));
+            }
+            else {
+                Date date = new Date(last_update);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
+                            .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                }
+                else {
+                    tvLastUpdate.setText(date.toLocaleString());
+                }
+            }
         }
     }
 

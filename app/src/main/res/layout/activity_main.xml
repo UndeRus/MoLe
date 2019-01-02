@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -36,9 +36,7 @@
         android:layout_height="match_parent"
         tools:openDrawer="start">
 
-        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/root_frame"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -50,8 +48,95 @@
                 android:layout_margin="@dimen/fab_margin"
                 android:onClick="fab_new_transaction_clicked"
                 app:backgroundTint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@drawable/svg_thick_plus_white" />
-        </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/main_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="24dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/transaction_last_update_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="8dp"
+                        android:text="@string/transactions_last_update_label"
+                        android:textColor="@android:color/tertiary_text_light" />
+
+                    <TextView
+                        android:id="@+id/transactions_last_update"
+                        style="@android:style/Widget.DeviceDefault.Light.TextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="\?"
+                        android:textColor="@android:color/tertiary_text_light"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/transaction_progress_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:id="@+id/transaction_list_progress_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-8dp"
+                        android:layout_marginBottom="-7dp"
+                        android:layout_weight="1"
+                        android:indeterminate="true"
+                        android:padding="0dp"
+                        android:progressTint="@color/colorPrimary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/transaction_list_head" />
+
+                    <TextView
+                        android:id="@+id/transaction_list_cancel_download"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_clear_black_24dp"
+                        android:clickable="true"
+                        android:focusable="auto"
+                        android:onClick="onStopTransactionRefreshClick" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/root_frame"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/main_header">
+
+            </FrameLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="4dp"
+                android:background="@drawable/drop_shadow"
+                app:layout_constraintTop_toBottomOf="@id/main_header" />
+
+        </android.support.constraint.ConstraintLayout>
 
 
         <android.support.design.widget.NavigationView
