@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class AccountSummaryViewModel extends AndroidViewModel {
         }
     }
     void commitSelections(Context context) {
-        try(SQLiteDatabase db = MLDB.getWritableDatabase(context)) {
+        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
             db.beginTransaction();
             try {
                 for (LedgerAccount acc : accounts) {
