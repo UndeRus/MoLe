@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -39,9 +39,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.async.RetrieveAccountsTask;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -154,7 +154,7 @@ public class AccountSummaryFragment extends Fragment {
 
     }
     private void prepare_db() {
-        account_list_last_updated = MLDB.get_option_value(mActivity, "last_refresh", (long) 0);
+        account_list_last_updated = MLDB.get_option_value("last_refresh", (long) 0);
     }
 
     private void update_accounts(boolean force) {
@@ -182,7 +182,7 @@ public class AccountSummaryFragment extends Fragment {
             Snackbar.make(swiper, err_text, Snackbar.LENGTH_LONG).show();
         }
         else {
-            MLDB.set_option_value(mActivity, "last_refresh", new Date().getTime());
+            MLDB.set_option_value("last_refresh", new Date().getTime());
             update_account_table();
         }
     }

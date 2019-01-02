@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -21,9 +21,9 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -57,7 +57,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection(pref, "add");
             publishProgress(0);
-            try (SQLiteDatabase db = MLDB.getWritableDatabase(mContext.get().getActivity())) {
+            try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
                 try (InputStream resp = http.getInputStream()) {
                     Log.d("update_accounts", String.valueOf(http.getResponseCode()));
                     if (http.getResponseCode() != 200) {

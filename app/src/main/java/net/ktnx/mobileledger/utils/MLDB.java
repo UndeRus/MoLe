@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -66,11 +66,11 @@ public final class MLDB {
     public static SQLiteDatabase getReadableDatabase() {
         return getDatabase(READ);
     }
-    public static SQLiteDatabase getWritableDatabase(Context context) {
+    public static SQLiteDatabase getWritableDatabase() {
         return getDatabase(WRITE);
     }
-    static public int get_option_value(Context context, String name, int default_value) {
-        String s = get_option_value(context, name, String.valueOf(default_value));
+    static public int get_option_value(String name, int default_value) {
+        String s = get_option_value(name, String.valueOf(default_value));
         try {
             return Integer.parseInt(s);
         }
@@ -79,8 +79,8 @@ public final class MLDB {
             return default_value;
         }
     }
-    static public long get_option_value(Context context, String name, long default_value) {
-        String s = get_option_value(context, name, String.valueOf(default_value));
+    static public long get_option_value(String name, long default_value) {
+        String s = get_option_value(name, String.valueOf(default_value));
         try {
             return Long.parseLong(s);
         }
@@ -89,7 +89,7 @@ public final class MLDB {
             return default_value;
         }
     }
-    static public String get_option_value(Context context, String name, String default_value) {
+    static public String get_option_value(String name, String default_value) {
         Log.d("db", "about to fetch option " + name);
         try (SQLiteDatabase db = getReadableDatabase()) {
             try (Cursor cursor = db
@@ -111,15 +111,15 @@ public final class MLDB {
             }
         }
     }
-    static public void set_option_value(Context context, String name, String value) {
+    static public void set_option_value(String name, String value) {
         Log.d("db", "setting option " + name + "=" + value);
-        try (SQLiteDatabase db = getWritableDatabase(context)) {
+        try (SQLiteDatabase db = getWritableDatabase()) {
             db.execSQL("insert or replace into options(name, value) values(?, ?);",
                     new String[]{name, value});
         }
     }
-    static public void set_option_value(Context context, String name, long value) {
-        set_option_value(context, name, String.valueOf(value));
+    static public void set_option_value(String name, long value) {
+        set_option_value(name, String.valueOf(value));
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hook_autocompletion_adapter(final Context context,

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -102,7 +102,7 @@ public class RetrieveTransactionsTask extends
             publishProgress(progress);
             TransactionListFragment ctx = getContext();
             if (ctx == null) return null;
-            try (SQLiteDatabase db = MLDB.getWritableDatabase(ctx.getActivity())) {
+            try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
                 try (InputStream resp = http.getInputStream()) {
                     if (http.getResponseCode() != 200) throw new IOException(
                             String.format("HTTP error %d", http.getResponseCode()));
@@ -251,7 +251,7 @@ public class RetrieveTransactionsTask extends
 
             if (success && !isCancelled()) {
                 Log.d("db", "Updating transaction list stamp");
-                MLDB.set_option_value(ctx.getActivity(), MLDB.OPT_TRANSACTION_LIST_STAMP,
+                MLDB.set_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP,
                         new Date().getTime());
                 ctx.model.reloadTransactions(ctx);
             }
