@@ -154,7 +154,7 @@ public class AccountSummaryFragment extends Fragment {
 
     }
     private void prepare_db() {
-        account_list_last_updated = MLDB.get_option_value("last_refresh", (long) 0);
+        account_list_last_updated = MLDB.get_option_value(MLDB.OPT_LAST_REFRESH, (long) 0);
     }
 
     private void update_accounts(boolean force) {
@@ -182,7 +182,7 @@ public class AccountSummaryFragment extends Fragment {
             Snackbar.make(swiper, err_text, Snackbar.LENGTH_LONG).show();
         }
         else {
-            MLDB.set_option_value("last_refresh", new Date().getTime());
+            MLDB.set_option_value(MLDB.OPT_LAST_REFRESH, new Date().getTime());
             update_account_table();
         }
     }

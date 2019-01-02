@@ -45,6 +45,7 @@ public final class MLDB {
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
     public static final String OPT_TRANSACTION_LIST_STAMP = "transaction_list_last_update";
+    public static final String OPT_LAST_REFRESH = "last_refresh";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
     private static Context context;
     private static void checkState() {
