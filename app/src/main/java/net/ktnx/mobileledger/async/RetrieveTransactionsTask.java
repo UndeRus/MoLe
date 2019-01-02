@@ -110,7 +110,7 @@ public class RetrieveTransactionsTask extends
                     try {
                         db.execSQL("UPDATE transactions set keep=0");
 
-                        int state = ParserState.EXPECTING_JOURNAL;
+                        ParserState state = ParserState.EXPECTING_JOURNAL;
                         String line;
                         BufferedReader buf =
                                 new BufferedReader(new InputStreamReader(resp, "UTF-8"));
@@ -125,14 +125,14 @@ public class RetrieveTransactionsTask extends
                             Matcher m;
                             //L(String.format("State is %d", state));
                             switch (state) {
-                                case ParserState.EXPECTING_JOURNAL:
+                                case EXPECTING_JOURNAL:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                     if (line.equals("<h2>General Journal</h2>")) {
                                         state = ParserState.EXPECTING_TRANSACTION;
                                         L("→ expecting transaction");
                                     }
                                     break;
-                                case ParserState.EXPECTING_TRANSACTION:
+                                case EXPECTING_TRANSACTION:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                     m = transactionStartPattern.matcher(line);
                                     if (m.find()) {
@@ -156,7 +156,7 @@ public class RetrieveTransactionsTask extends
                                         break LINES;
                                     }
                                     break;
-                                case ParserState.EXPECTING_TRANSACTION_DESCRIPTION:
+                                case EXPECTING_TRANSACTION_DESCRIPTION:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                     m = transactionDescriptionPattern.matcher(line);
                                     if (m.find()) {
@@ -174,7 +174,7 @@ public class RetrieveTransactionsTask extends
                                                 m.group(1), m.group(2)));
                                     }
                                     break;
-                                case ParserState.EXPECTING_TRANSACTION_DETAILS:
+                                case EXPECTING_TRANSACTION_DETAILS:
                                     if (line.isEmpty()) {
                                         // transaction data collected
                                         if (transaction.existsInDb(db)) {
@@ -235,7 +235,7 @@ public class RetrieveTransactionsTask extends
                                     break;
                                 default:
                                     throw new RuntimeException(
-                                            String.format("Unknown parser state %d", state));
+                                            String.format("Unknown parser state %s", state.name()));
                             }
                         }
                         if (!isCancelled()) {
@@ -272,6 +272,11 @@ public class RetrieveTransactionsTask extends
     }
     TransactionListFragment getContext() {
         return contextRef.get();
+    }
+
+    private enum ParserState {
+        EXPECTING_JOURNAL, EXPECTING_TRANSACTION, EXPECTING_TRANSACTION_DESCRIPTION,
+        EXPECTING_TRANSACTION_DETAILS
     }
 
     public static class Params {
@@ -314,12 +319,5 @@ public class RetrieveTransactionsTask extends
         TransactionParserException(String message) {
             super(message);
         }
-    }
-
-    private class ParserState {
-        static final int EXPECTING_JOURNAL = 0;
-        static final int EXPECTING_TRANSACTION = 1;
-        static final int EXPECTING_TRANSACTION_DESCRIPTION = 2;
-        static final int EXPECTING_TRANSACTION_DETAILS = 3;
     }
 }
