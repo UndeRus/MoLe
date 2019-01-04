@@ -21,12 +21,16 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.OperationCanceledException;
 import android.util.Log;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -38,7 +42,10 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,40 +59,47 @@ public class RetrieveTransactionsTask extends
     private static final Pattern transactionDetailsPattern =
             Pattern.compile("^\\s+" + "(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
-    protected WeakReference<TransactionListFragment> contextRef;
+    protected WeakReference<MainActivity> contextRef;
     protected int error;
+    // %3A is '='
+    Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
+    Pattern account_value_re = Pattern.compile(
+            "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
+    Pattern tr_end_re = Pattern.compile("</tr>");
+    Pattern descriptions_line_re = Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
+    Pattern description_items_re = Pattern.compile("\"value\":\"([^\"]+)\"");
     private boolean success;
-    public RetrieveTransactionsTask(WeakReference<TransactionListFragment> contextRef) {
+    public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef) {
         this.contextRef = contextRef;
     }
     private static final void L(String msg) {
-//        Log.d("transaction-parser", msg);
+        Log.d("transaction-parser", msg);
     }
     @Override
     protected void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
-        TransactionListFragment context = getContext();
+        MainActivity context = getContext();
         if (context == null) return;
         context.onRetrieveProgress(values[0]);
     }
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        TransactionListFragment context = getContext();
+        MainActivity context = getContext();
         if (context == null) return;
         context.onRetrieveStart();
     }
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        TransactionListFragment context = getContext();
+        MainActivity context = getContext();
         if (context == null) return;
         context.onRetrieveDone(success);
     }
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        TransactionListFragment context = getContext();
+        MainActivity context = getContext();
         if (context == null) return;
         context.onRetrieveDone(false);
     }
@@ -95,12 +109,15 @@ public class RetrieveTransactionsTask extends
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
         success = false;
+        List<LedgerAccount> accountList = new ArrayList<>();
+        LedgerAccount lastAccount = null;
+        Data.backgroundTaskCount.incrementAndGet();
         try {
             HttpURLConnection http =
                     NetworkUtil.prepare_connection(params[0].getBackendPref(), "journal");
             http.setAllowUserInteraction(false);
             publishProgress(progress);
-            TransactionListFragment ctx = getContext();
+            MainActivity ctx = getContext();
             if (ctx == null) return null;
             try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
                 try (InputStream resp = http.getInputStream()) {
@@ -109,8 +126,10 @@ public class RetrieveTransactionsTask extends
                     db.beginTransaction();
                     try {
                         db.execSQL("UPDATE transactions set keep=0");
+                        db.execSQL("update account_values set keep=0;");
+                        db.execSQL("update accounts set keep=0;");
 
-                        ParserState state = ParserState.EXPECTING_JOURNAL;
+                        ParserState state = ParserState.EXPECTING_ACCOUNT;
                         String line;
                         BufferedReader buf =
                                 new BufferedReader(new InputStreamReader(resp, "UTF-8"));
@@ -121,17 +140,61 @@ public class RetrieveTransactionsTask extends
                         LedgerTransaction transaction = null;
                         LINES:
                         while ((line = buf.readLine()) != null) {
-                            if (isCancelled()) break;
+                            throwIfCancelled();
                             Matcher m;
-                            //L(String.format("State is %d", state));
+                            //L(String.format("State is %d", updating));
                             switch (state) {
-                                case EXPECTING_JOURNAL:
-                                    if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                                case EXPECTING_ACCOUNT:
                                     if (line.equals("<h2>General Journal</h2>")) {
                                         state = ParserState.EXPECTING_TRANSACTION;
                                         L("→ expecting transaction");
+                                        Data.accounts.set(accountList);
+                                        continue;
+                                    }
+                                    m = account_name_re.matcher(line);
+                                    if (m.find()) {
+                                        String acct_encoded = m.group(1);
+                                        String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
+                                        acct_name = acct_name.replace("\"", "");
+                                        L(String.format("found account: %s", acct_name));
+
+                                        addAccount(db, acct_name);
+                                        lastAccount = new LedgerAccount(acct_name);
+                                        accountList.add(lastAccount);
+
+                                        state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
+                                        L("→ expecting account amount");
                                     }
                                     break;
+
+                                case EXPECTING_ACCOUNT_AMOUNT:
+                                    m = account_value_re.matcher(line);
+                                    boolean match_found = false;
+                                    while (m.find()) {
+                                        throwIfCancelled();
+
+                                        match_found = true;
+                                        String value = m.group(1);
+                                        String currency = m.group(2);
+                                        if (currency == null) currency = "";
+                                        value = value.replace(',', '.');
+                                        L("curr=" + currency + ", value=" + value);
+                                        db.execSQL(
+                                                "insert or replace into account_values(account, currency, value, keep) values(?, ?, ?, 1);",
+                                                new Object[]{lastAccount.getName(),
+                                                             currency,
+                                                             Float.valueOf(value)
+                                                });
+                                        lastAccount.addAmount(Float.parseFloat(value), currency);
+                                    }
+
+                                    if (match_found) {
+                                        state = ParserState.EXPECTING_ACCOUNT;
+                                        L("→ expecting account");
+                                    }
+
+                                    break;
+
                                 case EXPECTING_TRANSACTION:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                     m = transactionStartPattern.matcher(line);
@@ -139,7 +202,7 @@ public class RetrieveTransactionsTask extends
                                         transactionId = Integer.valueOf(m.group(1));
                                         state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
                                         L(String.format(
-                                                "found transaction %d → expecting " + "description",
+                                                "found transaction %d → expecting description",
                                                 transactionId));
                                         progress.setProgress(++processedTransactionCount);
                                         if (maxTransactionId < transactionId)
@@ -151,11 +214,12 @@ public class RetrieveTransactionsTask extends
                                     }
                                     m = endPattern.matcher(line);
                                     if (m.find()) {
-                                        L("--- transaction list complete ---");
+                                        L("--- transaction value complete ---");
                                         success = true;
                                         break LINES;
                                     }
                                     break;
+
                                 case EXPECTING_TRANSACTION_DESCRIPTION:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
                                     m = transactionDescriptionPattern.matcher(line);
@@ -174,6 +238,7 @@ public class RetrieveTransactionsTask extends
                                                 m.group(1), m.group(2)));
                                     }
                                     break;
+
                                 case EXPECTING_TRANSACTION_DETAILS:
                                     if (line.isEmpty()) {
                                         // transaction data collected
@@ -205,7 +270,7 @@ public class RetrieveTransactionsTask extends
 
                                         state = ParserState.EXPECTING_TRANSACTION;
                                         L(String.format(
-                                                "transaction %s saved → expecting " + "transaction",
+                                                "transaction %s saved → expecting transaction",
                                                 transaction.getId()));
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
@@ -235,7 +300,7 @@ public class RetrieveTransactionsTask extends
                                     break;
                                 default:
                                     throw new RuntimeException(
-                                            String.format("Unknown parser state %s", state.name()));
+                                            String.format("Unknown parser updating %s", state.name()));
                             }
                         }
                         if (!isCancelled()) {
@@ -250,9 +315,9 @@ public class RetrieveTransactionsTask extends
             }
 
             if (success && !isCancelled()) {
-                Log.d("db", "Updating transaction list stamp");
+                Log.d("db", "Updating transaction value stamp");
                 MLDB.set_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, new Date().getTime());
-                ctx.model.reloadTransactions(ctx);
+                ((TransactionListViewModel)ctx.currentFragment.model).scheduleTransactionListReload(ctx);
             }
         }
         catch (MalformedURLException e) {
@@ -267,15 +332,32 @@ public class RetrieveTransactionsTask extends
             error = R.string.err_net_io_error;
             e.printStackTrace();
         }
+        finally {
+            Data.backgroundTaskCount.decrementAndGet();
+        }
         return null;
     }
-    TransactionListFragment getContext() {
+    private MainActivity getContext() {
         return contextRef.get();
+    }
+    private void addAccount(SQLiteDatabase db, String name) {
+        do {
+            LedgerAccount acc = new LedgerAccount(name);
+            db.execSQL("update accounts set level = ?, keep = 1 where name = ?",
+                    new Object[]{acc.getLevel(), name});
+            db.execSQL("insert into accounts(name, name_upper, parent_name, level) select ?,?," +
+                       "?,? " + "where (select changes() = 0)",
+                    new Object[]{name, name.toUpperCase(), acc.getParentName(), acc.getLevel()});
+            name = acc.getParentName();
+        } while (name != null);
+    }
+    private void throwIfCancelled() {
+        if (isCancelled()) throw new OperationCanceledException(null);
     }
 
     private enum ParserState {
-        EXPECTING_JOURNAL, EXPECTING_TRANSACTION, EXPECTING_TRANSACTION_DESCRIPTION,
-        EXPECTING_TRANSACTION_DETAILS
+        EXPECTING_ACCOUNT, EXPECTING_ACCOUNT_AMOUNT, EXPECTING_JOURNAL, EXPECTING_TRANSACTION,
+        EXPECTING_TRANSACTION_DESCRIPTION, EXPECTING_TRANSACTION_DETAILS
     }
 
     public static class Params {

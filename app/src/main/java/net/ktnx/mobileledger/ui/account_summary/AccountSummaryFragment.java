@@ -25,9 +25,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -41,6 +38,7 @@ import android.view.ViewGroup;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveAccountsTask;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -51,7 +49,7 @@ import java.util.List;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
-public class AccountSummaryFragment extends Fragment {
+public class AccountSummaryFragment extends MobileLedgerListFragment {
 
     private static long account_list_last_updated;
     private static boolean account_list_needs_update = true;
@@ -60,9 +58,7 @@ public class AccountSummaryFragment extends Fragment {
     private AccountSummaryViewModel model;
     private AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
-    private MainActivity mActivity;
     private FloatingActionButton fab;
-    private SwipeRefreshLayout swiper;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,7 +97,7 @@ public class AccountSummaryFragment extends Fragment {
                 new RecyclerItemListener.RecyclerTouchListener() {
                     @Override
                     public void onClickItem(View v, int position) {
-                        Log.d("list", String.format("item %d clicked", position));
+                        Log.d("value", String.format("item %d clicked", position));
                         if (modelAdapter.isSelectionActive()) {
                             modelAdapter.selectItem(position);
                         }
@@ -117,7 +113,7 @@ public class AccountSummaryFragment extends Fragment {
 
                     @Override
                     public void onLongClickItem(View v, int position) {
-                        Log.d("list", String.format("item %d long-clicked", position));
+                        Log.d("value", String.format("item %d long-clicked", position));
                         modelAdapter.startSelection();
                         if (optMenu != null) {
                             optMenu.findItem(R.id.menu_acc_summary_cancel_selection)
@@ -168,23 +164,11 @@ public class AccountSummaryFragment extends Fragment {
     }
 
     private void update_accounts() {
-        RetrieveAccountsTask task = new RetrieveAccountsTask(new WeakReference<>(this));
+        RetrieveAccountsTask task = new RetrieveAccountsTask(new WeakReference<>(mActivity));
 
         task.setPref(PreferenceManager.getDefaultSharedPreferences(mActivity));
         task.execute();
 
-    }
-    public void onAccountRefreshDone(int error) {
-        swiper.setRefreshing(false);
-        if (error != 0) {
-            String err_text = getResources().getString(error);
-            Log.d("visual", String.format("showing snackbar: %s", err_text));
-            Snackbar.make(swiper, err_text, Snackbar.LENGTH_LONG).show();
-        }
-        else {
-            MLDB.set_option_value(MLDB.OPT_LAST_REFRESH, new Date().getTime());
-            update_account_table();
-        }
     }
     private void update_account_table() {
         if (this.getContext() == null) return;
@@ -192,10 +176,6 @@ public class AccountSummaryFragment extends Fragment {
         model.reloadAccounts(this.getContext());
         modelAdapter.notifyDataSetChanged();
     }
-    public void onRefreshAccountSummaryClicked(MenuItem mi) {
-        update_accounts(true);
-    }
-
     public void onShowOnlyStarredClicked(MenuItem mi) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mActivity);
         boolean flag = pref.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);

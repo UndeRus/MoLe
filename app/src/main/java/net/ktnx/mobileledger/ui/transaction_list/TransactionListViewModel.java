@@ -19,68 +19,58 @@ package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModel;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+import android.os.AsyncTask;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.UpdateTransactionsTask;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.model.ObservableValue;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionListViewModel extends ViewModel {
+    public static ObservableValue<Boolean> updating = new ObservableValue<>();
 
-    private ArrayList<LedgerTransaction> transactions;
-
-    public void reloadTransactions(TransactionListFragment context) {
-        ArrayList<LedgerTransaction> newList = new ArrayList<>();
-
-        Activity act = context.getActivity();
-
+    public static void scheduleTransactionListReload(Activity act) {
         boolean hasFilter =
                 act.findViewById(R.id.transaction_list_account_name_filter).getVisibility() ==
                 View.VISIBLE;
-
-        String sql;
-        String[] params;
-
-        sql = "SELECT id FROM transactions  ORDER BY date desc, id desc";
-        params = null;
-
-        if (hasFilter) {
-            String filterAccName = String.valueOf(
-                    ((AutoCompleteTextView) act.findViewById(R.id.transaction_filter_account_name))
-                            .getText());
-
-            if (!filterAccName.isEmpty()) {
-                sql = "SELECT distinct tr.id from transactions tr JOIN transaction_accounts ta " +
-                      "ON ta.transaction_id=tr.id WHERE ta.account_name LIKE ?||'%' AND ta" +
-                      ".amount <> 0 ORDER BY tr.date desc, tr.id desc";
-                params = new String[]{filterAccName};
-            }
-        }
-
-        Log.d("tmp", sql);
-        try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
-            try (Cursor cursor = db.rawQuery(sql, params)) {
-                while (cursor.moveToNext()) {
-                    newList.add(new LedgerTransaction(cursor.getInt(0)));
-                }
-                transactions = newList;
-                Log.d("transactions", "transaction list updated");
-            }
-        }
-
+        String accFilter = hasFilter ? String.valueOf(
+                ((AutoCompleteTextView) act.findViewById(R.id.transaction_filter_account_name))
+                        .getText()) : null;
+        updating.set(true);
+        AsyncTask<String, Void, List<LedgerTransaction>> task = new UTT();
+        task.execute(accFilter);
     }
-    public LedgerTransaction getTransaction(int position) {
+    public static LedgerTransaction getTransaction(int position) {
+        List<LedgerTransaction> transactions = Data.transactions.get();
         if (position >= transactions.size()) return null;
         return transactions.get(position);
     }
-    public int getTransactionCount() {
+    public static int getTransactionCount() {
+        List<LedgerTransaction> transactions = Data.transactions.get();
         if (transactions == null) return 0;
         return transactions.size();
+    }
+    private static class UTT extends UpdateTransactionsTask {
+        @Override
+        protected void onPostExecute(List<LedgerTransaction> list) {
+            super.onPostExecute(list);
+            updating.set(false);
+            if (list != null) Data.transactions.set(list);
+        }
+        @Override
+        protected void onCancelled(List<LedgerTransaction> ledgerTransactions) {
+            super.onCancelled(ledgerTransactions);
+            updating.set(false);
+        }
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            updating.set(false);
+        }
     }
 }

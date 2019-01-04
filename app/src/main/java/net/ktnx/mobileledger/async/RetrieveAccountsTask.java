@@ -24,7 +24,7 @@ import android.util.Log;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -42,10 +42,10 @@ import java.util.regex.Pattern;
 
 public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Void> {
     int error;
-    WeakReference<AccountSummaryFragment> mContext;
+    WeakReference<MainActivity> mContext;
     private SharedPreferences pref;
 
-    public RetrieveAccountsTask(WeakReference<AccountSummaryFragment> context) {
+    public RetrieveAccountsTask(WeakReference<MainActivity> context) {
         mContext = context;
         error = 0;
     }
@@ -82,9 +82,9 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
                             // %3A is '='
                             Pattern account_name_re =
                                     Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
-                            Pattern value_re = Pattern.compile(
+                            Pattern account_value_re = Pattern.compile(
                                     "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
-                            Pattern tr_re = Pattern.compile("</tr>");
+                            Pattern tr_end_re = Pattern.compile("</tr>");
                             Pattern descriptions_line_re =
                                     Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
                             Pattern description_items_re =
@@ -108,7 +108,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
                                     continue;
                                 }
 
-                                Matcher tr_m = tr_re.matcher(line);
+                                Matcher tr_m = tr_end_re.matcher(line);
                                 if (tr_m.find()) {
                                     Log.d("account-parser", "<tr> - another account expected");
                                     last_account_name = null;
@@ -116,7 +116,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
                                 }
 
                                 if (last_account_name != null) {
-                                    m = value_re.matcher(line);
+                                    m = account_value_re.matcher(line);
                                     boolean match_found = false;
                                     while (m.find()) {
                                         throwIfCancelled();
@@ -208,9 +208,9 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
     }
     @Override
     protected void onPostExecute(Void result) {
-        AccountSummaryFragment ctx = mContext.get();
+        MainActivity ctx = mContext.get();
         if (ctx == null) return;
-        ctx.onAccountRefreshDone(this.error);
+        ctx.onRetrieveDone(this.error == 0);
     }
 
 }

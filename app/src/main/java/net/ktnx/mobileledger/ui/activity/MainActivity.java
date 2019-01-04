@@ -21,8 +21,8 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -35,14 +35,18 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.MLDB;
 
+import java.lang.ref.WeakReference;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -51,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawer;
     private AccountSummaryFragment accountSummaryFragment;
     private TransactionListFragment transactionListFragment;
-    private Fragment currentFragment = null;
+    public MobileLedgerListFragment currentFragment = null;
     private FragmentManager fragmentManager;
     private TextView tvLastUpdate;
+    private RetrieveTransactionsTask retrieveTransactionsTask;
+    private View bTransactionListCancelDownload;
+    private ProgressBar progressBar;
+    private LinearLayout progressLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +93,14 @@ public class MainActivity extends AppCompatActivity {
         long last_update = MLDB.get_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, 0L);
         Log.d("transactions", String.format("Last update = %d", last_update));
 
+        bTransactionListCancelDownload =
+                findViewById(R.id.transaction_list_cancel_download);
+        progressBar = findViewById(R.id.transaction_list_progress_bar);
+        if (progressBar == null)
+            throw new RuntimeException("Can't get hold on the transaction value progress bar");
+        progressLayout = findViewById(R.id.transaction_progress_layout);
+        if (progressLayout == null) throw new RuntimeException(
+                "Can't get hold on the transaction value progress bar layout");
 
         fragmentManager = getSupportFragmentManager();
 
@@ -235,6 +251,48 @@ public class MainActivity extends AppCompatActivity {
                     tvLastUpdate.setText(date.toLocaleString());
                 }
             }
+        }
+    }
+    public void update_transactions() {
+        retrieveTransactionsTask = new RetrieveTransactionsTask(new WeakReference<>(this));
+
+        RetrieveTransactionsTask.Params params = new RetrieveTransactionsTask.Params(
+                PreferenceManager.getDefaultSharedPreferences(this));
+
+        retrieveTransactionsTask.execute(params);
+        bTransactionListCancelDownload.setEnabled(true);
+    }
+    public void onStopTransactionRefreshClick(View view) {
+        Log.d("interactive", "Cancelling transactions refresh");
+        if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
+        bTransactionListCancelDownload.setEnabled(false);
+    }
+    public void onRetrieveDone(boolean success) {
+        progressLayout.setVisibility(View.GONE);
+        updateLastUpdateText();
+    }
+    public void onRetrieveStart() {
+        progressBar.setIndeterminate(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
+        else progressBar.setProgress(0);
+        progressLayout.setVisibility(View.VISIBLE);
+    }
+    public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
+        if ((progress.getTotal() == RetrieveTransactionsTask.Progress.INDETERMINATE) ||
+            (progress.getTotal() == 0))
+        {
+            progressBar.setIndeterminate(true);
+        }
+        else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                progressBar.setMin(0);
+            }
+            progressBar.setMax(progress.getTotal());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                progressBar.setProgress(progress.getProgress(), true);
+            }
+            else progressBar.setProgress(progress.getProgress());
+            progressBar.setIndeterminate(false);
         }
     }
 

@@ -126,7 +126,7 @@ public class LedgerTransaction {
                 .rawQuery("SELECT 1 from transactions where data_hash = ?", new String[]{dataHash}))
         {
             boolean result = c.moveToFirst();
-            Log.d("transactions", String.format("Transaction %d (%s) %s", id, dataHash,
+            Log.d("db", String.format("Transaction %d (%s) %s", id, dataHash,
                     result ? "already present" : "not present"));
             return result;
         }
