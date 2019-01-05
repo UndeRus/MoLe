@@ -55,8 +55,6 @@ public class UpdateAccountsTask extends AsyncTask<Boolean, Void, ArrayList<Ledge
                 }
             }
 
-            Data.accounts.set(newList);
-
             return newList;
         }
         finally {
