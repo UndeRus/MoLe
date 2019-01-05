@@ -23,6 +23,7 @@ import android.os.OperationCanceledException;
 import android.util.Log;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -55,6 +56,7 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
     }
 
     protected Void doInBackground(Void... params) {
+        Data.backgroundTaskCount.incrementAndGet();
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection(pref, "add");
             publishProgress(0);
@@ -187,6 +189,10 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
         catch (Exception e) {
             error = R.string.err_net_error;
             e.printStackTrace();
+        }
+        finally {
+            Log.d("RAT", "decrementing background task count");
+            Data.backgroundTaskCount.decrementAndGet();
         }
 
         return null;
