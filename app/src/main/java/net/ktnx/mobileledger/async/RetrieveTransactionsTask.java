@@ -181,8 +181,7 @@ public class RetrieveTransactionsTask extends
                                         L("curr=" + currency + ", value=" + value);
                                         db.execSQL(
                                                 "insert or replace into account_values(account, currency, value, keep) values(?, ?, ?, 1);",
-                                                new Object[]{lastAccount.getName(),
-                                                             currency,
+                                                new Object[]{lastAccount.getName(), currency,
                                                              Float.valueOf(value)
                                                 });
                                         lastAccount.addAmount(Float.parseFloat(value), currency);
@@ -302,7 +301,8 @@ public class RetrieveTransactionsTask extends
                                     break;
                                 default:
                                     throw new RuntimeException(
-                                            String.format("Unknown parser updating %s", state.name()));
+                                            String.format("Unknown parser updating %s",
+                                                    state.name()));
                             }
                         }
 
