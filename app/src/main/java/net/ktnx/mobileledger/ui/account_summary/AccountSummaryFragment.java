@@ -36,15 +36,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.async.RetrieveAccountsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 
-import java.lang.ref.WeakReference;
-import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -171,7 +168,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
         swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing accounts via swipe");
-            update_accounts(true);
+            mActivity.scheduleTransactionListRetrieval();
         });
 
         Data.accounts.addObserver(new Observer() {
@@ -186,24 +183,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             }
         });
         update_account_table();
-    }
-
-    private void update_accounts(boolean force) {
-        long now = new Date().getTime();
-        if ((now > (account_list_last_updated + (24 * 3600 * 1000))) || force) {
-            Log.d("db",
-                    "accounts last updated at " + account_list_last_updated + " and now is " + now +
-                    ". re-fetching");
-            update_accounts();
-        }
-    }
-
-    private void update_accounts() {
-        RetrieveAccountsTask task = new RetrieveAccountsTask(new WeakReference<>(mActivity));
-
-        task.setPref(PreferenceManager.getDefaultSharedPreferences(mActivity));
-        task.execute();
-
     }
     private void update_account_table() {
         if (this.getContext() == null) return;
