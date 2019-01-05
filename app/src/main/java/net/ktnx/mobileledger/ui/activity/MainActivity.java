@@ -139,6 +139,19 @@ public class MainActivity extends AppCompatActivity {
 
             scheduleTransactionListRetrieval();
         }
+
+        Data.ledgerTitle.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                runOnUiThread(() -> {
+                    String title = Data.ledgerTitle.get();
+                    if (title == null)
+                        toolbar.setSubtitle("");
+                    else
+                        toolbar.setSubtitle(title);
+                });
+            }
+        });
     }
     public void fab_new_transaction_clicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);

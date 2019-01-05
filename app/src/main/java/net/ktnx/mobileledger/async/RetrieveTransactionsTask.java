@@ -61,6 +61,7 @@ public class RetrieveTransactionsTask extends
     protected WeakReference<MainActivity> contextRef;
     protected int error;
     // %3A is '='
+    private Pattern ledger_title_re = Pattern.compile("<h1>([^<]+)</h1>");
     Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     Pattern account_value_re = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
@@ -125,6 +126,8 @@ public class RetrieveTransactionsTask extends
                             String.format("HTTP error %d", http.getResponseCode()));
                     db.beginTransaction();
                     try {
+                        String ledgerTitle = null;
+
                         db.execSQL("UPDATE transactions set keep=0");
                         db.execSQL("update account_values set keep=0;");
                         db.execSQL("update accounts set keep=0;");
@@ -164,6 +167,13 @@ public class RetrieveTransactionsTask extends
 
                                         state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
                                         L("→ expecting account amount");
+                                    }
+                                    else if (ledgerTitle == null) {
+                                        m = ledger_title_re.matcher(line);
+                                        if (m.find()) {
+                                            ledgerTitle = m.group(1);
+                                            Data.ledgerTitle.set(ledgerTitle);
+                                        }
                                     }
                                     break;
 
