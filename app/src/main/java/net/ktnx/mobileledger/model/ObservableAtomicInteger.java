@@ -39,11 +39,13 @@ public class ObservableAtomicInteger extends Observable {
         return holder.get();
     }
     public void set(int newValue) {
+//        Log.d("atomic", "set");
         holder.set(newValue);
         forceNotify();
     }
     private void forceNotify() {
         setChanged();
+//        Log.d("atomic", String.format("notifying %d observers", countObservers()));
         notifyObservers();
     }
 //    public void lazySet(int newValue) {
@@ -81,11 +83,13 @@ public class ObservableAtomicInteger extends Observable {
         return result;
     }
     public int incrementAndGet() {
+//        Log.d("atomic", "incrementAndGet");
         int result = holder.incrementAndGet();
         forceNotify();
         return result;
     }
     public int decrementAndGet() {
+//        Log.d("atomic", "decrementAndGet");
         int result = holder.decrementAndGet();
         forceNotify();
         return result;
