@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 
 public class RetrieveTransactionsTask extends
         AsyncTask<RetrieveTransactionsTask.Params, RetrieveTransactionsTask.Progress, Void> {
+    public static final int MATCHING_TRANSACTIONS_LIMIT = 100;
     private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
                                                                            "id=\"transaction-(\\d+)\"><td class=\"date\"[^\\\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =
@@ -246,7 +247,9 @@ public class RetrieveTransactionsTask extends
                                                        "=?", new Integer[]{transaction.getId()});
                                             matchedTransactionsCount++;
 
-                                            if (matchedTransactionsCount == 100) {
+                                            if (matchedTransactionsCount ==
+                                                MATCHING_TRANSACTIONS_LIMIT)
+                                            {
                                                 db.execSQL("UPDATE transactions SET keep=1 WHERE " +
                                                            "id < ?",
                                                         new Integer[]{transaction.getId()});
