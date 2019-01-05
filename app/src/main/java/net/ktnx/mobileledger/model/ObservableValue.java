@@ -59,7 +59,9 @@ public class ObservableValue<T> {
             setValue(newValue, true);
         }
         private synchronized void setValue(T newValue, boolean notify) {
-            if (newValue.equals(value)) return;
+            if ((newValue == null) && (value == null)) return;
+
+            if ((newValue != null) && newValue.equals(value)) return;
 
             T oldValue = value;
             value = newValue;
