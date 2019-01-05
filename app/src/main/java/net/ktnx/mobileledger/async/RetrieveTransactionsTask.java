@@ -45,7 +45,6 @@ import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -109,7 +108,7 @@ public class RetrieveTransactionsTask extends
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
         success = false;
-        List<LedgerAccount> accountList = new ArrayList<>();
+        ArrayList<LedgerAccount> accountList = new ArrayList<>();
         LedgerAccount lastAccount = null;
         Data.backgroundTaskCount.incrementAndGet();
         try {
