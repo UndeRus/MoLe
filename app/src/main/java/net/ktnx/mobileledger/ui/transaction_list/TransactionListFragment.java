@@ -141,10 +141,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (fab != null) {
-                    if (dy < 0) fab.show();
-                    if (dy > 0) fab.hide();
-                }
+                if (dy < 0) fab.show();
+                if (dy > 0) fab.hide();
             }
         });
 
