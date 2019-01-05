@@ -302,10 +302,11 @@ public class RetrieveTransactionsTask extends
                                             String.format("Unknown parser updating %s", state.name()));
                             }
                         }
-                        if (!isCancelled()) {
-                            db.execSQL("DELETE FROM transactions WHERE keep = 0");
-                            db.setTransactionSuccessful();
-                        }
+
+                        throwIfCancelled();
+
+                        db.execSQL("DELETE FROM transactions WHERE keep = 0");
+                        db.setTransactionSuccessful();
                     }
                     finally {
                         db.endTransaction();
