@@ -94,13 +94,10 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = new Observer() {
                 @Override
                 public void update(Observable o, Object arg) {
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            int cnt = Data.backgroundTaskCount.get();
-                            Log.d("trl", String.format("background task count changed to %d", cnt));
-                            swiper.setRefreshing(cnt > 0);
-                        }
+                    mActivity.runOnUiThread(() -> {
+                        int cnt = Data.backgroundTaskCount.get();
+                        Log.d("trl", String.format("background task count changed to %d", cnt));
+                        swiper.setRefreshing(cnt > 0);
                     });
                 }
             });
@@ -197,12 +194,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         Data.transactions.addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        modelAdapter.notifyDataSetChanged();
-                    }
-                });
+                mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged());
             }
         });
 

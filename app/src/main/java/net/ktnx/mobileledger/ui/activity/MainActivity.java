@@ -109,21 +109,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void update(Observable o, Object arg) {
                 Log.d("main", "lastUpdateDate changed");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Date date = Data.lastUpdateDate.get();
-                        if (date == null) {
-                            tvLastUpdate.setText(R.string.transaction_last_update_never);
+                runOnUiThread(() -> {
+                    Date date = Data.lastUpdateDate.get();
+                    if (date == null) {
+                        tvLastUpdate.setText(R.string.transaction_last_update_never);
+                    }
+                    else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
+                                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                         }
                         else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
-                                        .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                            }
-                            else {
-                                tvLastUpdate.setText(date.toLocaleString());
-                            }
+                            tvLastUpdate.setText(date.toLocaleString());
                         }
                     }
                 });

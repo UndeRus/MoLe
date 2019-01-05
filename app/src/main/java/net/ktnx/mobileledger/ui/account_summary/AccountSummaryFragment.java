@@ -79,13 +79,10 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
                 public void update(Observable o, Object arg) {
                     if (mActivity == null) return;
                     if (swiper == null) return;
-                    mActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            int cnt = Data.backgroundTaskCount.get();
-                            Log.d("acc", String.format("background task count changed to %d", cnt));
-                            swiper.setRefreshing(cnt > 0);
-                        }
+                    mActivity.runOnUiThread(() -> {
+                        int cnt = Data.backgroundTaskCount.get();
+                        Log.d("acc", String.format("background task count changed to %d", cnt));
+                        swiper.setRefreshing(cnt > 0);
                     });
                 }
             });
@@ -174,12 +171,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.accounts.addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        modelAdapter.notifyDataSetChanged();
-                    }
-                });
+                mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged());
             }
         });
         update_account_table();
