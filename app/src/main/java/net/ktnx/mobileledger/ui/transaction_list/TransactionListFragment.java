@@ -120,8 +120,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         Log.d("flow", "TransactionListFragment.onActivityCreated called");
         super.onActivityCreated(savedInstanceState);
 
-        mActivity.markDrawerItemCurrent(R.id.nav_latest_transactions);
-
         swiper = mActivity.findViewById(R.id.transaction_swipe);
         if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
         root = mActivity.findViewById(R.id.transaction_root);
@@ -131,11 +129,9 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         modelAdapter = new TransactionListAdapter();
 
         modelAdapter.setBoldAccountName(mShowOnlyAccountName);
+        root.setAdapter(modelAdapter);
 
         FloatingActionButton fab = mActivity.findViewById(R.id.btn_add_transaction);
-
-        RecyclerView root = mActivity.findViewById(R.id.transaction_root);
-        root.setAdapter(modelAdapter);
 
         fab.show();
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {

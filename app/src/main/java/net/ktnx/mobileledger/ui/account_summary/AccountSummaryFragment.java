@@ -95,24 +95,24 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        Log.d("flow", "AccountSummaryFragment.onCreateView()");
         return inflater.inflate(R.layout.account_summary_fragment, container, false);
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
-        mActivity.markDrawerItemCurrent(R.id.nav_account_summary);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.d("flow", "AccountSummaryFragment.onActivityCreated()");
+        super.onActivityCreated(savedInstanceState);
 
         model = ViewModelProviders.of(this).get(AccountSummaryViewModel.class);
         modelAdapter = new AccountSummaryAdapter();
 
-        RecyclerView root = mActivity.findViewById(R.id.account_root);
-        root.setAdapter(modelAdapter);
-
+        root = mActivity.findViewById(R.id.account_root);
         LinearLayoutManager llm = new LinearLayoutManager(mActivity);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         root.setLayoutManager(llm);
+        root.setAdapter(modelAdapter);
 
         fab = mActivity.findViewById(R.id.btn_add_transaction);
 

@@ -23,9 +23,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -65,7 +67,27 @@ public class MainActivity extends AppCompatActivity {
     private View bTransactionListCancelDownload;
     private ProgressBar progressBar;
     private LinearLayout progressLayout;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private ViewPager mViewPager;
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Data.lastUpdateDate.set(null);
+        updateLastUpdateTextFromDB();
+        Date lastUpdate = Data.lastUpdateDate.get();
+
+        long now = new Date().getTime();
+        if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
+            if (lastUpdate == null) Log.d("db::", "WEB data never fetched. scheduling a fetch");
+            else Log.d("db",
+                    String.format("WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
+                            lastUpdate.getTime() / 1000f, now / 1000f));
+
+            scheduleTransactionListRetrieval();
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,8 +124,27 @@ public class MainActivity extends AppCompatActivity {
                 "Can't get hold on the transaction value progress bar layout");
 
         fragmentManager = getSupportFragmentManager();
+        mSectionsPagerAdapter = new SectionsPagerAdapter(fragmentManager);
 
-        onAccountSummaryClicked(null);
+        mViewPager = findViewById(R.id.root_frame);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        markDrawerItemCurrent(R.id.nav_account_summary);
+                        break;
+                    case 1:
+                        markDrawerItemCurrent(R.id.nav_latest_transactions);
+                        break;
+                    default:
+                        Log.e("MainActivity", String.format("Unexpected page index %d", position));
+                }
+
+                super.onPageSelected(position);
+            }
+        });
 
         Data.lastUpdateDate.addObserver(new Observer() {
             @Override
@@ -127,28 +168,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        updateLastUpdateTextFromDB();
-        Date lastUpdate = Data.lastUpdateDate.get();
-
-        long now = new Date().getTime();
-        if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
-            if (lastUpdate == null) Log.d("db", "WEB data never fetched. scheduling a fetch");
-            else Log.d("db",
-                    String.format("WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
-                            lastUpdate.getTime() / 1000f, now / 1000f));
-
-            scheduleTransactionListRetrieval();
-        }
-
         Data.ledgerTitle.addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
                 runOnUiThread(() -> {
                     String title = Data.ledgerTitle.get();
-                    if (title == null)
-                        toolbar.setSubtitle("");
-                    else
-                        toolbar.setSubtitle(title);
+                    if (title == null) toolbar.setSubtitle("");
+                    else toolbar.setSubtitle(title);
                 });
             }
         });
@@ -225,21 +251,18 @@ public class MainActivity extends AppCompatActivity {
     public void onAccountSummaryClicked(View view) {
         drawer.closeDrawers();
 
-        resetFragmentBackStack();
-
         showAccountSummaryFragment();
     }
     private void showAccountSummaryFragment() {
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        accountSummaryFragment = new AccountSummaryFragment();
-        ft.replace(R.id.root_frame, accountSummaryFragment);
-        ft.commit();
-        currentFragment = accountSummaryFragment;
+        mViewPager.setCurrentItem(0, true);
+//        FragmentTransaction ft = fragmentManager.beginTransaction();
+//        accountSummaryFragment = new AccountSummaryFragment();
+//        ft.replace(R.id.root_frame, accountSummaryFragment);
+//        ft.commit();
+//        currentFragment = accountSummaryFragment;
     }
     public void onLatestTransactionsClicked(View view) {
         drawer.closeDrawers();
-
-        resetFragmentBackStack();
 
         showTransactionsFragment(null);
     }
@@ -247,23 +270,24 @@ public class MainActivity extends AppCompatActivity {
 //        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
     private void showTransactionsFragment(LedgerAccount account) {
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        if (transactionListFragment == null) {
-            Log.d("flow", "MainActivity creating TransactionListFragment");
-            transactionListFragment = new TransactionListFragment();
-        }
-        Bundle bundle = new Bundle();
-        if (account != null) {
-            bundle.putString(TransactionListFragment.BUNDLE_KEY_FILTER_ACCOUNT_NAME,
-                    account.getName());
-        }
-        transactionListFragment.setArguments(bundle);
-        ft.replace(R.id.root_frame, transactionListFragment);
-        if (account != null)
-            ft.addToBackStack(getResources().getString(R.string.title_activity_transaction_list));
-        ft.commit();
-
-        currentFragment = transactionListFragment;
+        mViewPager.setCurrentItem(1, true);
+//        FragmentTransaction ft = fragmentManager.beginTransaction();
+//        if (transactionListFragment == null) {
+//            Log.d("flow", "MainActivity creating TransactionListFragment");
+//            transactionListFragment = new TransactionListFragment();
+//        }
+//        Bundle bundle = new Bundle();
+//        if (account != null) {
+//            bundle.putString(TransactionListFragment.BUNDLE_KEY_FILTER_ACCOUNT_NAME,
+//                    account.getName());
+//        }
+//        transactionListFragment.setArguments(bundle);
+//        ft.replace(R.id.root_frame, transactionListFragment);
+//        if (account != null)
+//            ft.addToBackStack(getResources().getString(R.string.title_activity_transaction_list));
+//        ft.commit();
+//
+//        currentFragment = transactionListFragment;
     }
     public void showAccountTransactions(LedgerAccount account) {
         showTransactionsFragment(account);
@@ -334,6 +358,31 @@ public class MainActivity extends AppCompatActivity {
             }
             else progressBar.setProgress(progress.getProgress());
             progressBar.setIndeterminate(false);
+        }
+    }
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            Log.d("main", String.format("Switching to gragment %d", position));
+            switch (position) {
+                case 0:
+                    return new AccountSummaryFragment();
+                case 1:
+                    return new TransactionListFragment();
+                default:
+                    throw new IllegalStateException(
+                            String.format("Unexpected fragment index: " + "%d", position));
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
         }
     }
 

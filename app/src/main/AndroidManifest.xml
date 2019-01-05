@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
@@ -14,21 +13,20 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
-  -->
-
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.ktnx.mobileledger">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MobileLedgerApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name="net.ktnx.mobileledger.MobileLedgerApplication"
         android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activity.MainActivity"
@@ -36,6 +34,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
