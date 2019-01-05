@@ -116,7 +116,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/ic_clear_black_24dp"
                         android:clickable="true"
-                        android:focusable="auto"
+                        android:focusable="true"
                         android:onClick="onStopTransactionRefreshClick" />
                 </LinearLayout>
 
