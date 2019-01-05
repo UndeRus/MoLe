@@ -55,10 +55,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class MainActivity extends AppCompatActivity {
+    public MobileLedgerListFragment currentFragment = null;
     DrawerLayout drawer;
     private AccountSummaryFragment accountSummaryFragment;
     private TransactionListFragment transactionListFragment;
-    public MobileLedgerListFragment currentFragment = null;
     private FragmentManager fragmentManager;
     private TextView tvLastUpdate;
     private RetrieveTransactionsTask retrieveTransactionsTask;
@@ -93,8 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         tvLastUpdate = findViewById(R.id.transactions_last_update);
 
-        bTransactionListCancelDownload =
-                findViewById(R.id.transaction_list_cancel_download);
+        bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
         progressBar = findViewById(R.id.transaction_list_progress_bar);
         if (progressBar == null)
             throw new RuntimeException("Can't get hold on the transaction value progress bar");
