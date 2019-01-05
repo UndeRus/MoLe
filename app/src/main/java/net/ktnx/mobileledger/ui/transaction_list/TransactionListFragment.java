@@ -167,7 +167,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d("tmp", "direct onItemClick");
-                ((TransactionListViewModel) model).scheduleTransactionListReload(mActivity);
+                TransactionListViewModel.scheduleTransactionListReload(mActivity);
                 MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
                 modelAdapter.setBoldAccountName(mc.getString(1));
                 modelAdapter.notifyDataSetChanged();
