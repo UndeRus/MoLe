@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.utils;
 
 import android.annotation.TargetApi;
+import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -47,7 +48,7 @@ public final class MLDB {
     public static final String OPT_TRANSACTION_LIST_STAMP = "transaction_list_last_update";
     public static final String OPT_LAST_REFRESH = "last_refresh";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
-    private static Context context;
+    private static Application context;
     private static void checkState() {
         if (context == null)
             throw new IllegalStateException("First call init with a valid context");
@@ -160,6 +161,7 @@ public final class MLDB {
                 }
 
                 return c;
+
             }
         };
 
@@ -167,8 +169,8 @@ public final class MLDB {
 
         view.setAdapter(adapter);
     }
-    public static void init(Context context) {
-        MLDB.context = context.getApplicationContext();
+    public static void init(Application context) {
+        MLDB.context = context;
     }
     public static void done() {
         if (helperForReading != null)
