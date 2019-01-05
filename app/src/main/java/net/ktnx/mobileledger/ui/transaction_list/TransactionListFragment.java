@@ -55,7 +55,16 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     private MenuItem menuTransactionListFilter;
     private View vAccountFilter;
     private AutoCompleteTextView accNameFilter;
+    private Observer backgroundTaskCountObserver;
     private static void update(Observable o, Object arg) {
+    }
+    @Override
+    public void onDestroy() {
+        if (backgroundTaskCountObserver != null) {
+            Log.d("rtl", "destroying background task count observer");
+            Data.backgroundTaskCount.deleteObserver(backgroundTaskCountObserver);
+        }
+        super.onDestroy();
     }
     public void setShowOnlyAccountName(String mShowOnlyAccountName) {
         this.mShowOnlyAccountName = mShowOnlyAccountName;
@@ -80,6 +89,22 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        if (backgroundTaskCountObserver == null) {
+            Log.d("rtl", "creating background task count observer");
+            Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = new Observer() {
+                @Override
+                public void update(Observable o, Object arg) {
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int cnt = Data.backgroundTaskCount.get();
+                            Log.d("trl", String.format("background task count changed to %d", cnt));
+                            swiper.setRefreshing(cnt > 0);
+                        }
+                    });
+                }
+            });
+        }
     }
     @Override
     public void onAttach(Context context) {
@@ -180,6 +205,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
                 });
             }
         });
+
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

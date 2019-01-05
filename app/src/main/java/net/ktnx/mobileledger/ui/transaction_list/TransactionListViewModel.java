@@ -41,7 +41,6 @@ public class TransactionListViewModel extends ViewModel {
         String accFilter = hasFilter ? String.valueOf(
                 ((AutoCompleteTextView) act.findViewById(R.id.transaction_filter_account_name))
                         .getText()) : null;
-        updating.set(true);
         AsyncTask<String, Void, List<LedgerTransaction>> task = new UTT();
         task.execute(accFilter);
     }
@@ -59,18 +58,7 @@ public class TransactionListViewModel extends ViewModel {
         @Override
         protected void onPostExecute(List<LedgerTransaction> list) {
             super.onPostExecute(list);
-            updating.set(false);
             if (list != null) Data.transactions.set(list);
-        }
-        @Override
-        protected void onCancelled(List<LedgerTransaction> ledgerTransactions) {
-            super.onCancelled(ledgerTransactions);
-            updating.set(false);
-        }
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-            updating.set(false);
         }
     }
 }

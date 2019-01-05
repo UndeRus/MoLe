@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveAccountsTask;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.RecyclerItemListener;
@@ -46,6 +47,8 @@ import net.ktnx.mobileledger.utils.MLDB;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
@@ -59,10 +62,38 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     private AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
     private FloatingActionButton fab;
+    private Observer backgroundTaskCountObserver;
+    @Override
+    public void onDestroy() {
+        if(backgroundTaskCountObserver!= null) {
+            Log.d("acc", "destroying background task count observer");
+            Data.backgroundTaskCount.deleteObserver(backgroundTaskCountObserver);
+        }
+        super.onDestroy();
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        if (backgroundTaskCountObserver == null) {
+            Log.d("acc", "creating background task count observer");
+            Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = new Observer() {
+                @Override
+                public void update(Observable o, Object arg) {
+                    if (mActivity == null) return;
+                    if (swiper == null) return;
+                    mActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int cnt = Data.backgroundTaskCount.get();
+                            Log.d("acc", String.format("background task count changed to %d", cnt));
+                            swiper.setRefreshing(cnt > 0);
+                        }
+                    });
+                }
+            });
+        }
     }
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -144,13 +175,19 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             Log.d("ui", "refreshing accounts via swipe");
             update_accounts(true);
         });
-        prepare_db();
-//        update_account_table();
-        update_accounts(false);
 
-    }
-    private void prepare_db() {
-        account_list_last_updated = MLDB.get_option_value(MLDB.OPT_LAST_REFRESH, (long) 0);
+        Data.accounts.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        modelAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+        update_account_table();
     }
 
     private void update_accounts(boolean force) {
