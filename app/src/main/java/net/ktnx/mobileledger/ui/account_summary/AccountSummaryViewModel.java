@@ -64,7 +64,10 @@ class AccountSummaryViewModel extends ViewModel {
         @Override
         protected void onPostExecute(ArrayList<LedgerAccount> list) {
             super.onPostExecute(list);
-            if (list != null) Data.accounts.set(list);
+            if (list != null) {
+                Log.d("acc", "setting updated account list");
+                Data.accounts.set(list);
+            }
         }
     }
     private static class CAT extends CommitAccountsTask {
