@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
 
 public class RetrieveTransactionsTask extends
         AsyncTask<RetrieveTransactionsTask.Params, RetrieveTransactionsTask.Progress, Void> {
-    public static final int MATCHING_TRANSACTIONS_LIMIT = 100;
+    public static final int MATCHING_TRANSACTIONS_LIMIT = 50;
     private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
                                                                            "id=\"transaction-(\\d+)\"><td class=\"date\"[^\\\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =
