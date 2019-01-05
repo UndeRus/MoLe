@@ -15,15 +15,17 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.model;
+package net.ktnx.mobileledger.async;
 
-import java.util.ArrayList;
+import net.ktnx.mobileledger.model.LedgerAccount;
+
 import java.util.List;
 
-public final class Data {
-    public static TransactionList transactions = new TransactionList();
-    public static ObservableValue<ArrayList<LedgerAccount>> accounts =
-            new ObservableValue<>(new ArrayList<LedgerAccount>());
-    public static ObservableValue<List<String>> descriptions = new ObservableValue<>();
-    public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
+public class CommitAccountsTaskParams {
+    List<LedgerAccount> accountList;
+    boolean showOnlyStarred;
+    public CommitAccountsTaskParams(List<LedgerAccount> accountList, boolean showOnlyStarred) {
+        this.accountList = accountList;
+        this.showOnlyStarred = showOnlyStarred;
+    }
 }

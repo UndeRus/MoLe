@@ -42,7 +42,6 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.util.Date;
@@ -112,8 +111,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         mActivity.markDrawerItemCurrent(R.id.nav_account_summary);
 
         model = ViewModelProviders.of(this).get(AccountSummaryViewModel.class);
-        List<LedgerAccount> accounts = model.getAccounts(this.getContext());
-        modelAdapter = new AccountSummaryAdapter(accounts);
+        modelAdapter = new AccountSummaryAdapter();
 
         RecyclerView root = mActivity.findViewById(R.id.account_root);
         root.setAdapter(modelAdapter);
@@ -133,7 +131,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
                             modelAdapter.selectItem(position);
                         }
                         else {
-                            List<LedgerAccount> accounts = model.getAccounts(mActivity);
+                            List<LedgerAccount> accounts = Data.accounts.get();
                             if (accounts != null) {
                                 LedgerAccount account = accounts.get(position);
 
@@ -210,8 +208,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     private void update_account_table() {
         if (this.getContext() == null) return;
 
-        model.reloadAccounts(this.getContext());
-        modelAdapter.notifyDataSetChanged();
+        model.scheduleAccountListReload(this.getContext());
     }
     public void onShowOnlyStarredClicked(MenuItem mi) {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mActivity);
@@ -240,7 +237,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         stopSelection();
     }
     public void onConfirmAccSelection(MenuItem item) {
-        model.commitSelections(mActivity);
+        AccountSummaryViewModel.commitSelections(mActivity);
         stopSelection();
     }
     @Override

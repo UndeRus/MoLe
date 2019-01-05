@@ -17,12 +17,9 @@
 
 package net.ktnx.mobileledger.ui.account_summary;
 
-import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -37,97 +34,67 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.CommitAccountsTask;
+import net.ktnx.mobileledger.async.CommitAccountsTaskParams;
+import net.ktnx.mobileledger.async.UpdateAccountsTask;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
-class AccountSummaryViewModel extends AndroidViewModel {
-    private List<LedgerAccount> accounts;
+class AccountSummaryViewModel extends ViewModel {
+    void scheduleAccountListReload(Context context) {
+        boolean showingOnlyStarred = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
 
-    public AccountSummaryViewModel(@NonNull Application application) {
-        super(application);
+        UAT task = new UAT();
+        task.execute(showingOnlyStarred);
+
     }
-
-    List<LedgerAccount> getAccounts(Context context) {
-        if (accounts == null) {
-            accounts = new ArrayList<>();
-            reloadAccounts(context);
-        }
-
-        return accounts;
+    static void commitSelections(Context context) {
+        boolean showingOnlyStarred = PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
+        CAT task = new CAT();
+        //noinspection unchecked
+        task.execute(new CommitAccountsTaskParams(Data.accounts.get(), showingOnlyStarred));
     }
-
-    void reloadAccounts(Context context) {
-        accounts.clear();
-        boolean showingOnlyStarred =
-                PreferenceManager.getDefaultSharedPreferences(getApplication())
-                        .getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
-        String sql = "SELECT name, hidden FROM accounts";
-        if (showingOnlyStarred) sql += " WHERE hidden = 0";
-        sql += " ORDER BY name";
-
-        try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
-            try (Cursor cursor = db
-                    .rawQuery(sql,null))
-            {
-                while (cursor.moveToNext()) {
-                    LedgerAccount acc = new LedgerAccount(cursor.getString(0));
-                    acc.setHidden(cursor.getInt(1) == 1);
-                    try (Cursor c2 = db.rawQuery(
-                            "SELECT value, currency FROM account_values " + "WHERE account = ?",
-                            new String[]{acc.getName()}))
-                    {
-                        while (c2.moveToNext()) {
-                            acc.addAmount(c2.getFloat(0), c2.getString(1));
-                        }
-                    }
-                    accounts.add(acc);
-                }
-            }
+    private static class UAT extends UpdateAccountsTask {
+        @Override
+        protected void onPostExecute(ArrayList<LedgerAccount> list) {
+            super.onPostExecute(list);
+            if (list != null) Data.accounts.set(list);
         }
     }
-    void commitSelections(Context context) {
-        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
-            db.beginTransaction();
-            try {
-                for (LedgerAccount acc : accounts) {
-                    Log.d("db", String.format("Setting %s to %s", acc.getName(),
-                            acc.isHidden() ? "hidden" : "starred"));
-                    db.execSQL("UPDATE accounts SET hidden=? WHERE name=?",
-                            new Object[]{acc.isHiddenToBe() ? 1 : 0, acc.getName()});
-                }
-                db.setTransactionSuccessful();
-                for (LedgerAccount acc : accounts ) { acc.setHidden(acc.isHiddenToBe()); }
+    private static class CAT extends CommitAccountsTask {
+        @Override
+        protected void onPostExecute(ArrayList<LedgerAccount> list) {
+            super.onPostExecute(list);
+            if (list != null) {
+                Log.d("acc", "setting new account list");
+                Data.accounts.set(list);
             }
-            finally { db.endTransaction(); }
         }
     }
 }
 
-class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter
-.LedgerRowHolder> {
-    private List<LedgerAccount> accounts;
+class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     private boolean selectionActive;
 
-    AccountSummaryAdapter(List<LedgerAccount> accounts) {
-        this.accounts = accounts;
+    AccountSummaryAdapter() {
         this.selectionActive = false;
     }
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
-        LedgerAccount acc = accounts.get(position);
+        LedgerAccount acc = Data.accounts.get().get(position);
         Context ctx = holder.row.getContext();
         Resources rm = ctx.getResources();
 
         holder.tvAccountName.setText(acc.getShortName());
         holder.tvAccountName.setPadding(
                 acc.getLevel() * rm.getDimensionPixelSize(R.dimen.activity_horizontal_margin) / 2,
-                0, 0,
-                0);
+                0, 0, 0);
         holder.tvAccountAmounts.setText(acc.getAmountsString());
 
         if (acc.isHidden()) {
@@ -150,7 +117,7 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter
             else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
         }
 
-        holder.selectionCb.setVisibility( selectionActive ? View.VISIBLE : View.GONE);
+        holder.selectionCb.setVisibility(selectionActive ? View.VISIBLE : View.GONE);
         holder.selectionCb.setChecked(!acc.isHiddenToBe());
 
         holder.row.setTag(R.id.POS, position);
@@ -166,10 +133,10 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return accounts.size();
+        return Data.accounts.get().size();
     }
     public void startSelection() {
-        for( LedgerAccount acc : accounts ) acc.setHiddenToBe(acc.isHidden());
+        for (LedgerAccount acc : Data.accounts.get()) acc.setHiddenToBe(acc.isHidden());
         this.selectionActive = true;
         notifyDataSetChanged();
     }
@@ -184,13 +151,13 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter
     }
 
     public void selectItem(int position) {
-        LedgerAccount acc = accounts.get(position);
+        LedgerAccount acc = Data.accounts.get().get(position);
         acc.toggleHiddenToBe();
         toggleChildrenOf(acc, acc.isHiddenToBe());
         notifyDataSetChanged();
     }
     void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe) {
-        for (LedgerAccount acc : accounts) {
+        for (LedgerAccount acc : Data.accounts.get()) {
             String acc_parent = acc.getParentName();
             if ((acc_parent != null) && acc.getParentName().equals(parent.getName())) {
                 acc.setHiddenToBe(hiddenToBe);
@@ -198,6 +165,7 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter
             }
         }
     }
+
     class LedgerRowHolder extends RecyclerView.ViewHolder {
         CheckBox selectionCb;
         TextView tvAccountName, tvAccountAmounts;
