@@ -158,7 +158,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
         swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing transactions via swipe");
-            mActivity.update_transactions();
+            mActivity.scheduleTransactionListRetrieval();
         });
 
         swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
