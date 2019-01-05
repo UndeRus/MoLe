@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public final class Data {
@@ -26,4 +27,5 @@ public final class Data {
             new ObservableValue<>(new ArrayList<LedgerAccount>());
     public static ObservableValue<List<String>> descriptions = new ObservableValue<>();
     public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
+    public static ObservableValue<Date> lastUpdateDate = new ObservableValue<>();
 }
