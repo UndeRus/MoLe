@@ -53,7 +53,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
-                android:text="Sample description goes here."
+                android:text="---."
                 android:textStyle="bold"
                 tools:ignore="HardcodedText" />
 
@@ -98,7 +98,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
+                    android:text="---"
                     android:textAlignment="viewStart"
                     tools:ignore="HardcodedText" />
 
@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="0dp"
                     android:minWidth="60dp"
-                    android:text="€ 123,45"
+                    android:text="€ --,--"
                     android:textAlignment="viewEnd"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
@@ -124,7 +124,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
-                    android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
+                    android:text="---"
                     android:textAlignment="viewStart"
                     tools:ignore="HardcodedText" />
 
@@ -133,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="0dp"
                     android:minWidth="60dp"
-                    android:text="-14 678,90"
+                    android:text="---,--"
                     android:textAlignment="viewEnd"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
