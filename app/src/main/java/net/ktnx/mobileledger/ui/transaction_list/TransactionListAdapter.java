@@ -84,19 +84,19 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         protected Void doInBackground(TransactionLoaderParams... p) {
             LedgerTransaction tr = p[0].transaction;
 
-            try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
-                tr.loadData(db);
+            SQLiteDatabase db = MLDB.getReadableDatabase();
+            tr.loadData(db);
 
-                publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr));
+            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr));
 
-                int rowIndex = 0;
-                for (LedgerTransactionAccount acc : tr.getAccounts()) {
-                    publishProgress(new TransactionLoaderStep(p[0].holder, acc, rowIndex++,
-                            p[0].boldAccountName));
-                }
-
-                publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, rowIndex));
+            int rowIndex = 0;
+            for (LedgerTransactionAccount acc : tr.getAccounts()) {
+                publishProgress(new TransactionLoaderStep(p[0].holder, acc, rowIndex++,
+                        p[0].boldAccountName));
             }
+
+            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, rowIndex));
+
             return null;
         }
         @Override

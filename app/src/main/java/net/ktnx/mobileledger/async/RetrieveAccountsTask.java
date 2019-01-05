@@ -60,116 +60,113 @@ public class RetrieveAccountsTask extends android.os.AsyncTask<Void, Integer, Vo
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection(pref, "add");
             publishProgress(0);
-            try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
-                try (InputStream resp = http.getInputStream()) {
-                    Log.d("update_accounts", String.valueOf(http.getResponseCode()));
-                    if (http.getResponseCode() != 200) {
-                        throw new IOException(
-                                String.format("HTTP error: %d %s", http.getResponseCode(),
-                                        http.getResponseMessage()));
-                    }
-                    else {
-                        if (db.inTransaction()) throw new AssertionError();
+            SQLiteDatabase db = MLDB.getWritableDatabase();
+            try (InputStream resp = http.getInputStream()) {
+                Log.d("update_accounts", String.valueOf(http.getResponseCode()));
+                if (http.getResponseCode() != 200) {
+                    throw new IOException(String.format("HTTP error: %d %s", http.getResponseCode(),
+                            http.getResponseMessage()));
+                }
+                else {
+                    if (db.inTransaction()) throw new AssertionError();
 
-                        db.beginTransaction();
+                    db.beginTransaction();
 
-                        try {
-                            db.execSQL("update account_values set keep=0;");
-                            db.execSQL("update accounts set keep=0;");
+                    try {
+                        db.execSQL("update account_values set keep=0;");
+                        db.execSQL("update accounts set keep=0;");
 
-                            String line;
-                            String last_account_name = null;
-                            BufferedReader buf =
-                                    new BufferedReader(new InputStreamReader(resp, "UTF-8"));
-                            // %3A is '='
-                            Pattern account_name_re =
-                                    Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
-                            Pattern account_value_re = Pattern.compile(
-                                    "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
-                            Pattern tr_end_re = Pattern.compile("</tr>");
-                            Pattern descriptions_line_re =
-                                    Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
-                            Pattern description_items_re =
-                                    Pattern.compile("\"value\":\"([^\"]+)\"");
-                            int count = 0;
-                            while ((line = buf.readLine()) != null) {
-                                throwIfCancelled();
+                        String line;
+                        String last_account_name = null;
+                        BufferedReader buf =
+                                new BufferedReader(new InputStreamReader(resp, "UTF-8"));
+                        // %3A is '='
+                        Pattern account_name_re =
+                                Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
+                        Pattern account_value_re = Pattern.compile(
+                                "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
+                        Pattern tr_end_re = Pattern.compile("</tr>");
+                        Pattern descriptions_line_re =
+                                Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
+                        Pattern description_items_re = Pattern.compile("\"value\":\"([^\"]+)\"");
+                        int count = 0;
+                        while ((line = buf.readLine()) != null) {
+                            throwIfCancelled();
 
-                                Matcher m = account_name_re.matcher(line);
-                                if (m.find()) {
-                                    String acct_encoded = m.group(1);
-                                    String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
-                                    acct_name = acct_name.replace("\"", "");
-                                    Log.d("account-parser", acct_name);
+                            Matcher m = account_name_re.matcher(line);
+                            if (m.find()) {
+                                String acct_encoded = m.group(1);
+                                String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
+                                acct_name = acct_name.replace("\"", "");
+                                Log.d("account-parser", acct_name);
 
-                                    addAccount(db, acct_name);
-                                    publishProgress(++count);
+                                addAccount(db, acct_name);
+                                publishProgress(++count);
 
-                                    last_account_name = acct_name;
+                                last_account_name = acct_name;
 
-                                    continue;
-                                }
-
-                                Matcher tr_m = tr_end_re.matcher(line);
-                                if (tr_m.find()) {
-                                    Log.d("account-parser", "<tr> - another account expected");
-                                    last_account_name = null;
-                                    continue;
-                                }
-
-                                if (last_account_name != null) {
-                                    m = account_value_re.matcher(line);
-                                    boolean match_found = false;
-                                    while (m.find()) {
-                                        throwIfCancelled();
-
-                                        match_found = true;
-                                        String value = m.group(1);
-                                        String currency = m.group(2);
-                                        if (currency == null) currency = "";
-                                        value = value.replace(',', '.');
-                                        Log.d("db", "curr=" + currency + ", value=" + value);
-                                        db.execSQL(
-                                                "insert or replace into account_values(account, currency, value, keep) values(?, ?, ?, 1);",
-                                                new Object[]{last_account_name, currency,
-                                                             Float.valueOf(value)
-                                                });
-                                    }
-
-                                    if (match_found) continue;
-                                }
-
-                                m = descriptions_line_re.matcher(line);
-                                if (m.find()) {
-                                    db.execSQL("update description_history set keep=0;");
-                                    m = description_items_re.matcher(line);
-                                    while (m.find()) {
-                                        throwIfCancelled();
-
-                                        String description = m.group(1);
-                                        if (description.isEmpty()) continue;
-
-                                        Log.d("db", String.format("Stored description: %s",
-                                                description));
-                                        db.execSQL("insert or replace into description_history" +
-                                                   "(description, description_upper, keep) " +
-                                                   "values(?, ?, 1);",
-                                                new Object[]{description, description.toUpperCase()
-                                                });
-                                    }
-                                }
+                                continue;
                             }
 
-                            db.execSQL("delete from account_values where keep=0;");
-                            db.execSQL("delete from accounts where keep=0;");
-                            db.setTransactionSuccessful();
+                            Matcher tr_m = tr_end_re.matcher(line);
+                            if (tr_m.find()) {
+                                Log.d("account-parser", "<tr> - another account expected");
+                                last_account_name = null;
+                                continue;
+                            }
+
+                            if (last_account_name != null) {
+                                m = account_value_re.matcher(line);
+                                boolean match_found = false;
+                                while (m.find()) {
+                                    throwIfCancelled();
+
+                                    match_found = true;
+                                    String value = m.group(1);
+                                    String currency = m.group(2);
+                                    if (currency == null) currency = "";
+                                    value = value.replace(',', '.');
+                                    Log.d("db", "curr=" + currency + ", value=" + value);
+                                    db.execSQL(
+                                            "insert or replace into account_values(account, currency, value, keep) values(?, ?, ?, 1);",
+                                            new Object[]{last_account_name, currency,
+                                                         Float.valueOf(value)
+                                            });
+                                }
+
+                                if (match_found) continue;
+                            }
+
+                            m = descriptions_line_re.matcher(line);
+                            if (m.find()) {
+                                db.execSQL("update description_history set keep=0;");
+                                m = description_items_re.matcher(line);
+                                while (m.find()) {
+                                    throwIfCancelled();
+
+                                    String description = m.group(1);
+                                    if (description.isEmpty()) continue;
+
+                                    Log.d("db",
+                                            String.format("Stored description: %s", description));
+                                    db.execSQL("insert or replace into description_history" +
+                                               "(description, description_upper, keep) " +
+                                               "values(?, ?, 1);",
+                                            new Object[]{description, description.toUpperCase()
+                                            });
+                                }
+                            }
                         }
-                        catch (OperationCanceledException e) {
-                            Log.w("async", "Account retrieval cancelled");
-                        }
-                        finally {
-                            db.endTransaction();
-                        }
+
+                        db.execSQL("delete from account_values where keep=0;");
+                        db.execSQL("delete from accounts where keep=0;");
+                        db.setTransactionSuccessful();
+                    }
+                    catch (OperationCanceledException e) {
+                        Log.w("async", "Account retrieval cancelled");
+                    }
+                    finally {
+                        db.endTransaction();
                     }
                 }
             }

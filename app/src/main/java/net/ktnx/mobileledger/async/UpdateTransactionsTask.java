@@ -52,16 +52,15 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, List<LedgerT
             }
 
             Log.d("tmp", sql);
-            try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
-                try (Cursor cursor = db.rawQuery(sql, params)) {
-                    while (cursor.moveToNext()) {
-                        if (isCancelled()) return null;
+            SQLiteDatabase db = MLDB.getReadableDatabase();
+            try (Cursor cursor = db.rawQuery(sql, params)) {
+                while (cursor.moveToNext()) {
+                    if (isCancelled()) return null;
 
-                        newList.add(new LedgerTransaction(cursor.getInt(0)));
-                    }
-                    Data.transactions.set(newList);
-                    Log.d("transactions", "transaction value updated");
+                    newList.add(new LedgerTransaction(cursor.getInt(0)));
                 }
+                Data.transactions.set(newList);
+                Log.d("transactions", "transaction value updated");
             }
 
             return newList;

@@ -34,6 +34,11 @@ public class MobileLedgerApplication extends Application {
         MLDB.init(this);
     }
     @Override
+    public void onTerminate() {
+        MLDB.done();
+        super.onTerminate();
+    }
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateColorValues();

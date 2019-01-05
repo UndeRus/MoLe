@@ -92,32 +92,30 @@ public final class MLDB {
     }
     static public String get_option_value(String name, String default_value) {
         Log.d("db", "about to fetch option " + name);
-        try (SQLiteDatabase db = getReadableDatabase()) {
-            try (Cursor cursor = db
-                    .rawQuery("select value from options where name=?", new String[]{name}))
-            {
-                if (cursor.moveToFirst()) {
-                    String result = cursor.getString(0);
+        SQLiteDatabase db = getReadableDatabase();
+        try (Cursor cursor = db
+                .rawQuery("select value from options where name=?", new String[]{name}))
+        {
+            if (cursor.moveToFirst()) {
+                String result = cursor.getString(0);
 
-                    if (result == null) result = default_value;
+                if (result == null) result = default_value;
 
-                    Log.d("db", "option " + name + "=" + result);
-                    return result;
-                }
-                else return default_value;
+                Log.d("db", "option " + name + "=" + result);
+                return result;
             }
-            catch (Exception e) {
-                Log.d("db", "returning default value for " + name, e);
-                return default_value;
-            }
+            else return default_value;
+        }
+        catch (Exception e) {
+            Log.d("db", "returning default value for " + name, e);
+            return default_value;
         }
     }
     static public void set_option_value(String name, String value) {
         Log.d("db", "setting option " + name + "=" + value);
-        try (SQLiteDatabase db = getWritableDatabase()) {
-            db.execSQL("insert or replace into options(name, value) values(?, ?);",
-                    new String[]{name, value});
-        }
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("insert or replace into options(name, value) values(?, ?);",
+                new String[]{name, value});
     }
     static public void set_option_value(String name, long value) {
         set_option_value(name, String.valueOf(value));
@@ -143,28 +141,25 @@ public final class MLDB {
                 String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
-                try (SQLiteDatabase db = MLDB.getReadableDatabase()) {
+                SQLiteDatabase db = MLDB.getReadableDatabase();
 
-                    try (Cursor matches = db.rawQuery(String.format(
-                            "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                            "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                            "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
-                            "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;",
-                            field, field, field, field, table, field),
-                            new String[]{str, str, str, str}))
-                    {
-                        int i = 0;
-                        while (matches.moveToNext()) {
-                            String match = matches.getString(0);
-                            int order = matches.getInt(1);
-                            Log.d("autocompletion", String.format("match: %s |%d", match, order));
-                            c.newRow().add(i++).add(match);
-                        }
+                try (Cursor matches = db.rawQuery(String.format(
+                        "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                        "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " + "FROM %s " +
+                        "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;", field, field,
+                        field, field, table, field), new String[]{str, str, str, str}))
+                {
+                    int i = 0;
+                    while (matches.moveToNext()) {
+                        String match = matches.getString(0);
+                        int order = matches.getInt(1);
+                        Log.d("autocompletion", String.format("match: %s |%d", match, order));
+                        c.newRow().add(i++).add(match);
                     }
-
-                    return c;
                 }
 
+                return c;
             }
         };
 
@@ -174,6 +169,13 @@ public final class MLDB {
     }
     public static void init(Context context) {
         MLDB.context = context.getApplicationContext();
+    }
+    public static void done() {
+        if (helperForReading != null)
+            helperForReading.close();
+
+        if ((helperForWriting != helperForReading) && (helperForWriting != null))
+            helperForWriting.close();
     }
     public enum DatabaseMode {READ, WRITE}
 }
