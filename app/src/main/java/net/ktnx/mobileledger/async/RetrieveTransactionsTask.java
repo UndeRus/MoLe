@@ -30,7 +30,6 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -110,6 +109,7 @@ public class RetrieveTransactionsTask extends
         int maxTransactionId = Progress.INDETERMINATE;
         success = false;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
+        ArrayList<LedgerTransaction> transactionList = new ArrayList<>();
         LedgerAccount lastAccount = null;
         Data.backgroundTaskCount.incrementAndGet();
         try {
@@ -273,6 +273,7 @@ public class RetrieveTransactionsTask extends
                                         L(String.format(
                                                 "transaction %s saved → expecting transaction",
                                                 transaction.getId()));
+                                        transactionList.add(transaction);
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
 // for example, when you add the initial seeding transaction after entering some others
@@ -310,17 +311,17 @@ public class RetrieveTransactionsTask extends
 
                         db.execSQL("DELETE FROM transactions WHERE keep = 0");
                         db.setTransactionSuccessful();
+
+                        Log.d("db", "Updating transaction value stamp");
+                        Date now = new Date();
+                        MLDB.set_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, now.getTime());
+                        Data.lastUpdateDate.set(now);
+                        Data.transactions.set(transactionList);
                     }
                     finally {
                         db.endTransaction();
                     }
                 }
-            }
-
-            if (success && !isCancelled()) {
-                Log.d("db", "Updating transaction value stamp");
-                MLDB.set_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, new Date().getTime());
-                TransactionListViewModel.scheduleTransactionListReload(ctx);
             }
         }
         catch (MalformedURLException e) {
@@ -333,6 +334,10 @@ public class RetrieveTransactionsTask extends
         }
         catch (IOException e) {
             error = R.string.err_net_io_error;
+            e.printStackTrace();
+        }
+        catch (OperationCanceledException e) {
+            error = R.string.err_cancelled;
             e.printStackTrace();
         }
         finally {
