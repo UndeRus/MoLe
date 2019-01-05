@@ -317,7 +317,7 @@ public class RetrieveTransactionsTask extends
             if (success && !isCancelled()) {
                 Log.d("db", "Updating transaction value stamp");
                 MLDB.set_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, new Date().getTime());
-                ((TransactionListViewModel)ctx.currentFragment.model).scheduleTransactionListReload(ctx);
+                TransactionListViewModel.scheduleTransactionListReload(ctx);
             }
         }
         catch (MalformedURLException e) {
