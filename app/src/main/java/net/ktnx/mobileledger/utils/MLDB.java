@@ -184,7 +184,7 @@ public final class MLDB {
 
 class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     public static final String DB_NAME = "mobile-ledger.db";
-    public static final int LATEST_REVISION = 10;
+    public static final int LATEST_REVISION = 11;
 
     private final Context mContext;
 
