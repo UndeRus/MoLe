@@ -1,0 +1,1 @@
+drop index un_profile_name;
