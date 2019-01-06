@@ -33,6 +33,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 
+import org.jetbrains.annotations.NonNls;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +49,8 @@ public final class MLDB {
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
     public static final String OPT_TRANSACTION_LIST_STAMP = "transaction_list_last_update";
     public static final String OPT_LAST_REFRESH = "last_refresh";
+    @NonNls
+    public static final String OPT_PROFILE_UUID = "profile_uuid";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
     private static Application context;
     private static void checkState() {

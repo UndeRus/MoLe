@@ -28,5 +28,5 @@ public final class Data {
     public static ObservableValue<List<String>> descriptions = new ObservableValue<>();
     public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
     public static ObservableValue<Date> lastUpdateDate = new ObservableValue<>();
-    public static ObservableValue<String> ledgerTitle = new ObservableValue<>();
+    public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -57,7 +57,7 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         task_callback = callback;
     }
     private boolean send_ok() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepare_connection(pref, "add");
+        HttpURLConnection http = NetworkUtil.prepare_connection("add");
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         http.setRequestProperty("Accept", "*/*");

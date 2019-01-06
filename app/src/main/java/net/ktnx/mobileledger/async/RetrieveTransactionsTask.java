@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.async;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.OperationCanceledException;
@@ -29,6 +28,7 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
@@ -48,11 +48,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class RetrieveTransactionsTask extends
-        AsyncTask<RetrieveTransactionsTask.Params, RetrieveTransactionsTask.Progress, Void> {
+public class RetrieveTransactionsTask
+        extends AsyncTask<Void, RetrieveTransactionsTask.Progress, Void> {
     public static final int MATCHING_TRANSACTIONS_LIMIT = 50;
     private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
-                                                                           "id=\"transaction-(\\d+)\"><td class=\"date\"[^\\\"]*>([\\d.-]+)</td>");
+                                                                           "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
     private static final Pattern transactionDetailsPattern =
@@ -60,14 +60,13 @@ public class RetrieveTransactionsTask extends
     private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
     protected WeakReference<MainActivity> contextRef;
     protected int error;
-    // %3A is '='
-    private Pattern ledger_title_re = Pattern.compile("<h1>([^<]+)</h1>");
     Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     Pattern account_value_re = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     Pattern tr_end_re = Pattern.compile("</tr>");
     Pattern descriptions_line_re = Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
     Pattern description_items_re = Pattern.compile("\"value\":\"([^\"]+)\"");
+    // %3A is '='
     private boolean success;
     public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef) {
         this.contextRef = contextRef;
@@ -105,7 +104,8 @@ public class RetrieveTransactionsTask extends
     }
     @SuppressLint("DefaultLocale")
     @Override
-    protected Void doInBackground(Params... params) {
+    protected Void doInBackground(Void... params) {
+        MobileLedgerProfile profile = Data.profile.get();
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
         success = false;
@@ -114,8 +114,7 @@ public class RetrieveTransactionsTask extends
         LedgerAccount lastAccount = null;
         Data.backgroundTaskCount.incrementAndGet();
         try {
-            HttpURLConnection http =
-                    NetworkUtil.prepare_connection(params[0].getBackendPref(), "journal");
+            HttpURLConnection http = NetworkUtil.prepare_connection("journal");
             http.setAllowUserInteraction(false);
             publishProgress(progress);
             MainActivity ctx = getContext();
@@ -167,13 +166,6 @@ public class RetrieveTransactionsTask extends
 
                                         state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
                                         L("→ expecting account amount");
-                                    }
-                                    else if (ledgerTitle == null) {
-                                        m = ledger_title_re.matcher(line);
-                                        if (m.find()) {
-                                            ledgerTitle = m.group(1);
-                                            Data.ledgerTitle.set(ledgerTitle);
-                                        }
                                     }
                                     break;
 
@@ -376,17 +368,6 @@ public class RetrieveTransactionsTask extends
     private enum ParserState {
         EXPECTING_ACCOUNT, EXPECTING_ACCOUNT_AMOUNT, EXPECTING_JOURNAL, EXPECTING_TRANSACTION,
         EXPECTING_TRANSACTION_DESCRIPTION, EXPECTING_TRANSACTION_DETAILS
-    }
-
-    public static class Params {
-        private SharedPreferences backendPref;
-
-        public Params(SharedPreferences backendPref) {
-            this.backendPref = backendPref;
-        }
-        SharedPreferences getBackendPref() {
-            return backendPref;
-        }
     }
 
     public class Progress {

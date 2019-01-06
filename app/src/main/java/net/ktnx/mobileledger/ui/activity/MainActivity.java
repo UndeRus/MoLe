@@ -18,10 +18,10 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.ColorInt;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -44,6 +44,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
@@ -55,6 +56,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     public MobileLedgerListFragment currentFragment = null;
@@ -94,6 +96,40 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Data.profile.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                MobileLedgerProfile profile = Data.profile.get();
+                runOnUiThread(() -> {
+                    if (profile == null) toolbar.setSubtitle("");
+                    else toolbar.setSubtitle(profile.getName());
+                });
+            }
+        });
+
+        String profileUUID = MLDB.get_option_value(MLDB.OPT_PROFILE_UUID, null);
+        if (profileUUID == null) {
+            SharedPreferences backend = getSharedPreferences("backend", MODE_PRIVATE);
+            Log.d("profiles", "Migrating from preferences to profiles");
+            // migration to multiple profiles
+            profileUUID = UUID.randomUUID().toString();
+            MobileLedgerProfile profile = new MobileLedgerProfile(profileUUID, "default",
+                    backend.getString("backend_url", ""),
+                    backend.getBoolean("backend_use_http_auth", false),
+                    backend.getString("backend_auth_user", null),
+                    backend.getString("backend_auth_password", null));
+            profile.storeInDB();
+            SharedPreferences.Editor editor = backend.edit();
+            editor.clear();
+            editor.apply();
+            Data.profile.set(profile);
+            MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, profileUUID);
+        }
+        else {
+            MobileLedgerProfile profile = MobileLedgerProfile.loadUUIDFromDB(profileUUID);
+            Data.profile.set(profile);
+        }
 
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle =
@@ -164,17 +200,6 @@ public class MainActivity extends AppCompatActivity {
                             tvLastUpdate.setText(date.toLocaleString());
                         }
                     }
-                });
-            }
-        });
-
-        Data.ledgerTitle.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                runOnUiThread(() -> {
-                    String title = Data.ledgerTitle.get();
-                    if (title == null) toolbar.setSubtitle("");
-                    else toolbar.setSubtitle(title);
                 });
             }
         });
@@ -321,10 +346,7 @@ public class MainActivity extends AppCompatActivity {
     public void scheduleTransactionListRetrieval() {
         retrieveTransactionsTask = new RetrieveTransactionsTask(new WeakReference<>(this));
 
-        RetrieveTransactionsTask.Params params = new RetrieveTransactionsTask.Params(
-                PreferenceManager.getDefaultSharedPreferences(this));
-
-        retrieveTransactionsTask.execute(params);
+        retrieveTransactionsTask.execute();
         bTransactionListCancelDownload.setEnabled(true);
     }
     public void onStopTransactionRefreshClick(View view) {

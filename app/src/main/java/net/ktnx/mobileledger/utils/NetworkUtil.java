@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,9 +17,11 @@
 
 package net.ktnx.mobileledger.utils;
 
-import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
+
+import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -27,16 +29,18 @@ import java.net.URL;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
-    public static HttpURLConnection prepare_connection(SharedPreferences pref, String path) throws
-            IOException {
-        final String backend_url = pref.getString("backend_url", "");
-        final boolean use_auth = pref.getBoolean("backend_use_http_auth", false);
-        Log.d("network", "Connecting to "+backend_url + "/" + path);
-        HttpURLConnection http = (HttpURLConnection) new URL(backend_url + "/" + path).openConnection();
+    public static HttpURLConnection prepare_connection(String path) throws IOException {
+        MobileLedgerProfile profile = Data.profile.get();
+        final String backend_url = profile.getUrl();
+        final boolean use_auth = profile.isUseAuthentication();
+        Log.d("network", "Connecting to " + backend_url + "/" + path);
+        HttpURLConnection http =
+                (HttpURLConnection) new URL(backend_url + "/" + path).openConnection();
         if (use_auth) {
-            final String auth_user = pref.getString("backend_auth_user", "");
-            final String auth_password = pref.getString("backend_auth_password", "");
-            final byte[] bytes = (String.format("%s:%s", auth_user, auth_password)).getBytes("UTF-8");
+            final String auth_user = profile.getAuthUserName();
+            final String auth_password = profile.getAuthPassword();
+            final byte[] bytes =
+                    (String.format("%s:%s", auth_user, auth_password)).getBytes("UTF-8");
             final String value = Base64.encodeToString(bytes, Base64.DEFAULT);
             http.setRequestProperty("Authorization", "Basic " + value);
         }
