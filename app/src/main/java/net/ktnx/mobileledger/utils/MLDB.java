@@ -190,9 +190,9 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     public static final String DB_NAME = "mobile-ledger.db";
     public static final int LATEST_REVISION = 11;
 
-    private final Context mContext;
+    private final Application mContext;
 
-    public MobileLedgerDatabase(Context context) {
+    public MobileLedgerDatabase(Application context) {
         super(context, DB_NAME, null, LATEST_REVISION);
         Log.d("db", "creating helper instance");
         mContext = context;
