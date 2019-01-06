@@ -1,0 +1,2 @@
+create table profiles(uuid varchar not null primary key, name not null, url not null, use_authentication boolean not null, auth_user varchar, auth_password varchar);
+create unique index un_profile_name on profiles(name);
