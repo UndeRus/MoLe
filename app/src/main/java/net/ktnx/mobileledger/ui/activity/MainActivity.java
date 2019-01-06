@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = findViewById(R.id.root_frame);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 switch (position) {
