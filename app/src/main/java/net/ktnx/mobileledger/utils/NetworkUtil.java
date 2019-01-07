@@ -32,7 +32,7 @@ public final class NetworkUtil {
     public static HttpURLConnection prepare_connection(String path) throws IOException {
         MobileLedgerProfile profile = Data.profile.get();
         final String backend_url = profile.getUrl();
-        final boolean use_auth = profile.isUseAuthentication();
+        final boolean use_auth = profile.isAuthEnabled();
         Log.d("network", "Connecting to " + backend_url + "/" + path);
         HttpURLConnection http =
                 (HttpURLConnection) new URL(backend_url + "/" + path).openConnection();

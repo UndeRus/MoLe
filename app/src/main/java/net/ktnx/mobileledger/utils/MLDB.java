@@ -33,6 +33,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 
+import net.ktnx.mobileledger.model.Data;
+
 import org.jetbrains.annotations.NonNls;
 
 import java.io.BufferedReader;
@@ -47,10 +49,10 @@ import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.WRITE;
 public final class MLDB {
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
-    public static final String OPT_TRANSACTION_LIST_STAMP = "transaction_list_last_update";
-    public static final String OPT_LAST_REFRESH = "last_refresh";
+    public static final String OPT_LAST_SCRAPE = "last_scrape";
     @NonNls
     public static final String OPT_PROFILE_UUID = "profile_uuid";
+    private static final String NO_PROFILE = "-";
     private static MobileLedgerDatabase helperForReading, helperForWriting;
     private static Application context;
     private static void checkState() {
@@ -98,8 +100,8 @@ public final class MLDB {
     static public String get_option_value(String name, String default_value) {
         Log.d("db", "about to fetch option " + name);
         SQLiteDatabase db = getReadableDatabase();
-        try (Cursor cursor = db
-                .rawQuery("select value from options where name=?", new String[]{name}))
+        try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
+                new String[]{NO_PROFILE, name}))
         {
             if (cursor.moveToFirst()) {
                 String result = cursor.getString(0);
@@ -117,18 +119,19 @@ public final class MLDB {
         }
     }
     static public void set_option_value(String name, String value) {
-        Log.d("db", "setting option " + name + "=" + value);
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("insert or replace into options(name, value) values(?, ?);",
-                new String[]{name, value});
+        Log.d("option", String.format("%s := %s", name, value));
+        SQLiteDatabase db = MLDB.getWritableDatabase();
+        db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
+                new String[]{NO_PROFILE, name, value});
     }
     static public void set_option_value(String name, long value) {
-        set_option_value(name, String.valueOf(value));
+        set_option_value(name, value);
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hook_autocompletion_adapter(final Context context,
                                                    final AutoCompleteTextView view,
-                                                   final String table, final String field) {
+                                                   final String table, final String field,
+                                                   final boolean profileSpecific) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
         SimpleCursorAdapter adapter =
@@ -146,15 +149,30 @@ public final class MLDB {
                 String[] col_names = {FontsContract.Columns._ID, field};
                 MatrixCursor c = new MatrixCursor(col_names);
 
+                String sql;
+                String[] params;
+                if (profileSpecific) {
+                    sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                                        "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " +
+                                        "else 9 end " + "FROM %s " +
+                                        "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
+                                        "ORDER BY 2, 1;", field, field, field, field, table, field);
+                    params = new String[]{str, str, str, Data.profile.get().getUuid(), str};
+                }
+                else {
+                    sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                                        "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " +
+                                        "else 9 end " + "FROM %s " +
+                                        "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;",
+                            field, field, field, field, table, field);
+                    params = new String[]{str, str, str, str};
+                }
+                Log.d("autocompletion", sql);
                 SQLiteDatabase db = MLDB.getReadableDatabase();
 
-                try (Cursor matches = db.rawQuery(String.format(
-                        "SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                        "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " + "FROM %s " +
-                        "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;", field, field,
-                        field, field, table, field), new String[]{str, str, str, str}))
-                {
+                try (Cursor matches = db.rawQuery(sql, params)) {
                     int i = 0;
                     while (matches.moveToNext()) {
                         String match = matches.getString(0);
@@ -177,8 +195,7 @@ public final class MLDB {
         MLDB.context = context;
     }
     public static void done() {
-        if (helperForReading != null)
-            helperForReading.close();
+        if (helperForReading != null) helperForReading.close();
 
         if ((helperForWriting != helperForReading) && (helperForWriting != null))
             helperForWriting.close();
@@ -188,7 +205,7 @@ public final class MLDB {
 
 class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     public static final String DB_NAME = "mobile-ledger.db";
-    public static final int LATEST_REVISION = 11;
+    public static final int LATEST_REVISION = 15;
 
     private final Application mContext;
 
@@ -225,8 +242,25 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
             BufferedReader reader = new BufferedReader(isr);
 
             String line;
+            int line_no = 1;
             while ((line = reader.readLine()) != null) {
-                db.execSQL(line);
+                if (line.startsWith("--")) {
+                    line_no++;
+                    continue;
+                }
+                if (line.isEmpty()) {
+                    line_no++;
+                    continue;
+                }
+                try {
+                    db.execSQL(line);
+                }
+                catch (Exception e) {
+                    throw new RuntimeException(
+                            String.format("Error applying revision %d, line %d", rev_no, line_no),
+                            e);
+                }
+                line_no++;
             }
 
             db.setTransactionSuccessful();

@@ -32,6 +32,7 @@ import java.util.List;
 public class UpdateTransactionsTask extends AsyncTask<String, Void, List<LedgerTransaction>> {
     protected List<LedgerTransaction> doInBackground(String[] filterAccName) {
         Data.backgroundTaskCount.incrementAndGet();
+        String profile_uuid = Data.profile.get().getUuid();
         try {
             ArrayList<LedgerTransaction> newList = new ArrayList<>();
 
@@ -41,26 +42,29 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, List<LedgerT
             String sql;
             String[] params;
 
-            sql = "SELECT id FROM transactions  ORDER BY date desc, id desc";
-            params = null;
+            sql = "SELECT id FROM transactions WHERE profile=? ORDER BY date desc, id desc";
+            params = new String[]{profile_uuid};
 
             if (hasFilter) {
                 sql = "SELECT distinct tr.id from transactions tr JOIN transaction_accounts ta " +
-                      "ON ta.transaction_id=tr.id WHERE ta.account_name LIKE ?||'%' AND ta" +
+                      "ON ta.transaction_id=tr.id AND ta.profile=tr.profile WHERE tr.profile=? " +
+                      "and ta" + ".account_name LIKE ?||'%' AND ta" +
                       ".amount <> 0 ORDER BY tr.date desc, tr.id desc";
                 params = filterAccName;
             }
 
-            Log.d("tmp", sql);
+            Log.d("UTT", sql);
             SQLiteDatabase db = MLDB.getReadableDatabase();
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
                     if (isCancelled()) return null;
 
-                    newList.add(new LedgerTransaction(cursor.getInt(0)));
+                    int transaction_id = cursor.getInt(0);
+                    newList.add(new LedgerTransaction(transaction_id));
+                    Log.d("UTT", String.format("got transaction %d", transaction_id));
                 }
                 Data.transactions.set(newList);
-                Log.d("transactions", "transaction value updated");
+                Log.d("UTT", "transaction list value updated");
             }
 
             return newList;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -50,7 +50,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         // a bit longer
         if (tr == null) return;
 
-        Log.d("transactions", String.format("Filling position %d", position));
+        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
+                tr.getAccounts().size()));
 
         TransactionLoader loader = new TransactionLoader();
         loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName));
@@ -91,6 +92,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
+                Log.d("tmp", String.format("publishing tr %d acc %s %1.2f", tr.getId(),
+                        acc.getAccountName(), acc.getAmount()));
                 publishProgress(new TransactionLoaderStep(p[0].holder, acc, rowIndex++,
                         p[0].boldAccountName));
             }
@@ -155,6 +158,9 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
                     accName.setText(acc.getAccountName());
                     accAmount.setText(acc.toString());
+
+                    Log.d("tmp", String.format("showing acc row %d: %s %1.2f", rowIndex,
+                            acc.getAccountName(), acc.getAmount()));
 
                     String boldAccountName = step.getBoldAccountName();
                     if ((boldAccountName != null) && boldAccountName.equals(acc.getAccountName())) {

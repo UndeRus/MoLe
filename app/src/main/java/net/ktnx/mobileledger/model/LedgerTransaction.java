@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -41,11 +41,15 @@ public class LedgerTransaction {
                     return Float.compare(o1.getAmount(), o2.getAmount());
                 }
             };
+    private String profile;
     private Integer id;
     private String date;
     private String description;
     private ArrayList<LedgerTransactionAccount> accounts;
+    private String dataHash;
+    private boolean dataLoaded;
     public LedgerTransaction(Integer id, String date, String description) {
+        this.profile = Data.profile.get().getUuid();
         this.id = id;
         this.date = date;
         this.description = description;
@@ -53,16 +57,14 @@ public class LedgerTransaction {
         this.dataHash = null;
         dataLoaded = false;
     }
-    private String dataHash;
-    private boolean dataLoaded;
-    public ArrayList<LedgerTransactionAccount> getAccounts() {
-        return accounts;
-    }
     public LedgerTransaction(String date, String description) {
         this(null, date, description);
     }
     public LedgerTransaction(int id) {
         this(id, null, null);
+    }
+    public ArrayList<LedgerTransactionAccount> getAccounts() {
+        return accounts;
     }
     public void addAccount(LedgerTransactionAccount item) {
         accounts.add(item);
@@ -85,22 +87,12 @@ public class LedgerTransaction {
     public int getId() {
         return id;
     }
-    public void insertInto(SQLiteDatabase db) {
-        fillDataHash();
-        db.execSQL("INSERT INTO transactions(id, date, description, data_hash) values(?,?,?,?)",
-                new Object[]{id, date, description, dataHash});
-
-        for (LedgerTransactionAccount item : accounts) {
-            db.execSQL("INSERT INTO transaction_accounts(transaction_id, account_name, amount, " +
-                       "currency) values(?, ?, ?, ?)",
-                    new Object[]{id, item.getAccountName(), item.getAmount(), item.getCurrency()});
-        }
-    }
-    private void fillDataHash() {
+    protected void fillDataHash() {
         if (dataHash != null) return;
         try {
             Digest sha = new Digest(DIGEST_TYPE);
             StringBuilder data = new StringBuilder();
+            data.append(profile);
             data.append(getId());
             data.append('\0');
             data.append(getDescription());
@@ -134,26 +126,37 @@ public class LedgerTransaction {
     public void loadData(SQLiteDatabase db) {
         if (dataLoaded) return;
 
-        try (Cursor cTr = db.rawQuery("SELECT date, description from transactions WHERE id=?",
-                new String[]{String.valueOf(id)}))
+        try (Cursor cTr = db
+                .rawQuery("SELECT date, description from transactions WHERE profile=? AND id=?",
+                        new String[]{profile, String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
                 date = cTr.getString(0);
                 description = cTr.getString(1);
 
                 try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +
-                                               "transaction_accounts WHERE transaction_id = ?",
-                        new String[]{String.valueOf(id)}))
+                                               "transaction_accounts WHERE " +
+                                               "profile=? AND transaction_id = ?",
+                        new String[]{profile, String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {
+//                        Log.d("transactions",
+//                                String.format("Loaded %d: %s %1.2f %s", id, cAcc.getString(0),
+//                                        cAcc.getFloat(1), cAcc.getString(2)));
                         addAccount(new LedgerTransactionAccount(cAcc.getString(0), cAcc.getFloat(1),
                                 cAcc.getString(2)));
                     }
 
-                    dataLoaded = true;
+                    finishLoading();
                 }
             }
         }
 
+    }
+    public String getDataHash() {
+        return dataHash;
+    }
+    public void finishLoading() {
+        dataLoaded = true;
     }
 }

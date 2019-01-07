@@ -160,7 +160,7 @@ public class RetrieveTransactionsTask
                                         acct_name = acct_name.replace("\"", "");
                                         L(String.format("found account: %s", acct_name));
 
-                                        addAccount(db, acct_name);
+                                        profile.storeAccount(acct_name);
                                         lastAccount = new LedgerAccount(acct_name);
                                         accountList.add(lastAccount);
 
@@ -181,11 +181,8 @@ public class RetrieveTransactionsTask
                                         if (currency == null) currency = "";
                                         value = value.replace(',', '.');
                                         L("curr=" + currency + ", value=" + value);
-                                        db.execSQL(
-                                                "insert or replace into account_values(account, currency, value, keep) values(?, ?, ?, 1);",
-                                                new Object[]{lastAccount.getName(), currency,
-                                                             Float.valueOf(value)
-                                                });
+                                        profile.storeAccountValue(lastAccount.getName(), currency,
+                                                Float.valueOf(value));
                                         lastAccount.addAmount(Float.parseFloat(value), currency);
                                     }
 
@@ -244,16 +241,21 @@ public class RetrieveTransactionsTask
                                     if (line.isEmpty()) {
                                         // transaction data collected
                                         if (transaction.existsInDb(db)) {
-                                            db.execSQL("UPDATE transactions SET keep = 1 WHERE id" +
-                                                       "=?", new Integer[]{transaction.getId()});
+                                            db.execSQL("UPDATE transactions SET keep = 1 WHERE " +
+                                                       "profile = ? and id=?",
+                                                    new Object[]{profile.getUuid(),
+                                                                 transaction.getId()
+                                                    });
                                             matchedTransactionsCount++;
 
                                             if (matchedTransactionsCount ==
                                                 MATCHING_TRANSACTIONS_LIMIT)
                                             {
                                                 db.execSQL("UPDATE transactions SET keep=1 WHERE " +
-                                                           "id < ?",
-                                                        new Integer[]{transaction.getId()});
+                                                           "profile = ? and id < ?",
+                                                        new Object[]{profile.getUuid(),
+                                                                     transaction.getId()
+                                                        });
                                                 success = true;
                                                 progress.setTotal(progress.getProgress());
                                                 publishProgress(progress);
@@ -261,12 +263,7 @@ public class RetrieveTransactionsTask
                                             }
                                         }
                                         else {
-                                            db.execSQL("DELETE from transactions WHERE id=?",
-                                                    new Integer[]{transaction.getId()});
-                                            db.execSQL("DELETE from transaction_accounts WHERE " +
-                                                       "transaction_id=?",
-                                                    new Integer[]{transaction.getId()});
-                                            transaction.insertInto(db);
+                                            profile.storeTransaction(transaction);
                                             matchedTransactionsCount = 0;
                                             progress.setTotal(maxTransactionId);
                                         }
@@ -275,6 +272,7 @@ public class RetrieveTransactionsTask
                                         L(String.format(
                                                 "transaction %s saved → expecting transaction",
                                                 transaction.getId()));
+                                        transaction.finishLoading();
                                         transactionList.add(transaction);
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
@@ -291,11 +289,13 @@ public class RetrieveTransactionsTask
                                             String acc_name = m.group(1);
                                             String amount = m.group(2);
                                             String currency = m.group(3);
+                                            if (currency == null) currency = "";
                                             amount = amount.replace(',', '.');
                                             transaction.addAccount(
                                                     new LedgerTransactionAccount(acc_name,
                                                             Float.valueOf(amount), currency));
-                                            L(String.format("%s = %s", acc_name, amount));
+                                            L(String.format("%d: %s = %s", transaction.getId(),
+                                                    acc_name, amount));
                                         }
                                         else throw new IllegalStateException(
                                                 String.format("Can't parse transaction %d details",
@@ -311,12 +311,13 @@ public class RetrieveTransactionsTask
 
                         throwIfCancelled();
 
-                        db.execSQL("DELETE FROM transactions WHERE keep = 0");
+                        db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0",
+                                new String[]{profile.getUuid()});
                         db.setTransactionSuccessful();
 
                         Log.d("db", "Updating transaction value stamp");
                         Date now = new Date();
-                        MLDB.set_option_value(MLDB.OPT_TRANSACTION_LIST_STAMP, now.getTime());
+                        profile.set_option_value(MLDB.OPT_LAST_SCRAPE, now.getTime());
                         Data.lastUpdateDate.set(now);
                         Data.transactions.set(transactionList);
                     }
@@ -349,17 +350,6 @@ public class RetrieveTransactionsTask
     }
     private MainActivity getContext() {
         return contextRef.get();
-    }
-    private void addAccount(SQLiteDatabase db, String name) {
-        do {
-            LedgerAccount acc = new LedgerAccount(name);
-            db.execSQL("update accounts set level = ?, keep = 1 where name = ?",
-                    new Object[]{acc.getLevel(), name});
-            db.execSQL("insert into accounts(name, name_upper, parent_name, level) select ?,?," +
-                       "?,? " + "where (select changes() = 0)",
-                    new Object[]{name, name.toUpperCase(), acc.getParentName(), acc.getLevel()});
-            name = acc.getParentName();
-        } while (name != null);
     }
     private void throwIfCancelled() {
         if (isCancelled()) throw new OperationCanceledException(null);

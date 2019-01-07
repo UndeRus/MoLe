@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -56,4 +56,12 @@
     <string name="err_bad_auth">Грешно потребителско име или парола</string>
     <string name="new_transaction_amount_hint">0,00</string>
     <string name="transactions_last_update_label">Данни към:</string>
+    <string name="title_profile_list">Профили</string>
+    <string name="profiles">Профили</string>
+    <string name="title_profile_details">Данни за профила</string>
+    <string name="transaction_last_update_never">никога</string>
+    <string name="err_cancelled">Операцията е прекъсната</string>
+    <string name="title_activity_transaction_list">Трансакции</string>
+    <string name="err_http_error">Грешка в HTTP</string>
+    <string name="new_profile_title">Нов профил</string>
 </resources>

@@ -241,6 +241,15 @@
                         app:layout_constraintBottom_toBottomOf="parent">
 
                         <TextView
+                            android:id="@+id/nav_profiles"
+                            style="@style/nav_button"
+                            android:layout_width="match_parent"
+                            android:layout_weight="1"
+                            android:drawableStart="@drawable/ic_view_list_black_24dp"
+                            android:onClick="nav_profiles_clicked"
+                            android:text="@string/profiles" />
+
+                        <TextView
                             android:id="@+id/textView2"
                             style="@style/nav_button"
                             android:layout_weight="1"

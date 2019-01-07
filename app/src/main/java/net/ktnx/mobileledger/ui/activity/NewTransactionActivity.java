@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -43,13 +42,13 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
+import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Date;
@@ -91,7 +90,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         });
         text_descr = findViewById(R.id.new_transaction_description);
         MLDB.hook_autocompletion_adapter(this, text_descr, MLDB.DESCRIPTION_HISTORY_TABLE,
-                "description");
+                "description", false);
         hook_text_change_listener(text_descr);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -103,7 +102,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
             TextView amount_view = (TextView) row.getChildAt(1);
             hook_swipe_listener(row);
-            MLDB.hook_autocompletion_adapter(this, acc_name_view, MLDB.ACCOUNTS_TABLE, "name");
+            MLDB.hook_autocompletion_adapter(this, acc_name_view, MLDB.ACCOUNTS_TABLE, "name",
+                    true);
             hook_text_change_listener(acc_name_view);
             hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
@@ -139,7 +139,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         saver = new SaveTransactionTask(this);
 
-        saver.setPref(PreferenceManager.getDefaultSharedPreferences(this));
         String date = text_date.getText().toString();
         if (date.isEmpty()) date = String.valueOf(new Date().getDate());
         LedgerTransaction tr = new LedgerTransaction(date, text_descr.getText().toString());
@@ -300,7 +299,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
-        MLDB.hook_autocompletion_adapter(this, acc, MLDB.ACCOUNTS_TABLE, "name");
+        MLDB.hook_autocompletion_adapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true);
         hook_text_change_listener(acc);
         hook_text_change_listener(amt);
     }

@@ -13,7 +13,7 @@
   ~
   ~ You should have received a copy of the GNU General Public License
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
--->
+  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.ktnx.mobileledger">
 
@@ -54,6 +54,19 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.ktnx.mobileledger.ui.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.activity.ProfileListActivity"
+            android:label="@string/title_profile_list"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ui.profiles.ProfileDetailActivity"
+            android:label="@string/title_profile_details"
+            android:parentActivityName=".ui.activity.ProfileListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.ktnx.mobileledger.ui.activity.ProfileListActivity" />
         </activity>
     </application>
 

@@ -158,7 +158,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         accNameFilter = mActivity.findViewById(R.id.transaction_filter_account_name);
 
         TransactionListFragment me = this;
-        MLDB.hook_autocompletion_adapter(mActivity, accNameFilter, "accounts", "name");
+        MLDB.hook_autocompletion_adapter(mActivity, accNameFilter, "accounts", "name", true);
         accNameFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -176,6 +176,16 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             onShowFilterClick(null);
             Log.d("flow", String.format("Account filter set to '%s'", mShowOnlyAccountName));
         }
+
+        Data.profile.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                mActivity.runOnUiThread(() -> {
+                    Log.d("transactions", "requesting list reload");
+                    TransactionListViewModel.scheduleTransactionListReload(mActivity);
+                });
+            }
+        });
 
         TransactionListViewModel.scheduleTransactionListReload(mActivity);
         TransactionListViewModel.updating.addObserver(new Observer() {

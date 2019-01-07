@@ -31,21 +31,22 @@ import java.util.ArrayList;
 public class UpdateAccountsTask extends AsyncTask<Boolean, Void, ArrayList<LedgerAccount>> {
     protected ArrayList<LedgerAccount> doInBackground(Boolean[] onlyStarred) {
         Data.backgroundTaskCount.incrementAndGet();
+        String profileUUID = Data.profile.get().getUuid();
         try {
             ArrayList<LedgerAccount> newList = new ArrayList<>();
 
-            String sql = "SELECT name, hidden FROM accounts";
-            if (onlyStarred[0]) sql += " WHERE hidden = 0";
+            String sql = "SELECT name, hidden FROM accounts WHERE profile = ?";
+            if (onlyStarred[0]) sql += " AND hidden = 0";
             sql += " ORDER BY name";
 
             SQLiteDatabase db = MLDB.getReadableDatabase();
-            try (Cursor cursor = db.rawQuery(sql, null)) {
+            try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
                 while (cursor.moveToNext()) {
                     LedgerAccount acc = new LedgerAccount(cursor.getString(0));
                     acc.setHidden(cursor.getInt(1) == 1);
                     try (Cursor c2 = db.rawQuery(
-                            "SELECT value, currency FROM account_values " + "WHERE account = ?",
-                            new String[]{acc.getName()}))
+                            "SELECT value, currency FROM account_values WHERE profile = ? " +
+                            "AND account = ?", new String[]{profileUUID, acc.getName()}))
                     {
                         while (c2.moveToNext()) {
                             acc.addAmount(c2.getFloat(0), c2.getString(1));

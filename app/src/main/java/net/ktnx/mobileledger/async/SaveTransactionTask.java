@@ -17,10 +17,10 @@
 
 package net.ktnx.mobileledger.async;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.NetworkUtil;
@@ -47,11 +47,6 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     private String backend_url;
     private LedgerTransaction ltr;
     protected String error;
-
-    private SharedPreferences pref;
-    public void setPref(SharedPreferences pref) {
-        this.pref = pref;
-    }
 
     public SaveTransactionTask(TaskCallback callback) {
         task_callback = callback;
@@ -140,7 +135,7 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
         error = null;
         try {
-            backend_url = pref.getString("backend_url", "");
+            backend_url = Data.profile.get().getUrl();
             ltr = ledgerTransactions[0];
 
             int tried = 0;
