@@ -51,12 +51,13 @@ import java.util.regex.Pattern;
 public class RetrieveTransactionsTask
         extends AsyncTask<Void, RetrieveTransactionsTask.Progress, Void> {
     public static final int MATCHING_TRANSACTIONS_LIMIT = 50;
+    public static final Pattern commentPattern = Pattern.compile("^\\s*;");
     private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
                                                                            "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
     private static final Pattern transactionDetailsPattern =
-            Pattern.compile("^\\s+" + "(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
+            Pattern.compile("^\\s+(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
     protected WeakReference<MainActivity> contextRef;
     protected int error;
@@ -144,6 +145,12 @@ public class RetrieveTransactionsTask
                         while ((line = buf.readLine()) != null) {
                             throwIfCancelled();
                             Matcher m;
+                            m = commentPattern.matcher(line);
+                            if (m.find()) {
+                                // TODO: comments are ignored for now
+                                Log.v("transaction-parser", "Ignoring comment");
+                                continue;
+                            }
                             //L(String.format("State is %d", updating));
                             switch (state) {
                                 case EXPECTING_ACCOUNT:
@@ -297,9 +304,9 @@ public class RetrieveTransactionsTask
                                             L(String.format("%d: %s = %s", transaction.getId(),
                                                     acc_name, amount));
                                         }
-                                        else throw new IllegalStateException(
-                                                String.format("Can't parse transaction %d details",
-                                                        transactionId));
+                                        else throw new IllegalStateException(String.format(
+                                                "Can't parse transaction %d " + "details: %s",
+                                                transactionId, line));
                                     }
                                     break;
                                 default:
