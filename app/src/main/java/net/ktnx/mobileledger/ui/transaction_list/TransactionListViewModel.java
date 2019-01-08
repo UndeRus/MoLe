@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.ObservableValue;
+import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.List;
 

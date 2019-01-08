@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.model;
+package net.ktnx.mobileledger.utils;
 
 import java.util.Observable;
 import java.util.Observer;

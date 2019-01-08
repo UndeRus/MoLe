@@ -15,7 +15,7 @@
  * along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.model;
+package net.ktnx.mobileledger.utils;
 
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -31,7 +31,7 @@ public class ObservableAtomicInteger extends Observable {
         super();
         holder = new AtomicInteger();
     }
-    ObservableAtomicInteger(int initialValue) {
+    public ObservableAtomicInteger(int initialValue) {
         this();
         holder.set(initialValue);
     }

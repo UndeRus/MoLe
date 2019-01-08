@@ -17,6 +17,9 @@
 
 package net.ktnx.mobileledger.model;
 
+import net.ktnx.mobileledger.utils.ObservableAtomicInteger;
+import net.ktnx.mobileledger.utils.ObservableValue;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

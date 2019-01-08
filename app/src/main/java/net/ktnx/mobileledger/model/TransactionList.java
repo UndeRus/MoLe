@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.model;
 
+import net.ktnx.mobileledger.utils.ObservableValue;
+
 import java.util.List;
 
 public class TransactionList extends ObservableValue<List<LedgerTransaction>> {
