@@ -50,9 +50,7 @@ import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_O
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
-    private static long account_list_last_updated;
-    private static boolean account_list_needs_update = true;
-    MenuItem mShowHiddenAccounts;
+    MenuItem mShowOnlyStarred;
     SharedPreferences.OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener;
     private AccountSummaryViewModel model;
     private AccountSummaryAdapter modelAdapter;
@@ -61,7 +59,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     private Observer backgroundTaskCountObserver;
     @Override
     public void onDestroy() {
-        if(backgroundTaskCountObserver!= null) {
+        if (backgroundTaskCountObserver != null) {
             Log.d("acc", "destroying background task count observer");
             Data.backgroundTaskCount.deleteObserver(backgroundTaskCountObserver);
         }
@@ -187,18 +185,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         model.scheduleAccountListReload(this.getContext());
     }
-    public void onShowOnlyStarredClicked(MenuItem mi) {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        boolean flag = pref.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
-
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, !flag);
-        Log.d("pref", "Setting show only starred accounts pref to " + (flag ? "false" : "true"));
-        editor.apply();
-
-        update_account_table();
-    }
-
     void stopSelection() {
         modelAdapter.stopSelection();
         if (optMenu != null) {
@@ -223,16 +209,34 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         inflater.inflate(R.menu.account_summary, menu);
         optMenu = menu;
 
-        mShowHiddenAccounts = menu.findItem(R.id.menu_acc_summary_only_starred);
-        if (mShowHiddenAccounts == null) throw new AssertionError();
+        mShowOnlyStarred = menu.findItem(R.id.menu_acc_summary_only_starred);
+        if (mShowOnlyStarred == null) throw new AssertionError();
 
-        sBindPreferenceSummaryToValueListener = (preference, value) -> mShowHiddenAccounts
-                .setChecked(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mActivity);
-        pref.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        Data.optShowOnlyStarred.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                boolean newValue = Data.optShowOnlyStarred.get();
+                Log.d("pref", String.format("pref change came (%s)", newValue ? "true" : "false"));
+                mShowOnlyStarred.setChecked(newValue);
+                update_account_table();
+            }
+        });
 
-        mShowHiddenAccounts.setChecked(pref.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
+        mShowOnlyStarred.setChecked(Data.optShowOnlyStarred.get());
 
-        Log.d("menu", "MainActivity: onCreateOptionsMenu called");
+        Log.d("menu", "Accounts: onCreateOptionsMenu called");
+
+        mShowOnlyStarred.setOnMenuItemClickListener(item -> {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mActivity);
+            SharedPreferences.Editor editor = pref.edit();
+            boolean flag = item.isChecked();
+            editor.putBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, !flag);
+            Log.d("pref",
+                    "Setting show only starred accounts pref to " + (flag ? "false" : "true"));
+            editor.apply();
+
+
+            return true;
+        });
     }
 }

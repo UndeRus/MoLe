@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -25,7 +25,6 @@
         android:id="@+id/menu_acc_summary_only_starred"
         android:checkable="true"
         android:checked="false"
-        android:onClick="onOptionsMenuClicked"
         android:title="@string/menu_acc_summary_show_only_starred_title"
         app:actionLayout="@layout/switch_item"
         app:showAsAction="never" />
@@ -34,18 +33,15 @@
         android:title="@string/menu_acc_summary_hide_selected_title"
         app:showAsAction="always"
         android:visible="false"
-        android:onClick="onOptionsMenuClicked"
         />
     <item android:id="@+id/menu_acc_summary_cancel_selection"
         android:title="@string/menu_acc_summary_cancel_selection_title"
         app:showAsAction="always"
         android:visible="false"
-        android:onClick="onOptionsMenuClicked"
         android:icon="@drawable/ic_cancel_white_24dp" />
     <item android:id="@+id/menu_acc_summary_confirm_selection"
         android:title="@string/menu_acc_summary_confirm_selection_title"
         app:showAsAction="always"
         android:visible="false"
-        android:onClick="onOptionsMenuClicked"
         android:icon="@drawable/ic_check_white_24dp" />
 </menu>

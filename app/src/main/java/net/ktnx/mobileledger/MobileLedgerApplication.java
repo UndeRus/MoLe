@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,12 +18,17 @@
 package net.ktnx.mobileledger;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
+
+import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
 public class MobileLedgerApplication extends Application {
 
@@ -32,6 +37,13 @@ public class MobileLedgerApplication extends Application {
         super.onCreate();
         updateColorValues();
         MLDB.init(this);
+        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
+        Data.optShowOnlyStarred.set(p.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
+        SharedPreferences.OnSharedPreferenceChangeListener handler = (preference, value) -> {
+            Data.optShowOnlyStarred
+                    .set(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
+        };
+        p.registerOnSharedPreferenceChangeListener(handler);
     }
     @Override
     public void onTerminate() {

@@ -33,4 +33,5 @@ public final class Data {
     public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
     public static ObservableList<MobileLedgerProfile> profiles =
             new ObservableList<>(new ArrayList<>());
+    public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
 }

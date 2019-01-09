@@ -33,8 +33,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -263,29 +261,6 @@ public class MainActivity extends AppCompatActivity {
             if (view.getId() != id) {
                 view.setBackgroundColor(transparent);
             }
-        }
-    }
-    public void onOptionsMenuClicked(MenuItem menuItem) {
-        ContextMenu.ContextMenuInfo info = menuItem.getMenuInfo();
-        switch (menuItem.getItemId()) {
-            case R.id.menu_acc_summary_cancel_selection:
-                if (accountSummaryFragment != null)
-                    accountSummaryFragment.onCancelAccSelection(menuItem);
-                break;
-            case R.id.menu_acc_summary_confirm_selection:
-                if (accountSummaryFragment != null)
-                    accountSummaryFragment.onConfirmAccSelection(menuItem);
-                break;
-            case R.id.menu_acc_summary_only_starred:
-                if (accountSummaryFragment != null)
-                    accountSummaryFragment.onShowOnlyStarredClicked(menuItem);
-                break;
-            case R.id.menu_transaction_list_filter:
-                if (transactionListFragment != null)
-                    transactionListFragment.onShowFilterClick(menuItem);
-                break;
-            default:
-                Log.e("menu", String.format("Menu item %d not handled", menuItem.getItemId()));
         }
     }
     public void onViewClicked(View view) {
