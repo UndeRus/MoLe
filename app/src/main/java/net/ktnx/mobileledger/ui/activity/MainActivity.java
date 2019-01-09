@@ -52,6 +52,7 @@ import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
+import java.text.DateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -161,26 +162,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Data.lastUpdateDate.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                Log.d("main", "lastUpdateDate changed");
-                runOnUiThread(() -> {
-                    Date date = Data.lastUpdateDate.get();
-                    if (date == null) {
-                        tvLastUpdate.setText(R.string.transaction_last_update_never);
+        Data.lastUpdateDate.addObserver((o, arg) -> {
+            Log.d("main", "lastUpdateDate changed");
+            runOnUiThread(() -> {
+                Date date = Data.lastUpdateDate.get();
+                if (date == null) {
+                    tvLastUpdate.setText(R.string.transaction_last_update_never);
+                }
+                else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
+                                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
                     }
                     else {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
-                                    .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                        }
-                        else {
-                            tvLastUpdate.setText(date.toLocaleString());
-                        }
+                        tvLastUpdate.setText(DateFormat.getDateTimeInstance().format(date));
                     }
-                });
-            }
+                }
+            });
         });
     }
     private void setupProfile() {
