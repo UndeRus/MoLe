@@ -41,6 +41,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -383,6 +384,8 @@ public class MainActivity extends AppCompatActivity {
     public void onRetrieveDone(boolean success) {
         progressLayout.setVisibility(View.GONE);
         updateLastUpdateTextFromDB();
+
+        new RefreshDescriptionsTask().execute();
     }
     public void onRetrieveStart() {
         progressBar.setIndeterminate(true);
