@@ -52,8 +52,8 @@ import java.util.regex.Pattern;
 
 public class RetrieveTransactionsTask
         extends AsyncTask<Void, RetrieveTransactionsTask.Progress, Void> {
-    public static final int MATCHING_TRANSACTIONS_LIMIT = 50;
-    public static final Pattern commentPattern = Pattern.compile("^\\s*;");
+    private static final int MATCHING_TRANSACTIONS_LIMIT = 50;
+    private static final Pattern commentPattern = Pattern.compile("^\\s*;");
     private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
                                                                            "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
     private static final Pattern transactionDescriptionPattern =
@@ -61,20 +61,17 @@ public class RetrieveTransactionsTask
     private static final Pattern transactionDetailsPattern =
             Pattern.compile("^\\s+(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
-    protected WeakReference<MainActivity> contextRef;
-    protected int error;
-    Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
-    Pattern account_value_re = Pattern.compile(
-            "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
-    Pattern tr_end_re = Pattern.compile("</tr>");
-    Pattern descriptions_line_re = Pattern.compile("\\bdescriptionsSuggester\\s*=\\s*new\\b");
-    Pattern description_items_re = Pattern.compile("\"value\":\"([^\"]+)\"");
+    private WeakReference<MainActivity> contextRef;
+    private int error;
     // %3A is '='
     private boolean success;
+    private Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
+    private Pattern account_value_re = Pattern.compile(
+            "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef) {
         this.contextRef = contextRef;
     }
-    private static final void L(String msg) {
+    private static void L(String msg) {
         Log.d("transaction-parser", msg);
     }
     @Override
@@ -129,8 +126,6 @@ public class RetrieveTransactionsTask
                             String.format("HTTP error %d", http.getResponseCode()));
                     db.beginTransaction();
                     try {
-                        String ledgerTitle = null;
-
                         db.execSQL("UPDATE transactions set keep=0");
                         db.execSQL("update account_values set keep=0;");
                         db.execSQL("update accounts set keep=0;");
