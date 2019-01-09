@@ -32,6 +32,7 @@ public class CommitAccountsTask
     protected ArrayList<LedgerAccount> doInBackground(CommitAccountsTaskParams... params) {
         Data.backgroundTaskCount.incrementAndGet();
         ArrayList<LedgerAccount> newList = new ArrayList<>();
+        String profile = Data.profile.get().getUuid();
         try {
 
             SQLiteDatabase db = MLDB.getWritableDatabase();
@@ -40,8 +41,8 @@ public class CommitAccountsTask
                 for (LedgerAccount acc : params[0].accountList) {
                     Log.d("db", String.format("Setting %s to %s", acc.getName(),
                             acc.isHidden() ? "hidden" : "starred"));
-                    db.execSQL("UPDATE accounts SET hidden=? WHERE name=?",
-                            new Object[]{acc.isHiddenToBe() ? 1 : 0, acc.getName()});
+                    db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
+                            new Object[]{acc.isHiddenToBe() ? 1 : 0, profile, acc.getName()});
 
                     acc.setHidden(acc.isHiddenToBe());
                     if (!params[0].showOnlyStarred || !acc.isHidden()) newList.add(acc);

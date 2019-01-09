@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -42,24 +41,18 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 
 import java.util.ArrayList;
 
-import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
-
 class AccountSummaryViewModel extends ViewModel {
-    void scheduleAccountListReload(Context context) {
-        boolean showingOnlyStarred = PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
-
-        UAT task = new UAT();
-        task.execute(showingOnlyStarred);
-
-    }
     static void commitSelections(Context context) {
-        boolean showingOnlyStarred = PreferenceManager.getDefaultSharedPreferences(context)
-                .getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false);
         CAT task = new CAT();
-        //noinspection unchecked
-        task.execute(new CommitAccountsTaskParams(Data.accounts.get(), showingOnlyStarred));
+        task.execute(
+                new CommitAccountsTaskParams(Data.accounts.get(), Data.optShowOnlyStarred.get()));
     }
+    void scheduleAccountListReload() {
+        UAT task = new UAT();
+        task.execute();
+
+    }
+
     private static class UAT extends UpdateAccountsTask {
         @Override
         protected void onPostExecute(ArrayList<LedgerAccount> list) {
@@ -70,6 +63,7 @@ class AccountSummaryViewModel extends ViewModel {
             }
         }
     }
+
     private static class CAT extends CommitAccountsTask {
         @Override
         protected void onPostExecute(ArrayList<LedgerAccount> list) {
@@ -156,15 +150,18 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
     public void selectItem(int position) {
         LedgerAccount acc = Data.accounts.get().get(position);
         acc.toggleHiddenToBe();
-        toggleChildrenOf(acc, acc.isHiddenToBe());
-        notifyDataSetChanged();
+        toggleChildrenOf(acc, acc.isHiddenToBe(), position);
+        notifyItemChanged(position);
     }
-    void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe) {
+    void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
+        int i = parentPosition + 1;
         for (LedgerAccount acc : Data.accounts.get()) {
             String acc_parent = acc.getParentName();
             if ((acc_parent != null) && acc.getParentName().equals(parent.getName())) {
                 acc.setHiddenToBe(hiddenToBe);
-                toggleChildrenOf(acc, hiddenToBe);
+                notifyItemChanged(i);
+                toggleChildrenOf(acc, hiddenToBe, i);
+                i++;
             }
         }
     }

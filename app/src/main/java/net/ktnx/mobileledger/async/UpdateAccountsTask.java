@@ -28,15 +28,16 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 
-public class UpdateAccountsTask extends AsyncTask<Boolean, Void, ArrayList<LedgerAccount>> {
-    protected ArrayList<LedgerAccount> doInBackground(Boolean[] onlyStarred) {
+public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAccount>> {
+    protected ArrayList<LedgerAccount> doInBackground(Void... params) {
         Data.backgroundTaskCount.incrementAndGet();
         String profileUUID = Data.profile.get().getUuid();
+        boolean onlyStarred = Data.optShowOnlyStarred.get();
         try {
             ArrayList<LedgerAccount> newList = new ArrayList<>();
 
             String sql = "SELECT name, hidden FROM accounts WHERE profile = ?";
-            if (onlyStarred[0]) sql += " AND hidden = 0";
+            if (onlyStarred) sql += " AND hidden = 0";
             sql += " ORDER BY name";
 
             SQLiteDatabase db = MLDB.getReadableDatabase();

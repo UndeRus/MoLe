@@ -175,7 +175,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.profile.addObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(() -> model.scheduleAccountListReload(mActivity));
+                mActivity.runOnUiThread(() -> model.scheduleAccountListReload());
             }
         });
         update_account_table();
@@ -183,7 +183,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     private void update_account_table() {
         if (this.getContext() == null) return;
 
-        model.scheduleAccountListReload(this.getContext());
+        model.scheduleAccountListReload();
     }
     void stopSelection() {
         modelAdapter.stopSelection();
@@ -211,15 +211,16 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         mShowOnlyStarred = menu.findItem(R.id.menu_acc_summary_only_starred);
         if (mShowOnlyStarred == null) throw new AssertionError();
+        MenuItem mCancelSelection = menu.findItem(R.id.menu_acc_summary_cancel_selection);
+        if (mCancelSelection == null) throw new AssertionError();
+        MenuItem mConfirmSelection = menu.findItem(R.id.menu_acc_summary_confirm_selection);
+        if (mConfirmSelection == null) throw new AssertionError();
 
-        Data.optShowOnlyStarred.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                boolean newValue = Data.optShowOnlyStarred.get();
-                Log.d("pref", String.format("pref change came (%s)", newValue ? "true" : "false"));
-                mShowOnlyStarred.setChecked(newValue);
-                update_account_table();
-            }
+        Data.optShowOnlyStarred.addObserver((o, arg) -> {
+            boolean newValue = Data.optShowOnlyStarred.get();
+            Log.d("pref", String.format("pref change came (%s)", newValue ? "true" : "false"));
+            mShowOnlyStarred.setChecked(newValue);
+            update_account_table();
         });
 
         mShowOnlyStarred.setChecked(Data.optShowOnlyStarred.get());
@@ -235,6 +236,17 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
                     "Setting show only starred accounts pref to " + (flag ? "false" : "true"));
             editor.apply();
 
+            return true;
+        });
+
+        mCancelSelection.setOnMenuItemClickListener(item -> {
+            stopSelection();
+            return true;
+        });
+
+        mConfirmSelection.setOnMenuItemClickListener(item -> {
+            AccountSummaryViewModel.commitSelections(mActivity);
+            stopSelection();
 
             return true;
         });
