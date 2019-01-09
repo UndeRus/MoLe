@@ -35,9 +35,9 @@ public class TransactionListViewModel extends ViewModel {
     public static ObservableValue<Boolean> updating = new ObservableValue<>();
 
     public static void scheduleTransactionListReload(Activity act) {
-        boolean hasFilter =
-                act.findViewById(R.id.transaction_list_account_name_filter).getVisibility() ==
-                View.VISIBLE;
+        View filter = act.findViewById(R.id.transaction_list_account_name_filter);
+        if (filter == null) return;
+        boolean hasFilter = filter.getVisibility() == View.VISIBLE;
         String accFilter = hasFilter ? String.valueOf(
                 ((AutoCompleteTextView) act.findViewById(R.id.transaction_filter_account_name))
                         .getText()) : null;
