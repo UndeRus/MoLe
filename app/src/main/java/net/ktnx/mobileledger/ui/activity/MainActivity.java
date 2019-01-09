@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
     public void nav_settings_clicked(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+        drawer.closeDrawers();
     }
     public void markDrawerItemCurrent(int id) {
         TextView item = drawer.findViewById(id);
