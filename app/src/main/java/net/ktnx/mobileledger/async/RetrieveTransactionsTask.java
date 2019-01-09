@@ -44,6 +44,8 @@ import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,6 +114,7 @@ public class RetrieveTransactionsTask
         success = false;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
         ArrayList<LedgerTransaction> transactionList = new ArrayList<>();
+        HashMap<String, Void> accountNames = new HashMap<>();
         LedgerAccount lastAccount = null;
         Data.backgroundTaskCount.incrementAndGet();
         try {
@@ -169,7 +172,30 @@ public class RetrieveTransactionsTask
 
                                         profile.storeAccount(acct_name);
                                         lastAccount = new LedgerAccount(acct_name);
+
+                                        // make sure the parent account(s) are present,
+                                        // synthesising them if necessary
+                                        String parentName = lastAccount.getParentName();
+                                        if (parentName != null) {
+                                            Stack<String> toAppend = new Stack<>();
+                                            while (parentName != null) {
+                                                if (accountNames.containsKey(parentName)) break;
+                                                toAppend.push(parentName);
+                                                parentName = new LedgerAccount(parentName)
+                                                        .getParentName();
+                                            }
+                                            while (!toAppend.isEmpty()) {
+                                                String aName = toAppend.pop();
+                                                LedgerAccount acc = new LedgerAccount(aName);
+                                                accountList.add(acc);
+                                                L(String.format("gap-filling with %s", aName));
+                                                accountNames.put(aName, null);
+                                                profile.storeAccount(aName);
+                                            }
+                                        }
+
                                         accountList.add(lastAccount);
+                                        accountNames.put(acct_name, null);
 
                                         state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
                                         L("→ expecting account amount");
