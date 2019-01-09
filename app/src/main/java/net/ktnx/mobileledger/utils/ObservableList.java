@@ -171,7 +171,7 @@ public class ObservableList<T> extends Observable {
         list = aList;
         forceNotify();
     }
-    public Iterable<? extends T> getList() {
+    public List<T> getList() {
         return list;
     }
 }

@@ -25,6 +25,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +41,7 @@ import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.utils.MLDB;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -69,7 +71,7 @@ public class ProfileListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
@@ -77,7 +79,7 @@ public class ProfileListActivity extends AppCompatActivity {
         if (recyclerView == null) throw new AssertionError();
         setupRecyclerView(recyclerView);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,7 +113,30 @@ public class ProfileListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new ProfilesRecyclerViewAdapter(this, mTwoPane));
+        final ProfilesRecyclerViewAdapter adapter = new ProfilesRecyclerViewAdapter(this, mTwoPane);
+        recyclerView.setAdapter(adapter);
+        ItemTouchHelper.Callback cb = new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView,
+                                        @NonNull RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0);
+            }
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                Collections.swap(Data.profiles.getList(), viewHolder.getAdapterPosition(),
+                        target.getAdapterPosition());
+                adapter.notifyItemMoved(viewHolder.getAdapterPosition(),
+                        target.getAdapterPosition());
+                return true;
+            }
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+            }
+        };
+        new ItemTouchHelper(cb).attachToRecyclerView(recyclerView);
     }
 
     public static class ProfilesRecyclerViewAdapter
@@ -129,7 +154,7 @@ public class ProfileListActivity extends AppCompatActivity {
         ProfilesRecyclerViewAdapter(ProfileListActivity parent, boolean twoPane) {
             mParentActivity = parent;
             mTwoPane = twoPane;
-            Data.profiles.addObserver((o, arg) ->{
+            Data.profiles.addObserver((o, arg) -> {
                 Log.d("profiles", "profile list changed");
                 notifyDataSetChanged();
             });
