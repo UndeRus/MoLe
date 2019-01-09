@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -19,10 +19,6 @@
 
     <!-- These settings headers are only used on tablets. -->
 
-    <header
-        android:fragment="net.ktnx.mobileledger.ui.activity.SettingsActivity$BackendPreferenceFragment"
-        android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_backend" />
     <header
         android:fragment="net.ktnx.mobileledger.ui.activity.SettingsActivity$InterfacePreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
