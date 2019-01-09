@@ -61,7 +61,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, List<LedgerT
 
                     int transaction_id = cursor.getInt(0);
                     newList.add(new LedgerTransaction(transaction_id));
-                    Log.d("UTT", String.format("got transaction %d", transaction_id));
+//                    Log.d("UTT", String.format("got transaction %d", transaction_id));
                 }
                 Data.transactions.set(newList);
                 Log.d("UTT", "transaction list value updated");
