@@ -64,4 +64,5 @@
     <string name="title_activity_transaction_list">Трансакции</string>
     <string name="err_http_error">Грешка в HTTP</string>
     <string name="new_profile_title">Нов профил</string>
+    <string name="delete">Изтриване на профила</string>
 </resources>

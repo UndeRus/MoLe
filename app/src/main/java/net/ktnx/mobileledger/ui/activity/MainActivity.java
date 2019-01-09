@@ -54,7 +54,6 @@ import java.lang.ref.WeakReference;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -184,14 +183,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void setupProfile() {
-        List<MobileLedgerProfile> profiles = MobileLedgerProfile.loadAllFromDB();
+        Data.profiles.setList(MobileLedgerProfile.loadAllFromDB());
         MobileLedgerProfile profile = null;
 
         String profileUUID = MLDB.get_option_value(MLDB.OPT_PROFILE_UUID, null);
         if (profileUUID == null) {
-            if (profiles.isEmpty()) {
-                profiles = MobileLedgerProfile.createInitialProfileList();
-                profile = profiles.get(0);
+            if (Data.profiles.isEmpty()) {
+                Data.profiles.setList(MobileLedgerProfile.createInitialProfileList());
+                profile = Data.profiles.get(0);
 
                 SharedPreferences backend = getSharedPreferences("backend", MODE_PRIVATE);
                 Log.d("profiles", "Migrating from preferences to profiles");
@@ -215,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             profile = MobileLedgerProfile.loadUUIDFromDB(profileUUID);
         }
 
-        if (profile == null) profile = profiles.get(0);
+        if (profile == null) profile = Data.profiles.get(0);
 
         if (profile == null) throw new AssertionError("profile must have a value");
 

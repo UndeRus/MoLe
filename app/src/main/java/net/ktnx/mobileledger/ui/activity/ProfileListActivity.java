@@ -111,15 +111,13 @@ public class ProfileListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        List<MobileLedgerProfile> list = MobileLedgerProfile.loadAllFromDB();
-        recyclerView.setAdapter(new ProfilesRecyclerViewAdapter(this, list, mTwoPane));
+        recyclerView.setAdapter(new ProfilesRecyclerViewAdapter(this, mTwoPane));
     }
 
     public static class ProfilesRecyclerViewAdapter
             extends RecyclerView.Adapter<ProfilesRecyclerViewAdapter.ProfileListViewHolder> {
 
         private final ProfileListActivity mParentActivity;
-        private final List<MobileLedgerProfile> mValues;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
             @Override
@@ -128,11 +126,13 @@ public class ProfileListActivity extends AppCompatActivity {
                 editProfile(view, item);
             }
         };
-        ProfilesRecyclerViewAdapter(ProfileListActivity parent, List<MobileLedgerProfile> items,
-                                    boolean twoPane) {
-            mValues = items;
+        ProfilesRecyclerViewAdapter(ProfileListActivity parent, boolean twoPane) {
             mParentActivity = parent;
             mTwoPane = twoPane;
+            Data.profiles.addObserver((o, arg) ->{
+                Log.d("profiles", "profile list changed");
+                notifyDataSetChanged();
+            });
         }
         private void editProfile(View view, MobileLedgerProfile item) {
             if (mTwoPane) {
@@ -171,7 +171,7 @@ public class ProfileListActivity extends AppCompatActivity {
         }
         @Override
         public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
-            final MobileLedgerProfile profile = mValues.get(position);
+            final MobileLedgerProfile profile = Data.profiles.get(position);
             final MobileLedgerProfile currentProfile = Data.profile.get();
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                     currentProfile.getUuid()));
@@ -193,7 +193,7 @@ public class ProfileListActivity extends AppCompatActivity {
         }
         @Override
         public int getItemCount() {
-            return mValues.size();
+            return Data.profiles.size();
         }
         class ProfileListViewHolder extends RecyclerView.ViewHolder {
             final RadioButton mRadioView;

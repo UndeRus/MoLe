@@ -26,6 +26,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -68,7 +71,24 @@ public class ProfileDetailFragment extends Fragment {
      */
     public ProfileDetailFragment() {
     }
-
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.d("profiles", "[fragment] Creating profile details options menu");
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.profile_details, menu);
+        menu.findItem(R.id.menuDelete).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Log.d("profiles", String.format("[fragment] removing profile %s", mItem.getUuid()));
+                mItem.removeFromDB();
+                Data.profiles.remove(mItem);
+                if (Data.profile.get().getUuid().equals(mItem.getUuid())) {
+                    Data.profile.set(Data.profiles.get(0));
+                }
+                return false;
+            }
+        });
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +133,7 @@ public class ProfileDetailFragment extends Fragment {
                 mItem = new MobileLedgerProfile(profileName.getText(), url.getText(),
                         useAuthentication.isChecked(), userName.getText(), password.getText());
                 mItem.storeInDB();
+                Data.profiles.add(mItem);
             }
 
             Activity activity = getActivity();

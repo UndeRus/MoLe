@@ -254,4 +254,9 @@ public final class MobileLedgerProfile {
     public void set_option_value(String name, long value) {
         set_option_value(name, String.valueOf(value));
     }
+    public void removeFromDB() {
+        SQLiteDatabase db = MLDB.getWritableDatabase();
+        Log.d("db", String.format("removinf progile %s from DB", uuid));
+        db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
+    }
 }

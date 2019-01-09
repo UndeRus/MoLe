@@ -21,13 +21,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.ProfileListActivity;
 
 /**
@@ -37,7 +41,7 @@ import net.ktnx.mobileledger.ui.activity.ProfileListActivity;
  * in a {@link ProfileListActivity}.
  */
 public class ProfileDetailActivity extends AppCompatActivity {
-
+    private MobileLedgerProfile profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,16 +74,49 @@ public class ProfileDetailActivity extends AppCompatActivity {
         // http://developer.android.com/guide/components/fragments.html
         //
         if (savedInstanceState == null) {
+            final String profileUUID =
+                    getIntent().getStringExtra(ProfileDetailFragment.ARG_ITEM_ID);
+
+            if (profileUUID != null) {
+                int i = 0;
+                for (MobileLedgerProfile p : Data.profiles.getList()) {
+                    if (p.getUuid().equals(profileUUID)) {
+                        Log.d("profiles", String.format("found profile %s at %d", profileUUID, i));
+                        profile = p;
+                        break;
+                    }
+                    i++;
+                }
+                if (profile == null) throw new AssertionError(
+                        String.format("Can't get profile " + "(uuid:%s) from the " + "global list",
+                                profileUUID));
+            }
+
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(ProfileDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(ProfileDetailFragment.ARG_ITEM_ID));
+            arguments.putString(ProfileDetailFragment.ARG_ITEM_ID, profileUUID);
             ProfileDetailFragment fragment = new ProfileDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.profile_detail_container, fragment).commit();
         }
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        Log.d("profiles", "[activity] Creating profile details options menu");
+        getMenuInflater().inflate(R.menu.profile_details, menu);
+        menu.findItem(R.id.menuDelete).setOnMenuItemClickListener(item -> {
+            Log.d("profiles", String.format("deleting profile %s", profile.getUuid()));
+            profile.removeFromDB();
+            Data.profiles.remove(profile);
+            Data.profile.set(Data.profiles.get(0));
+            finish();
+            return true;
+        });
+
+        return true;
     }
 
     @Override

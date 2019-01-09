@@ -106,4 +106,5 @@
     <string name="title_profile_details">Profile Details</string>
     <string name="profiles">Profiles</string>
     <string name="new_profile_title" type="id">New profile</string>
+    <string name="delete">Delete profile</string>
 </resources>

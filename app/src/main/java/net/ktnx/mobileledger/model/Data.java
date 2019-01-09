@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import net.ktnx.mobileledger.utils.ObservableAtomicInteger;
+import net.ktnx.mobileledger.utils.ObservableList;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.ArrayList;
@@ -32,4 +33,6 @@ public final class Data {
     public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
     public static ObservableValue<Date> lastUpdateDate = new ObservableValue<>();
     public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
+    public static ObservableList<MobileLedgerProfile> profiles =
+            new ObservableList<>(new ArrayList<>());
 }
