@@ -23,8 +23,6 @@
     android:name="net.ktnx.mobileledger.ui.activity.ProfileListFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".ui.activity.ProfileListActivity"
     tools:listitem="@layout/profile_list_content" />

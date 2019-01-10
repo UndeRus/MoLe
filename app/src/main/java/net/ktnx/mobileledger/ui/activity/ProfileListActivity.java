@@ -204,7 +204,11 @@ public class ProfileListActivity extends AppCompatActivity {
             final MobileLedgerProfile currentProfile = Data.profile.get();
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                     currentProfile.getUuid()));
-            holder.mRadioView.setText(profile.getName());
+            View.OnClickListener profileSelector = v -> holder.mRadioView.setChecked(true);
+            holder.mTitle.setText(profile.getName());
+            holder.mTitle.setOnClickListener(profileSelector);
+            holder.mSubTitle.setText(profile.getUrl());
+            holder.mSubTitle.setOnClickListener(profileSelector);
             holder.mRadioView.setChecked(profile.getUuid().equals(currentProfile.getUuid()));
             holder.mRadioView
                     .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -227,11 +231,14 @@ public class ProfileListActivity extends AppCompatActivity {
         class ProfileListViewHolder extends RecyclerView.ViewHolder {
             final RadioButton mRadioView;
             final TextView mEditButton;
+            final TextView mTitle, mSubTitle;
 
             ProfileListViewHolder(View view) {
                 super(view);
                 mRadioView = view.findViewById(R.id.profile_list_radio);
                 mEditButton = view.findViewById(R.id.profile_list_edit_button);
+                mTitle = view.findViewById(R.id.title);
+                mSubTitle = view.findViewById(R.id.subtitle);
             }
         }
     }
