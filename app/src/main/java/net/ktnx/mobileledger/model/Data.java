@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.model;
 
+import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableAtomicInteger;
 import net.ktnx.mobileledger.utils.ObservableList;
 import net.ktnx.mobileledger.utils.ObservableValue;
@@ -34,4 +35,8 @@ public final class Data {
     public static ObservableList<MobileLedgerProfile> profiles =
             new ObservableList<>(new ArrayList<>());
     public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
+    public static void setCurrentProfile(MobileLedgerProfile newProfile) {
+        MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
+        profile.set(newProfile);
+    }
 }
