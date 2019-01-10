@@ -74,28 +74,19 @@ public class ProfileDetailActivity extends AppCompatActivity {
         // http://developer.android.com/guide/components/fragments.html
         //
         if (savedInstanceState == null) {
-            final String profileUUID =
-                    getIntent().getStringExtra(ProfileDetailFragment.ARG_ITEM_ID);
+            final int index = getIntent().getIntExtra(ProfileDetailFragment.ARG_ITEM_ID, -1);
 
-            if (profileUUID != null) {
-                int i = 0;
-                for (MobileLedgerProfile p : Data.profiles.getList()) {
-                    if (p.getUuid().equals(profileUUID)) {
-                        Log.d("profiles", String.format("found profile %s at %d", profileUUID, i));
-                        profile = p;
-                        break;
-                    }
-                    i++;
-                }
+            if (index != -1) {
+                profile = Data.profiles.get(index);
                 if (profile == null) throw new AssertionError(
-                        String.format("Can't get profile " + "(uuid:%s) from the " + "global list",
-                                profileUUID));
+                        String.format("Can't get profile " + "(index:%d) from the global list",
+                                index));
             }
 
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(ProfileDetailFragment.ARG_ITEM_ID, profileUUID);
+            arguments.putInt(ProfileDetailFragment.ARG_ITEM_ID, index);
             ProfileDetailFragment fragment = new ProfileDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
@@ -109,10 +100,13 @@ public class ProfileDetailActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.profile_details, menu);
         MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
         menuDeleteProfile.setOnMenuItemClickListener(item -> {
-            Log.d("profiles", String.format("deleting profile %s", profile.getUuid()));
+            Log.d("profiles", String.format("[activity] deleting profile %s", profile.getUuid()));
             profile.removeFromDB();
             Data.profiles.remove(profile);
-            Data.profile.set(Data.profiles.get(0));
+            if (Data.profile.get().equals(profile)) {
+                Log.d("profiles", "[activity] selecting profile 0");
+                Data.setCurrentProfile(Data.profiles.get(0));
+            }
             finish();
             return true;
         });

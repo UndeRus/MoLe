@@ -21,6 +21,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -43,9 +44,9 @@ public class ObservableList<T> extends Observable {
         setChanged();
         notifyObservers();
     }
-    private void forceNotify(Object arg) {
+    private void forceNotify(int index) {
         setChanged();
-        notifyObservers(arg);
+        notifyObservers(index);
     }
     public int size() {
         return list.size();
@@ -167,11 +168,23 @@ public class ObservableList<T> extends Observable {
     public void forEach(Consumer<? super T> action) {
         list.forEach(action);
     }
+    public List<T> getList() {
+        return list;
+    }
     public void setList(List<T> aList) {
         list = aList;
         forceNotify();
     }
-    public List<T> getList() {
-        return list;
+    public void triggerItemChangedNotification(T item) {
+        int index = list.indexOf(item);
+        if (index == -1) {
+            Log.d("ObList", "??? not sending notifications for item not found in the list");
+            return;
+        }
+        Log.d("ObList", "Notifying item change observers");
+        triggerItemChangedNotification(index);
+    }
+    public void triggerItemChangedNotification(int index) {
+        forceNotify(index);
     }
 }

@@ -81,8 +81,9 @@ public class ProfileDetailFragment extends Fragment {
             Log.d("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
             mProfile.removeFromDB();
             Data.profiles.remove(mProfile);
-            if (Data.profile.get().getUuid().equals(mProfile.getUuid())) {
-                Data.profile.set(Data.profiles.get(0));
+            if (Data.profile.get().equals(mProfile)) {
+                Log.d("profiles", "[fragment] setting current profile to 0");
+                Data.setCurrentProfile(Data.profiles.get(0));
             }
             return false;
         });
@@ -96,9 +97,8 @@ public class ProfileDetailFragment extends Fragment {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            String uuid = getArguments().getString(ARG_ITEM_ID);
-            if (uuid != null) mProfile =
-                    MobileLedgerProfile.loadUUIDFromDB(getArguments().getString(ARG_ITEM_ID));
+            int index = getArguments().getInt(ARG_ITEM_ID, -1);
+            if (index != -1) mProfile = Data.profiles.get(index);
 
             Activity activity = this.getActivity();
             if (activity == null) throw new AssertionError();
@@ -122,6 +122,8 @@ public class ProfileDetailFragment extends Fragment {
                 mProfile.setAuthUserName(userName.getText());
                 mProfile.setAuthPassword(password.getText());
                 mProfile.storeInDB();
+                Log.d("profiles", "profile stored in DB");
+                Data.profiles.triggerItemChangedNotification(mProfile);
 
 
                 if (mProfile.getUuid().equals(Data.profile.get().getUuid())) {

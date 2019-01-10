@@ -39,10 +39,10 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * An activity representing a list of Profiles. This activity
@@ -98,12 +98,10 @@ public class ProfileListActivity extends AppCompatActivity {
             Log.d("profiles", "got edit profile action");
             int index = getIntent().getIntExtra(ARG_PROFILE_INDEX, -1);
             if (index >= 0) {
-                List<MobileLedgerProfile> list = MobileLedgerProfile.loadAllFromDB();
-                if (index < list.size()) {
-                    ProfilesRecyclerViewAdapter adapter =
-                            (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
-                    if (adapter != null) adapter.editProfile(recyclerView, list.get(index));
-                }
+                MobileLedgerProfile profile = Data.profiles.get(index);
+                ProfilesRecyclerViewAdapter adapter =
+                        (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
+                if (adapter != null) adapter.editProfile(recyclerView, profile);
             }
         }
     }
@@ -168,21 +166,23 @@ public class ProfileListActivity extends AppCompatActivity {
         private final ProfileListActivity mParentActivity;
         private final boolean mTwoPane;
         private final View.OnClickListener mOnClickListener = view -> {
-            MobileLedgerProfile item = (MobileLedgerProfile) ((View) view.getParent()).getTag();
-            editProfile(view, item);
+            MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
+            editProfile(view, profile);
         };
         ProfilesRecyclerViewAdapter(ProfileListActivity parent, boolean twoPane) {
             mParentActivity = parent;
             mTwoPane = twoPane;
             Data.profiles.addObserver((o, arg) -> {
                 Log.d("profiles", "profile list changed");
-                notifyDataSetChanged();
+                if (arg == null) notifyDataSetChanged();
+                else notifyItemChanged((int) arg);
             });
         }
-        private void editProfile(View view, MobileLedgerProfile item) {
+        private void editProfile(View view, MobileLedgerProfile profile) {
+            int index = Data.profiles.indexOf(profile);
             if (mTwoPane) {
                 Bundle arguments = new Bundle();
-                arguments.putString(ProfileDetailFragment.ARG_ITEM_ID, item.getUuid());
+                arguments.putInt(ProfileDetailFragment.ARG_ITEM_ID, index);
                 ProfileDetailFragment fragment = new ProfileDetailFragment();
                 fragment.setArguments(arguments);
                 mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -191,8 +191,7 @@ public class ProfileListActivity extends AppCompatActivity {
             else {
                 Context context = view.getContext();
                 Intent intent = new Intent(context, ProfileDetailActivity.class);
-                intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID,
-                        (item == null) ? null : item.getUuid());
+                if (index != -1) intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
 
                 context.startActivity(intent);
             }
@@ -206,8 +205,7 @@ public class ProfileListActivity extends AppCompatActivity {
             Data.profile.addObserver((o, arg) -> {
                 MobileLedgerProfile newProfile = Data.profile.get();
                 MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
-                holder.mRadioView.setChecked(
-                        newProfile != null && newProfile.getUuid().equals(profile.getUuid()));
+                holder.mRadioView.setChecked(profile.equals(newProfile));
             });
             return holder;
         }
@@ -217,21 +215,24 @@ public class ProfileListActivity extends AppCompatActivity {
             final MobileLedgerProfile currentProfile = Data.profile.get();
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                     currentProfile.getUuid()));
-            View.OnClickListener profileSelector = v -> holder.mRadioView.setChecked(true);
+            View.OnClickListener profileSelector = v -> {
+                holder.mRadioView.setChecked(true);
+                Data.setCurrentProfile(profile);
+            };
+            Data.profile.addObserver(new Observer() {
+                @Override
+                public void update(Observable o, Object arg) {
+                    holder.mRadioView.setChecked(Data.profile.get().equals(profile));
+                }
+            });
             holder.mTitle.setText(profile.getName());
             holder.mTitle.setOnClickListener(profileSelector);
             holder.mSubTitle.setText(profile.getUrl());
             holder.mSubTitle.setOnClickListener(profileSelector);
             holder.mRadioView.setChecked(profile.getUuid().equals(currentProfile.getUuid()));
-            holder.mRadioView.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (!isChecked) return;
-                MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, profile.getUuid());
-                Data.profile.set(profile);
-                    });
 
             holder.itemView.setTag(profile);
             holder.mEditButton.setOnClickListener(mOnClickListener);
-
         }
         @Override
         public int getItemCount() {

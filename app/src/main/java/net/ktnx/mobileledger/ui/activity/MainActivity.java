@@ -54,8 +54,6 @@ import java.text.DateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Observable;
-import java.util.Observer;
 
 public class MainActivity extends AppCompatActivity {
     public MobileLedgerListFragment currentFragment = null;
@@ -96,15 +94,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Data.profile.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                MobileLedgerProfile profile = Data.profile.get();
-                runOnUiThread(() -> {
-                    if (profile == null) toolbar.setSubtitle("");
-                    else toolbar.setSubtitle(profile.getName());
-                });
-            }
+        Data.profile.addObserver((o, arg) -> {
+            MobileLedgerProfile profile = Data.profile.get();
+            runOnUiThread(() -> {
+                if (profile == null) toolbar.setSubtitle("");
+                else toolbar.setSubtitle(profile.getName());
+            });
         });
 
         setupProfile();
@@ -215,8 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (profile == null) throw new AssertionError("profile must have a value");
 
-        Data.profile.set(profile);
-        MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, profile.getUuid());
+        Data.setCurrentProfile(profile);
 
         if (profile.getUrl().isEmpty()) {
             Intent intent = new Intent(this, ProfileListActivity.class);
