@@ -39,8 +39,8 @@ public class CommitAccountsTask
             db.beginTransaction();
             try {
                 for (LedgerAccount acc : params[0].accountList) {
-                    Log.d("db", String.format("Setting %s to %s", acc.getName(),
-                            acc.isHidden() ? "hidden" : "starred"));
+                    Log.d("CAT", String.format("Setting %s to %s", acc.getName(),
+                            acc.isHiddenToBe() ? "hidden" : "starred"));
                     db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
                             new Object[]{acc.isHiddenToBe() ? 1 : 0, profile, acc.getName()});
 
