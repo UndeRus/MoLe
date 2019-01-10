@@ -113,6 +113,7 @@ public class RetrieveTransactionsTask
         ArrayList<LedgerTransaction> transactionList = new ArrayList<>();
         HashMap<String, Void> accountNames = new HashMap<>();
         LedgerAccount lastAccount = null;
+        boolean onlyStarred = Data.optShowOnlyStarred.get();
         Data.backgroundTaskCount.incrementAndGet();
         try {
             HttpURLConnection http = NetworkUtil.prepare_connection("journal");
@@ -165,8 +166,11 @@ public class RetrieveTransactionsTask
                                         acct_name = acct_name.replace("\"", "");
                                         L(String.format("found account: %s", acct_name));
 
-                                        profile.storeAccount(acct_name);
-                                        lastAccount = new LedgerAccount(acct_name);
+                                        lastAccount = profile.loadAccount(acct_name);
+                                        if (lastAccount == null) {
+                                            lastAccount = new LedgerAccount(acct_name);
+                                            profile.storeAccount(lastAccount);
+                                        }
 
                                         // make sure the parent account(s) are present,
                                         // synthesising them if necessary
@@ -182,14 +186,17 @@ public class RetrieveTransactionsTask
                                             while (!toAppend.isEmpty()) {
                                                 String aName = toAppend.pop();
                                                 LedgerAccount acc = new LedgerAccount(aName);
-                                                accountList.add(acc);
+                                                acc.setHidden(lastAccount.isHidden());
+                                                if (!onlyStarred || !acc.isHidden())
+                                                    accountList.add(acc);
                                                 L(String.format("gap-filling with %s", aName));
                                                 accountNames.put(aName, null);
-                                                profile.storeAccount(aName);
+                                                profile.storeAccount(acc);
                                             }
                                         }
 
-                                        accountList.add(lastAccount);
+                                        if (!onlyStarred || !lastAccount.isHidden())
+                                            accountList.add(lastAccount);
                                         accountNames.put(acct_name, null);
 
                                         state = ParserState.EXPECTING_ACCOUNT_AMOUNT;

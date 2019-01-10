@@ -180,16 +180,18 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public void storeAccount(String name) {
+    public void storeAccount(LedgerAccount acc) {
         SQLiteDatabase db = MLDB.getWritableDatabase();
 
-        do {
-            LedgerAccount acc = new LedgerAccount(name);
-            db.execSQL("replace into accounts(profile, name, name_upper, level, keep) values(?, " +
-                       "?, ?, ?, 1)",
-                    new Object[]{this.uuid, name, name.toUpperCase(), acc.getLevel()});
-            name = acc.getParentName();
-        } while (name != null);
+        // replace into is a bad idea because it would reset hidden to its default value
+        // we like the default, but for new accounts only
+        db.execSQL("update accounts set level = ?, keep = 1 where profile=? and name = ?",
+                new Object[]{acc.getLevel(), uuid, acc.getName()});
+        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level) " +
+                   "select ?,?,?,?,? where (select changes() = 0)",
+                new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
+                             acc.getLevel()
+                });
     }
     public void storeAccountValue(String name, String currency, Float amount) {
         SQLiteDatabase db = MLDB.getWritableDatabase();
@@ -275,5 +277,20 @@ public final class MobileLedgerProfile {
         SQLiteDatabase db = MLDB.getWritableDatabase();
         Log.d("db", String.format("removing progile %s from DB", uuid));
         db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
+    }
+    public LedgerAccount loadAccount(String name) {
+        SQLiteDatabase db = MLDB.getReadableDatabase();
+        try (Cursor cursor = db.rawQuery("SELECT hidden from accounts where profile=? and name=?",
+                new String[]{uuid, name}))
+        {
+            if (cursor.moveToFirst()) {
+                LedgerAccount acc = new LedgerAccount(name);
+                acc.setHidden(cursor.getInt(0) == 1);
+
+                return acc;
+            }
+        }
+
+        return null;
     }
 }
