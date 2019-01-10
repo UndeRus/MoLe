@@ -31,7 +31,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -44,8 +43,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * An activity representing a list of Profiles. This activity
@@ -81,13 +78,10 @@ public class ProfileListActivity extends AppCompatActivity {
         setupRecyclerView(recyclerView);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ProfilesRecyclerViewAdapter adapter =
-                        (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
-                if (adapter != null) adapter.editProfile(recyclerView, null);
-            }
+        fab.setOnClickListener(view -> {
+            ProfilesRecyclerViewAdapter adapter =
+                    (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
+            if (adapter != null) adapter.editProfile(recyclerView, null);
         });
 
         if (findViewById(R.id.profile_detail_container) != null) {
@@ -148,12 +142,9 @@ public class ProfileListActivity extends AppCompatActivity {
 
         private final ProfileListActivity mParentActivity;
         private final boolean mTwoPane;
-        private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MobileLedgerProfile item = (MobileLedgerProfile) ((View) view.getParent()).getTag();
-                editProfile(view, item);
-            }
+        private final View.OnClickListener mOnClickListener = view -> {
+            MobileLedgerProfile item = (MobileLedgerProfile) ((View) view.getParent()).getTag();
+            editProfile(view, item);
         };
         ProfilesRecyclerViewAdapter(ProfileListActivity parent, boolean twoPane) {
             mParentActivity = parent;
@@ -187,14 +178,11 @@ public class ProfileListActivity extends AppCompatActivity {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.profile_list_content, parent, false);
             ProfileListViewHolder holder = new ProfileListViewHolder(view);
-            Data.profile.addObserver(new Observer() {
-                @Override
-                public void update(Observable o, Object arg) {
-                    MobileLedgerProfile newProfile = Data.profile.get();
-                    MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
-                    holder.mRadioView.setChecked(
-                            newProfile != null && newProfile.getUuid().equals(profile.getUuid()));
-                }
+            Data.profile.addObserver((o, arg) -> {
+                MobileLedgerProfile newProfile = Data.profile.get();
+                MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
+                holder.mRadioView.setChecked(
+                        newProfile != null && newProfile.getUuid().equals(profile.getUuid()));
             });
             return holder;
         }
@@ -210,14 +198,10 @@ public class ProfileListActivity extends AppCompatActivity {
             holder.mSubTitle.setText(profile.getUrl());
             holder.mSubTitle.setOnClickListener(profileSelector);
             holder.mRadioView.setChecked(profile.getUuid().equals(currentProfile.getUuid()));
-            holder.mRadioView
-                    .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            if (!isChecked) return;
-                            MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, profile.getUuid());
-                            Data.profile.set(profile);
-                        }
+            holder.mRadioView.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!isChecked) return;
+                MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, profile.getUuid());
+                Data.profile.set(profile);
                     });
 
             holder.itemView.setTag(profile);
