@@ -156,8 +156,7 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
     void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
         int i = parentPosition + 1;
         for (LedgerAccount acc : Data.accounts.get()) {
-            String acc_parent = acc.getParentName();
-            if ((acc_parent != null) && acc.getParentName().equals(parent.getName())) {
+            if (acc.getName().startsWith(parent.getName() + ":")) {
                 acc.setHiddenToBe(hiddenToBe);
                 notifyItemChanged(i);
                 toggleChildrenOf(acc, hiddenToBe, i);
