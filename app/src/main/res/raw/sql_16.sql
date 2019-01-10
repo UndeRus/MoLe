@@ -1,0 +1,1 @@
+alter table profiles add order_no integer;

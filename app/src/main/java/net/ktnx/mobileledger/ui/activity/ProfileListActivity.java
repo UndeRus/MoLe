@@ -127,6 +127,7 @@ public class ProfileListActivity extends AppCompatActivity {
                                   @NonNull RecyclerView.ViewHolder target) {
                 Collections.swap(Data.profiles.getList(), viewHolder.getAdapterPosition(),
                         target.getAdapterPosition());
+                MobileLedgerProfile.storeProfilesOrder();
                 adapter.notifyItemMoved(viewHolder.getAdapterPosition(),
                         target.getAdapterPosition());
                 return true;

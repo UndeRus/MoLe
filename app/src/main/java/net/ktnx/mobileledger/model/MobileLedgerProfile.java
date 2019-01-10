@@ -65,6 +65,22 @@ public final class MobileLedgerProfile {
         }
         return result;
     }
+    public static void storeProfilesOrder() {
+        SQLiteDatabase db = MLDB.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            int orderNo = 0;
+            for (MobileLedgerProfile p : Data.profiles.getList()) {
+                db.execSQL("update profiles set order_no=? where uuid=?",
+                        new Object[]{orderNo, p.getUuid()});
+                orderNo++;
+            }
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
+    }
     public static List<MobileLedgerProfile> createInitialProfileList() {
         List<MobileLedgerProfile> result = new ArrayList<>();
         MobileLedgerProfile first =

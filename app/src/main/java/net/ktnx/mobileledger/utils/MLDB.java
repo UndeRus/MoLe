@@ -200,12 +200,13 @@ public final class MLDB {
         if ((helperForWriting != helperForReading) && (helperForWriting != null))
             helperForWriting.close();
     }
+
     public enum DatabaseMode {READ, WRITE}
 }
 
 class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     public static final String DB_NAME = "mobile-ledger.db";
-    public static final int LATEST_REVISION = 15;
+    public static final int LATEST_REVISION = 16;
 
     private final Application mContext;
 
