@@ -63,6 +63,7 @@ public class ProfileListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class ProfileListActivity extends AppCompatActivity {
         if (recyclerView == null) throw new AssertionError();
         setupRecyclerView(recyclerView);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
             ProfilesRecyclerViewAdapter adapter =
                     (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
@@ -107,6 +108,11 @@ public class ProfileListActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        fab.show();
+    }
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         final ProfilesRecyclerViewAdapter adapter = new ProfilesRecyclerViewAdapter(this, mTwoPane);
         recyclerView.setAdapter(adapter);
@@ -135,6 +141,25 @@ public class ProfileListActivity extends AppCompatActivity {
         new ItemTouchHelper(cb).attachToRecyclerView(recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL));
+
+        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            @Override
+            public boolean onFling(int dX, int dY) {
+                Log.d("tmp", String.format("fling %d %d", dX, dY));
+                if (dY > 0) fab.hide();
+                if (dY < 0) fab.show();
+                return false;
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) fab.hide();
+                if (dy < 0) fab.show();
+            }
+        });
     }
 
     public static class ProfilesRecyclerViewAdapter
