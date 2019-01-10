@@ -56,10 +56,11 @@ public final class MobileLedgerProfile {
         List<MobileLedgerProfile> result = new ArrayList<>();
         SQLiteDatabase db = MLDB.getReadableDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
-                                         "auth_password FROM profiles", null))
+                                         "auth_password FROM profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
-                result.add(new MobileLedgerProfile(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getInt(3) == 1, cursor.getString(4),
+                result.add(new MobileLedgerProfile(cursor.getString(0), cursor.getString(1),
+                        cursor.getString(2), cursor.getInt(3) == 1, cursor.getString(4),
                         cursor.getString(5)));
             }
         }

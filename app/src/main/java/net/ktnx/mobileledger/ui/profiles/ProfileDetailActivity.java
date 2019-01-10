@@ -46,10 +46,10 @@ public class ProfileDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,7 +107,8 @@ public class ProfileDetailActivity extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
         Log.d("profiles", "[activity] Creating profile details options menu");
         getMenuInflater().inflate(R.menu.profile_details, menu);
-        menu.findItem(R.id.menuDelete).setOnMenuItemClickListener(item -> {
+        MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
+        menuDeleteProfile.setOnMenuItemClickListener(item -> {
             Log.d("profiles", String.format("deleting profile %s", profile.getUuid()));
             profile.removeFromDB();
             Data.profiles.remove(profile);
@@ -115,6 +116,8 @@ public class ProfileDetailActivity extends AppCompatActivity {
             finish();
             return true;
         });
+
+        menuDeleteProfile.setVisible((profile != null) && (Data.profiles.size() > 1));
 
         return true;
     }

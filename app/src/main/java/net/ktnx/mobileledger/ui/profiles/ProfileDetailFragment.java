@@ -56,7 +56,7 @@ public class ProfileDetailFragment extends Fragment {
     /**
      * The dummy content this fragment is presenting.
      */
-    private MobileLedgerProfile mItem;
+    private MobileLedgerProfile mProfile;
     private TextView url;
     private LinearLayout authParams;
     private Switch useAuthentication;
@@ -76,18 +76,17 @@ public class ProfileDetailFragment extends Fragment {
         Log.d("profiles", "[fragment] Creating profile details options menu");
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.profile_details, menu);
-        menu.findItem(R.id.menuDelete).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d("profiles", String.format("[fragment] removing profile %s", mItem.getUuid()));
-                mItem.removeFromDB();
-                Data.profiles.remove(mItem);
-                if (Data.profile.get().getUuid().equals(mItem.getUuid())) {
-                    Data.profile.set(Data.profiles.get(0));
-                }
-                return false;
+        final MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
+        menuDeleteProfile.setOnMenuItemClickListener(item -> {
+            Log.d("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
+            mProfile.removeFromDB();
+            Data.profiles.remove(mProfile);
+            if (Data.profile.get().getUuid().equals(mProfile.getUuid())) {
+                Data.profile.set(Data.profiles.get(0));
             }
+            return false;
         });
+        menuDeleteProfile.setVisible((mProfile != null) && (Data.profiles.size() > 1));
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,14 +97,14 @@ public class ProfileDetailFragment extends Fragment {
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
             String uuid = getArguments().getString(ARG_ITEM_ID);
-            if (uuid != null)
-                mItem = MobileLedgerProfile.loadUUIDFromDB(getArguments().getString(ARG_ITEM_ID));
+            if (uuid != null) mProfile =
+                    MobileLedgerProfile.loadUUIDFromDB(getArguments().getString(ARG_ITEM_ID));
 
             Activity activity = this.getActivity();
             if (activity == null) throw new AssertionError();
             CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                if (mItem != null) appBarLayout.setTitle(mItem.getName());
+                if (mProfile != null) appBarLayout.setTitle(mProfile.getName());
                 else appBarLayout.setTitle(getResources().getString(R.string.new_profile_title));
             }
         }
@@ -116,24 +115,25 @@ public class ProfileDetailFragment extends Fragment {
         super.onAttach(context);
         fab = ((Activity) context).findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
-            if (mItem != null) {
-                mItem.setName(profileName.getText());
-                mItem.setUrl(url.getText());
-                mItem.setAuthEnabled(useAuthentication.isChecked());
-                mItem.setAuthUserName(userName.getText());
-                mItem.setAuthPassword(password.getText());
-                mItem.storeInDB();
+            if (mProfile != null) {
+                mProfile.setName(profileName.getText());
+                mProfile.setUrl(url.getText());
+                mProfile.setAuthEnabled(useAuthentication.isChecked());
+                mProfile.setAuthUserName(userName.getText());
+                mProfile.setAuthPassword(password.getText());
+                mProfile.storeInDB();
 
 
-                if (mItem.getUuid().equals(Data.profile.get().getUuid())) {
-                    Data.profile.set(mItem);
+                if (mProfile.getUuid().equals(Data.profile.get().getUuid())) {
+                    Data.profile.set(mProfile);
                 }
             }
             else {
-                mItem = new MobileLedgerProfile(profileName.getText(), url.getText(),
+                mProfile = new MobileLedgerProfile(profileName.getText(), url.getText(),
                         useAuthentication.isChecked(), userName.getText(), password.getText());
-                mItem.storeInDB();
-                Data.profiles.add(mItem);
+                mProfile.storeInDB();
+                Data.profiles.add(mProfile);
+                MobileLedgerProfile.storeProfilesOrder();
             }
 
             Activity activity = getActivity();
@@ -157,13 +157,13 @@ public class ProfileDetailFragment extends Fragment {
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
-        if (mItem != null) {
-            profileName.setText(mItem.getName());
-            url.setText(mItem.getUrl());
-            useAuthentication.setChecked(mItem.isAuthEnabled());
-            authParams.setVisibility(mItem.isAuthEnabled() ? View.VISIBLE : View.GONE);
-            userName.setText(mItem.isAuthEnabled() ? mItem.getAuthUserName() : "");
-            password.setText(mItem.isAuthEnabled() ? mItem.getAuthPassword() : "");
+        if (mProfile != null) {
+            profileName.setText(mProfile.getName());
+            url.setText(mProfile.getUrl());
+            useAuthentication.setChecked(mProfile.isAuthEnabled());
+            authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
+            userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
+            password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
         }
         else {
             profileName.setText("");

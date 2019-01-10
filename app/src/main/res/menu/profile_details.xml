@@ -16,10 +16,13 @@
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/menuDelete"
         android:icon="@drawable/ic_delete_white_24dp"
-        android:title="@string/delete" />
+        android:title="@string/delete_profile"
+        android:titleCondensed="@string/delete"
+        app:showAsAction="ifRoom" />
 </menu>
