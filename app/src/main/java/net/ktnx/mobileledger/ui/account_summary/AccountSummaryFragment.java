@@ -51,7 +51,6 @@ import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_O
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
     MenuItem mShowOnlyStarred;
-    SharedPreferences.OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener;
     private AccountSummaryViewModel model;
     private AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
