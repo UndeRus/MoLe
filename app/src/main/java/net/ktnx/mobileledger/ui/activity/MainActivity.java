@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
         Data.profile.addObserver((o, arg) -> {
             MobileLedgerProfile profile = Data.profile.get();
             runOnUiThread(() -> {
-                if (profile == null) toolbar.setSubtitle("");
-                else toolbar.setSubtitle(profile.getName());
+                if (profile == null) setTitle(R.string.app_name);
+                else setTitle(profile.getName());
             });
         });
 
@@ -239,8 +239,6 @@ public class MainActivity extends AppCompatActivity {
         else {
             item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
         }
-
-        setTitle(item.getText());
 
         @ColorInt int transparent = getResources().getColor(android.R.color.transparent);
 
