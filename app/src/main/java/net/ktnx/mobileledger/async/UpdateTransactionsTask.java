@@ -36,21 +36,20 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, List<LedgerT
         try {
             ArrayList<LedgerTransaction> newList = new ArrayList<>();
 
-            boolean hasFilter = (filterAccName != null) && (filterAccName.length > 0) &&
-                                (filterAccName[0] != null) && !filterAccName[0].isEmpty();
-
             String sql;
             String[] params;
 
-            sql = "SELECT id FROM transactions WHERE profile=? ORDER BY date desc, id desc";
-            params = new String[]{profile_uuid};
+            if (filterAccName[0] == null) {
+                sql = "SELECT id FROM transactions WHERE profile=? ORDER BY date desc, id desc";
+                params = new String[]{profile_uuid};
 
-            if (hasFilter) {
+            }
+            else {
                 sql = "SELECT distinct tr.id from transactions tr JOIN transaction_accounts ta " +
                       "ON ta.transaction_id=tr.id AND ta.profile=tr.profile WHERE tr.profile=? " +
-                      "and ta" + ".account_name LIKE ?||'%' AND ta" +
+                      "and ta.account_name LIKE ?||'%' AND ta" +
                       ".amount <> 0 ORDER BY tr.date desc, tr.id desc";
-                params = filterAccName;
+                params = new String[]{profile_uuid, filterAccName[0]};
             }
 
             Log.d("UTT", sql);

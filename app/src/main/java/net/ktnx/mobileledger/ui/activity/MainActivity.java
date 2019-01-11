@@ -250,16 +250,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.clearAccountNameFilter:
-                if (transactionListFragment != null)
-                    transactionListFragment.onClearAccountNameClick(view);
-                break;
-            default:
-                Log.e("click", String.format("View %d click not handled", view.getId()));
-        }
-    }
     public void onAccountSummaryClicked(View view) {
         drawer.closeDrawers();
 
@@ -282,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
 //        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
     private void showTransactionsFragment(LedgerAccount account) {
+        TransactionListFragment.accountFilter.set(account.getName());
         mViewPager.setCurrentItem(1, true);
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        if (transactionListFragment == null) {

@@ -17,13 +17,9 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.app.Activity;
 import android.arch.lifecycle.ViewModel;
 import android.os.AsyncTask;
-import android.view.View;
-import android.widget.AutoCompleteTextView;
 
-import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -34,15 +30,10 @@ import java.util.List;
 public class TransactionListViewModel extends ViewModel {
     public static ObservableValue<Boolean> updating = new ObservableValue<>();
 
-    public static void scheduleTransactionListReload(Activity act) {
-        View filter = act.findViewById(R.id.transaction_list_account_name_filter);
-        if (filter == null) return;
-        boolean hasFilter = filter.getVisibility() == View.VISIBLE;
-        String accFilter = hasFilter ? String.valueOf(
-                ((AutoCompleteTextView) act.findViewById(R.id.transaction_filter_account_name))
-                        .getText()) : null;
+    public static void scheduleTransactionListReload() {
+        String filter = TransactionListFragment.accountFilter.get();
         AsyncTask<String, Void, List<LedgerTransaction>> task = new UTT();
-        task.execute(accFilter);
+        task.execute(filter);
     }
     public static LedgerTransaction getTransaction(int position) {
         List<LedgerTransaction> transactions = Data.transactions.get();

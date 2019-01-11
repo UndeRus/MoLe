@@ -34,7 +34,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 
 import net.ktnx.mobileledger.R;
@@ -43,6 +42,7 @@ import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -51,6 +51,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class TransactionListFragment extends MobileLedgerListFragment {
     public static final String BUNDLE_KEY_FILTER_ACCOUNT_NAME = "filter_account_name";
+    public static ObservableValue<String> accountFilter = new ObservableValue<>();
     private String mShowOnlyAccountName;
     private MenuItem menuTransactionListFilter;
     private View vAccountFilter;
@@ -114,7 +115,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.transaction_list_fragment, container, false);
     }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d("flow", "TransactionListFragment.onActivityCreated called");
@@ -159,49 +159,42 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
         TransactionListFragment me = this;
         MLDB.hook_autocompletion_adapter(mActivity, accNameFilter, "accounts", "name", true);
-        accNameFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
 //                Log.d("tmp", "direct onItemClick");
-                TransactionListViewModel.scheduleTransactionListReload(mActivity);
-                MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
-                modelAdapter.setBoldAccountName(mc.getString(1));
-                modelAdapter.notifyDataSetChanged();
-                Globals.hideSoftKeyboard(mActivity);
-            }
+            TransactionListViewModel.scheduleTransactionListReload();
+            MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
+            accountFilter.set(mc.getString(1));
+            Globals.hideSoftKeyboard(mActivity);
         });
 
-        if (mShowOnlyAccountName != null) {
-            accNameFilter.setText(mShowOnlyAccountName, false);
-            onShowFilterClick(null);
-            Log.d("flow", String.format("Account filter set to '%s'", mShowOnlyAccountName));
-        }
-
-        Data.profile.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(() -> {
-                    Log.d("transactions", "requesting list reload");
-                    TransactionListViewModel.scheduleTransactionListReload(mActivity);
-                });
-            }
+        accountFilter.addObserver((o, arg) -> {
+            String accountName = accountFilter.get();
+            modelAdapter.setBoldAccountName(accountName);
+            setShowOnlyAccountName(accountName);
+            TransactionListViewModel.scheduleTransactionListReload();
+            if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
         });
 
-        TransactionListViewModel.scheduleTransactionListReload(mActivity);
-        TransactionListViewModel.updating.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                swiper.setRefreshing(TransactionListViewModel.updating.get());
-            }
-        });
+        Data.profile.addObserver((o, arg) -> mActivity.runOnUiThread(() -> {
+            Log.d("transactions", "requesting list reload");
+            TransactionListViewModel.scheduleTransactionListReload();
+        }));
 
-        Data.transactions.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged());
-            }
-        });
+        TransactionListViewModel.scheduleTransactionListReload();
+        TransactionListViewModel.updating.addObserver(
+                (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
 
+        Data.transactions.addObserver(
+                (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
+
+        mActivity.findViewById(R.id.clearAccountNameFilter).setOnClickListener(v -> {
+            vAccountFilter.setVisibility(View.GONE);
+            if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(true);
+            accountFilter.set(null);
+            accNameFilter.setText(null);
+            TransactionListViewModel.scheduleTransactionListReload();
+            Globals.hideSoftKeyboard(mActivity);
+        });
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -215,25 +208,16 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         }
 
         super.onCreateOptionsMenu(menu, inflater);
-    }
 
-    public void onClearAccountNameClick(View view) {
-        vAccountFilter.setVisibility(View.GONE);
-        if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(true);
-        accNameFilter.setText(null);
-        mShowOnlyAccountName = null;
-        modelAdapter.resetBoldAccountName();
-        TransactionListViewModel.scheduleTransactionListReload(mActivity);
-        Globals.hideSoftKeyboard(mActivity);
-    }
-    public void onShowFilterClick(MenuItem menuItem) {
-        vAccountFilter.setVisibility(View.VISIBLE);
-        if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
-        if (menuItem != null) {
+        menuTransactionListFilter.setOnMenuItemClickListener(item -> {
+            vAccountFilter.setVisibility(View.VISIBLE);
+            if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
             accNameFilter.requestFocus();
             InputMethodManager imm =
                     (InputMethodManager) mActivity.getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(accNameFilter, 0);
-        }
+
+            return true;
+        });
     }
 }

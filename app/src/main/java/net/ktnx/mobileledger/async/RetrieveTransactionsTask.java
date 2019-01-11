@@ -30,6 +30,7 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -354,7 +355,7 @@ public class RetrieveTransactionsTask
                         Date now = new Date();
                         profile.set_option_value(MLDB.OPT_LAST_SCRAPE, now.getTime());
                         Data.lastUpdateDate.set(now);
-                        Data.transactions.set(transactionList);
+                        TransactionListViewModel.scheduleTransactionListReload();
                     }
                     finally {
                         db.endTransaction();
