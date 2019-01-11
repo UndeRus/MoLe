@@ -162,7 +162,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         accNameFilter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("tmp", "direct onItemClick");
+//                Log.d("tmp", "direct onItemClick");
                 TransactionListViewModel.scheduleTransactionListReload(mActivity);
                 MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
                 modelAdapter.setBoldAccountName(mc.getString(1));

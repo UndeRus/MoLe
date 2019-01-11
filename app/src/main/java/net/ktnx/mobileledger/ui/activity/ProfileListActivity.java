@@ -141,7 +141,7 @@ public class ProfileListActivity extends AppCompatActivity {
         recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
             @Override
             public boolean onFling(int dX, int dY) {
-                Log.d("tmp", String.format("fling %d %d", dX, dY));
+//                Log.d("tmp", String.format("fling %d %d", dX, dY));
                 if (dY > 0) fab.hide();
                 if (dY < 0) fab.show();
                 return false;

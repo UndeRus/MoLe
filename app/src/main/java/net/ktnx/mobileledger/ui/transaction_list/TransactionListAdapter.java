@@ -24,7 +24,6 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,8 +49,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         // a bit longer
         if (tr == null) return;
 
-        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
-                tr.getAccounts().size()));
+//        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
+//                tr.getAccounts().size()));
 
         TransactionLoader loader = new TransactionLoader();
         loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName));
@@ -60,7 +59,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     @NonNull
     @Override
     public TransactionRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("perf", "onCreateViewHolder called");
+//        Log.d("perf", "onCreateViewHolder called");
         View row = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.transaction_list_row, parent, false);
         return new TransactionRowHolder(row);
@@ -92,8 +91,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
-                Log.d("tmp", String.format("publishing tr %d acc %s %1.2f", tr.getId(),
-                        acc.getAccountName(), acc.getAmount()));
+//                Log.d(c.getAccountName(), acc.getAmount()));
                 publishProgress(new TransactionLoaderStep(p[0].holder, acc, rowIndex++,
                         p[0].boldAccountName));
             }
@@ -159,8 +157,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     accName.setText(acc.getAccountName());
                     accAmount.setText(acc.toString());
 
-                    Log.d("tmp", String.format("showing acc row %d: %s %1.2f", rowIndex,
-                            acc.getAccountName(), acc.getAmount()));
+//                    Log.d("tmp", String.format("showing acc row %d: %s %1.2f", rowIndex,
+//                            acc.getAccountName(), acc.getAmount()));
 
                     String boldAccountName = step.getBoldAccountName();
                     if ((boldAccountName != null) && boldAccountName.equals(acc.getAccountName())) {
@@ -184,8 +182,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                                 holder.tableAccounts.getChildCount() - accCount);
                     }
 
-                    Log.d("transactions",
-                            String.format("Position %d fill done", step.getPosition()));
+//                    Log.d("transactions",
+//                            String.format("Position %d fill done", step.getPosition()));
             }
         }
     }
