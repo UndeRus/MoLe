@@ -71,17 +71,14 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         if (backgroundTaskCountObserver == null) {
             Log.d("acc", "creating background task count observer");
-            Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = new Observer() {
-                @Override
-                public void update(Observable o, Object arg) {
-                    if (mActivity == null) return;
-                    if (swiper == null) return;
-                    mActivity.runOnUiThread(() -> {
-                        int cnt = Data.backgroundTaskCount.get();
-                        Log.d("acc", String.format("background task count changed to %d", cnt));
-                        swiper.setRefreshing(cnt > 0);
-                    });
-                }
+            Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = (o, arg) -> {
+                if (mActivity == null) return;
+                if (swiper == null) return;
+                mActivity.runOnUiThread(() -> {
+                    int cnt = Data.backgroundTaskCount.get();
+                    Log.d("acc", String.format("background task count changed to %d", cnt));
+                    swiper.setRefreshing(cnt > 0);
+                });
             });
         }
     }
