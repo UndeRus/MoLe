@@ -41,8 +41,6 @@ import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 
 import java.util.Collections;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * An activity representing a list of Profiles. This activity
@@ -207,6 +205,21 @@ public class ProfileListActivity extends AppCompatActivity {
                 MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
                 holder.mRadioView.setChecked(profile.equals(newProfile));
             });
+
+            holder.mRadioView.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (!isChecked) return;
+                MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
+                if (profile != null) Data.setCurrentProfile(profile);
+            });
+            View.OnClickListener profileSelector = v -> {
+                holder.mRadioView.setChecked(true);
+            };
+            holder.mTitle.setOnClickListener(profileSelector);
+            holder.mSubTitle.setOnClickListener(profileSelector);
+            Data.profile.addObserver((o, arg) -> {
+                MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
+                holder.mRadioView.setChecked(Data.profile.get().equals(profile));
+            });
             return holder;
         }
         @Override
@@ -215,20 +228,8 @@ public class ProfileListActivity extends AppCompatActivity {
             final MobileLedgerProfile currentProfile = Data.profile.get();
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                     currentProfile.getUuid()));
-            View.OnClickListener profileSelector = v -> {
-                holder.mRadioView.setChecked(true);
-                Data.setCurrentProfile(profile);
-            };
-            Data.profile.addObserver(new Observer() {
-                @Override
-                public void update(Observable o, Object arg) {
-                    holder.mRadioView.setChecked(Data.profile.get().equals(profile));
-                }
-            });
             holder.mTitle.setText(profile.getName());
-            holder.mTitle.setOnClickListener(profileSelector);
             holder.mSubTitle.setText(profile.getUrl());
-            holder.mSubTitle.setOnClickListener(profileSelector);
             holder.mRadioView.setChecked(profile.getUuid().equals(currentProfile.getUuid()));
 
             holder.itemView.setTag(profile);
