@@ -51,8 +51,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
@@ -163,13 +161,9 @@ public class MainActivity extends AppCompatActivity {
                     tvLastUpdate.setText(R.string.transaction_last_update_never);
                 }
                 else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        tvLastUpdate.setText(date.toInstant().atZone(ZoneId.systemDefault())
-                                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                    }
-                    else {
-                        tvLastUpdate.setText(DateFormat.getDateTimeInstance().format(date));
-                    }
+                    final String text = DateFormat.getDateTimeInstance().format(date);
+                    tvLastUpdate.setText(text);
+                    Log.d("despair", String.format("Date formatted: %s", text));
                 }
             });
         });
