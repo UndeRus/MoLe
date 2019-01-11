@@ -43,7 +43,6 @@ import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 
 import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
@@ -162,18 +161,10 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             mActivity.scheduleTransactionListRetrieval();
         });
 
-        Data.accounts.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged());
-            }
-        });
-        Data.profile.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                mActivity.runOnUiThread(() -> model.scheduleAccountListReload());
-            }
-        });
+        Data.accounts.addObserver(
+                (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
+        Data.profile.addObserver(
+                (o, arg) -> mActivity.runOnUiThread(() -> model.scheduleAccountListReload()));
         update_account_table();
     }
     private void update_account_table() {
