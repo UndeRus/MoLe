@@ -211,9 +211,7 @@ public class ProfileListActivity extends AppCompatActivity {
                 MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
                 if (profile != null) Data.setCurrentProfile(profile);
             });
-            View.OnClickListener profileSelector = v -> {
-                holder.mRadioView.setChecked(true);
-            };
+            View.OnClickListener profileSelector = v -> holder.mRadioView.setChecked(true);
             holder.mTitle.setOnClickListener(profileSelector);
             holder.mSubTitle.setOnClickListener(profileSelector);
             Data.profile.addObserver((o, arg) -> {
