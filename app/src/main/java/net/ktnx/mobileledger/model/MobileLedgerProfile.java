@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
@@ -209,7 +210,8 @@ public final class MobileLedgerProfile {
 
         db.execSQL("INSERT INTO transactions(profile, id, date, description, data_hash, keep) " +
                    "values(?,?,?,?,?,1)",
-                new Object[]{uuid, tr.getId(), tr.getDate(), tr.getDescription(), tr.getDataHash()
+                new Object[]{uuid, tr.getId(), Globals.formatLedgerDate(tr.getDate()),
+                             tr.getDescription(), tr.getDataHash()
                 });
 
         for (LedgerTransactionAccount item : tr.getAccounts()) {

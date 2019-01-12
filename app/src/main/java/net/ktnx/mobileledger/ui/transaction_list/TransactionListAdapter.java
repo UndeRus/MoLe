@@ -34,26 +34,57 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowHolder> {
     private String boldAccountName;
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
-        LedgerTransaction tr = TransactionListViewModel.getTransaction(position);
-        // in a race when transaction value is reduced, but the model hasn't been notified yet
-        // the view will disappear when the notifications reaches the model, so by simply omitting
-        // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
-        // a bit longer
-        if (tr == null) return;
+        TransactionListItem item = TransactionListViewModel.getTransactionListItem(position);
+
+        if (item.getType() == TransactionListItem.Type.TRANSACTION) {
+            holder.vTransaction.setVisibility(View.VISIBLE);
+            holder.vDelimiter.setVisibility(View.GONE);
+            LedgerTransaction tr = item.getTransaction();
+            // in a race when transaction value is reduced, but the model hasn't been notified yet
+            // the view will disappear when the notifications reaches the model, so by simply omitting
+            // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
+            // a bit longer
+            if (tr == null) return;
+
+            LedgerTransaction previous = null;
+            TransactionListItem previousItem = null;
+            if (position > 0)
+                previousItem = TransactionListViewModel.getTransactionListItem(position - 1);
 
 //        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
 //                tr.getAccounts().size()));
 
-        TransactionLoader loader = new TransactionLoader();
-        loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName));
+            TransactionLoader loader = new TransactionLoader();
+            loader.execute(
+                    new TransactionLoaderParams(tr, previous, holder, position, boldAccountName));
+
+            // WORKAROUND what seems to be a bug in CardHolder somewhere
+            // when a view that was previously holding a delimiter is re-purposed
+            // occasionally it stays too short (not high enough)
+            holder.vTransaction.measure(View.MeasureSpec
+                            .makeMeasureSpec(holder.itemView.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        }
+        else {
+            Date date = item.getDate();
+            holder.vTransaction.setVisibility(View.GONE);
+            holder.vDelimiter.setVisibility(View.VISIBLE);
+            holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
+            holder.tvDelimiterMonth
+                    .setText(item.isMonthShown() ? Globals.monthNames[date.getMonth()] : "");
+        }
     }
 
     @NonNull
@@ -83,11 +114,18 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         @Override
         protected Void doInBackground(TransactionLoaderParams... p) {
             LedgerTransaction tr = p[0].transaction;
+            LedgerTransaction previous = p[0].previousTransaction;
 
             SQLiteDatabase db = MLDB.getReadableDatabase();
             tr.loadData(db);
 
-            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr));
+            boolean showDate;
+            if (previous == null) showDate = true;
+            else {
+                previous.loadData(db);
+                showDate = !previous.getDate().equals(tr.getDate());
+            }
+            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, showDate));
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
@@ -109,7 +147,6 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             switch (step.getStep()) {
                 case HEAD:
                     holder.tvDescription.setText(step.getTransaction().getDescription());
-                    holder.tvDate.setText(step.getTransaction().getDate());
 
                     if (step.getPosition() % 2 == 0) {
                         holder.row.setBackgroundColor(Globals.tableRowEvenBG);
@@ -189,13 +226,18 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     }
 
     private class TransactionLoaderParams {
-        LedgerTransaction transaction;
+        LedgerTransaction transaction, previousTransaction;
         TransactionRowHolder holder;
         int position;
         String boldAccountName;
-        TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder,
+        TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder, int position, String boldAccountName) {
+            this(transaction, null, holder, position, boldAccountName);
+        }
+        TransactionLoaderParams(LedgerTransaction transaction,
+                                LedgerTransaction previousTransaction, TransactionRowHolder holder,
                                 int position, String boldAccountName) {
             this.transaction = transaction;
+            this.previousTransaction = previousTransaction;
             this.holder = holder;
             this.position = position;
             this.boldAccountName = boldAccountName;

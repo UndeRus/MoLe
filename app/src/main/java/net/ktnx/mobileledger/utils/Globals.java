@@ -23,6 +23,11 @@ import android.support.annotation.ColorInt;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public final class Globals {
     @ColorInt
     public static int tableRowEvenBG;
@@ -30,6 +35,7 @@ public final class Globals {
     public static int tableRowOddBG;
     @ColorInt
     public static int primaryDark, defaultTextColor;
+    public static String[] monthNames;
     public static void hideSoftKeyboard(Activity act) {
         // hide the keyboard
         View v = act.getCurrentFocus();
@@ -39,5 +45,16 @@ public final class Globals {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
-
+    private static SimpleDateFormat ledgerDateFormatter = new SimpleDateFormat("y/M/d", Locale.US);
+    public static Date parseLedgerDate(String dateString) {
+        try {
+            return ledgerDateFormatter.parse(dateString);
+        }
+        catch (ParseException e) {
+            throw new RuntimeException(String.format("Error parsing date '%s'", dateString), e);
+        }
+    }
+    public static String formatLedgerDate(Date date) {
+        return ledgerDateFormatter.format(date);
+    }
 }

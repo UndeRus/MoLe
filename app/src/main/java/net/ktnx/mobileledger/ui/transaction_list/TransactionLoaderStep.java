@@ -29,12 +29,14 @@ class TransactionLoaderStep {
     private LedgerTransactionAccount account;
     private int accountPosition;
     private String boldAccountName;
+    private boolean showDate;
     public TransactionLoaderStep(TransactionRowHolder holder, int position,
-                                 LedgerTransaction transaction) {
+                                 LedgerTransaction transaction, boolean showDate) {
         this.step = TransactionListAdapter.LoaderStep.HEAD;
         this.holder = holder;
         this.transaction = transaction;
         this.position = position;
+        this.showDate = showDate;
     }
     public TransactionLoaderStep(TransactionRowHolder holder, LedgerTransactionAccount account,
                                  int accountPosition, String boldAccountName) {
@@ -73,5 +75,8 @@ class TransactionLoaderStep {
     }
     public LedgerTransactionAccount getAccount() {
         return account;
+    }
+    public boolean isDateShown() {
+        return showDate;
     }
 }

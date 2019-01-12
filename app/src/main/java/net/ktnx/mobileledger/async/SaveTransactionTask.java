@@ -23,6 +23,7 @@ import android.util.Log;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
 
@@ -42,11 +43,11 @@ import static java.lang.Thread.sleep;
 
 public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private final TaskCallback taskCallback;
+    protected String error;
     private String token;
     private String session;
     private String backendUrl;
     private LedgerTransaction ltr;
-    protected String error;
 
     public SaveTransactionTask(TaskCallback callback) {
         taskCallback = callback;
@@ -65,7 +66,7 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         UrlEncodedFormData params = new UrlEncodedFormData();
         params.addPair("_formid", "identify-add");
         if (token != null) params.addPair("_token", token);
-        params.addPair("date", ltr.getDate());
+        params.addPair("date", Globals.formatLedgerDate(ltr.getDate()));
         params.addPair("description", ltr.getDescription());
         for (LedgerTransactionAccount acc : ltr.getAccounts()) {
             params.addPair("account", acc.getAccountName());

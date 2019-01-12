@@ -22,7 +22,7 @@ import android.os.AsyncTask;
 
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.List;
@@ -32,22 +32,22 @@ public class TransactionListViewModel extends ViewModel {
 
     public static void scheduleTransactionListReload() {
         String filter = TransactionListFragment.accountFilter.get();
-        AsyncTask<String, Void, List<LedgerTransaction>> task = new UTT();
+        AsyncTask<String, Void, List<TransactionListItem>> task = new UTT();
         task.execute(filter);
     }
-    public static LedgerTransaction getTransaction(int position) {
-        List<LedgerTransaction> transactions = Data.transactions.get();
+    public static TransactionListItem getTransactionListItem(int position) {
+        List<TransactionListItem> transactions = Data.transactions.get();
         if (position >= transactions.size()) return null;
         return transactions.get(position);
     }
     public static int getTransactionCount() {
-        List<LedgerTransaction> transactions = Data.transactions.get();
+        List<TransactionListItem> transactions = Data.transactions.get();
         if (transactions == null) return 0;
         return transactions.size();
     }
     private static class UTT extends UpdateTransactionsTask {
         @Override
-        protected void onPostExecute(List<LedgerTransaction> list) {
+        protected void onPostExecute(List<TransactionListItem> list) {
             super.onPostExecute(list);
             if (list != null) Data.transactions.set(list);
         }

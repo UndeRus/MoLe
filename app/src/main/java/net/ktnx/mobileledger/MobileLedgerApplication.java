@@ -36,14 +36,18 @@ public class MobileLedgerApplication extends Application {
     public void onCreate() {
         super.onCreate();
         updateColorValues();
+        updateMonthNames();
         MLDB.init(this);
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
         Data.optShowOnlyStarred.set(p.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
-        SharedPreferences.OnSharedPreferenceChangeListener handler = (preference, value) -> {
-            Data.optShowOnlyStarred
-                    .set(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
-        };
+        SharedPreferences.OnSharedPreferenceChangeListener handler =
+                (preference, value) -> Data.optShowOnlyStarred
+                        .set(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
         p.registerOnSharedPreferenceChangeListener(handler);
+    }
+    private void updateMonthNames() {
+        Resources rm = getResources();
+        Globals.monthNames = rm.getStringArray(R.array.month_names);
     }
     @Override
     public void onTerminate() {
@@ -54,6 +58,7 @@ public class MobileLedgerApplication extends Application {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateColorValues();
+        updateMonthNames();
     }
     private void updateColorValues() {
         Resources rm = getResources();

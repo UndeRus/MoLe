@@ -49,6 +49,7 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
+import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.Date;
@@ -135,8 +136,10 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         saver = new SaveTransactionTask(this);
 
-        String date = tvDate.getText().toString();
-        if (date.isEmpty()) date = String.valueOf(new Date().getDate());
+        String dateString = tvDate.getText().toString();
+        Date date;
+        if (dateString.isEmpty()) date = new Date();
+        else date = Globals.parseLedgerDate(dateString);
         LedgerTransaction tr = new LedgerTransaction(date, tvDescription.getText().toString());
 
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);

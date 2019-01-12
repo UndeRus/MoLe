@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -27,14 +28,20 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.R;
 
 class TransactionRowHolder extends RecyclerView.ViewHolder {
-    TextView tvDescription, tvDate;
+    TextView tvDescription;
     LinearLayout tableAccounts;
     ConstraintLayout row;
+    ConstraintLayout vDelimiter;
+    CardView vTransaction;
+    TextView tvDelimiterMonth, tvDelimiterDate;
     public TransactionRowHolder(@NonNull View itemView) {
         super(itemView);
         this.row = itemView.findViewById(R.id.transaction_row);
         this.tvDescription = itemView.findViewById(R.id.transaction_row_description);
-        this.tvDate = itemView.findViewById(R.id.transaction_row_date);
         this.tableAccounts = itemView.findViewById(R.id.transaction_row_acc_amounts);
+        this.vDelimiter = itemView.findViewById(R.id.transaction_delimiter);
+        this.vTransaction = itemView.findViewById(R.id.transaction_card_view);
+        this.tvDelimiterDate = itemView.findViewById(R.id.transaction_delimiter_date);
+        this.tvDelimiterMonth = itemView.findViewById(R.id.transaction_delimiter_month);
     }
 }

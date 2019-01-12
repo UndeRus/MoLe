@@ -22,11 +22,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import net.ktnx.mobileledger.utils.Digest;
+import net.ktnx.mobileledger.utils.Globals;
 
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -43,12 +45,15 @@ public class LedgerTransaction {
             };
     private String profile;
     private Integer id;
-    private String date;
+    private Date date;
     private String description;
     private ArrayList<LedgerTransactionAccount> accounts;
     private String dataHash;
     private boolean dataLoaded;
-    public LedgerTransaction(Integer id, String date, String description) {
+    public LedgerTransaction(Integer id, String dateString, String description) {
+        this(id, Globals.parseLedgerDate(dateString), description);
+    }
+    public LedgerTransaction(Integer id, Date date, String description) {
         this.profile = Data.profile.get().getUuid();
         this.id = id;
         this.date = date;
@@ -57,11 +62,11 @@ public class LedgerTransaction {
         this.dataHash = null;
         dataLoaded = false;
     }
-    public LedgerTransaction(String date, String description) {
+    public LedgerTransaction(Date date, String description) {
         this(null, date, description);
     }
     public LedgerTransaction(int id) {
-        this(id, null, null);
+        this(id, (Date) null, null);
     }
     public ArrayList<LedgerTransactionAccount> getAccounts() {
         return accounts;
@@ -70,10 +75,10 @@ public class LedgerTransaction {
         accounts.add(item);
         dataHash = null;
     }
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
         dataHash = null;
     }
@@ -131,7 +136,8 @@ public class LedgerTransaction {
                         new String[]{profile, String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
-                date = cTr.getString(0);
+                String dateString = cTr.getString(0);
+                date = Globals.parseLedgerDate(dateString);
                 description = cTr.getString(1);
 
                 try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +
