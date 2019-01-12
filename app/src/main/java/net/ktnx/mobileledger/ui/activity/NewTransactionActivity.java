@@ -82,15 +82,12 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         setSupportActionBar(toolbar);
 
         text_date = findViewById(R.id.new_transaction_date);
-        text_date.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) pickTransactionDate(v);
-            }
+        text_date.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) pickTransactionDate(v);
         });
         text_descr = findViewById(R.id.new_transaction_description);
         MLDB.hook_autocompletion_adapter(this, text_descr, MLDB.DESCRIPTION_HISTORY_TABLE,
-                "description", false);
+                "description", false, findViewById(R.id.new_transaction_acc_1));
         hook_text_change_listener(text_descr);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -102,8 +99,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
             TextView amount_view = (TextView) row.getChildAt(1);
             hook_swipe_listener(row);
-            MLDB.hook_autocompletion_adapter(this, acc_name_view, MLDB.ACCOUNTS_TABLE, "name",
-                    true);
+            MLDB.hook_autocompletion_adapter(this, acc_name_view, MLDB.ACCOUNTS_TABLE, "name", true,
+                    amount_view);
             hook_text_change_listener(acc_name_view);
             hook_text_change_listener(amount_view);
 //            Log.d("swipe", "hooked to row "+i);
@@ -299,7 +296,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hook_swipe_listener(row);
-        MLDB.hook_autocompletion_adapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true);
+        MLDB.hook_autocompletion_adapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt);
         hook_text_change_listener(acc);
         hook_text_change_listener(amt);
     }

@@ -29,6 +29,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.provider.FontsContract;
 import android.util.Log;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
@@ -132,6 +133,13 @@ public final class MLDB {
                                                    final AutoCompleteTextView view,
                                                    final String table, final String field,
                                                    final boolean profileSpecific) {
+        hook_autocompletion_adapter(context, view, table, field, profileSpecific, null);
+    }
+    @TargetApi(Build.VERSION_CODES.N)
+    public static void hook_autocompletion_adapter(final Context context,
+                                                   final AutoCompleteTextView view, final String table, final String field,
+                                                   final boolean profileSpecific,
+                                                   final View nextView) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
         SimpleCursorAdapter adapter =
@@ -139,57 +147,59 @@ public final class MLDB {
                         from, to, 0);
         adapter.setStringConversionColumn(1);
 
-        FilterQueryProvider provider = new FilterQueryProvider() {
-            @Override
-            public Cursor runQuery(CharSequence constraint) {
-                if (constraint == null) return null;
+        FilterQueryProvider provider = constraint -> {
+            if (constraint == null) return null;
 
-                String str = constraint.toString().toUpperCase();
-                Log.d("autocompletion", "Looking for " + str);
-                String[] col_names = {FontsContract.Columns._ID, field};
-                MatrixCursor c = new MatrixCursor(col_names);
+            String str = constraint.toString().toUpperCase();
+            Log.d("autocompletion", "Looking for " + str);
+            String[] col_names = {FontsContract.Columns._ID, field};
+            MatrixCursor c = new MatrixCursor(col_names);
 
-                String sql;
-                String[] params;
-                if (profileSpecific) {
-                    sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                                        "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " +
-                                        "else 9 end " + "FROM %s " +
-                                        "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
-                                        "ORDER BY 2, 1;", field, field, field, field, table, field);
-                    params = new String[]{str, str, str, Data.profile.get().getUuid(), str};
-                }
-                else {
-                    sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                                        "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " +
-                                        "else 9 end " + "FROM %s " +
-                                        "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 2, 1;",
-                            field, field, field, field, table, field);
-                    params = new String[]{str, str, str, str};
-                }
-                Log.d("autocompletion", sql);
-                SQLiteDatabase db = MLDB.getReadableDatabase();
-
-                try (Cursor matches = db.rawQuery(sql, params)) {
-                    int i = 0;
-                    while (matches.moveToNext()) {
-                        String match = matches.getString(0);
-                        int order = matches.getInt(1);
-                        Log.d("autocompletion", String.format("match: %s |%d", match, order));
-                        c.newRow().add(i++).add(match);
-                    }
-                }
-
-                return c;
-
+            String sql;
+            String[] params;
+            if (profileSpecific) {
+                sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                                    "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                                    "WHEN %s_upper LIKE '%% '||?||'%%' then 3 else 9 end " +
+                                    "FROM %s " +
+                                    "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
+                                    "ORDER BY 2, 1;", field, field, field, field, table, field);
+                params = new String[]{str, str, str, Data.profile.get().getUuid(), str};
             }
+            else {
+                sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
+                                    "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                                    "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
+                                    "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " +
+                                    "ORDER BY 2, 1;", field, field, field, field, table, field);
+                params = new String[]{str, str, str, str};
+            }
+            Log.d("autocompletion", sql);
+            SQLiteDatabase db = MLDB.getReadableDatabase();
+
+            try (Cursor matches = db.rawQuery(sql, params)) {
+                int i = 0;
+                while (matches.moveToNext()) {
+                    String match = matches.getString(0);
+                    int order = matches.getInt(1);
+                    Log.d("autocompletion", String.format("match: %s |%d", match, order));
+                    c.newRow().add(i++).add(match);
+                }
+            }
+
+            return c;
+
         };
 
         adapter.setFilterQueryProvider(provider);
 
         view.setAdapter(adapter);
+
+        if (nextView != null) {
+            view.setOnItemClickListener((parent, itemView, position, id) -> {
+                nextView.requestFocus(View.FOCUS_FORWARD);
+            });
+        }
     }
     public static void init(Application context) {
         MLDB.context = context;
