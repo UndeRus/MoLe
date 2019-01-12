@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -36,9 +36,9 @@
 
     <style name="nav_button">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_height">40dp</item>
         <item name="android:clickable">true</item>
-        <item name="android:drawablePadding">32dp</item>
+        <item name="android:drawablePadding">24dp</item>
         <item name="android:focusable">auto</item>
         <item name="android:gravity">center_vertical|start</item>
         <item name="android:paddingStart">@dimen/activity_horizontal_margin</item>
