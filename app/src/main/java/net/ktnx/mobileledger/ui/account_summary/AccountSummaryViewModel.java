@@ -105,8 +105,8 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
 
         if (position % 2 == 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                    .setBackgroundColor(rm.getColor(R.color.table_row_even_bg, ctx.getTheme()));
-            else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_even_bg));
+                    .setBackgroundColor(rm.getColor(R.color.table_row_dark_bg, ctx.getTheme()));
+            else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_dark_bg));
         }
         else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row

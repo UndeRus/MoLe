@@ -63,7 +63,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 //                tr.getAccounts().size()));
 
             TransactionLoader loader = new TransactionLoader();
-            loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName));
+            loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName,
+                    item.isOdd()));
 
             // WORKAROUND what seems to be a bug in CardHolder somewhere
             // when a view that was previously holding a delimiter is re-purposed
@@ -116,11 +117,12 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         @Override
         protected Void doInBackground(TransactionLoaderParams... p) {
             LedgerTransaction tr = p[0].transaction;
+            boolean odd = p[0].odd;
 
             SQLiteDatabase db = MLDB.getReadableDatabase();
             tr.loadData(db);
 
-            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr));
+            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, odd));
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
@@ -143,12 +145,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 case HEAD:
                     holder.tvDescription.setText(step.getTransaction().getDescription());
 
-                    if (step.getPosition() % 2 == 0) {
-                        holder.row.setBackgroundColor(Globals.tableRowEvenBG);
-                    }
-                    else {
-                        holder.row.setBackgroundColor(Globals.tableRowOddBG);
-                    }
+                    if (step.isOdd()) holder.row.setBackgroundColor(Globals.tableRowDarkBG);
+                    else holder.row.setBackgroundColor(Globals.tableRowLightBG);
 
                     break;
                 case ACCOUNTS:
@@ -225,12 +223,14 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         TransactionRowHolder holder;
         int position;
         String boldAccountName;
+        boolean odd;
         TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder,
-                                int position, String boldAccountName) {
+                                int position, String boldAccountName, boolean odd) {
             this.transaction = transaction;
             this.holder = holder;
             this.position = position;
             this.boldAccountName = boldAccountName;
+            this.odd = odd;
         }
     }
 }

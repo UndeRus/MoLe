@@ -30,9 +30,9 @@ import java.util.Locale;
 
 public final class Globals {
     @ColorInt
-    public static int tableRowEvenBG;
+    public static int tableRowLightBG;
     @ColorInt
-    public static int tableRowOddBG;
+    public static int tableRowDarkBG;
     @ColorInt
     public static int primaryDark, defaultTextColor;
     public static String[] monthNames;

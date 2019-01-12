@@ -26,14 +26,16 @@ public class TransactionListItem {
     private Date date;
     private boolean monthShown;
     private LedgerTransaction transaction;
+    private boolean odd;
     public TransactionListItem(Date date, boolean monthShown) {
         this.type = Type.DELIMITER;
         this.date = date;
         this.monthShown = monthShown;
     }
-    public TransactionListItem(LedgerTransaction transaction) {
+    public TransactionListItem(LedgerTransaction transaction, boolean isOdd) {
         this.type = Type.TRANSACTION;
         this.transaction = transaction;
+        this.odd = isOdd;
     }
     @NonNull
     public Type getType() {
@@ -47,6 +49,9 @@ public class TransactionListItem {
     }
     public LedgerTransaction getTransaction() {
         return transaction;
+    }
+    public boolean isOdd() {
+        return odd;
     }
     public enum Type {TRANSACTION, DELIMITER}
 }

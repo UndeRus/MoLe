@@ -64,14 +64,14 @@ public class MobileLedgerApplication extends Application {
         Resources rm = getResources();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Resources.Theme theme = getTheme();
-            Globals.tableRowOddBG = rm.getColor(R.color.table_row_odd_bg, theme);
-            Globals.tableRowEvenBG = rm.getColor(R.color.table_row_even_bg, theme);
+            Globals.tableRowDarkBG = rm.getColor(R.color.table_row_dark_bg, theme);
+            Globals.tableRowLightBG = rm.getColor(R.color.table_row_light_bg, theme);
             Globals.primaryDark = rm.getColor(R.color.design_default_color_primary_dark, theme);
             Globals.defaultTextColor = rm.getColor(android.R.color.tab_indicator_text, theme);
         }
         else {
-            Globals.tableRowOddBG = rm.getColor(R.color.table_row_odd_bg);
-            Globals.tableRowEvenBG = rm.getColor(R.color.table_row_even_bg);
+            Globals.tableRowDarkBG = rm.getColor(R.color.table_row_dark_bg);
+            Globals.tableRowLightBG = rm.getColor(R.color.table_row_light_bg);
             Globals.primaryDark = rm.getColor(R.color.design_default_color_primary_dark);
             Globals.defaultTextColor = rm.getColor(android.R.color.tab_indicator_text);
         }

@@ -234,10 +234,10 @@ public class MainActivity extends AppCompatActivity {
     public void markDrawerItemCurrent(int id) {
         TextView item = drawer.findViewById(id);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg, getTheme()));
+            item.setBackgroundColor(getResources().getColor(R.color.table_row_dark_bg, getTheme()));
         }
         else {
-            item.setBackgroundColor(getResources().getColor(R.color.table_row_even_bg));
+            item.setBackgroundColor(getResources().getColor(R.color.table_row_dark_bg));
         }
 
         @ColorInt int transparent = getResources().getColor(android.R.color.transparent);
