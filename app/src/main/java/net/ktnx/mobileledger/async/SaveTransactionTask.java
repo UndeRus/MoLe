@@ -41,18 +41,18 @@ import java.util.regex.Pattern;
 import static java.lang.Thread.sleep;
 
 public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
-    private final TaskCallback task_callback;
+    private final TaskCallback taskCallback;
     private String token;
     private String session;
-    private String backend_url;
+    private String backendUrl;
     private LedgerTransaction ltr;
     protected String error;
 
     public SaveTransactionTask(TaskCallback callback) {
-        task_callback = callback;
+        taskCallback = callback;
     }
-    private boolean send_ok() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepare_connection("add");
+    private boolean sendOK() throws IOException {
+        HttpURLConnection http = NetworkUtil.prepareConnection("add");
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         http.setRequestProperty("Accept", "*/*");
@@ -63,15 +63,15 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         http.setDoInput(true);
 
         UrlEncodedFormData params = new UrlEncodedFormData();
-        params.add_pair("_formid", "identify-add");
-        if (token != null) params.add_pair("_token", token);
-        params.add_pair("date", ltr.getDate());
-        params.add_pair("description", ltr.getDescription());
+        params.addPair("_formid", "identify-add");
+        if (token != null) params.addPair("_token", token);
+        params.addPair("date", ltr.getDate());
+        params.addPair("description", ltr.getDescription());
         for (LedgerTransactionAccount acc : ltr.getAccounts()) {
-            params.add_pair("account", acc.getAccountName());
+            params.addPair("account", acc.getAccountName());
             if (acc.isAmountSet())
-                params.add_pair("amount", String.format(Locale.US, "%1.2f", acc.getAmount()));
-            else params.add_pair("amount", "");
+                params.addPair("amount", String.format(Locale.US, "%1.2f", acc.getAmount()));
+            else params.addPair("amount", "");
         }
 
         String body = params.toString();
@@ -91,13 +91,13 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                 } else if (http.getResponseCode() == 200) {
                     // get the new cookie
                     {
-                        Pattern sess_cookie_re = Pattern.compile("_SESSION=([^;]+);.*");
+                        Pattern reSessionCookie = Pattern.compile("_SESSION=([^;]+);.*");
 
                         Map<String, List<String>> header = http.getHeaderFields();
-                        List<String> cookie_header = header.get("Set-Cookie");
-                        if (cookie_header != null) {
-                            String cookie = cookie_header.get(0);
-                            Matcher m = sess_cookie_re.matcher(cookie);
+                        List<String> cookieHeader = header.get("Set-Cookie");
+                        if (cookieHeader != null) {
+                            String cookie = cookieHeader.get(0);
+                            Matcher m = reSessionCookie.matcher(cookie);
                             if (m.matches()) {
                                 session = m.group(1);
                                 Log.d("network", "new session is " + session);
@@ -135,11 +135,11 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
         error = null;
         try {
-            backend_url = Data.profile.get().getUrl();
+            backendUrl = Data.profile.get().getUrl();
             ltr = ledgerTransactions[0];
 
             int tried = 0;
-            while (!send_ok()) {
+            while (!sendOK()) {
                 try {
                     tried++;
                     if (tried >= 2)
@@ -162,6 +162,6 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        task_callback.done(error);
+        taskCallback.done(error);
     }
 }

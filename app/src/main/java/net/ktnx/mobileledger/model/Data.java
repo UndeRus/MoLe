@@ -36,7 +36,7 @@ public final class Data {
             new ObservableList<>(new ArrayList<>());
     public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
-        MLDB.set_option_value(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
+        MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
         profile.set(newProfile);
     }
 }

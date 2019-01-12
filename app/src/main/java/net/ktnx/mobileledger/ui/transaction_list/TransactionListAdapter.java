@@ -112,10 +112,10 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     holder.tvDate.setText(step.getTransaction().getDate());
 
                     if (step.getPosition() % 2 == 0) {
-                        holder.row.setBackgroundColor(Globals.table_row_even_bg);
+                        holder.row.setBackgroundColor(Globals.tableRowEvenBG);
                     }
                     else {
-                        holder.row.setBackgroundColor(Globals.table_row_odd_bg);
+                        holder.row.setBackgroundColor(Globals.tableRowOddBG);
                     }
 
                     break;

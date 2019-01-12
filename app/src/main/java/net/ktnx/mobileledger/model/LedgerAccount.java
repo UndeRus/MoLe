@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -32,7 +32,7 @@ public class LedgerAccount {
     private boolean hidden;
     private boolean hiddenToBe;
     private List<LedgerAmount> amounts;
-    static Pattern higher_account = Pattern.compile("^[^:]+:");
+    static Pattern reHigherAccount = Pattern.compile("^[^:]+:");
 
     public LedgerAccount(String name) {
         this.setName(name);
@@ -64,7 +64,7 @@ public class LedgerAccount {
         shortName = name;
         StringBuilder parentBuilder = new StringBuilder();
         while (true) {
-            Matcher m = higher_account.matcher(shortName);
+            Matcher m = reHigherAccount.matcher(shortName);
             if (m.find()) {
                 level++;
                 parentBuilder.append(m.group(0));

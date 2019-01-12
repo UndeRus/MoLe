@@ -78,8 +78,8 @@ public final class MLDB {
     public static SQLiteDatabase getWritableDatabase() {
         return getDatabase(WRITE);
     }
-    static public int get_option_value(String name, int default_value) {
-        String s = get_option_value(name, String.valueOf(default_value));
+    static public int getIntOption(String name, int default_value) {
+        String s = getOption(name, String.valueOf(default_value));
         try {
             return Integer.parseInt(s);
         }
@@ -88,8 +88,8 @@ public final class MLDB {
             return default_value;
         }
     }
-    static public long get_option_value(String name, long default_value) {
-        String s = get_option_value(name, String.valueOf(default_value));
+    static public long getLongOption(String name, long default_value) {
+        String s = getOption(name, String.valueOf(default_value));
         try {
             return Long.parseLong(s);
         }
@@ -98,7 +98,7 @@ public final class MLDB {
             return default_value;
         }
     }
-    static public String get_option_value(String name, String default_value) {
+    static public String getOption(String name, String default_value) {
         Log.d("db", "about to fetch option " + name);
         SQLiteDatabase db = getReadableDatabase();
         try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
@@ -119,27 +119,28 @@ public final class MLDB {
             return default_value;
         }
     }
-    static public void set_option_value(String name, String value) {
+    static public void setOption(String name, String value) {
         Log.d("option", String.format("%s := %s", name, value));
         SQLiteDatabase db = MLDB.getWritableDatabase();
         db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{NO_PROFILE, name, value});
     }
-    static public void set_option_value(String name, long value) {
-        set_option_value(name, String.valueOf(value));
+    static public void setLongOption(String name, long value) {
+        setOption(name, String.valueOf(value));
     }
     @TargetApi(Build.VERSION_CODES.N)
-    public static void hook_autocompletion_adapter(final Context context,
-                                                   final AutoCompleteTextView view,
-                                                   final String table, final String field,
-                                                   final boolean profileSpecific) {
-        hook_autocompletion_adapter(context, view, table, field, profileSpecific, null);
+    public static void hookAutocompletionAdapter(final Context context,
+                                                 final AutoCompleteTextView view,
+                                                 final String table, final String field,
+                                                 final boolean profileSpecific) {
+        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null);
     }
     @TargetApi(Build.VERSION_CODES.N)
-    public static void hook_autocompletion_adapter(final Context context,
-                                                   final AutoCompleteTextView view, final String table, final String field,
-                                                   final boolean profileSpecific,
-                                                   final View nextView) {
+    public static void hookAutocompletionAdapter(final Context context,
+                                                 final AutoCompleteTextView view,
+                                                 final String table, final String field,
+                                                 final boolean profileSpecific,
+                                                 final View nextView) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
         SimpleCursorAdapter adapter =

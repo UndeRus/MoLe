@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -25,9 +25,9 @@ import android.view.inputmethod.InputMethodManager;
 
 public final class Globals {
     @ColorInt
-    public static int table_row_even_bg;
+    public static int tableRowEvenBG;
     @ColorInt
-    public static int table_row_odd_bg;
+    public static int tableRowOddBG;
     @ColorInt
     public static int primaryDark, defaultTextColor;
     public static void hideSoftKeyboard(Activity act) {

@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         Data.profiles.setList(MobileLedgerProfile.loadAllFromDB());
         MobileLedgerProfile profile = null;
 
-        String profileUUID = MLDB.get_option_value(MLDB.OPT_PROFILE_UUID, null);
+        String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
         if (profileUUID == null) {
             if (Data.profiles.isEmpty()) {
                 Data.profiles.setList(MobileLedgerProfile.createInitialProfileList());
@@ -215,18 +215,18 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent, args);
         }
     }
-    public void fab_new_transaction_clicked(View view) {
+    public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.dummy);
     }
 
-    public void nav_exit_clicked(View view) {
+    public void navExitClicked(View view) {
         Log.w("app", "exiting");
         finish();
     }
 
-    public void nav_settings_clicked(View view) {
+    public void navSettingsClicked(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
         drawer.closeDrawers();
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setIndeterminate(false);
         }
     }
-    public void nav_profiles_clicked(View view) {
+    public void navProfilesClicked(View view) {
         drawer.closeDrawers();
         Intent intent = new Intent(this, ProfileListActivity.class);
         startActivity(intent);

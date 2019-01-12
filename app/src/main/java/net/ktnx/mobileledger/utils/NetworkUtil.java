@@ -29,7 +29,7 @@ import java.net.URL;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
-    public static HttpURLConnection prepare_connection(String path) throws IOException {
+    public static HttpURLConnection prepareConnection(String path) throws IOException {
         MobileLedgerProfile profile = Data.profile.get();
         final String backend_url = profile.getUrl();
         final boolean use_auth = profile.isAuthEnabled();

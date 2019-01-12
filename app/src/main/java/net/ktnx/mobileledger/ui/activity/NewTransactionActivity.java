@@ -69,10 +69,12 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private static SaveTransactionTask saver;
     private TableLayout table;
     private ProgressBar progress;
-    private TextView text_date;
-    private AutoCompleteTextView text_descr;
+    private TextView tvDate;
+    private AutoCompleteTextView tvDescription;
     private MenuItem mSave;
-
+    private static boolean isZero(float f) {
+        return (f < 0.005) && (f > -0.005);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,14 +82,14 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        text_date = findViewById(R.id.new_transaction_date);
-        text_date.setOnFocusChangeListener((v, hasFocus) -> {
+        tvDate = findViewById(R.id.new_transaction_date);
+        tvDate.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) pickTransactionDate(v);
         });
-        text_descr = findViewById(R.id.new_transaction_description);
-        MLDB.hook_autocompletion_adapter(this, text_descr, MLDB.DESCRIPTION_HISTORY_TABLE,
+        tvDescription = findViewById(R.id.new_transaction_description);
+        MLDB.hookAutocompletionAdapter(this, tvDescription, MLDB.DESCRIPTION_HISTORY_TABLE,
                 "description", false, findViewById(R.id.new_transaction_acc_1));
-        hook_text_change_listener(text_descr);
+        hookTextChangeListener(tvDescription);
 
         progress = findViewById(R.id.save_transaction_progress);
 
@@ -95,21 +97,15 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
             TableRow row = (TableRow) table.getChildAt(i);
-            AutoCompleteTextView acc_name_view = (AutoCompleteTextView) row.getChildAt(0);
-            TextView amount_view = (TextView) row.getChildAt(1);
-            hook_swipe_listener(row);
-            MLDB.hook_autocompletion_adapter(this, acc_name_view, MLDB.ACCOUNTS_TABLE, "name", true,
-                    amount_view);
-            hook_text_change_listener(acc_name_view);
-            hook_text_change_listener(amount_view);
+            AutoCompleteTextView tvAccountName = (AutoCompleteTextView) row.getChildAt(0);
+            TextView tvAmount = (TextView) row.getChildAt(1);
+            hookSwipeListener(row);
+            MLDB.hookAutocompletionAdapter(this, tvAccountName, MLDB.ACCOUNTS_TABLE, "name", true,
+                    tvAmount);
+            hookTextChangeListener(tvAccountName);
+            hookTextChangeListener(tvAmount);
 //            Log.d("swipe", "hooked to row "+i);
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (text_descr.getText().toString().isEmpty()) text_descr.requestFocus();
     }
 
     @Override
@@ -127,17 +123,21 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
         return super.onOptionsItemSelected(item);
     }
-
-    public void save_transaction() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (tvDescription.getText().toString().isEmpty()) tvDescription.requestFocus();
+    }
+    public void saveTransaction() {
         if (mSave != null) mSave.setVisible(false);
-        toggle_all_editing(false);
+        toggleAllEditing(false);
         progress.setVisibility(View.VISIBLE);
 
         saver = new SaveTransactionTask(this);
 
-        String date = text_date.getText().toString();
+        String date = tvDate.getText().toString();
         if (date.isEmpty()) date = String.valueOf(new Date().getDate());
-        LedgerTransaction tr = new LedgerTransaction(date, text_descr.getText().toString());
+        LedgerTransaction tr = new LedgerTransaction(date, tvDescription.getText().toString());
 
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
@@ -152,10 +152,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         }
         saver.execute(tr);
     }
-
-    private void toggle_all_editing(boolean enabled) {
-        text_date.setEnabled(enabled);
-        text_descr.setEnabled(enabled);
+    private void toggleAllEditing(boolean enabled) {
+        tvDate.setEnabled(enabled);
+        tvDescription.setEnabled(enabled);
         TableLayout table = findViewById(R.id.new_transaction_accounts_table);
         for (int i = 0; i < table.getChildCount(); i++) {
             TableRow row = (TableRow) table.getChildAt(i);
@@ -164,8 +163,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             }
         }
     }
-
-    private void hook_swipe_listener(final TableRow row) {
+    private void hookSwipeListener(final TableRow row) {
         row.getChildAt(0).setOnTouchListener(new OnSwipeTouchListener(this) {
             public void onSwipeLeft() {
 //                Log.d("swipe", "LEFT" + row.getId());
@@ -173,7 +171,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                     TableRow prev_row = (TableRow) table.getChildAt(table.indexOfChild(row) - 1);
                     TableRow next_row = (TableRow) table.getChildAt(table.indexOfChild(row) + 1);
                     TextView prev_amt =
-                            (prev_row != null) ? (TextView) prev_row.getChildAt(1) : text_descr;
+                            (prev_row != null) ? (TextView) prev_row.getChildAt(1) : tvDescription;
                     TextView next_acc =
                             (next_row != null) ? (TextView) next_row.getChildAt(0) : null;
 
@@ -212,27 +210,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         });
     }
 
-    private void hook_text_change_listener(final TextView view) {
-        view.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-//                Log.d("input", "text changed");
-                check_transaction_submittable();
-            }
-        });
-
-    }
-
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
@@ -253,8 +230,27 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics()));
     }
+    private void hookTextChangeListener(final TextView view) {
+        view.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    private void do_add_account_row(boolean focus) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+//                Log.d("input", "text changed");
+                check_transaction_submittable();
+            }
+        });
+
+    }
+    private void doAddAccountRow(boolean focus) {
         final AutoCompleteTextView acc = new AutoCompleteTextView(this);
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                 TableRow.LayoutParams.WRAP_CONTENT, 9f));
@@ -294,28 +290,20 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         if (focus) acc.requestFocus();
 
-        hook_swipe_listener(row);
-        MLDB.hook_autocompletion_adapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt);
-        hook_text_change_listener(acc);
-        hook_text_change_listener(amt);
+        hookSwipeListener(row);
+        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt);
+        hookTextChangeListener(acc);
+        hookTextChangeListener(amt);
     }
-
     public void addTransactionAccountFromMenu(MenuItem item) {
-        do_add_account_row(true);
+        doAddAccountRow(true);
     }
-
     public void resetTransactionFromMenu(MenuItem item) {
-        reset_form();
+        resetForm();
     }
-
     public void saveTransactionFromMenu(MenuItem item) {
-        save_transaction();
+        saveTransaction();
     }
-
-    private boolean is_zero(float f) {
-        return (f < 0.005) && (f > -0.005);
-    }
-
     // rules:
     // 1) at least two account names
     // 2) each amount must have account name
@@ -377,7 +365,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             if ((empty_rows == 0) &&
                 ((table.getChildCount() == accounts) || (table.getChildCount() == amounts)))
             {
-                do_add_account_row(false);
+                doAddAccountRow(false);
             }
 
             Log.d("submittable", String.format("accounts=%d, accounts_with_values=%s, " +
@@ -388,7 +376,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
             if (have_description && (accounts >= 2) && (accounts_with_values >= (accounts - 1)) &&
                 (amounts_with_accounts == amounts) &&
-                (single_empty_amount && single_empty_amount_has_account || is_zero(running_total)))
+                (single_empty_amount && single_empty_amount_has_account || isZero(running_total)))
             {
                 if (mSave != null) mSave.setVisible(true);
             }
@@ -414,19 +402,19 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         progress.setVisibility(View.INVISIBLE);
         Log.d("visuals", "hiding progress");
 
-        if (error == null) reset_form();
+        if (error == null) resetForm();
         else Snackbar.make(findViewById(R.id.new_transaction_accounts_table), error,
                 BaseTransientBottomBar.LENGTH_LONG).show();
 
-        toggle_all_editing(true);
+        toggleAllEditing(true);
         check_transaction_submittable();
     }
 
-    private void reset_form() {
-        text_date.setText("");
-        text_descr.setText("");
+    private void resetForm() {
+        tvDate.setText("");
+        tvDescription.setText("");
 
-        text_descr.requestFocus();
+        tvDescription.requestFocus();
 
         while (table.getChildCount() > 2) {
             table.removeViewAt(2);

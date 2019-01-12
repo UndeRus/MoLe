@@ -54,20 +54,20 @@ import java.util.regex.Pattern;
 public class RetrieveTransactionsTask
         extends AsyncTask<Void, RetrieveTransactionsTask.Progress, Void> {
     private static final int MATCHING_TRANSACTIONS_LIMIT = 50;
-    private static final Pattern commentPattern = Pattern.compile("^\\s*;");
-    private static final Pattern transactionStartPattern = Pattern.compile("<tr class=\"title\" " +
-                                                                           "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
-    private static final Pattern transactionDescriptionPattern =
+    private static final Pattern reComment = Pattern.compile("^\\s*;");
+    private static final Pattern reTransactionStart = Pattern.compile("<tr class=\"title\" " +
+                                                                      "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
+    private static final Pattern reTransactionDescription =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
-    private static final Pattern transactionDetailsPattern =
+    private static final Pattern reTransactionDetails =
             Pattern.compile("^\\s+(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
-    private static final Pattern endPattern = Pattern.compile("\\bid=\"addmodal\"");
+    private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
     private WeakReference<MainActivity> contextRef;
     private int error;
     // %3A is '='
     private boolean success;
-    private Pattern account_name_re = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
-    private Pattern account_value_re = Pattern.compile(
+    private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
+    private Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef) {
         this.contextRef = contextRef;
@@ -117,7 +117,7 @@ public class RetrieveTransactionsTask
         boolean onlyStarred = Data.optShowOnlyStarred.get();
         Data.backgroundTaskCount.incrementAndGet();
         try {
-            HttpURLConnection http = NetworkUtil.prepare_connection("journal");
+            HttpURLConnection http = NetworkUtil.prepareConnection("journal");
             http.setAllowUserInteraction(false);
             publishProgress(progress);
             MainActivity ctx = getContext();
@@ -145,7 +145,7 @@ public class RetrieveTransactionsTask
                         while ((line = buf.readLine()) != null) {
                             throwIfCancelled();
                             Matcher m;
-                            m = commentPattern.matcher(line);
+                            m = reComment.matcher(line);
                             if (m.find()) {
                                 // TODO: comments are ignored for now
                                 Log.v("transaction-parser", "Ignoring comment");
@@ -160,7 +160,7 @@ public class RetrieveTransactionsTask
                                         Data.accounts.set(accountList);
                                         continue;
                                     }
-                                    m = account_name_re.matcher(line);
+                                    m = reAccountName.matcher(line);
                                     if (m.find()) {
                                         String acct_encoded = m.group(1);
                                         String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
@@ -206,7 +206,7 @@ public class RetrieveTransactionsTask
                                     break;
 
                                 case EXPECTING_ACCOUNT_AMOUNT:
-                                    m = account_value_re.matcher(line);
+                                    m = reAccountValue.matcher(line);
                                     boolean match_found = false;
                                     while (m.find()) {
                                         throwIfCancelled();
@@ -231,7 +231,7 @@ public class RetrieveTransactionsTask
 
                                 case EXPECTING_TRANSACTION:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
-                                    m = transactionStartPattern.matcher(line);
+                                    m = reTransactionStart.matcher(line);
                                     if (m.find()) {
                                         transactionId = Integer.valueOf(m.group(1));
                                         state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
@@ -246,7 +246,7 @@ public class RetrieveTransactionsTask
                                             progress.setTotal(transactionId);
                                         publishProgress(progress);
                                     }
-                                    m = endPattern.matcher(line);
+                                    m = reEnd.matcher(line);
                                     if (m.find()) {
                                         L("--- transaction value complete ---");
                                         success = true;
@@ -256,7 +256,7 @@ public class RetrieveTransactionsTask
 
                                 case EXPECTING_TRANSACTION_DESCRIPTION:
                                     if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
-                                    m = transactionDescriptionPattern.matcher(line);
+                                    m = reTransactionDescription.matcher(line);
                                     if (m.find()) {
                                         if (transactionId == 0)
                                             throw new TransactionParserException(
@@ -320,7 +320,7 @@ public class RetrieveTransactionsTask
 //                                            }
                                     }
                                     else {
-                                        m = transactionDetailsPattern.matcher(line);
+                                        m = reTransactionDetails.matcher(line);
                                         if (m.find()) {
                                             String acc_name = m.group(1);
                                             String amount = m.group(2);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -32,8 +32,8 @@ public class UrlEncodedFormData {
         pairs = new ArrayList<>();
     }
 
-    public void add_pair(String name, String value) {
-        pairs.add(new AbstractMap.SimpleEntry<String,String>(name, value));
+    public void addPair(String name, String value) {
+        pairs.add(new AbstractMap.SimpleEntry<>(name, value));
     }
 
     @NonNull
