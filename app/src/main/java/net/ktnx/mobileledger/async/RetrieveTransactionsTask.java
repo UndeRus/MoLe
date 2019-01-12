@@ -111,7 +111,6 @@ public class RetrieveTransactionsTask
         int maxTransactionId = Progress.INDETERMINATE;
         success = false;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
-        ArrayList<LedgerTransaction> transactionList = new ArrayList<>();
         HashMap<String, Void> accountNames = new HashMap<>();
         LedgerAccount lastAccount = null;
         boolean onlyStarred = Data.optShowOnlyStarred.get();
@@ -309,7 +308,6 @@ public class RetrieveTransactionsTask
                                                 "transaction %s saved → expecting transaction",
                                                 transaction.getId()));
                                         transaction.finishLoading();
-                                        transactionList.add(transaction);
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
 // for example, when you add the initial seeding transaction after entering some others
