@@ -36,6 +36,8 @@ public final class Globals {
     @ColorInt
     public static int primaryDark, defaultTextColor;
     public static String[] monthNames;
+    private static SimpleDateFormat ledgerDateFormatter =
+            new SimpleDateFormat("yyyy/MM/dd", Locale.US);
     public static void hideSoftKeyboard(Activity act) {
         // hide the keyboard
         View v = act.getCurrentFocus();
@@ -45,7 +47,6 @@ public final class Globals {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
-    private static SimpleDateFormat ledgerDateFormatter = new SimpleDateFormat("y/M/d", Locale.US);
     public static Date parseLedgerDate(String dateString) {
         try {
             return ledgerDateFormatter.parse(dateString);
