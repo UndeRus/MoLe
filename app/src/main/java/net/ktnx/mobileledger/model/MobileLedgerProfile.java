@@ -126,20 +126,20 @@ public final class MobileLedgerProfile {
     public String getName() {
         return name;
     }
-    public void setName(CharSequence text) {
-        setName(String.valueOf(text));
-    }
     public void setName(String name) {
         this.name = name;
+    }
+    public void setName(CharSequence text) {
+        setName(String.valueOf(text));
     }
     public String getUrl() {
         return url;
     }
-    public void setUrl(CharSequence text) {
-        setUrl(String.valueOf(text));
-    }
     public void setUrl(String url) {
         this.url = url;
+    }
+    public void setUrl(CharSequence text) {
+        setUrl(String.valueOf(text));
     }
     public boolean isAuthEnabled() {
         return authEnabled;
@@ -150,20 +150,20 @@ public final class MobileLedgerProfile {
     public String getAuthUserName() {
         return authUserName;
     }
-    public void setAuthUserName(CharSequence text) {
-        setAuthUserName(String.valueOf(text));
-    }
     public void setAuthUserName(String authUserName) {
         this.authUserName = authUserName;
+    }
+    public void setAuthUserName(CharSequence text) {
+        setAuthUserName(String.valueOf(text));
     }
     public String getAuthPassword() {
         return authPassword;
     }
-    public void setAuthPassword(CharSequence text) {
-        setAuthPassword(String.valueOf(text));
-    }
     public void setAuthPassword(String authPassword) {
         this.authPassword = authPassword;
+    }
+    public void setAuthPassword(CharSequence text) {
+        setAuthPassword(String.valueOf(text));
     }
     public void storeInDB() {
         SQLiteDatabase db = MLDB.getWritableDatabase();

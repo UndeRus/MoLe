@@ -88,7 +88,8 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                 if (http.getResponseCode() == 303) {
                     // everything is fine
                     return true;
-                } else if (http.getResponseCode() == 200) {
+                }
+                else if (http.getResponseCode() == 200) {
                     // get the new cookie
                     {
                         Pattern reSessionCookie = Pattern.compile("_SESSION=([^;]+);.*");
@@ -101,17 +102,21 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                             if (m.matches()) {
                                 session = m.group(1);
                                 Log.d("network", "new session is " + session);
-                            } else {
-                                Log.d("network", "set-cookie: " + cookie);
-                                Log.w("network", "Response Set-Cookie headers is not a _SESSION one");
                             }
-                        } else {
+                            else {
+                                Log.d("network", "set-cookie: " + cookie);
+                                Log.w("network",
+                                        "Response Set-Cookie headers is not a _SESSION one");
+                            }
+                        }
+                        else {
                             Log.w("network", "Response has no Set-Cookie header");
                         }
                     }
                     // the token needs to be updated
                     BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
-                    Pattern re = Pattern.compile("<input type=\"hidden\" name=\"_token\" value=\"([^\"]+)\">");
+                    Pattern re = Pattern.compile(
+                            "<input type=\"hidden\" name=\"_token\" value=\"([^\"]+)\">");
                     String line;
                     while ((line = reader.readLine()) != null) {
                         //Log.d("dump", line);
@@ -124,8 +129,10 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                         }
                     }
                     throw new IOException("Can't find _token string");
-                } else {
-                    throw new IOException(String.format("Error response code %d", http.getResponseCode()));
+                }
+                else {
+                    throw new IOException(
+                            String.format("Error response code %d", http.getResponseCode()));
                 }
             }
         }
