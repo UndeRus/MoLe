@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.ColorInt;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -73,7 +72,7 @@ public final class Globals {
         }
         else toParse = dateString;
 
-        Log.d("globals", String.format("Parsing date '%s'", toParse));
+//        Log.d("globals", String.format("Parsing date '%s'", toParse));
         return ledgerDateFormatter.parse(toParse);
     }
     public static String formatLedgerDate(Date date) {
