@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 public class TransactionListItem {
@@ -33,6 +35,7 @@ public class TransactionListItem {
         this.type = Type.TRANSACTION;
         this.transaction = transaction;
     }
+    @NonNull
     public Type getType() {
         return type;
     }

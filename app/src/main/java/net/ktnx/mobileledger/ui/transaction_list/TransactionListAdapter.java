@@ -48,27 +48,22 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
         TransactionListItem item = TransactionListViewModel.getTransactionListItem(position);
 
+        // in a race when transaction value is reduced, but the model hasn't been notified yet
+        // the view will disappear when the notifications reaches the model, so by simply omitting
+        // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
+        // a bit longer
+        if (item == null) return;
+
         if (item.getType() == TransactionListItem.Type.TRANSACTION) {
             holder.vTransaction.setVisibility(View.VISIBLE);
             holder.vDelimiter.setVisibility(View.GONE);
             LedgerTransaction tr = item.getTransaction();
-            // in a race when transaction value is reduced, but the model hasn't been notified yet
-            // the view will disappear when the notifications reaches the model, so by simply omitting
-            // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
-            // a bit longer
-            if (tr == null) return;
-
-            LedgerTransaction previous = null;
-            TransactionListItem previousItem = null;
-            if (position > 0)
-                previousItem = TransactionListViewModel.getTransactionListItem(position - 1);
 
 //        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
 //                tr.getAccounts().size()));
 
             TransactionLoader loader = new TransactionLoader();
-            loader.execute(
-                    new TransactionLoaderParams(tr, previous, holder, position, boldAccountName));
+            loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName));
 
             // WORKAROUND what seems to be a bug in CardHolder somewhere
             // when a view that was previously holding a delimiter is re-purposed
@@ -121,18 +116,11 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         @Override
         protected Void doInBackground(TransactionLoaderParams... p) {
             LedgerTransaction tr = p[0].transaction;
-            LedgerTransaction previous = p[0].previousTransaction;
 
             SQLiteDatabase db = MLDB.getReadableDatabase();
             tr.loadData(db);
 
-            boolean showDate;
-            if (previous == null) showDate = true;
-            else {
-                previous.loadData(db);
-                showDate = !previous.getDate().equals(tr.getDate());
-            }
-            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, showDate));
+            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr));
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
@@ -233,18 +221,13 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     }
 
     private class TransactionLoaderParams {
-        LedgerTransaction transaction, previousTransaction;
+        LedgerTransaction transaction;
         TransactionRowHolder holder;
         int position;
         String boldAccountName;
-        TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder, int position, String boldAccountName) {
-            this(transaction, null, holder, position, boldAccountName);
-        }
-        TransactionLoaderParams(LedgerTransaction transaction,
-                                LedgerTransaction previousTransaction, TransactionRowHolder holder,
+        TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder,
                                 int position, String boldAccountName) {
             this.transaction = transaction;
-            this.previousTransaction = previousTransaction;
             this.holder = holder;
             this.position = position;
             this.boldAccountName = boldAccountName;
