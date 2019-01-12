@@ -353,7 +353,7 @@ public class RetrieveTransactionsTask
 
                         Log.d("db", "Updating transaction value stamp");
                         Date now = new Date();
-                        profile.set_option_value(MLDB.OPT_LAST_SCRAPE, now.getTime());
+                        profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
                         Data.lastUpdateDate.set(now);
                         TransactionListViewModel.scheduleTransactionListReload();
                     }

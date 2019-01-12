@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void updateLastUpdateTextFromDB() {
         {
-            long last_update = Data.profile.get().get_option_value(MLDB.OPT_LAST_SCRAPE, 0L);
+            long last_update = Data.profile.get().getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
 
             Log.d("transactions", String.format("Last update = %d", last_update));
             if (last_update == 0) {

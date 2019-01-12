@@ -221,7 +221,7 @@ public final class MobileLedgerProfile {
         }
         Log.d("profile", String.format("Transaction %d stored", tr.getId()));
     }
-    public String get_option_value(String name, String default_value) {
+    public String getOption(String name, String default_value) {
         SQLiteDatabase db = MLDB.getReadableDatabase();
         try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
                 new String[]{uuid, name}))
@@ -244,9 +244,9 @@ public final class MobileLedgerProfile {
             return default_value;
         }
     }
-    public long get_option_value(String name, long default_value) {
+    public long getLongOption(String name, long default_value) {
         long longResult;
-        String result = get_option_value(name, "");
+        String result = getOption(name, "");
         if ((result == null) || result.isEmpty()) {
             Log.d("profile", String.format("Returning default value for option %s", name));
             longResult = default_value;
@@ -264,14 +264,14 @@ public final class MobileLedgerProfile {
 
         return longResult;
     }
-    public void set_option_value(String name, String value) {
+    public void setOption(String name, String value) {
         Log.d("profile", String.format("setting option %s=%s", name, value));
         SQLiteDatabase db = MLDB.getWritableDatabase();
         db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{uuid, name, value});
     }
-    public void set_option_value(String name, long value) {
-        set_option_value(name, String.valueOf(value));
+    public void setLongOption(String name, long value) {
+        setOption(name, String.valueOf(value));
     }
     public void removeFromDB() {
         SQLiteDatabase db = MLDB.getWritableDatabase();
