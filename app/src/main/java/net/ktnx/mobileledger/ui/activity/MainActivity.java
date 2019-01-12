@@ -257,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void showAccountSummaryFragment() {
         mViewPager.setCurrentItem(0, true);
+        TransactionListFragment.accountFilter.set(null);
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        accountSummaryFragment = new AccountSummaryFragment();
 //        ft.replace(R.id.root_frame, accountSummaryFragment);
@@ -272,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
 //        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
     private void showTransactionsFragment(LedgerAccount account) {
-        TransactionListFragment.accountFilter.set(account.getName());
+        if (account != null) TransactionListFragment.accountFilter.set(account.getName());
         mViewPager.setCurrentItem(1, true);
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        if (transactionListFragment == null) {
