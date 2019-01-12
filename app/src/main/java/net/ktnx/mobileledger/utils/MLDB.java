@@ -125,7 +125,7 @@ public final class MLDB {
                 new String[]{NO_PROFILE, name, value});
     }
     static public void set_option_value(String name, long value) {
-        set_option_value(name, value);
+        set_option_value(name, String.valueOf(value));
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hook_autocompletion_adapter(final Context context,
