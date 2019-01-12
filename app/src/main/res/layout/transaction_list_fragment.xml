@@ -34,34 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/transaction_list_account_name_filter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_filter_list_black_24dp" />
-
-            <AutoCompleteTextView
-                android:id="@+id/transaction_filter_account_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/clearAccountNameFilter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ic_clear_black_24dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:onClick="onViewClicked" />
-
-        </LinearLayout>
 
     </LinearLayout>
 
