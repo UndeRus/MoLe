@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
@@ -183,7 +184,16 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         TransactionListViewModel.scheduleTransactionListReload();
         TransactionListViewModel.updating.addObserver(
                 (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
+        TransactionListViewModel.updateError.addObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                String err = TransactionListViewModel.updateError.get();
+                if (err == null) return;
 
+                Toast.makeText(mActivity, err, Toast.LENGTH_SHORT).show();
+                TransactionListViewModel.updateError.set(null);
+            }
+        });
         Data.transactions.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
 

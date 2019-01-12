@@ -41,6 +41,7 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
@@ -52,6 +53,7 @@ import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Objects;
 
@@ -133,27 +135,46 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (mSave != null) mSave.setVisible(false);
         toggleAllEditing(false);
         progress.setVisibility(View.VISIBLE);
+        try {
 
-        saver = new SaveTransactionTask(this);
+            saver = new SaveTransactionTask(this);
 
-        String dateString = tvDate.getText().toString();
-        Date date;
-        if (dateString.isEmpty()) date = new Date();
-        else date = Globals.parseLedgerDate(dateString);
-        LedgerTransaction tr = new LedgerTransaction(date, tvDescription.getText().toString());
+            String dateString = tvDate.getText().toString();
+            Date date;
+            if (dateString.isEmpty()) date = new Date();
+            else date = Globals.parseLedgerDate(dateString);
+            LedgerTransaction tr = new LedgerTransaction(date, tvDescription.getText().toString());
 
-        TableLayout table = findViewById(R.id.new_transaction_accounts_table);
-        for (int i = 0; i < table.getChildCount(); i++) {
-            TableRow row = (TableRow) table.getChildAt(i);
-            String acc = ((TextView) row.getChildAt(0)).getText().toString();
-            String amt = ((TextView) row.getChildAt(1)).getText().toString();
-            LedgerTransactionAccount item =
-                    amt.length() > 0 ? new LedgerTransactionAccount(acc, Float.parseFloat(amt))
-                                     : new LedgerTransactionAccount(acc);
+            TableLayout table = findViewById(R.id.new_transaction_accounts_table);
+            for (int i = 0; i < table.getChildCount(); i++) {
+                TableRow row = (TableRow) table.getChildAt(i);
+                String acc = ((TextView) row.getChildAt(0)).getText().toString();
+                String amt = ((TextView) row.getChildAt(1)).getText().toString();
+                LedgerTransactionAccount item =
+                        amt.length() > 0 ? new LedgerTransactionAccount(acc, Float.parseFloat(amt))
+                                         : new LedgerTransactionAccount(acc);
 
-            tr.addAccount(item);
+                tr.addAccount(item);
+            }
+            saver.execute(tr);
         }
-        saver.execute(tr);
+        catch (ParseException e) {
+            Log.d("new-transaction", "Parse error", e);
+            Toast.makeText(this, getResources().getString(R.string.error_invalid_date),
+                    Toast.LENGTH_LONG).show();
+            tvDate.requestFocus();
+
+            progress.setVisibility(View.GONE);
+            toggleAllEditing(true);
+            if (mSave != null) mSave.setVisible(true);
+        }
+        catch (Exception e) {
+            Log.d("new-transaction", "Unknown error", e);
+
+            progress.setVisibility(View.GONE);
+            toggleAllEditing(true);
+            if (mSave != null) mSave.setVisible(true);
+        }
     }
     private void toggleAllEditing(boolean enabled) {
         tvDate.setEnabled(enabled);

@@ -29,10 +29,11 @@ import java.util.List;
 
 public class TransactionListViewModel extends ViewModel {
     public static ObservableValue<Boolean> updating = new ObservableValue<>();
+    public static ObservableValue<String> updateError = new ObservableValue<>();
 
     public static void scheduleTransactionListReload() {
         String filter = TransactionListFragment.accountFilter.get();
-        AsyncTask<String, Void, List<TransactionListItem>> task = new UTT();
+        AsyncTask<String, Void, String> task = new UTT();
         task.execute(filter);
     }
     public static TransactionListItem getTransactionListItem(int position) {
@@ -47,9 +48,9 @@ public class TransactionListViewModel extends ViewModel {
     }
     private static class UTT extends UpdateTransactionsTask {
         @Override
-        protected void onPostExecute(List<TransactionListItem> list) {
-            super.onPostExecute(list);
-            if (list != null) Data.transactions.set(list);
+        protected void onPostExecute(String error) {
+            super.onPostExecute(error);
+            if (error != null) updateError.set(error);
         }
     }
 }

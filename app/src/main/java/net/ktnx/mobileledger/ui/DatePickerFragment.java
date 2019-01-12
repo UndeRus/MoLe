@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of Mobile-Ledger.
  * Mobile-Ledger is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -37,8 +37,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DatePickerFragment extends AppCompatDialogFragment
-implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
-{
+        implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener {
+    static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
+    static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
+    static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -46,26 +48,33 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
         int year = c.get(GregorianCalendar.YEAR);
         int month = c.get(GregorianCalendar.MONTH);
         int day = c.get(GregorianCalendar.DAY_OF_MONTH);
-        TextView date = Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
+        TextView date =
+                Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
         CharSequence present = date.getText();
 
-        Pattern re_mon_day = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
-        Matcher m_mon_day = re_mon_day.matcher(present);
-
-        if (m_mon_day.matches()) {
-            month = Integer.parseInt(m_mon_day.group(1))-1;
-            day = Integer.parseInt(m_mon_day.group(2));
+        Matcher m = reYMD.matcher(present);
+        if (m.matches()) {
+            year = Integer.parseInt(m.group(1));
+            month = Integer.parseInt(m.group(2)) - 1;   // month is 0-based
+            day = Integer.parseInt(m.group(3));
         }
         else {
-            Pattern re_day = Pattern.compile("^\\s*(\\d{1,2})\\s*$");
-            Matcher m_day = re_day.matcher(present);
-            if (m_day.matches()) {
-                day = Integer.parseInt(m_day.group(1));
+            m = reMD.matcher(present);
+            if (m.matches()) {
+                month = Integer.parseInt(m.group(1)) - 1;
+                day = Integer.parseInt(m.group(2));
+            }
+            else {
+                m = reD.matcher(present);
+                if (m.matches()) {
+                    day = Integer.parseInt(m.group(1));
+                }
             }
         }
 
-        DatePickerDialog dpd =  new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
+        DatePickerDialog dpd =
+                new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
         // quicker date selection available in API 26
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             DatePicker dp = dpd.getDatePicker();
@@ -77,15 +86,16 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
 
     @TargetApi(Build.VERSION_CODES.O)
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        TextView date = Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
+        TextView date =
+                Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
         final Calendar c = GregorianCalendar.getInstance();
-        if ( c.get(GregorianCalendar.YEAR) == year && c.get(GregorianCalendar.MONTH) == month) {
-            date.setText(String.format(Locale.US, "%d", day));
+        if (c.get(GregorianCalendar.YEAR) == year) {
+            if (c.get(GregorianCalendar.MONTH) == month)
+                date.setText(String.format(Locale.US, "%d", day));
+            else date.setText(String.format(Locale.US, "%d/%d", month + 1, day));
         }
-        else {
-            date.setText(String.format(Locale.US, "%d/%d", month+1, day));
-        }
+        else date.setText(String.format(Locale.US, "%d/%d/%d", year, month + 1, day));
 
         TextView description = Objects.requireNonNull(getActivity())
                 .findViewById(R.id.new_transaction_description);
@@ -94,15 +104,19 @@ implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener
 
     @Override
     public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        TextView date = Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
+        TextView date =
+                Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
         final Calendar c = GregorianCalendar.getInstance();
-        if ( c.get(GregorianCalendar.YEAR) == year && c.get(GregorianCalendar.MONTH) == monthOfYear) {
-            date.setText(String.format(Locale.US, "%d", dayOfMonth));
+        if (c.get(GregorianCalendar.YEAR) == year) {
+            if (c.get(GregorianCalendar.MONTH) == monthOfYear) {
+                date.setText(String.format(Locale.US, "%d", dayOfMonth));
+            }
+            else {
+                date.setText(String.format(Locale.US, "%d/%d", monthOfYear + 1, dayOfMonth));
+            }
         }
-        else {
-            date.setText(String.format(Locale.US, "%d/%d", monthOfYear+1, dayOfMonth));
-        }
+        else date.setText(String.format(Locale.US, "%d/%d/%d", year, monthOfYear + 1, dayOfMonth));
 
         TextView description = Objects.requireNonNull(getActivity())
                 .findViewById(R.id.new_transaction_description);

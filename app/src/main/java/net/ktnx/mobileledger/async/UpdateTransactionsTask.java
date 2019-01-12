@@ -28,12 +28,12 @@ import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-public class UpdateTransactionsTask extends AsyncTask<String, Void, List<TransactionListItem>> {
-    protected List<TransactionListItem> doInBackground(String[] filterAccName) {
+public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
+    protected String doInBackground(String[] filterAccName) {
         Data.backgroundTaskCount.incrementAndGet();
         String profile_uuid = Data.profile.get().getUuid();
         try {
@@ -88,7 +88,10 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, List<Transac
                 Log.d("UTT", "transaction list value updated");
             }
 
-            return newList;
+            return null;
+        }
+        catch (ParseException e) {
+            return String.format("Error parsing stored date '%s'", e.getMessage());
         }
         finally {
             Data.backgroundTaskCount.decrementAndGet();

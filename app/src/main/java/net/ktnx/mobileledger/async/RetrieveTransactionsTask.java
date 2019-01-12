@@ -23,7 +23,6 @@ import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 import android.util.Log;
 
-import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -43,6 +42,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 
 
 public class RetrieveTransactionsTask
-        extends AsyncTask<Void, RetrieveTransactionsTask.Progress, Void> {
+        extends AsyncTask<Void, RetrieveTransactionsTask.Progress, String> {
     private static final int MATCHING_TRANSACTIONS_LIMIT = 50;
     private static final Pattern reComment = Pattern.compile("^\\s*;");
     private static final Pattern reTransactionStart = Pattern.compile("<tr class=\"title\" " +
@@ -65,7 +65,6 @@ public class RetrieveTransactionsTask
     private WeakReference<MainActivity> contextRef;
     private int error;
     // %3A is '='
-    private boolean success;
     private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     private Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
@@ -90,26 +89,25 @@ public class RetrieveTransactionsTask
         context.onRetrieveStart();
     }
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(String error) {
+        super.onPostExecute(error);
         MainActivity context = getContext();
         if (context == null) return;
-        context.onRetrieveDone(success);
+        context.onRetrieveDone(error);
     }
     @Override
     protected void onCancelled() {
         super.onCancelled();
         MainActivity context = getContext();
         if (context == null) return;
-        context.onRetrieveDone(false);
+        context.onRetrieveDone(null);
     }
     @SuppressLint("DefaultLocale")
     @Override
-    protected Void doInBackground(Void... params) {
+    protected String doInBackground(Void... params) {
         MobileLedgerProfile profile = Data.profile.get();
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
-        success = false;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
         HashMap<String, Void> accountNames = new HashMap<>();
         LedgerAccount lastAccount = null;
@@ -248,7 +246,6 @@ public class RetrieveTransactionsTask
                                     m = reEnd.matcher(line);
                                     if (m.find()) {
                                         L("--- transaction value complete ---");
-                                        success = true;
                                         break LINES;
                                     }
                                     break;
@@ -262,13 +259,22 @@ public class RetrieveTransactionsTask
                                                     "Transaction Id is 0 while expecting " +
                                                     "description");
 
-                                        transaction =
-                                                new LedgerTransaction(transactionId, m.group(1),
-                                                        m.group(2));
+                                        String date = m.group(1);
+                                        try {
+                                            int equalsIndex = date.indexOf('=');
+                                            if (equalsIndex >= 0)
+                                                date = date.substring(equalsIndex + 1);
+                                            transaction = new LedgerTransaction(transactionId, date,
+                                                    m.group(2));
+                                        }
+                                        catch (ParseException e) {
+                                            e.printStackTrace();
+                                            return String.format("Error parsing date '%s'", date);
+                                        }
                                         state = ParserState.EXPECTING_TRANSACTION_DETAILS;
                                         L(String.format("transaction %d created for %s (%s) →" +
-                                                        " expecting details", transactionId,
-                                                m.group(1), m.group(2)));
+                                                        " expecting details", transactionId, date,
+                                                m.group(2)));
                                     }
                                     break;
 
@@ -291,7 +297,6 @@ public class RetrieveTransactionsTask
                                                         new Object[]{profile.getUuid(),
                                                                      transaction.getId()
                                                         });
-                                                success = true;
                                                 progress.setTotal(progress.getProgress());
                                                 publishProgress(progress);
                                                 break LINES;
@@ -354,6 +359,8 @@ public class RetrieveTransactionsTask
                         profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
                         Data.lastUpdateDate.set(now);
                         TransactionListViewModel.scheduleTransactionListReload();
+
+                        return null;
                     }
                     finally {
                         db.endTransaction();
@@ -362,25 +369,24 @@ public class RetrieveTransactionsTask
             }
         }
         catch (MalformedURLException e) {
-            error = R.string.err_bad_backend_url;
             e.printStackTrace();
+            return "Invalid server URL";
         }
         catch (FileNotFoundException e) {
-            error = R.string.err_bad_auth;
             e.printStackTrace();
+            return "Invalid user name or password";
         }
         catch (IOException e) {
-            error = R.string.err_net_io_error;
             e.printStackTrace();
+            return "Network error";
         }
         catch (OperationCanceledException e) {
-            error = R.string.err_cancelled;
             e.printStackTrace();
+            return "Operation cancelled";
         }
         finally {
             Data.backgroundTaskCount.decrementAndGet();
         }
-        return null;
     }
     private MainActivity getContext() {
         return contextRef.get();

@@ -37,6 +37,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
@@ -333,11 +334,15 @@ public class MainActivity extends AppCompatActivity {
         if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
         bTransactionListCancelDownload.setEnabled(false);
     }
-    public void onRetrieveDone(boolean success) {
+    public void onRetrieveDone(String error) {
         progressLayout.setVisibility(View.GONE);
-        updateLastUpdateTextFromDB();
 
-        new RefreshDescriptionsTask().execute();
+        if (error == null) {
+            updateLastUpdateTextFromDB();
+
+            new RefreshDescriptionsTask().execute();
+        }
+        else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
     public void onRetrieveStart() {
         progressBar.setIndeterminate(true);

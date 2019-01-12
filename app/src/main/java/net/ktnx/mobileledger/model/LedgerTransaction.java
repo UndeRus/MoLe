@@ -26,6 +26,7 @@ import net.ktnx.mobileledger.utils.Globals;
 
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -50,7 +51,8 @@ public class LedgerTransaction {
     private ArrayList<LedgerTransactionAccount> accounts;
     private String dataHash;
     private boolean dataLoaded;
-    public LedgerTransaction(Integer id, String dateString, String description) {
+    public LedgerTransaction(Integer id, String dateString, String description)
+            throws ParseException {
         this(id, Globals.parseLedgerDate(dateString), description);
     }
     public LedgerTransaction(Integer id, Date date, String description) {
@@ -139,7 +141,15 @@ public class LedgerTransaction {
         {
             if (cTr.moveToFirst()) {
                 String dateString = cTr.getString(0);
-                date = Globals.parseLedgerDate(dateString);
+                try {
+                    date = Globals.parseLedgerDate(dateString);
+                }
+                catch (ParseException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(
+                            String.format("Error parsing date '%s' from " + "transacion %d",
+                                    dateString, id));
+                }
                 description = cTr.getString(1);
 
                 try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +

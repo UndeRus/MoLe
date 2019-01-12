@@ -20,13 +20,17 @@ package net.ktnx.mobileledger.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.ColorInt;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class Globals {
     @ColorInt
@@ -38,6 +42,8 @@ public final class Globals {
     public static String[] monthNames;
     private static SimpleDateFormat ledgerDateFormatter =
             new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+    private static Pattern reLedgerDate =
+            Pattern.compile("^(?:(\\d+)/)??(?:(\\d\\d?)/)?(\\d\\d?)$");
     public static void hideSoftKeyboard(Activity act) {
         // hide the keyboard
         View v = act.getCurrentFocus();
@@ -47,13 +53,28 @@ public final class Globals {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
-    public static Date parseLedgerDate(String dateString) {
-        try {
-            return ledgerDateFormatter.parse(dateString);
+    public static Date parseLedgerDate(String dateString) throws ParseException {
+        Matcher m = reLedgerDate.matcher(dateString);
+        if (!m.matches()) throw new ParseException(dateString, 0);
+
+        String year = m.group(1);
+        String month = m.group(2);
+        String day = m.group(3);
+
+        String toParse;
+        if (year == null) {
+            Calendar now = Calendar.getInstance();
+            int thisYear = now.get(Calendar.YEAR);
+            if (month == null) {
+                int thisMonth = now.get(Calendar.MONTH) + 1;
+                toParse = String.format(Locale.US, "%04d/%02d/%s", thisYear, thisMonth, dateString);
+            }
+            else toParse = String.format(Locale.US, "%04d/%s", thisYear, dateString);
         }
-        catch (ParseException e) {
-            throw new RuntimeException(String.format("Error parsing date '%s'", dateString), e);
-        }
+        else toParse = dateString;
+
+        Log.d("globals", String.format("Parsing date '%s'", toParse));
+        return ledgerDateFormatter.parse(toParse);
     }
     public static String formatLedgerDate(Date date) {
         return ledgerDateFormatter.format(date);

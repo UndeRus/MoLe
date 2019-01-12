@@ -108,6 +108,7 @@
     <string name="new_profile_title" type="id">New profile</string>
     <string name="delete_profile">Delete profile</string>
     <string name="delete">Delete</string>
+    <string name="error_invalid_date">Invalid date</string>
     <string-array name="month_names">
         <item>January</item>
         <item>February</item>
