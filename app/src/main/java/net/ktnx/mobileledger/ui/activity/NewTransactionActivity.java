@@ -56,7 +56,6 @@ import java.util.Objects;
 
 /*
  * TODO: nicer progress while transaction is submitted
- * TODO: latest transactions, maybe with browsing further in the past?
  * TODO: reports
  * TODO: get rid of the custom session/cookie and auth code?
  *         (the last problem with the POST was the missing content-length header)
