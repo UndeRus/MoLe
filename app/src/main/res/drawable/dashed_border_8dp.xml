@@ -21,7 +21,7 @@
     android:tint="@color/header_border">
     <stroke
         android:width="8dp"
-        android:color="@color/colorPrimaryDark"
+        android:color="@color/header_border"
         android:dashWidth="16dp"
         android:dashGap="8dp" />
 
