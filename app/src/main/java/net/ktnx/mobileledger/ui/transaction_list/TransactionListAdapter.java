@@ -82,8 +82,15 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             holder.vTransaction.setVisibility(View.GONE);
             holder.vDelimiter.setVisibility(View.VISIBLE);
             holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
-            holder.tvDelimiterMonth
-                    .setText(item.isMonthShown() ? Globals.monthNames[date.getMonth()] : "");
+            if (item.isMonthShown()) {
+                holder.tvDelimiterMonth.setText(Globals.monthNames[date.getMonth()]);
+                holder.tvDelimiterMonth.setVisibility(View.VISIBLE);
+                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_8dp);
+            }
+            else {
+                holder.tvDelimiterMonth.setVisibility(View.GONE);
+                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_1dp);
+            }
         }
     }
 
