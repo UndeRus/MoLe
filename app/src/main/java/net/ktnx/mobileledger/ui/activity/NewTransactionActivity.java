@@ -63,7 +63,6 @@ import java.util.Objects;
  * TODO: reports
  * TODO: get rid of the custom session/cookie and auth code?
  *         (the last problem with the POST was the missing content-length header)
- * TODO: app icon
  * TODO: nicer swiping removal with visual feedback
  * TODO: setup wizard
  * TODO: update accounts/check settings upon change of backend settings
