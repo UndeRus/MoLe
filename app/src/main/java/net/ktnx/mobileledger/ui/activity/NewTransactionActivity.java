@@ -46,6 +46,7 @@ import android.widget.Toast;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
@@ -84,6 +85,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         setContentView(R.layout.activity_new_transaction);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setSubtitle(Data.profile.get().getName());
 
         tvDate = findViewById(R.id.new_transaction_date);
         tvDate.setOnFocusChangeListener((v, hasFocus) -> {
