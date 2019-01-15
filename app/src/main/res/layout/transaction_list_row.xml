@@ -156,8 +156,11 @@
             android:id="@+id/transaction_delimiter_month"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:text="---------"
-            android:textColor="@color/header_border"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="HardcodedText" />
@@ -166,8 +169,11 @@
             android:id="@+id/transaction_delimiter_date"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:text="--.--.----"
-            android:textColor="@color/header_border"
+            android:textColor="@android:color/white"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="HardcodedText" />
@@ -175,10 +181,20 @@
         <View
             android:id="@+id/transaction_delimiter_line"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="16dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:background="@drawable/dashed_border_1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/transaction_delimiter_date"
+            app:layout_constraintStart_toEndOf="@id/transaction_delimiter_month"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/transaction_delimiter_thick"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/transaction_delimiter_date"
             app:layout_constraintStart_toEndOf="@id/transaction_delimiter_month"
