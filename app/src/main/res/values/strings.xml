@@ -24,7 +24,6 @@
     <string name="nav_header_subtitle" translatable="false">dam+google@ktnx.net</string>
     <string name="nav_latest_transactions_title">Latest transactions</string>
     <string name="nav_reports_title">Reports</string>
-    <string name="nav_exit_title">Exit</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

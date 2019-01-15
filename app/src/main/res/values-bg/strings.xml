@@ -18,7 +18,6 @@
 
 <resources>
     <string name="app_name">Mobile Ledger</string>
-    <string name="nav_exit_title">Изход</string>
     <string name="title_activity_settings">Настройки</string>
     <string name="pref_header_backend">Сървър</string>
     <string name="pref_title_use_http_auth">Удостоверяване</string>

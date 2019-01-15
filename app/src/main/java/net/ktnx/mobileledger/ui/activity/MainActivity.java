@@ -221,12 +221,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.dummy);
     }
-
-    public void navExitClicked(View view) {
-        Log.w("app", "exiting");
-        finish();
-    }
-
     public void navSettingsClicked(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
