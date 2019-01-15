@@ -191,7 +191,9 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 //                            acc.getAccountName(), acc.getAmount()));
 
                     String boldAccountName = step.getBoldAccountName();
-                    if ((boldAccountName != null) && boldAccountName.equals(acc.getAccountName())) {
+                    if ((boldAccountName != null) &&
+                        acc.getAccountName().startsWith(boldAccountName))
+                    {
                         accName.setTypeface(null, Typeface.BOLD);
                         accAmount.setTypeface(null, Typeface.BOLD);
                         accName.setTextColor(Globals.primaryDark);
