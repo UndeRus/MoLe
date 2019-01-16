@@ -24,6 +24,9 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -188,8 +191,6 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     }
                     LedgerTransactionAccount acc = step.getAccount();
 
-                    accName.setText(acc.getAccountName());
-                    accAmount.setText(acc.toString());
 
 //                    Log.d("tmp", String.format("showing acc row %d: %s %1.2f", rowIndex,
 //                            acc.getAccountName(), acc.getAmount()));
@@ -198,17 +199,20 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     if ((boldAccountName != null) &&
                         acc.getAccountName().startsWith(boldAccountName))
                     {
-                        accName.setTypeface(null, Typeface.BOLD);
-                        accAmount.setTypeface(null, Typeface.BOLD);
                         accName.setTextColor(Globals.primaryDark);
                         accAmount.setTextColor(Globals.primaryDark);
+
+                        SpannableString ss = new SpannableString(acc.getAccountName());
+                        ss.setSpan(new StyleSpan(Typeface.BOLD), 0, boldAccountName.length(),
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        accName.setText(ss);
                     }
                     else {
-                        accName.setTypeface(null, Typeface.NORMAL);
-                        accAmount.setTypeface(null, Typeface.NORMAL);
                         accName.setTextColor(Globals.defaultTextColor);
                         accAmount.setTextColor(Globals.defaultTextColor);
+                        accName.setText(acc.getAccountName());
                     }
+                    accAmount.setText(acc.toString());
 
                     break;
                 case DONE:
