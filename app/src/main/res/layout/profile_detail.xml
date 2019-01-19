@@ -35,7 +35,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Profile name" />
+            android:text="@string/profile_name_label" />
 
         <EditText
             android:id="@+id/profile_name"
@@ -43,7 +43,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="Name"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
     <LinearLayout
@@ -55,7 +56,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="URL" />
+            android:text="@string/url_label" />
 
         <EditText
             android:id="@+id/url"
@@ -63,7 +64,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textUri"
-            android:text="https://server/url" />
+            android:text="@string/pref_default_backend_url" />
     </LinearLayout>
 
     <LinearLayout

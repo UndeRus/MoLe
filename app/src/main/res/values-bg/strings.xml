@@ -79,5 +79,8 @@
         <item>Ноември</item>
         <item>Декември</item>
     </string-array>
+    <string name="error_invalid_date">Грешна дата</string>
+    <string name="url_label">Адрес</string>
+    <string name="profile_name_label">Име на профила</string>
 
 </resources>

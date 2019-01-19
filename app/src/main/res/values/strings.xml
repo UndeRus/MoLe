@@ -36,7 +36,7 @@
     <string name="pref_description_use_http_auth_off">Use plain HTTP without authentication when connecting to the backend</string>
 
     <string name="pref_title_backend_url">Backend URL</string>
-    <string name="pref_default_backend_url">https://server/loc</string>
+    <string name="pref_default_backend_url" translatable="false">https://server/loc</string>
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_title_sync_frequency">Sync frequency</string>
@@ -108,6 +108,8 @@
     <string name="delete_profile">Delete profile</string>
     <string name="delete">Delete</string>
     <string name="error_invalid_date">Invalid date</string>
+    <string name="profile_name_label">Profile name</string>
+    <string name="url_label">URL</string>
     <string-array name="month_names">
         <item>January</item>
         <item>February</item>
