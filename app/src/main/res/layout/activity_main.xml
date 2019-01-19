@@ -136,8 +136,7 @@
                         android:padding="0dp"
                         android:progressTint="@color/colorPrimary"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/transaction_list_head" />
+                        app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
                         android:id="@+id/transaction_list_cancel_download"
