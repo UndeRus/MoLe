@@ -38,6 +38,7 @@ public class TransactionListViewModel extends ViewModel {
     }
     public static TransactionListItem getTransactionListItem(int position) {
         List<TransactionListItem> transactions = Data.transactions.get();
+        if (transactions == null) return null;
         if (position >= transactions.size() + 1) return null;
         if (position == transactions.size()) return new TransactionListItem();
         return transactions.get(position);
