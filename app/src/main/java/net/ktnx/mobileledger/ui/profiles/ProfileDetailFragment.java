@@ -127,6 +127,7 @@ public class ProfileDetailFragment extends Fragment {
 
 
                 if (mProfile.getUuid().equals(Data.profile.get().getUuid())) {
+                    // dummy update to notify the observers of the possibly new name/URL
                     Data.profile.set(mProfile);
                 }
             }

@@ -200,23 +200,28 @@ public class ProfileListActivity extends AppCompatActivity {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.profile_list_content, parent, false);
             ProfileListViewHolder holder = new ProfileListViewHolder(view);
-            Data.profile.addObserver((o, arg) -> {
-                MobileLedgerProfile newProfile = Data.profile.get();
-                MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
-                holder.mRadioView.setChecked(profile.equals(newProfile));
-            });
 
             holder.mRadioView.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (!isChecked) return;
+                Log.d("profiles",
+                        String.format("Item %d got checked", holder.getAdapterPosition()));
                 MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
-                if (profile != null) Data.setCurrentProfile(profile);
+                if (profile != null) {
+                    Log.d("profiles",
+                            String.format("Setting current profile to %s", profile.getUuid()));
+                    Data.setCurrentProfile(profile);
+                }
             });
             View.OnClickListener profileSelector = v -> holder.mRadioView.setChecked(true);
             holder.mTitle.setOnClickListener(profileSelector);
             holder.mSubTitle.setOnClickListener(profileSelector);
             Data.profile.addObserver((o, arg) -> {
-                MobileLedgerProfile profile = (MobileLedgerProfile) holder.itemView.getTag();
-                holder.mRadioView.setChecked(Data.profile.get().equals(profile));
+                MobileLedgerProfile myProfile = (MobileLedgerProfile) holder.itemView.getTag();
+                final MobileLedgerProfile currentProfile = Data.profile.get();
+                final boolean sameProfile = currentProfile.equals(myProfile);
+                if (holder.mRadioView.isChecked() != sameProfile) {
+                    holder.mRadioView.setChecked(sameProfile);
+                }
             });
             return holder;
         }
@@ -226,11 +231,11 @@ public class ProfileListActivity extends AppCompatActivity {
             final MobileLedgerProfile currentProfile = Data.profile.get();
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                     currentProfile.getUuid()));
+            holder.itemView.setTag(profile);
             holder.mTitle.setText(profile.getName());
             holder.mSubTitle.setText(profile.getUrl());
-            holder.mRadioView.setChecked(profile.getUuid().equals(currentProfile.getUuid()));
+            holder.mRadioView.setChecked(profile.equals(currentProfile));
 
-            holder.itemView.setTag(profile);
             holder.mEditButton.setOnClickListener(mOnClickListener);
         }
         @Override

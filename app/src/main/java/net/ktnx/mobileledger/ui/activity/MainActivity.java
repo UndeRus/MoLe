@@ -170,10 +170,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void setupProfile() {
-        Data.profiles.setList(MobileLedgerProfile.loadAllFromDB());
-        MobileLedgerProfile profile = null;
-
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
+        MobileLedgerProfile profile;
+
         if (profileUUID == null) {
             if (Data.profiles.isEmpty()) {
                 Data.profiles.setList(MobileLedgerProfile.createInitialProfileList());
@@ -196,9 +195,10 @@ public class MainActivity extends AppCompatActivity {
                 editor.clear();
                 editor.apply();
             }
+            else profile = Data.profiles.get(0);
         }
         else {
-            profile = MobileLedgerProfile.loadUUIDFromDB(profileUUID);
+            profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
         }
 
         if (profile == null) profile = Data.profiles.get(0);

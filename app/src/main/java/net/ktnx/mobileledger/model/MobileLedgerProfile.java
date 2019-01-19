@@ -53,18 +53,25 @@ public final class MobileLedgerProfile {
         this.authUserName = String.valueOf(authUserName);
         this.authPassword = String.valueOf(authPassword);
     }
-    public static List<MobileLedgerProfile> loadAllFromDB() {
-        List<MobileLedgerProfile> result = new ArrayList<>();
+    // loads all profiles into Data.profiles
+    // returns the profile with the given UUID
+    public static MobileLedgerProfile loadAllFromDB(String currentProfileUUID) {
+        MobileLedgerProfile result = null;
+        List<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = MLDB.getReadableDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password FROM profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
-                result.add(new MobileLedgerProfile(cursor.getString(0), cursor.getString(1),
+                MobileLedgerProfile item =
+                        new MobileLedgerProfile(cursor.getString(0), cursor.getString(1),
                         cursor.getString(2), cursor.getInt(3) == 1, cursor.getString(4),
-                        cursor.getString(5)));
+                                cursor.getString(5));
+                list.add(item);
+                if (item.getUuid().equals(currentProfileUUID)) result = item;
             }
         }
+        Data.profiles.setList(list);
         return result;
     }
     public static void storeProfilesOrder() {
