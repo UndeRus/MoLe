@@ -57,43 +57,53 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         // a bit longer
         if (item == null) return;
 
-        if (item.getType() == TransactionListItem.Type.TRANSACTION) {
-            holder.vTransaction.setVisibility(View.VISIBLE);
-            holder.vDelimiter.setVisibility(View.GONE);
-            LedgerTransaction tr = item.getTransaction();
+        switch (item.getType()) {
+            case TRANSACTION:
+                holder.vTransaction.setVisibility(View.VISIBLE);
+                holder.vDelimiter.setVisibility(View.GONE);
+                holder.vTrailer.setVisibility(View.GONE);
+                LedgerTransaction tr = item.getTransaction();
 
-//        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
-//                tr.getAccounts().size()));
+                //        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
+                //                tr.getAccounts().size()));
 
-            TransactionLoader loader = new TransactionLoader();
-            loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName,
-                    item.isOdd()));
+                TransactionLoader loader = new TransactionLoader();
+                loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName,
+                        item.isOdd()));
 
-            // WORKAROUND what seems to be a bug in CardHolder somewhere
-            // when a view that was previously holding a delimiter is re-purposed
-            // occasionally it stays too short (not high enough)
-            holder.vTransaction.measure(View.MeasureSpec
-                            .makeMeasureSpec(holder.itemView.getWidth(), View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        }
-        else {
-            Date date = item.getDate();
-            holder.vTransaction.setVisibility(View.GONE);
-            holder.vDelimiter.setVisibility(View.VISIBLE);
-            holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
-            if (item.isMonthShown()) {
-                holder.tvDelimiterMonth.setText(Globals.monthNames[date.getMonth()]);
-                holder.tvDelimiterMonth.setVisibility(View.VISIBLE);
-//                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_8dp);
-                holder.vDelimiterLine.setVisibility(View.GONE);
-                holder.vDelimiterThick.setVisibility(View.VISIBLE);
-            }
-            else {
-                holder.tvDelimiterMonth.setVisibility(View.GONE);
-//                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_1dp);
-                holder.vDelimiterLine.setVisibility(View.VISIBLE);
-                holder.vDelimiterThick.setVisibility(View.GONE);
-            }
+                // WORKAROUND what seems to be a bug in CardHolder somewhere
+                // when a view that was previously holding a delimiter is re-purposed
+                // occasionally it stays too short (not high enough)
+                holder.vTransaction.measure(View.MeasureSpec
+                                .makeMeasureSpec(holder.itemView.getWidth(), View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                break;
+            case DELIMITER:
+                Date date = item.getDate();
+                holder.vTransaction.setVisibility(View.GONE);
+                holder.vTrailer.setVisibility(View.GONE);
+                holder.vDelimiter.setVisibility(View.VISIBLE);
+                holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
+                if (item.isMonthShown()) {
+                    holder.tvDelimiterMonth.setText(Globals.monthNames[date.getMonth()]);
+                    holder.tvDelimiterMonth.setVisibility(View.VISIBLE);
+                    //                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_8dp);
+                    holder.vDelimiterLine.setVisibility(View.GONE);
+                    holder.vDelimiterThick.setVisibility(View.VISIBLE);
+                }
+                else {
+                    holder.tvDelimiterMonth.setVisibility(View.GONE);
+                    //                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_1dp);
+                    holder.vDelimiterLine.setVisibility(View.VISIBLE);
+                    holder.vDelimiterThick.setVisibility(View.GONE);
+                }
+                break;
+            case TRAILER:
+                holder.vTransaction.setVisibility(View.GONE);
+                holder.vTrailer.setVisibility(View.VISIBLE);
+                holder.vDelimiter.setVisibility(View.GONE);
+
+                break;
         }
     }
 
@@ -108,7 +118,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
     @Override
     public int getItemCount() {
-        return TransactionListViewModel.getTransactionCount();
+        return TransactionListViewModel.getTransactionCount() + 1;
     }
     public void setBoldAccountName(String boldAccountName) {
         this.boldAccountName = boldAccountName;

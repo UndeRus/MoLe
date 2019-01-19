@@ -202,4 +202,11 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
+
+    <view
+        android:id="@+id/transaction_list_trailer"
+        class="android.support.constraint.Placeholder"
+        id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
 </android.support.v7.widget.ContentFrameLayout>

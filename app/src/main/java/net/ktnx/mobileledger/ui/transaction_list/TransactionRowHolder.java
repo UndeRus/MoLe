@@ -35,6 +35,7 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
     CardView vTransaction;
     TextView tvDelimiterMonth, tvDelimiterDate;
     View vDelimiterLine, vDelimiterThick;
+    View vTrailer;
     public TransactionRowHolder(@NonNull View itemView) {
         super(itemView);
         this.row = itemView.findViewById(R.id.transaction_row);
@@ -46,5 +47,6 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
         this.tvDelimiterMonth = itemView.findViewById(R.id.transaction_delimiter_month);
         this.vDelimiterLine = itemView.findViewById(R.id.transaction_delimiter_line);
         this.vDelimiterThick = itemView.findViewById(R.id.transaction_delimiter_thick);
+        this.vTrailer = itemView.findViewById(R.id.transaction_list_trailer);
     }
 }
