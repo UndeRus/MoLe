@@ -117,6 +117,21 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         return inflater.inflate(R.layout.transaction_list_fragment, container, false);
     }
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("flow", "TransactionListFragment.onResume()");
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d("flow", "TransactionListFragment.onStop()");
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d("flow", "TransactionListFragment.onPause()");
+    }
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Log.d("flow", "TransactionListFragment.onActivityCreated called");
         super.onActivityCreated(savedInstanceState);

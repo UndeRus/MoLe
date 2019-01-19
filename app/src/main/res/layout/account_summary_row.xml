@@ -2,7 +2,7 @@
 
 
 <!--
-  ~ Copyright © 2018 Damyan Ivanov.
+  ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of Mobile-Ledger.
   ~ Mobile-Ledger is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -18,31 +18,52 @@
   ~ along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/account_summary_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:minHeight="?attr/android:actionBarSize"
-    android:orientation="horizontal"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
     tools:showIn="@id/account_root">
 
-    <CheckBox
-        android:id="@+id/account_row_check"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:button="@drawable/checkbox_star_black" />
+    <LinearLayout
+        android:id="@+id/account_summary_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="?attr/android:actionBarSize"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/account_row_acc_name"
-        style="@style/account_summary_account_name"
-        android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more." />
+        <CheckBox
+            android:id="@+id/account_row_check"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:button="@drawable/checkbox_star_black" />
 
-    <TextView
-        android:id="@+id/account_row_acc_amounts"
-        style="@style/account_summary_amounts"
-        android:text="123,45\n678,90" />
-</LinearLayout>
+        <TextView
+            android:id="@+id/account_row_acc_name"
+            style="@style/account_summary_account_name"
+            android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/account_row_acc_amounts"
+            style="@style/account_summary_amounts"
+            android:text="123,45\n678,90"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/account_summary_trailer"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>
