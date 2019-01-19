@@ -137,25 +137,6 @@ public class ProfileListActivity extends AppCompatActivity {
         new ItemTouchHelper(cb).attachToRecyclerView(recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL));
-
-        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
-            @Override
-            public boolean onFling(int dX, int dY) {
-//                Log.d("tmp", String.format("fling %d %d", dX, dY));
-                if (dY > 0) fab.hide();
-                if (dY < 0) fab.show();
-                return false;
-            }
-        });
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0) fab.hide();
-                if (dy < 0) fab.show();
-            }
-        });
     }
 
     public static class ProfilesRecyclerViewAdapter
