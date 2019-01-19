@@ -45,7 +45,6 @@ import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -55,10 +54,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
-    public MobileLedgerListFragment currentFragment = null;
     DrawerLayout drawer;
-    private AccountSummaryFragment accountSummaryFragment;
-    private TransactionListFragment transactionListFragment;
     private FragmentManager fragmentManager;
     private TextView tvLastUpdate;
     private RetrieveTransactionsTask retrieveTransactionsTask;
