@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        android.widget.TextView ver = drawer.findViewById(R.id.drawer_version_text);
+        TextView ver = drawer.findViewById(R.id.drawer_version_text);
 
         try {
             PackageInfo pi =
