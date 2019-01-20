@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
         mSectionsPagerAdapter = new SectionsPagerAdapter(fragmentManager);
 
+        markDrawerItemCurrent(R.id.nav_account_summary);
+
         mViewPager = findViewById(R.id.root_frame);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
