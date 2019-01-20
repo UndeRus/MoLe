@@ -19,7 +19,7 @@
 <resources>
     <color name="colorPrimary">#935FF2</color>
     <color name="colorPrimaryDark">#3e148c</color>
-    <color name="colorAccent">#724db6</color>
+    <color name="colorAccent">#653BD0</color>
     <color name="drawer_background">#ffffffff</color>
     <color name="table_row_dark_bg">#286c33d4</color>
     <color name="table_row_light_bg">#28ddcbff</color>
