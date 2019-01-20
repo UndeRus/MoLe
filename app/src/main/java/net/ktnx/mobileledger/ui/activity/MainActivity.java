@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 if (profile == null) setTitle(R.string.app_name);
                 else setTitle(profile.getName());
+                updateLastUpdateTextFromDB();
             });
         });
 
