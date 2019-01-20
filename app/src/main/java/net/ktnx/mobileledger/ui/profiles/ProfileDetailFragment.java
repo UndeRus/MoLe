@@ -23,7 +23,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,12 +61,16 @@ public class ProfileDetailFragment extends Fragment {
      */
     private MobileLedgerProfile mProfile;
     private TextView url;
+    private TextInputLayout urlLayout;
     private LinearLayout authParams;
     private Switch useAuthentication;
     private TextView userName;
+    private TextInputLayout userNameLayout;
     private TextView password;
-    private FloatingActionButton fab;
+    private TextInputLayout passwordLayout;
     private TextView profileName;
+    private TextInputLayout profileNameLayout;
+    private FloatingActionButton fab;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -114,6 +121,8 @@ public class ProfileDetailFragment extends Fragment {
 
         fab = context.findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
+            if (!checkValidity()) return;
+
             if (mProfile != null) {
                 mProfile.setName(profileName.getText());
                 mProfile.setUrl(url.getText());
@@ -141,6 +150,8 @@ public class ProfileDetailFragment extends Fragment {
             Activity activity = getActivity();
             if (activity != null) activity.finish();
         });
+
+        profileName.requestFocus();
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -148,17 +159,26 @@ public class ProfileDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.profile_detail, container, false);
 
         profileName = rootView.findViewById(R.id.profile_name);
+        profileNameLayout = rootView.findViewById(R.id.profile_name_layout);
         url = rootView.findViewById(R.id.url);
+        urlLayout = rootView.findViewById(R.id.url_layout);
         authParams = rootView.findViewById(R.id.auth_params);
         useAuthentication = rootView.findViewById(R.id.enable_http_auth);
         userName = rootView.findViewById(R.id.auth_user_name);
+        userNameLayout = rootView.findViewById(R.id.auth_user_name_layout);
         password = rootView.findViewById(R.id.password);
+        passwordLayout = rootView.findViewById(R.id.password_layout);
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (isChecked) userName.requestFocus();
         });
+
+        hookClearErrorOnFocusListener(profileName, profileNameLayout);
+        hookClearErrorOnFocusListener(url, urlLayout);
+        hookClearErrorOnFocusListener(userName, userNameLayout);
+        hookClearErrorOnFocusListener(password, passwordLayout);
 
         if (mProfile != null) {
             profileName.setText(mProfile.getName());
@@ -178,5 +198,54 @@ public class ProfileDetailFragment extends Fragment {
         }
 
         return rootView;
+    }
+    private void hookClearErrorOnFocusListener(TextView view, TextInputLayout layout) {
+        view.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) layout.setError(null);
+        });
+        view.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                layout.setError(null);
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+    boolean checkValidity() {
+        boolean valid = true;
+
+        String val = String.valueOf(profileName.getText());
+        if (val.trim().isEmpty()) {
+            valid = false;
+            profileNameLayout.setError(getResources().getText(R.string.err_profile_name_empty));
+        }
+
+        val = String.valueOf(url.getText());
+        if (val.trim().isEmpty()) {
+            valid = false;
+            urlLayout.setError(getResources().getText(R.string.err_profile_url_empty));
+        }
+        if (useAuthentication.isChecked()) {
+            val = String.valueOf(userName.getText());
+            if (val.trim().isEmpty()) {
+                valid = false;
+                userNameLayout
+                        .setError(getResources().getText(R.string.err_profile_user_name_empty));
+            }
+
+            val = String.valueOf(password.getText());
+            if (val.trim().isEmpty()) {
+                valid = false;
+                passwordLayout
+                        .setError(getResources().getText(R.string.err_profile_password_empty));
+            }
+        }
+
+        return valid;
     }
 }

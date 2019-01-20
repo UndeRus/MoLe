@@ -113,6 +113,10 @@
     <string name="text_welcome">Welcome</string>
     <string name="text_welcome_profile_needed">A profile for connecting to the backend hledger-web instance needs to be created first</string>
     <string name="create_profile_label">Create profile</string>
+    <string name="err_profile_name_empty">Profile name cannot be empty</string>
+    <string name="err_profile_url_empty">Please enter backend URL, e.g. https://server/location</string>
+    <string name="err_profile_user_name_empty">User name is required when authentication is switched on</string>
+    <string name="err_profile_password_empty">Password is mandatory</string>
     <string-array name="month_names">
         <item>January</item>
         <item>February</item>
