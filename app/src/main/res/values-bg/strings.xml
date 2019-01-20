@@ -85,5 +85,9 @@
     <string name="create_profile_label">Създаване на профил</string>
     <string name="text_welcome">Добре дошли</string>
     <string name="text_welcome_profile_needed">Първо трябва да се създаде профил за връзка с hledger-web</string>
+    <string name="err_profile_name_empty">Моля, въведете име на профила</string>
+    <string name="err_profile_url_empty">Моля, въведете адрес, например https://server/location</string>
+    <string name="err_profile_user_name_empty">Въвеждането на потребителско име е задължително когато се използва удостоверяване</string>
+    <string name="err_profile_password_empty">Паролата е задължителна</string>
 
 </resources>
