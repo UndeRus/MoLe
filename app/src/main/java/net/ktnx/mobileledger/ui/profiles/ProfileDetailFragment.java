@@ -160,6 +160,7 @@ public class ProfileDetailFragment extends Fragment {
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if (isChecked) userName.requestFocus();
         });
 
         if (mProfile != null) {
