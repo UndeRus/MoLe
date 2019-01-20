@@ -21,7 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
@@ -62,8 +63,13 @@ public class ProfileListActivity extends AppCompatActivity {
      * device.
      */
     private boolean mTwoPane;
-    private FloatingActionButton fab;
+    private RecyclerView recyclerView;
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return super.onSupportNavigateUp();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,17 +78,15 @@ public class ProfileListActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
+        final ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+            supportActionBar.setDisplayShowHomeEnabled(true);
+        }
 
-        RecyclerView recyclerView = findViewById(R.id.profile_list);
+        recyclerView = findViewById(R.id.profile_list);
         if (recyclerView == null) throw new AssertionError();
         setupRecyclerView(recyclerView);
-
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            ProfilesRecyclerViewAdapter adapter =
-                    (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
-            if (adapter != null) adapter.editProfile(recyclerView, null);
-        });
 
         if (findViewById(R.id.profile_detail_container) != null) {
             // The detail container view will be present only in the
@@ -98,8 +102,7 @@ public class ProfileListActivity extends AppCompatActivity {
             int index = getIntent().getIntExtra(ARG_PROFILE_INDEX, PROFILE_INDEX_NONE);
 
             MobileLedgerProfile profile = (index >= 0) ? Data.profiles.get(index) : null;
-            ProfilesRecyclerViewAdapter adapter =
-                    (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
+            ProfilesRecyclerViewAdapter adapter = (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
             if (adapter != null) {
                 adapter.editProfile(recyclerView, profile);
 
@@ -109,11 +112,10 @@ public class ProfileListActivity extends AppCompatActivity {
             }
         }
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        fab.show();
+    void launchNewProfileActivity() {
+        ProfilesRecyclerViewAdapter adapter =
+                (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
+        if (adapter != null) adapter.editProfile(recyclerView, null);
     }
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         final ProfilesRecyclerViewAdapter adapter = new ProfilesRecyclerViewAdapter(this, mTwoPane);
@@ -144,7 +146,15 @@ public class ProfileListActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(),
                 DividerItemDecoration.VERTICAL));
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.profile_list, menu);
+        menu.findItem(R.id.menu_add_profile).setOnMenuItemClickListener(item -> {
+            launchNewProfileActivity();
+            return true;
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
     public static class ProfilesRecyclerViewAdapter
             extends RecyclerView.Adapter<ProfilesRecyclerViewAdapter.ProfileListViewHolder> {
 
