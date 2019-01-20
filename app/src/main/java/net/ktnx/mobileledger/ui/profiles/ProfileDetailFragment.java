@@ -145,6 +145,9 @@ public class ProfileDetailFragment extends Fragment {
                 mProfile.storeInDB();
                 Data.profiles.add(mProfile);
                 MobileLedgerProfile.storeProfilesOrder();
+
+                // first profile ever?
+                if (Data.profiles.getList().size() == 1) Data.profile.set(mProfile);
             }
 
             Activity activity = getActivity();
