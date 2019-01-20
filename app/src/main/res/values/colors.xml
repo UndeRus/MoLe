@@ -17,7 +17,7 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#935ff2</color>
+    <color name="colorPrimary">#935FF2</color>
     <color name="colorPrimaryDark">#3e148c</color>
     <color name="colorAccent">#724db6</color>
     <color name="drawer_background">#ffffffff</color>

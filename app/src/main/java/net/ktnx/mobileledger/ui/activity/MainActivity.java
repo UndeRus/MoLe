@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -97,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
             });
         });
 
-        setupProfile();
-
         drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle =
                 new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
@@ -164,53 +161,42 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         });
+
+        findViewById(R.id.btn_no_profiles_add).setOnClickListener(v -> startAddProfileActivity());
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupProfile();
+    }
+    private void startAddProfileActivity() {
+        Intent intent = new Intent(this, ProfileListActivity.class);
+        Bundle args = new Bundle();
+        args.putInt(ProfileListActivity.ARG_ACTION, ProfileListActivity.ACTION_EDIT_PROFILE);
+        args.putInt(ProfileListActivity.ARG_PROFILE_INDEX, ProfileListActivity.PROFILE_INDEX_NONE);
+        intent.putExtras(args);
+        startActivity(intent, args);
     }
     private void setupProfile() {
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
         MobileLedgerProfile profile;
 
-        if (profileUUID == null) {
-            if (Data.profiles.isEmpty()) {
-                Data.profiles.setList(MobileLedgerProfile.createInitialProfileList());
-                profile = Data.profiles.get(0);
+        profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
 
-                SharedPreferences backend = getSharedPreferences("backend", MODE_PRIVATE);
-                Log.d("profiles", "Migrating from preferences to profiles");
-                // migration to multiple profiles
-                if (profile.getUrl().isEmpty()) {
-                    // no legacy config
-                    Intent intent = new Intent(this, ProfileListActivity.class);
-                    startActivity(intent);
-                }
-                profile.setUrl(backend.getString("backend_url", ""));
-                profile.setAuthEnabled(backend.getBoolean("backend_use_http_auth", false));
-                profile.setAuthUserName(backend.getString("backend_auth_user", null));
-                profile.setAuthPassword(backend.getString("backend_auth_password", null));
-                profile.storeInDB();
-                SharedPreferences.Editor editor = backend.edit();
-                editor.clear();
-                editor.apply();
-            }
-            else profile = Data.profiles.get(0);
+        if (Data.profiles.getList().isEmpty()) {
+            findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
+            findViewById(R.id.pager_layout).setVisibility(View.GONE);
+            return;
         }
-        else {
-            profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
-        }
+
+        findViewById(R.id.pager_layout).setVisibility(View.VISIBLE);
+        findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
 
         if (profile == null) profile = Data.profiles.get(0);
 
         if (profile == null) throw new AssertionError("profile must have a value");
 
         Data.setCurrentProfile(profile);
-
-        if (profile.getUrl().isEmpty()) {
-            Intent intent = new Intent(this, ProfileListActivity.class);
-            Bundle args = new Bundle();
-            args.putInt(ProfileListActivity.ARG_ACTION, ProfileListActivity.ACTION_EDIT_PROFILE);
-            args.putInt(ProfileListActivity.ARG_PROFILE_INDEX, 0);
-            intent.putExtras(args);
-            startActivity(intent, args);
-        }
     }
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
@@ -302,7 +288,9 @@ public class MainActivity extends AppCompatActivity {
     }
     public void updateLastUpdateTextFromDB() {
         {
-            long last_update = Data.profile.get().getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
+            final MobileLedgerProfile profile = Data.profile.get();
+            long last_update =
+                    (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
 
             Log.d("transactions", String.format("Last update = %d", last_update));
             if (last_update == 0) {
@@ -314,6 +302,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public void scheduleTransactionListRetrieval() {
+        if (Data.profile.get() == null) return;
+
         retrieveTransactionsTask = new RetrieveTransactionsTask(new WeakReference<>(this));
 
         retrieveTransactionsTask.execute();
@@ -371,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            Log.d("main", String.format("Switching to gragment %d", position));
+            Log.d("main", String.format("Switching to fragment %d", position));
             switch (position) {
                 case 0:
                     return new AccountSummaryFragment();

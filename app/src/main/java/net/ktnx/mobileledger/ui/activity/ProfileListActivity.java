@@ -53,7 +53,8 @@ import java.util.Collections;
 public class ProfileListActivity extends AppCompatActivity {
 
     public static final String ARG_ACTION = "action";
-    public static final String ARG_PROFILE_INDEX = "profile_uuid";
+    public static final String ARG_PROFILE_INDEX = "profile_index";
+    public static final int PROFILE_INDEX_NONE = -1;
     public static final int ACTION_EDIT_PROFILE = 1;
     public static final int ACTION_INVALID = -1;
     /**
@@ -94,12 +95,17 @@ public class ProfileListActivity extends AppCompatActivity {
         int action = getIntent().getIntExtra(ARG_ACTION, ACTION_INVALID);
         if (action == ACTION_EDIT_PROFILE) {
             Log.d("profiles", "got edit profile action");
-            int index = getIntent().getIntExtra(ARG_PROFILE_INDEX, -1);
-            if (index >= 0) {
-                MobileLedgerProfile profile = Data.profiles.get(index);
-                ProfilesRecyclerViewAdapter adapter =
-                        (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
-                if (adapter != null) adapter.editProfile(recyclerView, profile);
+            int index = getIntent().getIntExtra(ARG_PROFILE_INDEX, PROFILE_INDEX_NONE);
+
+            MobileLedgerProfile profile = (index >= 0) ? Data.profiles.get(index) : null;
+            ProfilesRecyclerViewAdapter adapter =
+                    (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
+            if (adapter != null) {
+                adapter.editProfile(recyclerView, profile);
+
+                // if invoked from the initial screen, get out so that when the new profile
+                // activity finishes the user i navigated to the main activity
+                if ((profile == null) && Data.profiles.getList().isEmpty()) finish();
             }
         }
     }
@@ -170,6 +176,7 @@ public class ProfileListActivity extends AppCompatActivity {
             else {
                 Context context = view.getContext();
                 Intent intent = new Intent(context, ProfileDetailActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION);
                 if (index != -1) intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
 
                 context.startActivity(intent);
@@ -211,7 +218,7 @@ public class ProfileListActivity extends AppCompatActivity {
             final MobileLedgerProfile profile = Data.profiles.get(position);
             final MobileLedgerProfile currentProfile = Data.profile.get();
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
-                    currentProfile.getUuid()));
+                    (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
             holder.itemView.setTag(profile);
             holder.mTitle.setText(profile.getName());
             holder.mSubTitle.setText(profile.getUrl());

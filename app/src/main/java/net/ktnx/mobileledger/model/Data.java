@@ -24,6 +24,7 @@ import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public final class Data {
     public static TransactionList transactions = new TransactionList();
@@ -38,5 +39,15 @@ public final class Data {
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
         profile.set(newProfile);
+    }
+    public static int getProfileIndex(MobileLedgerProfile profile) {
+        List<MobileLedgerProfile> list = profiles.getList();
+
+        for (int i = 0; i < list.size(); i++) {
+            MobileLedgerProfile p = list.get(i);
+            if (p.equals(profile)) return i;
+        }
+
+        return -1;
     }
 }

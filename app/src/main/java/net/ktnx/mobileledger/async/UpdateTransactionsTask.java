@@ -24,6 +24,7 @@ import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -35,7 +36,10 @@ import java.util.Date;
 public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String[] filterAccName) {
         Data.backgroundTaskCount.incrementAndGet();
-        String profile_uuid = Data.profile.get().getUuid();
+        final MobileLedgerProfile profile = Data.profile.get();
+        if (profile == null) return "Profile not configured";
+
+        String profile_uuid = profile.getUuid();
         try {
             ArrayList<TransactionListItem> newList = new ArrayList<>();
 

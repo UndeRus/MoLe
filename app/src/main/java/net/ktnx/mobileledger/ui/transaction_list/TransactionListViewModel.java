@@ -32,6 +32,8 @@ public class TransactionListViewModel extends ViewModel {
     public static ObservableValue<String> updateError = new ObservableValue<>();
 
     public static void scheduleTransactionListReload() {
+        if (Data.profile.get() == null) return;
+
         String filter = TransactionListFragment.accountFilter.get();
         AsyncTask<String, Void, String> task = new UTT();
         task.execute(filter);

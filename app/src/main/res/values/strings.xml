@@ -110,6 +110,9 @@
     <string name="error_invalid_date">Invalid date</string>
     <string name="profile_name_label">Profile name</string>
     <string name="url_label">URL</string>
+    <string name="text_welcome">Welcome</string>
+    <string name="text_welcome_profile_needed">A profile needs to be created first</string>
+    <string name="create_profile_label">Create profile</string>
     <string-array name="month_names">
         <item>January</item>
         <item>February</item>

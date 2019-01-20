@@ -18,9 +18,9 @@
 package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -109,11 +109,13 @@ public class ProfileDetailFragment extends Fragment {
             }
         }
     }
-
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        fab = ((Activity) context).findViewById(R.id.fab);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Activity context = getActivity();
+        if (context == null) return;
+
+        fab = context.findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             if (mProfile != null) {
                 mProfile.setName(profileName.getText());

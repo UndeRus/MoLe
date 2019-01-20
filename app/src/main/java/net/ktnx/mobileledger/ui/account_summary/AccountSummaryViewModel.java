@@ -36,6 +36,8 @@ class AccountSummaryViewModel extends ViewModel {
                 new CommitAccountsTaskParams(Data.accounts.get(), Data.optShowOnlyStarred.get()));
     }
     void scheduleAccountListReload() {
+        if (Data.profile.get() == null) return;
+
         UAT task = new UAT();
         task.execute();
 
