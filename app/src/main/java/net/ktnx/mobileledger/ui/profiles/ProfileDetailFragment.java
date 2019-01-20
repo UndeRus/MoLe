@@ -94,9 +94,6 @@ public class ProfileDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if ((getArguments() != null) && getArguments().containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             int index = getArguments().getInt(ARG_ITEM_ID, -1);
             if (index != -1) mProfile = Data.profiles.get(index);
 
