@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btn_no_profiles_add).setOnClickListener(v -> startAddProfileActivity());
+
+        findViewById(R.id.btn_add_transaction).setOnClickListener(this::fabNewTransactionClicked);
     }
     @Override
     protected void onResume() {
