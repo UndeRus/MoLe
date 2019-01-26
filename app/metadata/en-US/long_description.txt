@@ -1,0 +1,24 @@
+If you are into [[https://plaintextaccounting.org plain text accounting]], this
+may be your mobile companion app.
+
+Requirements:
+
+* [https://hledger.org/hledger-web.html hledger-web] instance
+
+Features:
+
+* https, authentication (basic)
+* Account list with current balance
+* Transaction history
+* New transaction input
+* Multiple currencies (not yet in the new transaction functionality)
+* Multiple back-end instances (only one active at a given time)
+
+The development is still ongoing, here's an example list of what to expect in
+the future:
+
+* Reports
+* More filtering of the transaction list
+* Pre-filling of new transaction input from SMS (e.g. from your bank) or
+  QR-code.
+* Themes
