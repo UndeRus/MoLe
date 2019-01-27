@@ -61,6 +61,7 @@ public class ProfileDetailFragment extends Fragment {
      */
     private MobileLedgerProfile mProfile;
     private TextView url;
+    private Switch postingPermitted;
     private TextInputLayout urlLayout;
     private LinearLayout authParams;
     private Switch useAuthentication;
@@ -140,8 +141,9 @@ public class ProfileDetailFragment extends Fragment {
                 }
             }
             else {
-                mProfile = new MobileLedgerProfile(profileName.getText(), url.getText(),
-                        useAuthentication.isChecked(), userName.getText(), password.getText());
+                mProfile = new MobileLedgerProfile(profileName.getText(), postingPermitted.isChecked(),
+                        url.getText(), useAuthentication.isChecked(), userName.getText(),
+                        password.getText());
                 mProfile.storeInDB();
                 Data.profiles.add(mProfile);
                 MobileLedgerProfile.storeProfilesOrder();
@@ -165,6 +167,7 @@ public class ProfileDetailFragment extends Fragment {
         profileNameLayout = rootView.findViewById(R.id.profile_name_layout);
         url = rootView.findViewById(R.id.url);
         urlLayout = rootView.findViewById(R.id.url_layout);
+        postingPermitted = rootView.findViewById(R.id.profile_permit_posting);
         authParams = rootView.findViewById(R.id.auth_params);
         useAuthentication = rootView.findViewById(R.id.enable_http_auth);
         userName = rootView.findViewById(R.id.auth_user_name);
@@ -185,6 +188,7 @@ public class ProfileDetailFragment extends Fragment {
 
         if (mProfile != null) {
             profileName.setText(mProfile.getName());
+            postingPermitted.setChecked(mProfile.isPostingPermitted());
             url.setText(mProfile.getUrl());
             useAuthentication.setChecked(mProfile.isAuthEnabled());
             authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
@@ -194,6 +198,7 @@ public class ProfileDetailFragment extends Fragment {
         else {
             profileName.setText("");
             url.setText("");
+            postingPermitted.setChecked(true);
             useAuthentication.setChecked(false);
             authParams.setVisibility(View.GONE);
             userName.setText("");

@@ -64,6 +64,13 @@
         android:orientation="vertical">
 
         <Switch
+            android:id="@+id/profile_permit_posting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/posting_permitted" />
+
+        <Switch
             android:id="@+id/enable_http_auth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -31,23 +31,27 @@ import java.util.UUID;
 public final class MobileLedgerProfile {
     private String uuid;
     private String name;
+    private boolean permitPosting;
     private String url;
     private boolean authEnabled;
     private String authUserName;
     private String authPassword;
-    public MobileLedgerProfile(String uuid, String name, String url, boolean authEnabled,
-                               String authUserName, String authPassword) {
+    public MobileLedgerProfile(String uuid, String name, boolean permitPosting, String url,
+                               boolean authEnabled, String authUserName, String authPassword) {
         this.uuid = uuid;
         this.name = name;
+        this.permitPosting = permitPosting;
         this.url = url;
         this.authEnabled = authEnabled;
         this.authUserName = authUserName;
         this.authPassword = authPassword;
     }
-    public MobileLedgerProfile(CharSequence name, CharSequence url, boolean authEnabled,
-                               CharSequence authUserName, CharSequence authPassword) {
+    public MobileLedgerProfile(CharSequence name, boolean permitPosting, CharSequence url,
+                               boolean authEnabled, CharSequence authUserName,
+                               CharSequence authPassword) {
         this.uuid = String.valueOf(UUID.randomUUID());
         this.name = String.valueOf(name);
+        this.permitPosting = permitPosting;
         this.url = String.valueOf(url);
         this.authEnabled = authEnabled;
         this.authUserName = String.valueOf(authUserName);
@@ -60,13 +64,14 @@ public final class MobileLedgerProfile {
         List<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = MLDB.getReadableDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
-                                         "auth_password FROM profiles order by order_no", null))
+                                         "auth_password, permit_posting FROM profiles order by " +
+                                         "order_no", null))
         {
             while (cursor.moveToNext()) {
                 MobileLedgerProfile item =
                         new MobileLedgerProfile(cursor.getString(0), cursor.getString(1),
-                        cursor.getString(2), cursor.getInt(3) == 1, cursor.getString(4),
-                                cursor.getString(5));
+                                cursor.getInt(6) == 1, cursor.getString(2), cursor.getInt(3) == 1,
+                                cursor.getString(4), cursor.getString(5));
                 list.add(item);
                 if (item.getUuid().equals(currentProfileUUID)) result = item;
             }
@@ -91,6 +96,9 @@ public final class MobileLedgerProfile {
         }
     }
 
+    public boolean isPostingPermitted() {
+        return permitPosting;
+    }
     public String getUuid() {
         return uuid;
     }
@@ -140,9 +148,11 @@ public final class MobileLedgerProfile {
         SQLiteDatabase db = MLDB.getWritableDatabase();
         db.beginTransaction();
         try {
-            db.execSQL("REPLACE INTO profiles(uuid, name, url, use_authentication, auth_user, " +
-                       "auth_password) VALUES(?, ?, ?, ?, ?, ?)",
-                    new Object[]{uuid, name, url, authEnabled, authEnabled ? authUserName : null,
+            db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
+                       "use_authentication, auth_user, " +
+                       "auth_password) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                    new Object[]{uuid, name, permitPosting, url, authEnabled,
+                                 authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null
                     });
             db.setTransactionSuccessful();

@@ -131,4 +131,5 @@
         <item>November</item>
         <item>December</item>
     </string-array>
+    <string name="posting_permitted">Posting of new transactions enabled</string>
 </resources>

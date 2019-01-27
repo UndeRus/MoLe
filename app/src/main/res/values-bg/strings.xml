@@ -89,5 +89,6 @@
     <string name="err_profile_url_empty">Моля, въведете адрес, например https://server/location</string>
     <string name="err_profile_user_name_empty">Въвеждането на потребителско име е задължително когато се използва удостоверяване</string>
     <string name="err_profile_password_empty">Паролата е задължителна</string>
+    <string name="posting_permitted">Позволяване на добавянето на нови трансакции</string>
 
 </resources>
