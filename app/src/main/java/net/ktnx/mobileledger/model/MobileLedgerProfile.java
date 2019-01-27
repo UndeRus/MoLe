@@ -90,35 +90,7 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public static MobileLedgerProfile loadUUIDFromDB(String profileUUID) {
-        SQLiteDatabase db = MLDB.getReadableDatabase();
-        String name;
-        String url;
-        String authUser;
-        String authPassword;
-        Boolean useAuthentication;
-        try (Cursor cursor = db.rawQuery("SELECT name, url, use_authentication, auth_user, " +
-                                         "auth_password FROM profiles WHERE uuid=?",
-                new String[]{profileUUID}))
-        {
-            if (cursor.moveToNext()) {
-                name = cursor.getString(0);
-                url = cursor.getString(1);
-                useAuthentication = cursor.getInt(2) == 1;
-                authUser = useAuthentication ? cursor.getString(3) : null;
-                authPassword = useAuthentication ? cursor.getString(4) : null;
-            }
-            else {
-                name = "Unknown profile";
-                url = "Https://server/url";
-                useAuthentication = false;
-                authUser = authPassword = null;
-            }
-        }
 
-        return new MobileLedgerProfile(profileUUID, name, url, useAuthentication, authUser,
-                authPassword);
-    }
     public String getUuid() {
         return uuid;
     }
