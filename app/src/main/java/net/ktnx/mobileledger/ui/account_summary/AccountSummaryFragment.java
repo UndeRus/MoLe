@@ -144,12 +144,12 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
                     }
                 }));
 
-        fab.show();
+        mActivity.fabShouldShow();
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (fab != null) {
-                    if (dy < 0) fab.show();
+                    if (dy < 0) mActivity.fabShouldShow();
                     if (dy > 0) fab.hide();
                 }
             }

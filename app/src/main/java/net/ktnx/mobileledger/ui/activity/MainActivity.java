@@ -22,6 +22,7 @@ import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout progressLayout;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+    private FloatingActionButton fab;
 
     @Override
     protected void onStart() {
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        fab = findViewById(R.id.btn_add_transaction);
 
         Data.profile.addObserver((o, arg) -> {
             MobileLedgerProfile profile = Data.profile.get();
@@ -94,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
                 if (profile == null) setTitle(R.string.app_name);
                 else setTitle(profile.getName());
                 updateLastUpdateTextFromDB();
+                if (profile.isPostingPermitted()) fab.show();
+                else fab.hide();
             });
         });
 
@@ -383,5 +388,8 @@ public class MainActivity extends AppCompatActivity {
             return 2;
         }
     }
-
+    public void fabShouldShow() {
+        MobileLedgerProfile profile = Data.profile.get();
+        if (profile.isPostingPermitted()) fab.show();
+    }
 }
