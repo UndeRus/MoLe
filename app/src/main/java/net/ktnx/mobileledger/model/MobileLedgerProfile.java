@@ -90,15 +90,6 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public static List<MobileLedgerProfile> createInitialProfileList() {
-        List<MobileLedgerProfile> result = new ArrayList<>();
-        MobileLedgerProfile first =
-                new MobileLedgerProfile(UUID.randomUUID().toString(), "default", "", false, "", "");
-        first.storeInDB();
-        result.add(first);
-
-        return result;
-    }
     public static MobileLedgerProfile loadUUIDFromDB(String profileUUID) {
         SQLiteDatabase db = MLDB.getReadableDatabase();
         String name;
