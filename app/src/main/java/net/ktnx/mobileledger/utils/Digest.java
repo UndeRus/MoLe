@@ -28,7 +28,7 @@ public class Digest {
         digest = MessageDigest.getInstance(type);
     }
     public static char[] hexDigitsFor(byte x) {
-        return hexDigitsFor((int) ((x<0) ? 256+x : x));
+        return hexDigitsFor(((x < 0) ? 256 + x : x));
     }
     public static char[] hexDigitsFor(int x) {
         if ((x < 0) || (x > 255)) throw new ArithmeticException(
