@@ -63,7 +63,8 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
 
             Log.d("UTT", sql);
             SQLiteDatabase db = MLDB.getReadableDatabase();
-            Date lastDate = null;
+            String lastDateString = Globals.formatLedgerDate(new Date());
+            Date lastDate = Globals.parseLedgerDate(lastDateString);
             boolean odd = true;
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
@@ -73,12 +74,9 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                     String dateString = cursor.getString(1);
                     Date date = Globals.parseLedgerDate(dateString);
 
-                    if ((lastDate == null) || !lastDate.equals(date)) {
-                        boolean showMonth = (lastDate == null) || (date != null) &&
-                                                                  (date.getMonth() !=
-                                                                   lastDate.getMonth() ||
-                                                                   date.getYear() !=
-                                                                   lastDate.getYear());
+                    if (!lastDateString.equals(dateString)) {
+                        boolean showMonth = (date.getMonth() != lastDate.getMonth() ||
+                                             date.getYear() != lastDate.getYear());
                         newList.add(new TransactionListItem(date, showMonth));
                     }
                     newList.add(
@@ -86,6 +84,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
 //                    Log.d("UTT", String.format("got transaction %d", transaction_id));
 
                     lastDate = date;
+                    lastDateString = dateString;
                     odd = !odd;
                 }
                 Data.transactions.set(newList);
