@@ -127,6 +127,7 @@ public class ProfileDetailFragment extends Fragment {
             if (mProfile != null) {
                 mProfile.setName(profileName.getText());
                 mProfile.setUrl(url.getText());
+                mProfile.setPostingPermitted(postingPermitted.isChecked());
                 mProfile.setAuthEnabled(useAuthentication.isChecked());
                 mProfile.setAuthUserName(userName.getText());
                 mProfile.setAuthPassword(password.getText());

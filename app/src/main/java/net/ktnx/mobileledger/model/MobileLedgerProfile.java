@@ -95,9 +95,11 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-
     public boolean isPostingPermitted() {
         return permitPosting;
+    }
+    public void setPostingPermitted(boolean permitPosting) {
+        this.permitPosting = permitPosting;
     }
     public String getUuid() {
         return uuid;

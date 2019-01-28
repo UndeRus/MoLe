@@ -132,4 +132,5 @@
         <item>December</item>
     </string-array>
     <string name="posting_permitted">Posting of new transactions enabled</string>
+    <string name="profile_subitlte_read_only">(Read only)</string>
 </resources>

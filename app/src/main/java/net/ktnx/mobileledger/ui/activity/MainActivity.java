@@ -97,8 +97,14 @@ public class MainActivity extends AppCompatActivity {
                 if (profile == null) setTitle(R.string.app_name);
                 else setTitle(profile.getName());
                 updateLastUpdateTextFromDB();
-                if (profile.isPostingPermitted()) fab.show();
-                else fab.hide();
+                if (profile.isPostingPermitted()) {
+                    toolbar.setSubtitle(null);
+                    fab.show();
+                }
+                else {
+                    toolbar.setSubtitle(R.string.profile_subitlte_read_only);
+                    fab.hide();
+                }
             });
         });
 
