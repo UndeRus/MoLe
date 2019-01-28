@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
 
         try (OutputStream req = http.getOutputStream()) {
             Log.d("network", "Request body: " + body);
-            req.write(body.getBytes("ASCII"));
+            req.write(body.getBytes(StandardCharsets.US_ASCII));
 
             try (InputStream resp = http.getInputStream()) {
                 Log.d("update_accounts", String.valueOf(http.getResponseCode()));

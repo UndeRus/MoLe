@@ -26,6 +26,7 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
@@ -39,8 +40,8 @@ public final class NetworkUtil {
         if (use_auth) {
             final String auth_user = profile.getAuthUserName();
             final String auth_password = profile.getAuthPassword();
-            final byte[] bytes =
-                    (String.format("%s:%s", auth_user, auth_password)).getBytes("UTF-8");
+            final byte[] bytes = (String.format("%s:%s", auth_user, auth_password))
+                    .getBytes(StandardCharsets.UTF_8);
             final String value = Base64.encodeToString(bytes, Base64.DEFAULT);
             http.setRequestProperty("Authorization", "Basic " + value);
         }

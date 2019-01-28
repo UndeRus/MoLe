@@ -42,6 +42,7 @@ import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,8 +132,8 @@ public class RetrieveTransactionsTask
 
                         ParserState state = ParserState.EXPECTING_ACCOUNT;
                         String line;
-                        BufferedReader buf =
-                                new BufferedReader(new InputStreamReader(resp, "UTF-8"));
+                        BufferedReader buf = new BufferedReader(
+                                new InputStreamReader(resp, StandardCharsets.UTF_8));
 
                         int processedTransactionCount = 0;
                         int transactionId = 0;
