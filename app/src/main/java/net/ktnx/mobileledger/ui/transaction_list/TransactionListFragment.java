@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.database.MatrixCursor;
 import android.os.Bundle;
@@ -141,7 +140,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         root = mActivity.findViewById(R.id.transaction_root);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
-        model = ViewModelProviders.of(this).get(TransactionListViewModel.class);
         modelAdapter = new TransactionListAdapter();
 
         modelAdapter.setBoldAccountName(mShowOnlyAccountName);

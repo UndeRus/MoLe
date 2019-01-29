@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.arch.lifecycle.ViewModel;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -26,7 +25,6 @@ import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;
 
 public class MobileLedgerListFragment extends Fragment {
-    public ViewModel model;
     protected MainActivity mActivity;
     public SwipeRefreshLayout swiper;
     protected RecyclerView root;
