@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.account_summary;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -50,7 +49,6 @@ import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_O
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
     MenuItem mShowOnlyStarred;
-    private AccountSummaryViewModel model;
     private AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
     private FloatingActionButton fab;
@@ -98,7 +96,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Log.d("flow", "AccountSummaryFragment.onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
 
-        model = ViewModelProviders.of(this).get(AccountSummaryViewModel.class);
         modelAdapter = new AccountSummaryAdapter();
 
         root = mActivity.findViewById(R.id.account_root);
@@ -164,13 +161,13 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.accounts.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
         Data.profile.addObserver(
-                (o, arg) -> mActivity.runOnUiThread(() -> model.scheduleAccountListReload()));
+                (o, arg) -> mActivity.runOnUiThread(() -> AccountSummaryViewModel.scheduleAccountListReload()));
         update_account_table();
     }
     private void update_account_table() {
         if (this.getContext() == null) return;
 
-        model.scheduleAccountListReload();
+        AccountSummaryViewModel.scheduleAccountListReload();
     }
     void stopSelection() {
         modelAdapter.stopSelection();
