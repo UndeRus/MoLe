@@ -34,6 +34,7 @@ android {
         }
         debug {
             versionNameSuffix '-debug'
+            applicationIdSuffix '.debug'
         }
     }
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
