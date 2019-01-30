@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -e
+set -u
+
+ROOT_DIR=$(dirname $(realpath "$0"))/..
+ART_DIR="$ROOT_DIR/art"
+RES_DIR="$ROOT_DIR/app/src/main/res"
+ICON_ART="$ART_DIR/app-icon.svg"
+
+gen_icons() {
+    while read size name; do
+        mkdir -p "$RES_DIR/drawable-$name"
+        convert "$ICON_ART" -scale ${size}x${size} \
+            -antialias -strip \
+            "$RES_DIR/drawable-$name/ic_app_icon.png"
+    done
+}
+
+cat <<EOF | gen_icons
+36 ldpi
+48 mdpi
+64 tvdpi
+72 hdpi
+96 xhdpi
+144 xxhdpi
+192 xxxhdpi
+EOF
