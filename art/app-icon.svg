@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg4620"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="app-icon.svg">
+  <title
+     id="title921">Mobile Ledger app icon</title>
+  <defs
+     id="defs4614" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.79886862"
+     inkscape:cx="343.24115"
+     inkscape:cy="95.182567"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-page="true"
+     showguides="false"
+     inkscape:guide-bbox="true"
+     inkscape:snap-object-midpoints="true"
+     showborder="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1014"
+     inkscape:window-x="0"
+     inkscape:window-y="35"
+     inkscape:window-maximized="1">
+    <sodipodi:guide
+       position="50,138.6761"
+       orientation="1,0"
+       id="guide5186"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="70.959076,4"
+       orientation="0,1"
+       id="guide5236"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="6,-7.7831425"
+       orientation="1,0"
+       id="guide5240"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="56.615925,63.290398"
+       orientation="0,1"
+       id="guide5242"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="110.53864,6"
+       orientation="0,1"
+       id="guide5295"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="50.407291,60.491062"
+       orientation="0,1"
+       id="guide5297"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="93.999999,-2.1077283"
+       orientation="1,0"
+       id="guide5299"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="71.999999,17.719069"
+       orientation="1,0"
+       id="guide5301"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="28,-19.706254"
+       orientation="1,0"
+       id="guide5309"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,0,255)" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata4617">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Mobile Ledger app icon</dc:title>
+        <cc:license
+           rdf:resource="https://spdx.org/licenses/GPL-3.0-or-later.html" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Damyan Ivanov &lt;dam+mobileledger@ktnx.net&gt;</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Copyright © 2019 Damyan Ivanov &lt;dam+mobileledger@ktnx.net&gt;. All rights reserved.</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="фон">
+    <rect
+       style="opacity:1;fill:#724db6;fill-opacity:1;stroke:none;stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.08858268;stroke-opacity:1;paint-order:markers stroke fill"
+       id="rect5267"
+       width="100"
+       height="100"
+       x="0"
+       y="0"
+       ry="8" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-197)"
+     style="opacity:1">
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#eeeeee;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.08858268;stroke-opacity:1"
+       id="path5171"
+       sodipodi:type="arc"
+       sodipodi:cx="50"
+       sodipodi:cy="235.68813"
+       sodipodi:rx="15"
+       sodipodi:ry="15"
+       sodipodi:start="3.9269908"
+       sodipodi:end="5.4977871"
+       d="m 39.393398,225.08152 a 15,15 0 0 1 21.213203,0"
+       sodipodi:open="true" />
+    <path
+       sodipodi:open="true"
+       d="m 28.786797,214.47492 a 30,30 0 0 1 42.426406,0"
+       sodipodi:end="5.4977871"
+       sodipodi:start="3.9269908"
+       sodipodi:ry="30"
+       sodipodi:rx="30"
+       sodipodi:cy="235.68813"
+       sodipodi:cx="50"
+       sodipodi:type="arc"
+       id="path5179"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#e7e7e7;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.08858268;stroke-opacity:1" />
+    <path
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:3.99999976;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.08858268;stroke-opacity:1"
+       d="m 8.0369154,236.50894 c 0,0 12.8033076,-1.76941 19.2474296,-1.81547 7.595836,-0.0543 22.715656,1.81547 22.715656,1.81547 0,0 15.663958,-1.89903 23.530238,-1.81547 6.169214,0.0656 18.419435,1.81547 18.419435,1.81547 1.117189,0.10537 2.025681,0.89628 2.025681,2.00961 v 50.44311 c 0,1.11333 -0.903454,2.00961 -2.025681,2.00961 0,0 -12.248259,-1.81012 -18.419435,-1.874 C 65.661646,289.01577 50.000001,291 50.000001,291 c 0,0 -15.117427,-1.95398 -22.715656,-1.90273 -6.446002,0.0435 -19.2474296,1.874 -19.2474296,1.874 -1.1222277,0 -2.0256817,-0.89628 -2.0256817,-2.00961 v -50.44311 c 0,-1.11333 0.903454,-2.00961 2.0256817,-2.00961 z"
+       id="rect5165"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="sacassssacassss" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:4.00000048;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 50.000001,291 V 236.50894"
+       id="path5167"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <g
+       style="stroke:#ffffff;stroke-width:1.01320028;stroke-opacity:1"
+       id="g5227"
+       transform="matrix(0.99090936,0,0,0.9830498,3.5547677,6.9211761)">
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5216"
+         d="M 9.1013673,261.31306 H 40.237622"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.10560226;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.10560226;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 24.669494,276.88119 V 245.74493"
+         id="path5218"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+    </g>
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path5220"
+       d="M 56.573397,263.80493 H 87.426603"
+       style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:8.00000095;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <path
+       style="opacity:1;fill:#724db6;fill-opacity:1;stroke:none;stroke-width:6.50000048;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.08858268;stroke-opacity:1;paint-order:markers stroke fill"
+       d="m 42.622952,229.07442 h 14.754097 l 1.405152,14.28574 H 40.749416 Z"
+       id="rect5263"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <ellipse
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#724db6;stroke-width:6.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.08858268;stroke-opacity:1;paint-order:markers stroke fill"
+       id="path5169"
+       cx="50"
+       cy="235.68813"
+       rx="4"
+       ry="4.0000043" />
+  </g>
+</svg>
