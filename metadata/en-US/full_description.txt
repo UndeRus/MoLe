@@ -1,4 +1,4 @@
-If you are into [https://plaintextaccounting.org plain text accounting], this may be your mobile companion app.
+If you are into <a href="https://plaintextaccounting.org">plain text accounting</a>, this may be your mobile companion app.
 
 Requirements:
 
