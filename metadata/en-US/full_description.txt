@@ -3,7 +3,7 @@ If you are into <a href="https://plaintextaccounting.org">plain text accounting<
 Requirements:
 
 <ul>
-<li>An <a href="https://hledger.org/hledger-web.html>hledger-web</a> instance</li>
+<li>An <a href="https://hledger.org/hledger-web.html">hledger-web</a> instance</li>
 </ul>
 
 Features:
