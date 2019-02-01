@@ -1,27 +1,20 @@
 If you are into <a href="https://plaintextaccounting.org">plain text accounting</a>, this may be your mobile companion app.
 
-Requirements:
-
-<ul>
-<li>An <a href="http://hledger.org/hledger-web.html">hledger-web</a> instance</li>
-</ul>
+Needs access to an <a href="http://hledger.org/hledger-web.html">hledger-web</a> instance.
 
 Features:
 
-<ul>
-<li>https, authentication (basic)</li>
-<li>Account list with current balance</li>
-<li>Transaction history</li>
-<li>New transaction input</li>
-<li>Multiple currencies (not when entering transactions, yet)</li>
-<li>Multiple back-end instances (only one active at a given time)</li>
-</ul>
+<p>Mobile Ledger connects via http/https and supports authentication (basic).
+It can show the list of accounts with their current balance, including support
+for multiple currencies. List of transactions is also available, and new
+transactions can be entered and submitted to the back-end. Multiple back-ends
+are supported.</p>
 
 The development is still ongoing, here's a list of some of the planned features:
 
 <ul>
-<li>Reports</li>
-<li>>More filtering of the transaction list, search</li>
-<li>Pre-filling of new transaction input from SMS (e.g. from your bank) or QR-code</li>
-<li>Themes</li>
+<li>Reports
+<li>More filtering of the transaction list, search
+<li>Pre-filling of new transaction input from SMS (e.g. from your bank) or QR-code
+<li>Themes
 </ul>
