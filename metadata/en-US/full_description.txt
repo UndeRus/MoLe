@@ -2,21 +2,26 @@ If you are into <a href="https://plaintextaccounting.org">plain text accounting<
 
 Requirements:
 
-* An [https://hledger.org/hledger-web.html hledger-web] instance
+<ul>
+<li>An <a href="https://hledger.org/hledger-web.html>hledger-web</a> instance</li>
+</ul>
 
 Features:
 
-* https, authentication (basic)
-* Account list with current balance
-* Transaction history
-* New transaction input
-* Multiple currencies (not yet in the new transaction functionality)
-* Multiple back-end instances (only one active at a given time)
+<ul>
+<li>https, authentication (basic)</li>
+<li>Account list with current balance</li>
+<li>Transaction history</li>
+<li>New transaction input</li>
+<li>Multiple currencies (not when entering transactions, yet)</li>
+<li>Multiple back-end instances (only one active at a given time)</li>
+</ul>
 
-The development is still ongoing, here's an example list of what to expect in the future:
+The development is still ongoing, here's a list of some of the planned features:
 
-* Reports
-* More filtering of the transaction list
-* Pre-filling of new transaction input from SMS (e.g. from your bank) or QR-code.
-* Themes
-.
+<ul>
+<li>Reports</li>
+<li>>More filtering of the transaction list, search</li>
+<li>Pre-filling of new transaction input from SMS (e.g. from your bank) or QR-code</li>
+<li>Themes</li>
+</ul>
