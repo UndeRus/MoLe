@@ -128,12 +128,12 @@
            rdf:resource="https://spdx.org/licenses/GPL-3.0-or-later.html" />
         <dc:creator>
           <cc:Agent>
-            <dc:title>Damyan Ivanov &lt;dam+mobileledger@ktnx.net&gt;</dc:title>
+            <dc:title>Damyan Ivanov &lt;dam+mole@ktnx.net&gt;</dc:title>
           </cc:Agent>
         </dc:creator>
         <dc:rights>
           <cc:Agent>
-            <dc:title>Copyright © 2019 Damyan Ivanov &lt;dam+mobileledger@ktnx.net&gt;. All rights reserved.</dc:title>
+            <dc:title>Copyright © 2019 Damyan Ivanov &lt;dam+mole@ktnx.net&gt;. All rights reserved.</dc:title>
           </cc:Agent>
         </dc:rights>
       </cc:Work>
