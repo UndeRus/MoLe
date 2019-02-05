@@ -1,20 +1,13 @@
-If you are into <a href="https://plaintextaccounting.org">plain text accounting</a>, this may be your mobile companion app.
+Work with your <a href="http://hledger.org/hledger-web.html">hledger-web</a> instance conveniently.
 
-Needs access to an <a href="http://hledger.org/hledger-web.html">hledger-web</a> instance.
+hledger-web is a web interface to hledger - a plain text based accounting system.
+
+MoLe is a convenient front-end to hledger-web, providing more natural interface for mobile devices.
 
 Features:
 
-<p>Mobile Ledger connects via http/https and supports authentication (basic).
-It can show the list of accounts with their current balance, including support
-for multiple currencies. List of transactions is also available, and new
-transactions can be entered and submitted to the back-end. Multiple back-ends
-are supported.</p>
+<ul><li>List of accounts with their current balance, including support for multiple currencies</li><li>Transaction list with filters</li>Input of new transactions</li><li>Multiple back-ends</li><li>Supports http authentication (basic)</li></ul>
 
 The development is still ongoing, here's a list of some of the planned features:
 
-<ul>
-<li>Reports
-<li>More filtering of the transaction list, search
-<li>Pre-filling of new transaction input from SMS (e.g. from your bank) or QR-code
-<li>Themes
-</ul>
+<ul><li>Reports</li><li>More filters for the transaction list, search</li><li>Pre-filling of new transaction input from history, SMS (e.g. from your bank) or QR-code</li><li>Themes</li></ul>

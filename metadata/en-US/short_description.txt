@@ -1,1 +1,1 @@
-Convenience front-end to hledger-web
+Convenient front-end to hledger-web
