@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.activity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -72,9 +73,9 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     private static SaveTransactionTask saver;
     private TableLayout table;
     private ProgressBar progress;
+    private FloatingActionButton fab;
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
-    private MenuItem mSave;
     private static boolean isZero(float f) {
         return (f < 0.005) && (f > -0.005);
     }
@@ -96,6 +97,8 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         hookTextChangeListener(tvDescription);
 
         progress = findViewById(R.id.save_transaction_progress);
+        fab = findViewById(R.id.fab);
+        fab.setOnClickListener(v -> saveTransaction());
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         table = findViewById(R.id.new_transaction_accounts_table);
@@ -133,7 +136,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (tvDate.getText().toString().isEmpty()) tvDate.requestFocus();
     }
     public void saveTransaction() {
-        if (mSave != null) mSave.setVisible(false);
+        if (fab != null) fab.setEnabled(false);
         toggleAllEditing(false);
         progress.setVisibility(View.VISIBLE);
         try {
@@ -167,14 +170,14 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
             progress.setVisibility(View.GONE);
             toggleAllEditing(true);
-            if (mSave != null) mSave.setVisible(true);
+            if (fab != null) fab.setEnabled(true);
         }
         catch (Exception e) {
             Log.d("new-transaction", "Unknown error", e);
 
             progress.setVisibility(View.GONE);
             toggleAllEditing(true);
-            if (mSave != null) mSave.setVisible(true);
+            if (fab != null) fab.setEnabled(true);
         }
     }
     private void toggleAllEditing(boolean enabled) {
@@ -238,8 +241,6 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
-        mSave = menu.findItem(R.id.action_submit_transaction);
-        if (mSave == null) throw new AssertionError();
 
         check_transaction_submittable();
 
@@ -403,9 +404,14 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
                 (amounts_with_accounts == amounts) &&
                 (single_empty_amount && single_empty_amount_has_account || isZero(running_total)))
             {
-                if (mSave != null) mSave.setVisible(true);
+                if (fab != null) {
+                    fab.show();
+                    fab.setEnabled(true);
+                }
             }
-            else if (mSave != null) mSave.setVisible(false);
+            else {
+                if (fab != null) fab.hide();
+            }
 
             if (single_empty_amount) {
                 empty_amount.setHint(String.format("%1.2f",
@@ -414,11 +420,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
 
         }
         catch (NumberFormatException e) {
-            if (mSave != null) mSave.setVisible(false);
+            if (fab != null) fab.hide();
         }
         catch (Exception e) {
             e.printStackTrace();
-            if (mSave != null) mSave.setVisible(false);
+            if (fab != null) fab.hide();
         }
     }
 

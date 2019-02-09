@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2018 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
@@ -52,6 +51,21 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="@dimen/fab_margin"
+            android:tint="@android:color/white"
+            android:visibility="gone"
+            app:backgroundTint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@id/save_transaction_progress"
+            app:layout_constraintEnd_toEndOf="@id/save_transaction_progress"
+            app:layout_constraintStart_toStartOf="@id/save_transaction_progress"
+            app:layout_constraintTop_toTopOf="@id/save_transaction_progress"
+            app:srcCompat="@drawable/ic_save_white_24dp" />
 
     </android.support.constraint.ConstraintLayout>
 
