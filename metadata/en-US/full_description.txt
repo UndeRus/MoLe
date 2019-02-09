@@ -2,12 +2,11 @@ Work with your <a href="http://hledger.org/hledger-web.html">hledger-web</a> ins
 
 hledger-web is a web interface to hledger - a plain text based accounting system.
 
-MoLe is a convenient front-end to hledger-web, providing more natural interface for mobile devices.
+MoLe (from "Mobile Ledger") is a convenient front-end to hledger-web, providing more natural interface for mobile devices.
 
 Features:
 
-<ul><li>List of accounts with their current balance, including support for multiple currencies</li><li>Transaction list with filters</li>Input of new transactions</li><li>Multiple back-ends</li><li>Supports http authentication (basic)</li></ul>
-
+<ul><li>List of accounts with their current balance, including support for multiple currencies</li><li>Transaction list with filters</li><li>Input of new transactions</li><li>Multiple back-ends</li><li>Supports http authentication (basic)</li></ul>
 The development is still ongoing, here's a list of some of the planned features:
 
 <ul><li>Reports</li><li>More filters for the transaction list, search</li><li>Pre-filling of new transaction input from history, SMS (e.g. from your bank) or QR-code</li><li>Themes</li></ul>
