@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
@@ -45,18 +46,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /*
@@ -69,7 +75,8 @@ import java.util.Objects;
  * TODO: update accounts/check settings upon change of backend settings
  *  */
 
-public class NewTransactionActivity extends AppCompatActivity implements TaskCallback {
+public class NewTransactionActivity extends AppCompatActivity
+        implements TaskCallback, DescriptionSelectedCallback {
     private static SaveTransactionTask saver;
     private TableLayout table;
     private ProgressBar progress;
@@ -93,7 +100,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         });
         tvDescription = findViewById(R.id.new_transaction_description);
         MLDB.hookAutocompletionAdapter(this, tvDescription, MLDB.DESCRIPTION_HISTORY_TABLE,
-                "description", false, findViewById(R.id.new_transaction_acc_1));
+                "description", false, findViewById(R.id.new_transaction_acc_1), this);
         hookTextChangeListener(tvDescription);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -108,7 +115,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             TextView tvAmount = (TextView) row.getChildAt(1);
             hookSwipeListener(row);
             MLDB.hookAutocompletionAdapter(this, tvAccountName, MLDB.ACCOUNTS_TABLE, "name", true,
-                    tvAmount);
+                    tvAmount, null);
             hookTextChangeListener(tvAccountName);
             hookTextChangeListener(tvAmount);
 //            Log.d("swipe", "hooked to row "+i);
@@ -276,7 +283,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         });
 
     }
-    private void doAddAccountRow(boolean focus) {
+    private TableRow doAddAccountRow(boolean focus) {
         final AutoCompleteTextView acc = new AutoCompleteTextView(this);
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                 TableRow.LayoutParams.WRAP_CONTENT, 9f));
@@ -317,9 +324,11 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
         if (focus) acc.requestFocus();
 
         hookSwipeListener(row);
-        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt);
+        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt, null);
         hookTextChangeListener(acc);
         hookTextChangeListener(amt);
+
+        return row;
     }
     public void addTransactionAccountFromMenu(MenuItem item) {
         doAddAccountRow(true);
@@ -457,5 +466,64 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
             ((TextView) tr.getChildAt(0)).setText("");
             ((TextView) tr.getChildAt(1)).setText("");
         }
+    }
+    @Override
+    public void descriptionSelected(String description) {
+        Log.d("descr selected", description);
+        if (!inputStateIsInitial()) return;
+
+        try (Cursor c = MLDB.getReadableDatabase().rawQuery(
+                "select profile, id from transactions where description=? order by date desc " +
+                "limit 1", new String[]{description}))
+        {
+            if (!c.moveToNext()) return;
+
+            String profileUUID = c.getString(0);
+            int transactionId = c.getInt(1);
+            List<MobileLedgerProfile> profiles = Data.profiles.getList();
+            MobileLedgerProfile profile = null;
+            for (int i = 0; i < profiles.size(); i++) {
+                MobileLedgerProfile p = profiles.get(i);
+                if (p.getUuid().equals(profileUUID)) {
+                    profile = p;
+                    break;
+                }
+            }
+            if (profile == null) throw new RuntimeException(String.format(
+                    "Unable to find profile %s, which is supposed to contain " +
+                    "transaction %d with description %s", profileUUID, transactionId, description));
+
+            LedgerTransaction tr = profile.loadTransaction(transactionId);
+            int i = 0;
+            table = findViewById(R.id.new_transaction_accounts_table);
+            ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
+            for (i = 0; i < accounts.size(); i++) {
+                LedgerTransactionAccount acc = accounts.get(i);
+                TableRow row = (TableRow) table.getChildAt(i);
+                if (row == null) row = doAddAccountRow(false);
+
+                ((TextView) row.getChildAt(0)).setText(acc.getAccountName());
+                ((TextView) row.getChildAt(1))
+                        .setText(String.format(Locale.US, "%1.2f", acc.getAmount()));
+            }
+
+            check_transaction_submittable();
+
+            ((TableRow) table.getChildAt(table.getChildCount() - 1)).getChildAt(0).requestFocus();
+        }
+
+    }
+    private boolean inputStateIsInitial() {
+        table = findViewById(R.id.new_transaction_accounts_table);
+
+        if (table.getChildCount() != 2) return false;
+
+        for (int i = 0; i < 2; i++) {
+            TableRow row = (TableRow) table.getChildAt(i);
+            if (((TextView) row.getChildAt(0)).getText().length() > 0) return false;
+            if (((TextView) row.getChildAt(1)).getText().length() > 0) return false;
+        }
+
+        return true;
     }
 }

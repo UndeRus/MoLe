@@ -34,6 +34,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 
+import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.model.Data;
 
 import org.jetbrains.annotations.NonNls;
@@ -133,14 +134,15 @@ public final class MLDB {
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
                                                  final boolean profileSpecific) {
-        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null);
+        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null, null);
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hookAutocompletionAdapter(final Context context,
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
                                                  final boolean profileSpecific,
-                                                 final View nextView) {
+                                                 final View nextView,
+                                                 final DescriptionSelectedCallback callback) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
         SimpleCursorAdapter adapter =
@@ -199,6 +201,9 @@ public final class MLDB {
         if (nextView != null) {
             view.setOnItemClickListener((parent, itemView, position, id) -> {
                 nextView.requestFocus(View.FOCUS_FORWARD);
+                if (callback != null) {
+                    callback.descriptionSelected(String.valueOf(view.getText()));
+                }
             });
         }
     }
