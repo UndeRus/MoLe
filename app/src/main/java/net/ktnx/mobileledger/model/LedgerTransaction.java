@@ -70,6 +70,15 @@ public class LedgerTransaction {
     public LedgerTransaction(int id) {
         this(id, (Date) null, null);
     }
+    public LedgerTransaction(int id, String profileUUID) {
+        this.profile = profileUUID;
+        this.id = id;
+        this.date = null;
+        this.description = null;
+        this.accounts = new ArrayList<>();
+        this.dataHash = null;
+        this.dataLoaded = false;
+    }
     public ArrayList<LedgerTransactionAccount> getAccounts() {
         return accounts;
     }

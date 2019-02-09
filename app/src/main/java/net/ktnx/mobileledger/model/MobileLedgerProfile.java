@@ -277,4 +277,10 @@ public final class MobileLedgerProfile {
 
         return null;
     }
+    public LedgerTransaction loadTransaction(int transactionId) {
+        LedgerTransaction tr = new LedgerTransaction(transactionId, this.uuid);
+        tr.loadData(MLDB.getReadableDatabase());
+
+        return tr;
+    }
 }
