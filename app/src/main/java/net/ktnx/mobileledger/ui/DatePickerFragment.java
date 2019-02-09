@@ -83,9 +83,7 @@ public class DatePickerFragment extends AppCompatDialogFragment
 
         return dpd;
     }
-
-    @TargetApi(Build.VERSION_CODES.O)
-    public void onDateSet(DatePicker view, int year, int month, int day) {
+    private void updateDateInput(int year, int month, int day) {
         TextView date =
                 Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
@@ -101,26 +99,14 @@ public class DatePickerFragment extends AppCompatDialogFragment
                 .findViewById(R.id.new_transaction_description);
         description.requestFocus();
     }
+    @TargetApi(Build.VERSION_CODES.O)
+    public void onDateSet(DatePicker view, int year, int month, int day) {
+        updateDateInput(year, month, day);
+    }
 
     @Override
     public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        TextView date =
-                Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
-
-        final Calendar c = GregorianCalendar.getInstance();
-        if (c.get(GregorianCalendar.YEAR) == year) {
-            if (c.get(GregorianCalendar.MONTH) == monthOfYear) {
-                date.setText(String.format(Locale.US, "%d", dayOfMonth));
-            }
-            else {
-                date.setText(String.format(Locale.US, "%d/%d", monthOfYear + 1, dayOfMonth));
-            }
-        }
-        else date.setText(String.format(Locale.US, "%d/%d/%d", year, monthOfYear + 1, dayOfMonth));
-
-        TextView description = Objects.requireNonNull(getActivity())
-                .findViewById(R.id.new_transaction_description);
-        description.requestFocus();
+        updateDateInput(year, monthOfYear, dayOfMonth);
 
         this.dismiss();
     }
