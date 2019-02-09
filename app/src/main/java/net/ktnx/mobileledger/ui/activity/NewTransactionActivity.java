@@ -133,7 +133,7 @@ public class NewTransactionActivity extends AppCompatActivity implements TaskCal
     @Override
     protected void onStart() {
         super.onStart();
-        if (tvDate.getText().toString().isEmpty()) tvDate.requestFocus();
+        if (tvDescription.getText().toString().isEmpty()) tvDescription.requestFocus();
     }
     public void saveTransaction() {
         if (fab != null) fab.setEnabled(false);
