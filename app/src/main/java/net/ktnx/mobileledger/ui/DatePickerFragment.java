@@ -17,14 +17,11 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.annotation.TargetApi;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
-import android.widget.DatePicker;
+import android.widget.CalendarView;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
@@ -37,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DatePickerFragment extends AppCompatDialogFragment
-        implements DatePickerDialog.OnDateSetListener, DatePicker.OnDateChangedListener {
+        implements CalendarView.OnDateChangeListener {
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
@@ -48,6 +45,7 @@ public class DatePickerFragment extends AppCompatDialogFragment
         int year = c.get(GregorianCalendar.YEAR);
         int month = c.get(GregorianCalendar.MONTH);
         int day = c.get(GregorianCalendar.DAY_OF_MONTH);
+        long todayStamp = c.getTimeInMillis();
         TextView date =
                 Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
 
@@ -73,13 +71,16 @@ public class DatePickerFragment extends AppCompatDialogFragment
             }
         }
 
-        DatePickerDialog dpd =
-                new DatePickerDialog(Objects.requireNonNull(getActivity()), this, year, month, day);
-        // quicker date selection available in API 26
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            DatePicker dp = dpd.getDatePicker();
-            dp.setOnDateChangedListener(this);
-        }
+        c.set(year, month, day);
+
+        Dialog dpd = new Dialog(Objects.requireNonNull(getActivity()));
+        dpd.setContentView(R.layout.date_picker_view);
+        dpd.setTitle(null);
+        CalendarView cv = dpd.findViewById(R.id.calendarView);
+        cv.setDate(c.getTime().getTime());
+        cv.setMaxDate(todayStamp);
+
+        cv.setOnDateChangeListener(this);
 
         return dpd;
     }
@@ -99,15 +100,10 @@ public class DatePickerFragment extends AppCompatDialogFragment
                 .findViewById(R.id.new_transaction_description);
         description.requestFocus();
     }
-    @TargetApi(Build.VERSION_CODES.O)
-    public void onDateSet(DatePicker view, int year, int month, int day) {
-        updateDateInput(year, month, day);
-    }
-
     @Override
-    public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-        updateDateInput(year, monthOfYear, dayOfMonth);
-
+    public void onSelectedDayChange(@NonNull CalendarView view, int year, int month,
+                                    int dayOfMonth) {
+        updateDateInput(year, month, dayOfMonth);
         this.dismiss();
     }
 }
