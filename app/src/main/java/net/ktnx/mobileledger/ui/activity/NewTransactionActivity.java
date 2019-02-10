@@ -301,6 +301,7 @@ public class NewTransactionActivity extends AppCompatActivity
         amt.setMinWidth(dp2px(40));
         amt.setTextAlignment(EditText.TEXT_ALIGNMENT_VIEW_END);
         amt.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        amt.setSelectAllOnFocus(true);
 
         // forward navigation support
         final TableRow last_row = (TableRow) table.getChildAt(table.getChildCount() - 1);
@@ -495,6 +496,8 @@ public class NewTransactionActivity extends AppCompatActivity
             int i = 0;
             table = findViewById(R.id.new_transaction_accounts_table);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
+            TableRow firstNegative = null;
+            int negativeCount = 0;
             for (i = 0; i < accounts.size(); i++) {
                 LedgerTransactionAccount acc = accounts.get(i);
                 TableRow row = (TableRow) table.getChildAt(i);
@@ -503,11 +506,23 @@ public class NewTransactionActivity extends AppCompatActivity
                 ((TextView) row.getChildAt(0)).setText(acc.getAccountName());
                 ((TextView) row.getChildAt(1))
                         .setText(String.format(Locale.US, "%1.2f", acc.getAmount()));
+
+                if (acc.getAmount() < 0.005) {
+                    if (firstNegative == null) firstNegative = row;
+                    negativeCount++;
+                }
+            }
+
+            if (negativeCount == 1) {
+                ((TextView) firstNegative.getChildAt(1)).setText(null);
             }
 
             check_transaction_submittable();
 
-            ((TableRow) table.getChildAt(table.getChildCount() - 1)).getChildAt(0).requestFocus();
+            EditText firstAmount = (EditText) ((TableRow) table.getChildAt(0)).getChildAt(1);
+            String amtString = String.valueOf(firstAmount.getText());
+            firstAmount.requestFocus();
+            firstAmount.setSelection(0, amtString.length());
         }
 
     }
