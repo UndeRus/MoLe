@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.FloatingActionButton;
@@ -44,6 +45,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.async.SaveTransactionTask;
@@ -242,10 +244,18 @@ public class NewTransactionActivity extends CrashReportingActivity
         });
     }
 
+    public boolean simulateCrash(MenuItem item) {
+        Log.d("crash", "Will crash intentionally");
+        new AsyncCrasher().execute();
+        return true;
+    }
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
 
+        if (BuildConfig.DEBUG) {
+            menu.findItem(R.id.action_simulate_crash).setVisible(true);
+        }
         check_transaction_submittable();
 
         return true;
@@ -537,5 +547,11 @@ public class NewTransactionActivity extends CrashReportingActivity
         }
 
         return true;
+    }
+    private class AsyncCrasher extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... voids) {
+            throw new RuntimeException("Simulated crash");
+        }
     }
 }

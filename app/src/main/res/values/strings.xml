@@ -137,6 +137,7 @@
     <string name="crash_dialog_title">MoLe chashed</string>
     <string name="btn_send_crash_report">Send...</string>
     <string name="btn_not_now">Not now</string>
+    <string name="crash_app_label">Crash app</string>
     <string name="crash_app_condensed_label">Crash</string>
     <string name="crash_send_question">Would you like to send the crash report to the developer? This would help diagnosing and fixing the problem.</string>
     <string name="send_crash_via">Send crash report via:</string>

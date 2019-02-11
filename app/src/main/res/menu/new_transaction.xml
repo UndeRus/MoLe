@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-    <!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2018 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
@@ -17,26 +16,33 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-        <item
-            android:id="@+id/action_submit_transaction"
-            android:icon="@drawable/ic_save_white_24dp"
-            android:onClick="saveTransactionFromMenu"
-            android:title="@string/action_submit_transaction_title"
-            android:visible="false"
-            app:showAsAction="always" />
-        <item
-            android:id="@+id/action_add_account"
-            android:icon="@drawable/svg_thick_plus_white"
-            android:onClick="addTransactionAccountFromMenu"
-            android:orderInCategory="100"
-            android:title="@string/menu_add_account"
-            android:visible="false"
-            app:showAsAction="never|ifRoom" />
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_submit_transaction"
+        android:icon="@drawable/ic_save_white_24dp"
+        android:onClick="saveTransactionFromMenu"
+        android:title="@string/action_submit_transaction_title"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_add_account"
+        android:icon="@drawable/svg_thick_plus_white"
+        android:onClick="addTransactionAccountFromMenu"
+        android:orderInCategory="100"
+        android:title="@string/menu_add_account"
+        android:visible="false"
+        app:showAsAction="never|ifRoom" />
     <item
         android:id="@+id/action_reset_new_transaction_activity"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:onClick="resetTransactionFromMenu"
         android:title="@string/action_reset_new_transaction_activity_title"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_simulate_crash"
+        android:title="@string/crash_app_label"
+        android:titleCondensed="@string/crash_app_condensed_label"
+        android:onClick="simulateCrash"
+        android:visible="false"
         app:showAsAction="never" />
 </menu>
