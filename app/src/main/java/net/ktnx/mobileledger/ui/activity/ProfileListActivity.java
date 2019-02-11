@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -51,7 +50,7 @@ import java.util.Collections;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class ProfileListActivity extends AppCompatActivity {
+public class ProfileListActivity extends CrashReportingActivity {
 
     public static final String ARG_ACTION = "action";
     public static final String ARG_PROFILE_INDEX = "profile_index";

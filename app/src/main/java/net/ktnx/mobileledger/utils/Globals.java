@@ -39,6 +39,7 @@ public final class Globals {
     @ColorInt
     public static int primaryDark, defaultTextColor;
     public static String[] monthNames;
+    public static String developerEmail = "dam+mole-crash@ktnx.net";
     private static SimpleDateFormat ledgerDateFormatter =
             new SimpleDateFormat("yyyy/MM/dd", Locale.US);
     private static Pattern reLedgerDate =
