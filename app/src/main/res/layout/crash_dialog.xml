@@ -28,6 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Example crash report text goes here"
+                android:textIsSelectable="true"
                 tools:ignore="HardcodedText" />
         </LinearLayout>
     </ScrollView>
