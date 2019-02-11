@@ -15,5 +15,5 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <string name="app_name">MoLe (debug)</string>
+    <string name="app_name" translatable="false">MoLe (debug)</string>
 </resources>
