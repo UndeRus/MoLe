@@ -395,6 +395,6 @@ public class MainActivity extends CrashReportingActivity {
     }
     public void fabShouldShow() {
         MobileLedgerProfile profile = Data.profile.get();
-        if (profile.isPostingPermitted()) fab.show();
+        if ((profile != null) && profile.isPostingPermitted()) fab.show();
     }
 }
