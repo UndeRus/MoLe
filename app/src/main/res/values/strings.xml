@@ -142,4 +142,5 @@
     <string name="crash_send_question">Would you like to send the crash report to the developer? This would help diagnosing and fixing the problem.</string>
     <string name="send_crash_via">Send crash report via:</string>
     <string name="btn_show_report">Show report</string>
+    <string name="color_label">Color</string>
 </resources>
