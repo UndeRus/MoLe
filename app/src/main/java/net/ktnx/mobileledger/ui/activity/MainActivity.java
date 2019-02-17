@@ -106,6 +106,14 @@ public class MainActivity extends CrashReportingActivity {
                     toolbar.setSubtitle(R.string.profile_subitlte_read_only);
                     fab.hide();
                 }
+
+                int newProfileTheme = profile.getThemeId();
+                if (newProfileTheme != Colors.profileThemeId) {
+                    Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
+                            newProfileTheme));
+                    profileThemeChanged();
+                    Colors.profileThemeId = newProfileTheme;
+                }
             });
         });
 
@@ -180,6 +188,14 @@ public class MainActivity extends CrashReportingActivity {
         findViewById(R.id.btn_no_profiles_add).setOnClickListener(v -> startAddProfileActivity());
 
         findViewById(R.id.btn_add_transaction).setOnClickListener(this::fabNewTransactionClicked);
+    }
+    private void profileThemeChanged() {
+        setupProfileColors();
+
+        // restart activity to reflect theme change
+        finish();
+        Intent intent = new Intent(this, this.getClass());
+        startActivity(intent);
     }
     @Override
     protected void onResume() {
