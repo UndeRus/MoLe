@@ -18,10 +18,10 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="line"
     android:thickness="1dp"
-    android:tint="@color/header_border">
+    android:tint="?colorAccent">
     <stroke
         android:width="8dp"
-        android:color="@color/header_border"
+        android:color="?colorAccent"
         android:dashWidth="16dp"
         android:dashGap="8dp" />
 

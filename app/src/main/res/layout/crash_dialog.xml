@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="9"
-        android:background="@color/table_row_light_bg"
+        android:background="?table_row_light_bg"
         android:scrollbars="horizontal|vertical"
         android:visibility="gone">
 
