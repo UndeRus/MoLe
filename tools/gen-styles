@@ -1,0 +1,166 @@
+#!/usr/bin/perl
+
+use strict; use warnings; use utf8;
+
+sub hexTuple {
+	my ($r, $g, $b) = @_;
+	return sprintf('%02x%02x%02x', int(255*$r+0.5), int(255*$g+0.5), int(255*$b+0.5));
+}
+sub hsvHex {
+	my ($hue, $sat, $val ) = @_;
+	my $h = int($hue * 6);
+	my $f = $hue * 6 - $h;
+	my $p = $val * (1 - $sat);
+	my $q = $val * ( 1 - $f * $sat);
+	my $t = $val * ( 1 - (1-$f) * $sat);
+
+	return hexTuple($val, $t, $p) if $h == 0 or $h == 6;
+	return hexTuple($q, $val, $p) if $h == 1;
+	return hexTuple($p, $val, $t) if $h == 2;
+	return hexTuple($p, $q, $val) if $h == 3;
+	return hexTuple($t, $p, $val) if $h == 4;
+	return hexTuple($val, $p, $q) if $h == 5;
+
+	die $h;
+}
+
+# https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+sub hslHex {
+	my ($hue, $sat, $lig ) = @_;
+	my $h = ($hue * 6);
+	my $c = (1 - abs(2.0*$lig - 1)) * $sat;
+	my $h_mod_2 = $h - 2*int($h/2);
+	my $x = $c * (1 - abs($h_mod_2 - 1));
+	my ($r, $g, $b);
+	my $m = $lig - $c / 2.0;
+
+	return hexTuple($c + $m, $x + $m,  0 + $m) if $h < 1 or $h == 6;
+	return hexTuple($x + $m, $c + $m,  0 + $m) if $h < 2;
+	return hexTuple( 0 + $m, $c + $m, $x + $m) if $h < 3;
+	return hexTuple( 0 + $m, $x + $m, $c + $m) if $h < 4;
+	return hexTuple($x + $m,  0 + $m, $c + $m) if $h < 5;
+	return hexTuple($c + $m,  0 + $m, $x + $m) if $h < 6;
+
+	die $h;
+}
+
+my @hexDigit = split //, '0123456789abcdef';
+my %hexValue = map(
+       	(lc($hexDigit[$_]) => $_, uc($hexDigit[$_]) => $_ ),
+       	0..15 );
+
+sub min {
+	my $min = shift;
+
+	for (@_) { $min = $_ if $_ < $min }
+
+	return $min;
+}
+
+sub max {
+	my $max = shift;
+
+	for (@_) { $max = $_ if $_ > $max }
+
+	return $max;
+}
+
+sub hexToHSL {
+	my $hexTriplet = shift;
+	my ( $r,$g,$b ) = $hexTriplet =~ /^#?(..)(..)(..)/;
+	for ($r,$g,$b) {
+		my @d = split(//);
+		$_ = 16 * $hexValue{$d[0]} + $hexValue{$d[1]};
+	}
+
+	warn "$hexTriplet -> $r:$g:$b";
+
+	for ($r, $g, $b ) { $_ = $_ / 255.0 }
+
+	my $M = max($r, $g, $b);
+	my $m = min($r, $g, $b);
+	my $C = $M - $m;
+
+	my $h;
+	if ($C == 0) {
+		$h = 0;
+	}
+	elsif ( $r == $M ) {
+		$h = ($g-$b)/$C;
+		$h -= 6*int($h/6.0);
+	}
+	elsif ( $g == $M ) {
+		$h = ($b-$r)/$C + 2;
+	}
+	elsif ( $b == $M ) {
+		$h = ($r-$g)/$C + 4;
+	}
+	else { die "$C, $M, $r, $g, $b"; }
+
+	my $H = 60 * $h;
+	my $L = ($M + $m) / 2;
+
+	my $S = ( $L <= 0.5 ) ? $C/(2*$L) : $C / (2-2*$L);
+
+	return( $H, $S, $L );
+}
+
+my $baseColorHSV = [ hexToHSL('#935ff2') ];
+my $baseColorHue = $baseColorHSV->[0];
+warn sprintf( 'H:%1.4f S:%1.4f L:%1.4f', @$baseColorHSV );
+warn sprintf( 'H:%1.4f S:%1.4f L:%1.4f', hexToHSL('#3e148c') );
+
+my $baseTheme = "AppTheme.NoActionBar";
+
+# # hsb
+# for( my $hue = 0; $hue < 360; $hue += 15 ) {
+# 	printf "<style name=\"%s.%d\" parent=\"%s\">\n",
+# 		$baseTheme, $hue, $baseTheme;
+# 	printf "  <item name=\"colorPrimary\">#%s</item>\n",
+#        		hsvHex($hue/360.0, 0.61, 0.95);
+# 	printf "  <item name=\"colorPrimaryDark\">#%s</item>\n",
+#        		hsvHex($hue/360.0, 0.86, 0.55);
+# 	printf "  <item name=\"colorAccent\">#%s</item>\n",
+#        		hsvHex(($hue-4)/360.0, 0.72, 0.82);
+# 	printf "  <item name=\"drawer_background\">#ffffffff</item>\n";
+# 	printf "  <item name=\"table_row_dark_bg\">#28%s</item>\n",
+#        		hsvHex($hue/360.0, 0.65, 0.83);
+# 	printf "  <item name=\"table_row_light_bg\">#28%s</item>\n",
+#        		hsvHex($hue/360.0, 0.20, 1.00);
+# 	printf "  <item name=\"header_border\">#80%s</item>\n",
+#        		hsvHex(($hue+6)/360.0, 0.86, 0.55);
+# 	printf "</style>\n";
+# }
+
+# HSL
+hslStyleForHue($baseColorHue);
+for( my $hue = 0; $hue < 360; $hue += 15 ) {
+	hslStyleForHue($hue, $baseTheme);
+}
+
+sub hslStyleForHue {
+	my $hue = shift;
+	my $base = shift;
+
+	if ($base) {
+		printf "<style name=\"%s.%d\" parent=\"%s\">\n",
+			$baseTheme, $hue, $baseTheme;
+	}
+	else {
+		printf "<style name=\"%s\">\n",
+			$baseTheme;
+		printf "  <item name=\"windowActionBar\">false</item>\n";
+		printf "  <item name=\"windowNoTitle\">true</item>\n";
+		printf "  <item name=\"textColor\">#d0000000</item>\n";
+	}
+	printf "  <item name=\"colorPrimary\">#%s</item>\n",
+       		hslHex($hue/360.0, 0.60, 0.60);
+	printf "  <item name=\"colorAccent\">#%s</item>\n",
+       		hslHex($hue/360.0, 0.85, 0.50);
+	printf "  <item name=\"drawer_background\">#ffffffff</item>\n";
+	printf "  <item name=\"table_row_dark_bg\">#%s</item>\n",
+       		hslHex($hue/360.0, 0.85, 0.95);
+	printf "  <item name=\"table_row_light_bg\">#%s</item>\n",
+       		hslHex($hue/360.0, 0.85, 0.98);
+	printf "</style>\n";
+}
