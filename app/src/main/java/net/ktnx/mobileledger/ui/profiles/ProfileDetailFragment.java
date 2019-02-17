@@ -18,7 +18,10 @@
 package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -34,14 +37,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.activity.ProfileListActivity;
+import net.ktnx.mobileledger.utils.Colors;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * A fragment representing a single Profile detail screen.
@@ -72,6 +84,7 @@ public class ProfileDetailFragment extends Fragment {
     private TextView profileName;
     private TextInputLayout profileNameLayout;
     private FloatingActionButton fab;
+    private Spinner colorSpinner;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -131,6 +144,8 @@ public class ProfileDetailFragment extends Fragment {
                 mProfile.setAuthEnabled(useAuthentication.isChecked());
                 mProfile.setAuthUserName(userName.getText());
                 mProfile.setAuthPassword(password.getText());
+                mProfile.setThemeId(colorSpinner.getSelectedItem());
+//                Log.d("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
                 mProfile.storeInDB();
                 Log.d("profiles", "profile stored in DB");
                 Data.profiles.triggerItemChangedNotification(mProfile);
@@ -142,9 +157,11 @@ public class ProfileDetailFragment extends Fragment {
                 }
             }
             else {
-                mProfile = new MobileLedgerProfile(profileName.getText(), postingPermitted.isChecked(),
-                        url.getText(), useAuthentication.isChecked(), userName.getText(),
-                        password.getText());
+                mProfile =
+                        new MobileLedgerProfile(profileName.getText(), postingPermitted.isChecked(),
+                                url.getText(), useAuthentication.isChecked(), userName.getText(),
+                                password.getText(),
+                                Integer.valueOf((String) colorSpinner.getSelectedItem()));
                 mProfile.storeInDB();
                 Data.profiles.add(mProfile);
                 MobileLedgerProfile.storeProfilesOrder();
@@ -175,6 +192,48 @@ public class ProfileDetailFragment extends Fragment {
         userNameLayout = rootView.findViewById(R.id.auth_user_name_layout);
         password = rootView.findViewById(R.id.password);
         passwordLayout = rootView.findViewById(R.id.password_layout);
+        colorSpinner = rootView.findViewById(R.id.colorSpinner);
+
+        ArrayAdapter<CharSequence> adapter = ColorListAdapter
+                .createFromResource(rootView.getContext(), R.array.profile_colors,
+                        R.layout.color_selector_item);
+//        Log.d("profiles", String.format("color count: %s", adapter.getCount()));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        colorSpinner.setAdapter(adapter);
+        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                final int primaryColor;
+                final int degrees =
+                        Integer.valueOf((String) (parent.getAdapter().getItem(position)));
+                if (degrees < 0) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (getActivity() != null) primaryColor = getResources()
+                                .getColor(R.color.colorPrimary, getActivity().getTheme());
+                        else primaryColor = Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG);
+                    }
+                    else {
+                        primaryColor = getResources().getColor(R.color.colorPrimary);
+                    }
+                }
+                else primaryColor = Colors.getPrimaryColorForHue(degrees);
+
+                if (colorSpinner != null) {
+                    colorSpinner.setBackgroundColor(primaryColor);
+//                    for (int i = 0; i < colorSpinner.getChildCount(); i++) {
+//                        View v = colorSpinner.getChildAt(i);
+//
+//                        if (v instanceof TextView) {
+//                            ((TextView) v).setTextColor(Color.TRANSPARENT);
+//                        }
+//                    }
+                }
+            }
+        });
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d("profiles", isChecked ? "auth enabled " : "auth disabled");
@@ -195,6 +254,21 @@ public class ProfileDetailFragment extends Fragment {
             authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
             userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
             password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
+
+            colorSpinner.setSelection(0);
+            int i = 0;
+            int sought = mProfile.getThemeId();
+//            Log.d("profiles", String.format("Looking for %d",sought));
+            while (i < adapter.getCount()) {
+                int item = Integer.valueOf(String.valueOf(adapter.getItem(i)));
+//                Log.d("profiles", String.format("Item %d is %d", i, item));
+                if (item == sought) {
+                    colorSpinner.setSelection(i);
+                    break;
+                }
+
+                i++;
+            }
         }
         else {
             profileName.setText("");
@@ -204,6 +278,7 @@ public class ProfileDetailFragment extends Fragment {
             authParams.setVisibility(View.GONE);
             userName.setText("");
             password.setText("");
+            colorSpinner.setSelection(0);
         }
 
         return rootView;
@@ -256,5 +331,43 @@ public class ProfileDetailFragment extends Fragment {
         }
 
         return valid;
+    }
+    private class ColorListAdapter extends ArrayAdapter<String> {
+        public ColorListAdapter(@NonNull Context context, int resource) {
+            super(context, resource);
+        }
+        public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId) {
+            super(context, resource, textViewResourceId);
+        }
+        public ColorListAdapter(@NonNull Context context, int resource, @NonNull String[] objects) {
+            super(context, resource, objects);
+        }
+        public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId,
+                                @NonNull String[] objects) {
+            super(context, resource, textViewResourceId, objects);
+        }
+        public ColorListAdapter(@NonNull Context context, int resource,
+                                @NonNull List<String> objects) {
+            super(context, resource, objects);
+        }
+        public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId,
+                                @NonNull List<String> objects) {
+            super(context, resource, textViewResourceId, objects);
+        }
+        @NotNull
+        @Override
+        public View getView(int position, View convertView, @NotNull ViewGroup parent) {
+            String hueStr = getItem(position);
+            int hue = (hueStr == null) ? -1 : Integer.valueOf(hueStr);
+            @ColorInt int primaryColor = Colors.getPrimaryColorForHue(hue);
+
+            View view = convertView;
+            if (convertView == null) {
+                view = getLayoutInflater().inflate(R.layout.color_selector_item, parent);
+            }
+
+            view.setBackgroundColor(primaryColor);
+            return view;
+        }
     }
 }

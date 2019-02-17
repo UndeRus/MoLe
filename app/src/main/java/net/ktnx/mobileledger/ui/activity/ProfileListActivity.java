@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -37,8 +38,8 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
+import net.ktnx.mobileledger.utils.Colors;
 
 import java.util.Collections;
 
@@ -101,7 +102,8 @@ public class ProfileListActivity extends CrashReportingActivity {
             int index = getIntent().getIntExtra(ARG_PROFILE_INDEX, PROFILE_INDEX_NONE);
 
             MobileLedgerProfile profile = (index >= 0) ? Data.profiles.get(index) : null;
-            ProfilesRecyclerViewAdapter adapter = (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
+            ProfilesRecyclerViewAdapter adapter =
+                    (ProfilesRecyclerViewAdapter) recyclerView.getAdapter();
             if (adapter != null) {
                 adapter.editProfile(recyclerView, profile);
 
@@ -229,6 +231,11 @@ public class ProfileListActivity extends CrashReportingActivity {
             Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                     (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
             holder.itemView.setTag(profile);
+
+            int hue = profile.getThemeId();
+            if (hue == -1) holder.mColorTag.setBackgroundColor(Color.TRANSPARENT);
+            else holder.mColorTag.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
+
             holder.mTitle.setText(profile.getName());
             holder.mSubTitle.setText(profile.getUrl());
             holder.mRadioView.setChecked(profile.equals(currentProfile));
@@ -242,7 +249,7 @@ public class ProfileListActivity extends CrashReportingActivity {
         class ProfileListViewHolder extends RecyclerView.ViewHolder {
             final RadioButton mRadioView;
             final TextView mEditButton;
-            final TextView mTitle, mSubTitle;
+            final TextView mTitle, mSubTitle, mColorTag;
 
             ProfileListViewHolder(View view) {
                 super(view);
@@ -250,6 +257,7 @@ public class ProfileListActivity extends CrashReportingActivity {
                 mEditButton = view.findViewById(R.id.profile_list_edit_button);
                 mTitle = view.findViewById(R.id.title);
                 mSubTitle = view.findViewById(R.id.subtitle);
+                mColorTag = view.findViewById(R.id.colorTag);
             }
         }
     }
