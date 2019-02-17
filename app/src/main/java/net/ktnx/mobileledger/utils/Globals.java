@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.ColorInt;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -32,12 +31,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Globals {
-    @ColorInt
-    public static int tableRowLightBG;
-    @ColorInt
-    public static int tableRowDarkBG;
-    @ColorInt
-    public static int primaryDark, defaultTextColor;
     public static String[] monthNames;
     public static String developerEmail = "dam+mole-crash@ktnx.net";
     private static SimpleDateFormat ledgerDateFormatter =

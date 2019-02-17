@@ -40,6 +40,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
+import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableValue;
@@ -166,7 +167,9 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             mActivity.scheduleTransactionListRetrieval();
         });
 
-        swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+        Colors.themeWatch.addObserver(
+                (o, arg) -> swiper.setColorSchemeColors(Colors.primary));
+        swiper.setColorSchemeColors(Colors.primary);
 
         vAccountFilter = mActivity.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = mActivity.findViewById(R.id.transaction_filter_account_name);

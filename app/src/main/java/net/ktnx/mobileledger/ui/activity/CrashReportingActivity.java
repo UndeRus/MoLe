@@ -6,14 +6,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import net.ktnx.mobileledger.ui.CrashReportDialogFragment;
+import net.ktnx.mobileledger.utils.Colors;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class CrashReportingActivity extends AppCompatActivity {
+public abstract class CrashReportingActivity extends AppCompatActivity {
+    protected void setupProfileColors() {
+        Colors.setupTheme(this);
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Colors.refreshColors(getTheme());
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Colors.setupTheme(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override

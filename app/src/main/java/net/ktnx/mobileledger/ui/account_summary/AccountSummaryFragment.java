@@ -40,6 +40,7 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
+import net.ktnx.mobileledger.utils.Colors;
 
 import java.util.List;
 import java.util.Observer;
@@ -152,7 +153,9 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             }
         });
         swiper = mActivity.findViewById(R.id.account_swiper);
-        swiper.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent);
+        Colors.themeWatch.addObserver(
+                (o, arg) -> swiper.setColorSchemeColors(Colors.primary));
+        swiper.setColorSchemeColors(Colors.primary);
         swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing accounts via swipe");
             mActivity.scheduleTransactionListRetrieval();
@@ -160,8 +163,8 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         Data.accounts.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
-        Data.profile.addObserver(
-                (o, arg) -> mActivity.runOnUiThread(() -> AccountSummaryViewModel.scheduleAccountListReload()));
+        Data.profile.addObserver((o, arg) -> mActivity.runOnUiThread(
+                AccountSummaryViewModel::scheduleAccountListReload));
         update_account_table();
     }
     private void update_account_table() {

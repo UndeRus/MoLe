@@ -38,6 +38,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
+import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -162,8 +163,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 case HEAD:
                     holder.tvDescription.setText(step.getTransaction().getDescription());
 
-                    if (step.isOdd()) holder.row.setBackgroundColor(Globals.tableRowDarkBG);
-                    else holder.row.setBackgroundColor(Globals.tableRowLightBG);
+                    if (step.isOdd()) holder.row.setBackgroundColor(Colors.tableRowDarkBG);
+                    else holder.row.setBackgroundColor(Colors.tableRowLightBG);
 
                     break;
                 case ACCOUNTS:
@@ -209,8 +210,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     if ((boldAccountName != null) &&
                         acc.getAccountName().startsWith(boldAccountName))
                     {
-                        accName.setTextColor(Globals.primaryDark);
-                        accAmount.setTextColor(Globals.primaryDark);
+                        accName.setTextColor(Colors.accent);
+                        accAmount.setTextColor(Colors.accent);
 
                         SpannableString ss = new SpannableString(acc.getAccountName());
                         ss.setSpan(new StyleSpan(Typeface.BOLD), 0, boldAccountName.length(),
@@ -218,8 +219,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         accName.setText(ss);
                     }
                     else {
-                        accName.setTextColor(Globals.defaultTextColor);
-                        accAmount.setTextColor(Globals.defaultTextColor);
+                        accName.setTextColor(Colors.defaultTextColor);
+                        accAmount.setTextColor(Colors.defaultTextColor);
                         accName.setText(acc.getAccountName());
                     }
                     accAmount.setText(acc.toString());

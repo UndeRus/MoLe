@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -33,6 +32,7 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.utils.Colors;
 
 import java.util.List;
 
@@ -68,14 +68,10 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
             }
 
             if (position % 2 == 0) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                        .setBackgroundColor(rm.getColor(R.color.table_row_dark_bg, ctx.getTheme()));
-                else holder.row.setBackgroundColor(rm.getColor(R.color.table_row_dark_bg));
+                holder.row.setBackgroundColor(Colors.tableRowDarkBG);
             }
             else {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) holder.row
-                        .setBackgroundColor(rm.getColor(R.color.drawer_background, ctx.getTheme()));
-                else holder.row.setBackgroundColor(rm.getColor(R.color.drawer_background));
+                holder.row.setBackgroundColor(Colors.tableRowLightBG);
             }
 
             holder.selectionCb.setVisibility(selectionActive ? View.VISIBLE : View.GONE);

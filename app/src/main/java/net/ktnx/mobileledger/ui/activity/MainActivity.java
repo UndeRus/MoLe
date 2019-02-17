@@ -19,9 +19,10 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -46,6 +47,7 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
+import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
@@ -225,20 +227,13 @@ public class MainActivity extends CrashReportingActivity {
     }
     public void markDrawerItemCurrent(int id) {
         TextView item = drawer.findViewById(id);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            item.setBackgroundColor(getResources().getColor(R.color.table_row_dark_bg, getTheme()));
-        }
-        else {
-            item.setBackgroundColor(getResources().getColor(R.color.table_row_dark_bg));
-        }
-
-        @ColorInt int transparent = getResources().getColor(android.R.color.transparent);
+        item.setBackgroundColor(Colors.tableRowDarkBG);
 
         LinearLayout actions = drawer.findViewById(R.id.nav_actions);
         for (int i = 0; i < actions.getChildCount(); i++) {
             View view = actions.getChildAt(i);
             if (view.getId() != id) {
-                view.setBackgroundColor(transparent);
+                view.setBackgroundColor(Color.TRANSPARENT);
             }
         }
     }
@@ -340,6 +335,8 @@ public class MainActivity extends CrashReportingActivity {
         else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
     public void onRetrieveStart() {
+        progressBar.setIndeterminateTintList(ColorStateList.valueOf(Colors.primary));
+        progressBar.setProgressTintList(ColorStateList.valueOf(Colors.primary));
         progressBar.setIndeterminate(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
         else progressBar.setProgress(0);
