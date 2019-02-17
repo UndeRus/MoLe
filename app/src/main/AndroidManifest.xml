@@ -60,7 +60,7 @@
             android:label="@string/title_profile_list"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
-            android:name=".ui.profiles.ProfileDetailActivity"
+            android:name=".ui.activity.ProfileDetailActivity"
             android:label="@string/title_profile_details"
             android:parentActivityName=".ui.activity.ProfileListActivity"
             android:theme="@style/AppTheme.NoActionBar">

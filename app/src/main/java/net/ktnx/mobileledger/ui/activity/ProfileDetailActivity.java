@@ -15,14 +15,13 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.profiles;
+package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -32,7 +31,9 @@ import android.view.View;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 import net.ktnx.mobileledger.ui.activity.ProfileListActivity;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 
 /**
  * An activity representing a single Profile detail screen. This
@@ -40,7 +41,7 @@ import net.ktnx.mobileledger.ui.activity.ProfileListActivity;
  * item details are presented side-by-side with a list of items
  * in a {@link ProfileListActivity}.
  */
-public class ProfileDetailActivity extends AppCompatActivity {
+public class ProfileDetailActivity extends CrashReportingActivity {
     private MobileLedgerProfile profile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
