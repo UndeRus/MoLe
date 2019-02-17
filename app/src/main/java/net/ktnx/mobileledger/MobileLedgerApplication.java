@@ -21,7 +21,6 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import net.ktnx.mobileledger.model.Data;
@@ -35,7 +34,6 @@ public class MobileLedgerApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        updateColorValues();
         updateMonthNames();
         MLDB.init(this);
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
@@ -57,23 +55,6 @@ public class MobileLedgerApplication extends Application {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        updateColorValues();
         updateMonthNames();
-    }
-    private void updateColorValues() {
-        Resources rm = getResources();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Resources.Theme theme = getTheme();
-            Globals.tableRowDarkBG = rm.getColor(R.color.table_row_dark_bg, theme);
-            Globals.tableRowLightBG = rm.getColor(R.color.table_row_light_bg, theme);
-            Globals.primaryDark = rm.getColor(R.color.colorPrimaryDark, theme);
-            Globals.defaultTextColor = rm.getColor(android.R.color.tab_indicator_text, theme);
-        }
-        else {
-            Globals.tableRowDarkBG = rm.getColor(R.color.table_row_dark_bg);
-            Globals.tableRowLightBG = rm.getColor(R.color.table_row_light_bg);
-            Globals.primaryDark = rm.getColor(R.color.colorPrimaryDark);
-            Globals.defaultTextColor = rm.getColor(android.R.color.tab_indicator_text);
-        }
     }
 }
