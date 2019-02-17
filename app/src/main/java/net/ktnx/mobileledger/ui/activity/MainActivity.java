@@ -87,6 +87,7 @@ public class MainActivity extends CrashReportingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -381,6 +382,11 @@ public class MainActivity extends CrashReportingActivity {
         Intent intent = new Intent(this, ProfileListActivity.class);
         startActivity(intent);
     }
+    public void fabShouldShow() {
+        MobileLedgerProfile profile = Data.profile.get();
+        if ((profile != null) && profile.isPostingPermitted()) fab.show();
+    }
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -405,9 +411,5 @@ public class MainActivity extends CrashReportingActivity {
         public int getCount() {
             return 2;
         }
-    }
-    public void fabShouldShow() {
-        MobileLedgerProfile profile = Data.profile.get();
-        if ((profile != null) && profile.isPostingPermitted()) fab.show();
     }
 }
