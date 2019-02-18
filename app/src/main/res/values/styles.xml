@@ -25,14 +25,14 @@
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#286c33d4</item>
         <item name="table_row_light_bg">#28ddcbff</item>
-        <item name="textColor">#d0000000</item>
+        <item name="textColor">@android:color/tab_indicator_text</item>
     </style>
 
     <!-- base hue: 261.2245° -->
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="textColor">#d0000000</item>
+        <item name="textColor">@android:color/tab_indicator_text</item>
         <item name="colorPrimary">#875cd6</item>
         <item name="colorAccent">#6013ec</item>
         <item name="drawer_background">#ffffffff</item>

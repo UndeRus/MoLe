@@ -32,6 +32,10 @@ public class Colors {
         tableRowLightBG = tv.data;
         theme.resolveAttribute(R.attr.colorPrimary, tv, true);
         primary = tv.data;
+        theme.resolveAttribute(android.R.color.tab_indicator_text, tv, true);
+        defaultTextColor = tv.data;
+        theme.resolveAttribute(R.attr.colorAccent, tv, true);
+        accent = tv.data;
 
         // trigger theme observers
         themeWatch.notifyObservers();
