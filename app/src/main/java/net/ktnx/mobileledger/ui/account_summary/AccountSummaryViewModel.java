@@ -17,7 +17,7 @@
 
 package net.ktnx.mobileledger.ui.account_summary;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.content.Context;
 import android.util.Log;
 

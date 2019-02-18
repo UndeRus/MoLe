@@ -18,7 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import android.annotation.SuppressLint;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class LedgerAmount {
     private String currency;

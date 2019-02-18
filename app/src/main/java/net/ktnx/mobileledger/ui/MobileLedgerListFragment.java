@@ -17,9 +17,9 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;

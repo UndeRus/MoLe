@@ -18,12 +18,13 @@
 package net.ktnx.mobileledger.utils;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import java.util.Observable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntUnaryOperator;
+
+import androidx.annotation.RequiresApi;
 
 public class ObservableAtomicInteger extends Observable {
     private AtomicInteger holder;

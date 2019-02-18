@@ -17,12 +17,12 @@
 
 package net.ktnx.mobileledger.model;
 
-import android.support.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.annotation.NonNull;
 
 public class LedgerAccount {
     private String name;

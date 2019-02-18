@@ -2,8 +2,8 @@ package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
 import android.content.res.Resources;
-import android.support.annotation.ColorInt;
-import android.support.annotation.ColorLong;
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorLong;
 import android.util.Log;
 import android.util.TypedValue;
 

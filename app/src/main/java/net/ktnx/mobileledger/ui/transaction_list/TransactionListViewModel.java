@@ -17,7 +17,7 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 import android.os.AsyncTask;
 
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;

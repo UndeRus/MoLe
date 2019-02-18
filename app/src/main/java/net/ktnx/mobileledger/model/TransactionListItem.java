@@ -17,9 +17,9 @@
 
 package net.ktnx.mobileledger.model;
 
-import android.support.annotation.NonNull;
-
 import java.util.Date;
+
+import androidx.annotation.NonNull;
 
 public class TransactionListItem {
     private Type type;
