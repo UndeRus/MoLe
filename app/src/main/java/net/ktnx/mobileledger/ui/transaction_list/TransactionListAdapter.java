@@ -44,6 +44,8 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
@@ -86,7 +88,10 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 holder.vDelimiter.setVisibility(View.VISIBLE);
                 holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
                 if (item.isMonthShown()) {
-                    holder.tvDelimiterMonth.setText(Globals.monthNames[date.getMonth()]);
+                    GregorianCalendar cal = new GregorianCalendar(TimeZone.getDefault());
+                    cal.setTime(date);
+                    holder.tvDelimiterMonth
+                            .setText(Globals.monthNames[cal.get(GregorianCalendar.MONTH)]);
                     holder.tvDelimiterMonth.setVisibility(View.VISIBLE);
                     //                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_8dp);
                     holder.vDelimiterLine.setVisibility(View.GONE);
