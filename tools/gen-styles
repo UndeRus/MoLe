@@ -155,6 +155,8 @@ sub hslStyleForHue {
 	}
 	printf "  <item name=\"colorPrimary\">#%s</item>\n",
        		hslHex($hue/360.0, 0.60, 0.60);
+	printf "  <item name=\"colorPrimaryTransparent\">#00%s</item>\n",
+       		hslHex($hue/360.0, 0.60, 0.60);
 	printf "  <item name=\"colorAccent\">#%s</item>\n",
        		hslHex($hue/360.0, 0.85, 0.50);
 	printf "  <item name=\"drawer_background\">#ffffffff</item>\n";

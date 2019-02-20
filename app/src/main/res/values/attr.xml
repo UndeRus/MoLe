@@ -4,5 +4,6 @@
     <attr name="table_row_dark_bg" format="reference|color"/>
     <attr name="table_row_light_bg" format="reference|color"/>
     <attr name="textColor" format="reference|color"/>
+    <attr name="colorPrimaryTransparent" format="reference|color" />
 
 </resources>
