@@ -20,15 +20,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/profile_list_item"
+    android:alpha="0.50"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/thumb_row_height"
     android:layout_gravity="center_horizontal"
     android:foregroundGravity="center_vertical">
 
     <TextView
         android:id="@+id/colorTag"
-        android:layout_width="@dimen/activity_horizontal_margin"
+        android:layout_width="16dp"
         android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:background="?colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,53 +43,58 @@
         android:id="@+id/profile_list_edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="8dp"
         android:layout_weight="9"
         android:drawableStart="@drawable/ic_mode_edit_black_24dp"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"/>
 
-    <RadioButton
-        android:id="@+id/profile_list_radio"
+    <ImageView
+        android:id="@+id/profile_list_rearrange_handle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_weight="9"
+        android:background="@drawable/ic_unfold_more_black_24dp"
+        android:visibility="gone"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintStart_toEndOf="@id/colorTag"
+        app:layout_constraintEnd_toStartOf="@id/title"/>
 
     <TextView
         android:id="@+id/title"
-        style="@style/TextAppearance.AppCompat.Large"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="@dimen/nav_header_vertical_spacing"
-        android:layout_marginEnd="16dp"
-        android:text="Profile name"
-        app:layout_constraintEnd_toStartOf="@id/profile_list_edit_button"
-        app:layout_constraintStart_toEndOf="@id/profile_list_radio"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
-
-    <TextView
-        android:id="@+id/subtitle"
         style="@style/TextAppearance.AppCompat.Medium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="@dimen/nav_header_vertical_spacing"
-        android:text="Sub-heading"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:text="Profile name"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/profile_list_edit_button"
-        app:layout_constraintStart_toEndOf="@id/profile_list_radio"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintStart_toEndOf="@id/profile_list_rearrange_handle"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/subtitle"-->
+        <!--style="@style/TextAppearance.AppCompat.Small"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginBottom="4dp"-->
+        <!--android:text="Sub-heading"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toStartOf="@id/profile_list_edit_button"-->
+        <!--app:layout_constraintStart_toEndOf="@id/profile_list_radio"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/title"-->
+        <!--tools:ignore="HardcodedText" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

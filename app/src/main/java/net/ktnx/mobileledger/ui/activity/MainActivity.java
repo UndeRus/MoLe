@@ -23,21 +23,17 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.core.view.GravityCompat;
-import androidx.viewpager.widget.ViewPager;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
@@ -46,6 +42,8 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
+import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -54,8 +52,23 @@ import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.Date;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 public class MainActivity extends CrashReportingActivity {
+    private static final String STATE_CURRENT_PAGE = "current_page";
+    private static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     DrawerLayout drawer;
+    private LinearLayout profileListContainer;
+    private View profileListHeadArrow;
     private FragmentManager fragmentManager;
     private TextView tvLastUpdate;
     private RetrieveTransactionsTask retrieveTransactionsTask;
@@ -65,6 +78,9 @@ public class MainActivity extends CrashReportingActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private FloatingActionButton fab;
+    private boolean profileModificationEnabled = false;
+    private boolean profileListExpanded = false;
+    private ProfilesRecyclerViewAdapter mProfileListAdapter;
 
     @Override
     protected void onStart() {
@@ -85,13 +101,34 @@ public class MainActivity extends CrashReportingActivity {
         }
     }
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        fab = findViewById(R.id.btn_add_transaction);
+        profileListContainer = findViewById(R.id.nav_profile_list_container);
+        profileListHeadArrow = findViewById(R.id.nav_profiles_arrow);
+        drawer = findViewById(R.id.drawer_layout);
+        tvLastUpdate = findViewById(R.id.transactions_last_update);
+        bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
+        progressBar = findViewById(R.id.transaction_list_progress_bar);
+        progressLayout = findViewById(R.id.transaction_progress_layout);
+        fragmentManager = getSupportFragmentManager();
+        mSectionsPagerAdapter = new SectionsPagerAdapter(fragmentManager);
+        mViewPager = findViewById(R.id.root_frame);
+
+        Bundle extra = getIntent().getBundleExtra(BUNDLE_SAVED_STATE);
+        if (extra != null && savedInstanceState == null) savedInstanceState = extra;
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        fab = findViewById(R.id.btn_add_transaction);
 
         Data.profile.addObserver((o, arg) -> {
             MobileLedgerProfile profile = Data.profile.get();
@@ -118,7 +155,6 @@ public class MainActivity extends CrashReportingActivity {
             });
         });
 
-        drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle =
                 new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
                         R.string.navigation_drawer_close);
@@ -136,22 +172,13 @@ public class MainActivity extends CrashReportingActivity {
             e.printStackTrace();
         }
 
-        tvLastUpdate = findViewById(R.id.transactions_last_update);
-
-        bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
-        progressBar = findViewById(R.id.transaction_list_progress_bar);
         if (progressBar == null)
             throw new RuntimeException("Can't get hold on the transaction value progress bar");
-        progressLayout = findViewById(R.id.transaction_progress_layout);
         if (progressLayout == null) throw new RuntimeException(
                 "Can't get hold on the transaction value progress bar layout");
 
-        fragmentManager = getSupportFragmentManager();
-        mSectionsPagerAdapter = new SectionsPagerAdapter(fragmentManager);
-
         markDrawerItemCurrent(R.id.nav_account_summary);
 
-        mViewPager = findViewById(R.id.root_frame);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -171,6 +198,13 @@ public class MainActivity extends CrashReportingActivity {
             }
         });
 
+        if (savedInstanceState != null) {
+            int currentPage = savedInstanceState.getInt(STATE_CURRENT_PAGE, -1);
+            if (currentPage != -1) {
+                mViewPager.setCurrentItem(currentPage, false);
+            }
+        }
+
         Data.lastUpdateDate.addObserver((o, arg) -> {
             Log.d("main", "lastUpdateDate changed");
             runOnUiThread(() -> {
@@ -186,16 +220,35 @@ public class MainActivity extends CrashReportingActivity {
             });
         });
 
-        findViewById(R.id.btn_no_profiles_add).setOnClickListener(v -> startAddProfileActivity());
+        findViewById(R.id.btn_no_profiles_add)
+                .setOnClickListener(v -> startEditProfileActivity(null));
 
         findViewById(R.id.btn_add_transaction).setOnClickListener(this::fabNewTransactionClicked);
+
+        findViewById(R.id.nav_new_profile_button)
+                .setOnClickListener(v -> startEditProfileActivity(null));
+
+        RecyclerView root = findViewById(R.id.nav_profile_list);
+        if (root == null)
+            throw new RuntimeException("Can't get hold on the transaction value view");
+
+        mProfileListAdapter = new ProfilesRecyclerViewAdapter();
+        root.setAdapter(mProfileListAdapter);
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+
+        llm.setOrientation(RecyclerView.VERTICAL);
+        root.setLayoutManager(llm);
     }
     private void profileThemeChanged() {
         setupProfileColors();
 
+        Bundle bundle = new Bundle();
+        onSaveInstanceState(bundle);
         // restart activity to reflect theme change
         finish();
         Intent intent = new Intent(this, this.getClass());
+        intent.putExtra(BUNDLE_SAVED_STATE, bundle);
         startActivity(intent);
     }
     @Override
@@ -203,11 +256,13 @@ public class MainActivity extends CrashReportingActivity {
         super.onResume();
         setupProfile();
     }
-    private void startAddProfileActivity() {
-        Intent intent = new Intent(this, ProfileListActivity.class);
+    public void startEditProfileActivity(MobileLedgerProfile profile) {
+        Intent intent = new Intent(this, ProfileDetailActivity.class);
         Bundle args = new Bundle();
-        args.putInt(ProfileListActivity.ARG_ACTION, ProfileListActivity.ACTION_EDIT_PROFILE);
-        args.putInt(ProfileListActivity.ARG_PROFILE_INDEX, ProfileListActivity.PROFILE_INDEX_NONE);
+        if (profile != null) {
+            int index = Data.getProfileIndex(profile);
+            if (index != -1) intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
+        }
         intent.putExtras(args);
         startActivity(intent, args);
     }
@@ -377,14 +432,74 @@ public class MainActivity extends CrashReportingActivity {
             progressBar.setIndeterminate(false);
         }
     }
-    public void navProfilesClicked(View view) {
-        drawer.closeDrawers();
-        Intent intent = new Intent(this, ProfileListActivity.class);
-        startActivity(intent);
-    }
     public void fabShouldShow() {
         MobileLedgerProfile profile = Data.profile.get();
         if ((profile != null) && profile.isPostingPermitted()) fab.show();
+    }
+    public void navProfilesHeadClicked(View view) {
+        if (profileListExpanded) {
+            collapseProfileList();
+        }
+        else {
+            expandProfileList();
+        }
+    }
+    private void expandProfileList() {
+        profileListExpanded = true;
+
+
+        profileListContainer.setVisibility(View.VISIBLE);
+        profileListContainer.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_down));
+        profileListHeadArrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180));
+    }
+    private void collapseProfileList() {
+        profileListExpanded = false;
+
+        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                profileListContainer.setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        profileListContainer.startAnimation(animation);
+        profileListHeadArrow
+                .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
+
+        mProfileListAdapter.stopEditingProfiles();
+    }
+    public void onProfileRowClicked(View v) {
+        Data.setCurrentProfile((MobileLedgerProfile) v.getTag());
+    }
+    public void enableProfileModifications() {
+        profileModificationEnabled = true;
+        ViewGroup profileList = findViewById(R.id.nav_profile_list);
+        for (int i = 0; i < profileList.getChildCount(); i++) {
+            View aRow = profileList.getChildAt(i);
+            aRow.findViewById(R.id.profile_list_edit_button).setVisibility(View.VISIBLE);
+            aRow.findViewById(R.id.profile_list_rearrange_handle).setVisibility(View.VISIBLE);
+        }
+        // FIXME enable rearranging
+
+    }
+    public void disableProfileModifications() {
+        profileModificationEnabled = false;
+        ViewGroup profileList = findViewById(R.id.nav_profile_list);
+        for (int i = 0; i < profileList.getChildCount(); i++) {
+            View aRow = profileList.getChildAt(i);
+            aRow.findViewById(R.id.profile_list_edit_button).setVisibility(View.GONE);
+            aRow.findViewById(R.id.profile_list_rearrange_handle).setVisibility(View.GONE);
+        }
+        // FIXME disable rearranging
+
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -412,4 +527,5 @@ public class MainActivity extends CrashReportingActivity {
             return 2;
         }
     }
+
 }

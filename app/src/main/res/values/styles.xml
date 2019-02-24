@@ -267,9 +267,9 @@
 
     <style name="nav_button">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_height">@dimen/thumb_row_height</item>
+        <item name="android:drawablePadding">@dimen/activity_horizontal_margin</item>
         <item name="android:clickable">true</item>
-        <item name="android:drawablePadding">24dp</item>
         <item name="android:focusable">auto</item>
         <item name="android:gravity">center_vertical|start</item>
         <item name="android:paddingStart">@dimen/activity_horizontal_margin</item>
@@ -296,4 +296,5 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
+    <dimen name="thumb_row_height">40dp</dimen>
 </resources>

@@ -17,14 +17,15 @@
 
 <resources>
 
-    <style name="nav_button">
+    <style name="nav_button" parent="Base.TextAppearance.AppCompat.Medium">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_height">56dp</item>
         <item name="android:clickable">true</item>
-        <item name="android:drawablePadding">36dp</item>
+        <item name="android:drawablePadding">@dimen/activity_horizontal_margin</item>
         <item name="android:focusable">auto</item>
         <item name="android:gravity">center_vertical|start</item>
         <item name="android:paddingStart">@dimen/activity_horizontal_margin</item>
         <item name="android:paddingEnd">@dimen/activity_horizontal_margin</item>
+        <!--<item name="android:textSize">16sp</item>-->
     </style>
 </resources>
