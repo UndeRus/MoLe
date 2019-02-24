@@ -59,9 +59,10 @@ public class Colors {
         @ColorLong long result;
         int r, g, b;
 
-        if ((hue < 0) || (hue > 1) || (saturation < 0) || (saturation > 1) || (value < 0) ||
-            (value > 1)) throw new IllegalArgumentException(
-                "hue, saturation, value and alpha must all be between 0 and 1");
+        if ((hue < -0.00005) || (hue > 1.0000005) || (saturation < 0) || (saturation > 1) ||
+            (value < 0) || (value > 1)) throw new IllegalArgumentException(String.format(
+                "hue, saturation, value and alpha must all be between 0 and 1. Arguments given: " +
+                "hue=%1.5f, sat=%1.5f, val=%1.5f", hue, saturation, value));
 
         int h = (int) (hue * 6);
         float f = hue * 6 - h;
@@ -99,6 +100,8 @@ public class Colors {
     }
     public static @ColorInt
     int getPrimaryColorForHue(int degrees) {
+        // 0/360f becomes -0.000something for some reason
+        if (degrees == 0) return getPrimaryColorForHue(0f);
         return getPrimaryColorForHue(degrees / 360f);
     }
     public static @ColorInt
