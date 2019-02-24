@@ -2,14 +2,17 @@ package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
 import android.content.res.Resources;
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorLong;
 import android.util.Log;
 import android.util.TypedValue;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorLong;
+
+import static java.lang.Math.abs;
 
 public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
@@ -55,6 +58,10 @@ public class Colors {
         return 0xff000000 | hsvTriplet(hue, saturation, value);
     }
     public static @ColorInt
+    int hslColor(float hue, float saturation, float lightness) {
+        return 0xff000000 | hslTriplet(hue, saturation, lightness);
+    }
+    public static @ColorInt
     int hsvTriplet(float hue, float saturation, float value) {
         @ColorLong long result;
         int r, g, b;
@@ -90,6 +97,27 @@ public class Colors {
                                                          "rgb", h, hue, saturation, value));
         }
     }
+    public static @ColorInt
+    int hslTriplet(float hue, float saturation, float lightness) {
+        @ColorLong long result;
+        float h = hue * 6;
+        float c = (1 - abs(2f * lightness - 1)) * saturation;
+        float h_mod_2 = h % 2;
+        float x = c * (1 - Math.abs(h_mod_2 - 1));
+        int r, g, b;
+        float m = lightness - c / 2f;
+
+        if (h < 1 || h == 6) return tupleToColor(c + m, x + m, 0 + m);
+        if (h < 2) return tupleToColor(x + m, c + m, 0 + m);
+        if (h < 3) return tupleToColor(0 + m, c + m, x + m);
+        if (h < 4) return tupleToColor(0 + m, x + m, c + m);
+        if (h < 5) return tupleToColor(x + m, 0 + m, c + m);
+        if (h < 6) return tupleToColor(c + m, 0 + m, x + m);
+
+        throw new IllegalArgumentException(String.format(
+                "Unexpected value for h (%d) while converting hsl(%1.2f, %1.2f, %1.2f) to rgb", h,
+                hue, saturation, lightness));
+    }
 
     public static @ColorInt
     int tupleToColor(float r, float g, float b) {
@@ -106,7 +134,8 @@ public class Colors {
     }
     public static @ColorInt
     int getPrimaryColorForHue(float hue) {
-        int result = hsvColor(hue, 0.61f, 0.95f);
+//        int result = hsvColor(hue, 0.61f, 0.95f);
+        int result = hslColor(hue, 0.60f, 0.60f);
         Log.d("colors", String.format("getPrimaryColorForHue(%1.2f) = %x", hue, result));
         return result;
     }
