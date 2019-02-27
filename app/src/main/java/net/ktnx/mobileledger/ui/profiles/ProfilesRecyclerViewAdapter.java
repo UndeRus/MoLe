@@ -142,6 +142,11 @@ public class ProfilesRecyclerViewAdapter
             final boolean sameProfile = currentProfile.equals(myProfile);
             view.setAlpha(sameProfile ? 1 : 0.5f);
         });
+
+        holder.mRearrangeHandle.setOnTouchListener((v, event) -> {
+            rearrangeHelper.startDrag(holder);
+            return true;
+        });
         return holder;
     }
     @Override
