@@ -88,7 +88,7 @@ public class ProfilesRecyclerViewAdapter
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
-        rearrangeHelper.attachToRecyclerView(recyclerView);
+        if (editingProfiles) rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public boolean editingProfiles() {
         return this.editingProfiles;
