@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -401,7 +402,7 @@ public class MainActivity extends CrashReportingActivity {
         if (error == null) {
             updateLastUpdateTextFromDB();
 
-            new RefreshDescriptionsTask().execute();
+            new RefreshDescriptionsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }

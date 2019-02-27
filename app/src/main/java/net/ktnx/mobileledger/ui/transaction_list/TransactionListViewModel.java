@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import androidx.lifecycle.ViewModel;
 import android.os.AsyncTask;
 
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
@@ -26,6 +25,8 @@ import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.List;
+
+import androidx.lifecycle.ViewModel;
 
 public class TransactionListViewModel extends ViewModel {
     public static ObservableValue<Boolean> updating = new ObservableValue<>();
@@ -36,7 +37,7 @@ public class TransactionListViewModel extends ViewModel {
 
         String filter = TransactionListFragment.accountFilter.get();
         AsyncTask<String, Void, String> task = new UTT();
-        task.execute(filter);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, filter);
     }
     public static TransactionListItem getTransactionListItem(int position) {
         List<TransactionListItem> transactions = Data.transactions.get();
