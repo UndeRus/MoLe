@@ -32,7 +32,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="textColor">#b8000000</item>
+        <item name="textColor">#8a000000</item>
         <item name="colorPrimary">#875cd6</item>
         <item name="colorPrimaryTransparent">#00875cd6</item>
         <item name="colorAccent">#6013ec</item>
