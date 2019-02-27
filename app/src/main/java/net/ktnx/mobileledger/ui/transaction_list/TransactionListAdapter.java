@@ -21,9 +21,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -46,6 +43,10 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
@@ -71,8 +72,9 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 //                tr.getAccounts().size()));
 
                 TransactionLoader loader = new TransactionLoader();
-                loader.execute(new TransactionLoaderParams(tr, holder, position, boldAccountName,
-                        item.isOdd()));
+                loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                        new TransactionLoaderParams(tr, holder, position, boldAccountName,
+                                item.isOdd()));
 
                 // WORKAROUND what seems to be a bug in CardHolder somewhere
                 // when a view that was previously holding a delimiter is re-purposed
