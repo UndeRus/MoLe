@@ -165,7 +165,7 @@ public class ProfilesRecyclerViewAdapter
         final boolean sameProfile = currentProfile.equals(profile);
         holder.itemView.setAlpha(sameProfile ? 1 : 0.5f);
         holder.itemView
-                .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowLightBG) : null);
+                .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles) {
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
