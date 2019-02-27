@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.profiles;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -154,7 +153,8 @@ public class ProfilesRecyclerViewAdapter
         holder.itemView.setTag(profile);
 
         int hue = profile.getThemeId();
-        if (hue == -1) holder.mColorTag.setBackgroundColor(Color.TRANSPARENT);
+        if (hue == -1) holder.mColorTag
+                .setBackgroundColor(Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
         else holder.mColorTag.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
 
         holder.mTitle.setText(profile.getName());
