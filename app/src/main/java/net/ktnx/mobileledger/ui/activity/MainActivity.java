@@ -389,7 +389,6 @@ public class MainActivity extends CrashReportingActivity {
         retrieveTransactionsTask = new RetrieveTransactionsTask(new WeakReference<>(this));
 
         retrieveTransactionsTask.execute();
-        bTransactionListCancelDownload.setEnabled(true);
     }
     public void onStopTransactionRefreshClick(View view) {
         Log.d("interactive", "Cancelling transactions refresh");
@@ -407,6 +406,7 @@ public class MainActivity extends CrashReportingActivity {
         else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
     public void onRetrieveStart() {
+        bTransactionListCancelDownload.setEnabled(true);
         progressBar.setIndeterminateTintList(ColorStateList.valueOf(Colors.primary));
         progressBar.setProgressTintList(ColorStateList.valueOf(Colors.primary));
         progressBar.setIndeterminate(true);
