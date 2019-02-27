@@ -52,6 +52,8 @@ import net.ktnx.mobileledger.utils.MLDB;
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
@@ -236,6 +238,25 @@ public class MainActivity extends CrashReportingActivity {
         mProfileListAdapter = new ProfilesRecyclerViewAdapter();
         root.setAdapter(mProfileListAdapter);
 
+        mProfileListAdapter.addEditingProfilesObserver(new Observer() {
+            @Override
+            public void update(Observable o, Object arg) {
+                if (mProfileListAdapter.isEditingProfiles()) {
+                    findViewById(R.id.nav_profiles_arrow).setVisibility(View.GONE);
+                    findViewById(R.id.nav_profiles_arrow).setAlpha(0f);
+                    findViewById(R.id.nav_profiles_cancel_edit).setVisibility(View.VISIBLE);
+                }
+                else {
+                    findViewById(R.id.nav_profiles_arrow).setVisibility(View.VISIBLE);
+                    findViewById(R.id.nav_profiles_arrow).setAlpha(1f);
+                    findViewById(R.id.nav_profiles_cancel_edit).setVisibility(View.GONE);
+                }
+            }
+        });
+
+        findViewById(R.id.nav_profiles_cancel_edit).setOnClickListener((v) -> {
+            mProfileListAdapter.stopEditingProfiles();
+        });
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
         llm.setOrientation(RecyclerView.VERTICAL);

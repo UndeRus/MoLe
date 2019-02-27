@@ -32,8 +32,10 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.Collections;
+import java.util.Observer;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -45,7 +47,13 @@ public class ProfilesRecyclerViewAdapter
         MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
         editProfile(view, profile);
     };
-    private boolean editingProfiles = false;
+    private ObservableValue<Boolean> editingProfiles = new ObservableValue<>(false);
+    public void addEditingProfilesObserver(Observer o) {
+        editingProfiles.addObserver(o);
+    }
+    public void deleteEditingProfilesObserver(Observer o) {
+        editingProfiles.deleteObserver(o);
+    }
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     public ProfilesRecyclerViewAdapter() {
@@ -87,25 +95,22 @@ public class ProfilesRecyclerViewAdapter
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
-        if (editingProfiles) rearrangeHelper.attachToRecyclerView(recyclerView);
-    }
-    public boolean editingProfiles() {
-        return this.editingProfiles;
+        if (editingProfiles.get()) rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void startEditingProfiles() {
-        if (editingProfiles) return;
-        this.editingProfiles = true;
+        if (editingProfiles.get()) return;
+        this.editingProfiles.set(true);
         notifyDataSetChanged();
         rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void stopEditingProfiles() {
-        if (!editingProfiles) return;
-        this.editingProfiles = false;
+        if (!editingProfiles.get()) return;
+        this.editingProfiles.set(false);
         notifyDataSetChanged();
         rearrangeHelper.attachToRecyclerView(null);
     }
     public void flipEditingProfiles() {
-        if (editingProfiles) stopEditingProfiles();
+        if (editingProfiles.get()) stopEditingProfiles();
         else startEditingProfiles();
     }
     private void editProfile(View view, MobileLedgerProfile profile) {
@@ -171,7 +176,7 @@ public class ProfilesRecyclerViewAdapter
         holder.itemView.setAlpha(sameProfile ? 1 : 0.5f);
         holder.itemView
                 .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
-        if (editingProfiles) {
+        if (editingProfiles.get()) {
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
         }
@@ -183,6 +188,9 @@ public class ProfilesRecyclerViewAdapter
     @Override
     public int getItemCount() {
         return Data.profiles.size();
+    }
+    public boolean isEditingProfiles() {
+        return editingProfiles.get();
     }
     class ProfileListViewHolder extends RecyclerView.ViewHolder {
         final TextView mEditButton;

@@ -23,16 +23,39 @@
     android:layout_height="@dimen/thumb_row_height"
     android:paddingEnd="@dimen/activity_horizontal_margin">
 
-    <TextView
-        android:id="@+id/nav_profiles_arrow"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/nav_profile_list_head_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_expand_more_black_24dp"
-        android:gravity="end|center_vertical"
-        android:onClick="navProfilesHeadClicked"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/nav_profiles_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_expand_more_black_24dp"
+            android:gravity="end|center_vertical"
+            android:onClick="navProfilesHeadClicked"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/nav_profiles_cancel_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_clear_black_24dp"
+            android:gravity="end|center_vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <TextView
         android:id="@+id/nav_profiles_label"
@@ -42,10 +65,10 @@
         android:layout_marginEnd="8dp"
         android:drawableStart="@drawable/ic_view_list_black_24dp"
         android:gravity="start|center_vertical"
-        android:text="@string/profiles"
         android:onClick="navProfilesHeadClicked"
+        android:text="@string/profiles"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/nav_profiles_arrow"
+        app:layout_constraintEnd_toStartOf="@+id/nav_profile_list_head_buttons"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
