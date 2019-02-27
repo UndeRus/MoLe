@@ -73,7 +73,7 @@ public class RetrieveTransactionsTask
         this.contextRef = contextRef;
     }
     private static void L(String msg) {
-        Log.d("transaction-parser", msg);
+        //Log.d("transaction-parser", msg);
     }
     @Override
     protected void onProgressUpdate(Progress... values) {
