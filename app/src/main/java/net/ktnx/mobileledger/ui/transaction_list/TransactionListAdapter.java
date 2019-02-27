@@ -79,9 +79,9 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 // WORKAROUND what seems to be a bug in CardHolder somewhere
                 // when a view that was previously holding a delimiter is re-purposed
                 // occasionally it stays too short (not high enough)
-//                holder.vTransaction.measure(View.MeasureSpec
-//                                .makeMeasureSpec(holder.itemView.getWidth(), View.MeasureSpec.EXACTLY),
-//                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                holder.vTransaction.measure(View.MeasureSpec
+                                .makeMeasureSpec(holder.itemView.getWidth(), View.MeasureSpec.EXACTLY),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 break;
             case DELIMITER:
                 Date date = item.getDate();
