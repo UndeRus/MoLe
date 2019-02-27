@@ -31,10 +31,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class Globals {
+    private static final ThreadLocal<SimpleDateFormat> dateFormatter =
+            new ThreadLocal<SimpleDateFormat>() {
+                @Override
+                protected SimpleDateFormat initialValue() {
+                    return new SimpleDateFormat("yyyy/MM/dd", Locale.US);
+                }
+            };
     public static String[] monthNames;
     public static String developerEmail = "dam+mole-crash@ktnx.net";
-    private static SimpleDateFormat ledgerDateFormatter =
-            new SimpleDateFormat("yyyy/MM/dd", Locale.US);
     private static Pattern reLedgerDate =
             Pattern.compile("^(?:(\\d+)/)??(?:(\\d\\d?)/)?(\\d\\d?)$");
     public static void hideSoftKeyboard(Activity act) {
@@ -66,10 +71,9 @@ public final class Globals {
         }
         else toParse = dateString;
 
-//        Log.d("globals", String.format("Parsing date '%s'", toParse));
-        return ledgerDateFormatter.parse(toParse);
+        return dateFormatter.get().parse(toParse);
     }
     public static String formatLedgerDate(Date date) {
-        return ledgerDateFormatter.format(date);
+        return dateFormatter.get().format(date);
     }
 }
