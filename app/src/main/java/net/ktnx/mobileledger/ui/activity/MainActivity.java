@@ -241,15 +241,14 @@ public class MainActivity extends CrashReportingActivity {
         mProfileListAdapter.addEditingProfilesObserver(new Observer() {
             @Override
             public void update(Observable o, Object arg) {
-                final View profilesArrow = findViewById(R.id.nav_profiles_arrow);
                 if (mProfileListAdapter.isEditingProfiles()) {
-                    profilesArrow.clearAnimation();
-                    profilesArrow.setVisibility(View.GONE);
+                    profileListHeadArrow.clearAnimation();
+                    profileListHeadArrow.setVisibility(View.GONE);
 //                    findViewById(R.id.nav_profiles_arrow).setAlpha(0f);
                     findViewById(R.id.nav_profiles_cancel_edit).setVisibility(View.VISIBLE);
                 }
                 else {
-                    profilesArrow.setVisibility(View.VISIBLE);
+                    profileListHeadArrow.setVisibility(View.VISIBLE);
 //                    findViewById(R.id.nav_profiles_arrow).setAlpha(1f);
                     findViewById(R.id.nav_profiles_cancel_edit).setVisibility(View.GONE);
                 }
