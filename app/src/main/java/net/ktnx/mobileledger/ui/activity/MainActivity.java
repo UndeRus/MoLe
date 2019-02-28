@@ -250,6 +250,7 @@ public class MainActivity extends CrashReportingActivity {
                     profileListHeadCancel.setVisibility(View.VISIBLE);
                 }
                 else {
+                    profileListHeadArrow.setRotation(180f);
                     profileListHeadArrow.setVisibility(View.VISIBLE);
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
@@ -507,12 +508,13 @@ public class MainActivity extends CrashReportingActivity {
 
             }
         });
+        mProfileListAdapter.stopEditingProfiles();
+
         profileListContainer.startAnimation(animation);
+        profileListHeadArrow.setRotation(0f);
         profileListHeadArrow
                 .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
         profileListHeadMore.setVisibility(View.GONE);
-
-        mProfileListAdapter.stopEditingProfiles();
     }
     public void onProfileRowClicked(View v) {
         Data.setCurrentProfile((MobileLedgerProfile) v.getTag());
