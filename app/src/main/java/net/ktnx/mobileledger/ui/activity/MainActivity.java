@@ -268,6 +268,14 @@ public class MainActivity extends CrashReportingActivity {
 
         profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.startEditingProfiles());
         profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.stopEditingProfiles());
+
+        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                collapseProfileList();
+            }
+        });
     }
     private void profileThemeChanged() {
         setupProfileColors();
