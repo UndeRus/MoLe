@@ -37,6 +37,7 @@ public final class MobileLedgerProfile {
     private String authUserName;
     private String authPassword;
     private int themeId;
+    private int orderNo = -1;
     public MobileLedgerProfile(String uuid, String name, boolean permitPosting, String url,
                                boolean authEnabled, String authUserName, String authPassword) {
         this(uuid, name, permitPosting, url, authEnabled, authUserName, authPassword, -1);
@@ -53,6 +54,7 @@ public final class MobileLedgerProfile {
         this.authUserName = authUserName;
         this.authPassword = authPassword;
         this.themeId = themeId;
+        this.orderNo = -1;
     }
     public MobileLedgerProfile(CharSequence name, boolean permitPosting, CharSequence url,
                                boolean authEnabled, CharSequence authUserName,
@@ -65,22 +67,24 @@ public final class MobileLedgerProfile {
         this.authUserName = String.valueOf(authUserName);
         this.authPassword = String.valueOf(authPassword);
         this.themeId = themeId;
+        this.orderNo = -1;
     }
-        // loads all profiles into Data.profiles
+    // loads all profiles into Data.profiles
     // returns the profile with the given UUID
     public static MobileLedgerProfile loadAllFromDB(String currentProfileUUID) {
         MobileLedgerProfile result = null;
         List<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = MLDB.getReadableDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
-                                         "auth_password, permit_posting, theme FROM profiles " +
-                                         "order by order_no", null))
+                                         "auth_password, permit_posting, theme, order_no FROM " +
+                                         "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
                 MobileLedgerProfile item =
                         new MobileLedgerProfile(cursor.getString(0), cursor.getString(1),
                                 cursor.getInt(6) == 1, cursor.getString(2), cursor.getInt(3) == 1,
                                 cursor.getString(4), cursor.getString(5), cursor.getInt(7));
+                item.orderNo = cursor.getInt(8);
                 list.add(item);
                 if (item.getUuid().equals(currentProfileUUID)) result = item;
             }
@@ -96,6 +100,7 @@ public final class MobileLedgerProfile {
             for (MobileLedgerProfile p : Data.profiles.getList()) {
                 db.execSQL("update profiles set order_no=? where uuid=?",
                         new Object[]{orderNo, p.getUuid()});
+                p.orderNo = orderNo;
                 orderNo++;
             }
             db.setTransactionSuccessful();
@@ -165,10 +170,10 @@ public final class MobileLedgerProfile {
 //                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeId));
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, " +
-                       "auth_password, theme) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                       "auth_password, theme, order_no) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
-                                 authEnabled ? authPassword : null, themeId
+                                 authEnabled ? authPassword : null, themeId, orderNo
                     });
             db.setTransactionSuccessful();
         }
