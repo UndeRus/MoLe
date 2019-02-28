@@ -247,12 +247,10 @@ public class MainActivity extends CrashReportingActivity {
                     profileListHeadArrow.clearAnimation();
                     profileListHeadArrow.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
-//                    findViewById(R.id.nav_profiles_arrow).setAlpha(0f);
                     profileListHeadCancel.setVisibility(View.VISIBLE);
                 }
                 else {
                     profileListHeadArrow.setVisibility(View.VISIBLE);
-//                    findViewById(R.id.nav_profiles_arrow).setAlpha(1f);
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
                     profileListHeadMore
