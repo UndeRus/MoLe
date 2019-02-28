@@ -148,10 +148,15 @@ public class ProfilesRecyclerViewAdapter
             view.setAlpha(sameProfile ? 1 : 0.5f);
         });
 
-        holder.mRearrangeHandle.setOnTouchListener((v, event) -> {
-            rearrangeHelper.startDrag(holder);
-            return true;
-        });
+        View.OnTouchListener dragStarter = (v, event) -> {
+            if (rearrangeHelper != null && editingProfiles.get()) {
+                rearrangeHelper.startDrag(holder);
+                return true;
+            }
+            return false;
+        };
+        holder.mRearrangeHandle.setOnTouchListener(dragStarter);
+        holder.mColorTag.setOnTouchListener(dragStarter);
         return holder;
     }
     @Override
