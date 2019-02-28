@@ -19,7 +19,7 @@ package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,8 +46,6 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -194,11 +192,12 @@ public class ProfileDetailFragment extends Fragment {
         passwordLayout = rootView.findViewById(R.id.password_layout);
         colorSpinner = rootView.findViewById(R.id.colorSpinner);
 
-        ArrayAdapter<CharSequence> adapter = ColorListAdapter
-                .createFromResource(rootView.getContext(), R.array.profile_colors,
-                        R.layout.color_selector_item);
-//        Log.d("profiles", String.format("color count: %s", adapter.getCount()));
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ColorListAdapter adapter =
+                new ColorListAdapter(rootView.getContext(), R.layout.color_selector_item);
+        adapter.add(-1);
+        for (int i = 0; i < 360; i += 15) adapter.add(i);
+        Log.d("profiles", String.format("color count: %s", adapter.getCount()));
+//        adapter.setDropDownViewResource(R.layout.color_selector_item);
         colorSpinner.setAdapter(adapter);
         colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -208,17 +207,9 @@ public class ProfileDetailFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 final int primaryColor;
-                final int degrees =
-                        Integer.valueOf((String) (parent.getAdapter().getItem(position)));
+                final int degrees = (Integer) parent.getAdapter().getItem(position);
                 if (degrees < 0) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (getActivity() != null) primaryColor = getResources()
-                                .getColor(R.color.colorPrimary, getActivity().getTheme());
-                        else primaryColor = Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG);
-                    }
-                    else {
-                        primaryColor = getResources().getColor(R.color.colorPrimary);
-                    }
+                    primaryColor = Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG);
                 }
                 else primaryColor = Colors.getPrimaryColorForHue(degrees);
 
@@ -332,41 +323,42 @@ public class ProfileDetailFragment extends Fragment {
 
         return valid;
     }
-    private class ColorListAdapter extends ArrayAdapter<String> {
+    private class ColorListAdapter extends ArrayAdapter<Integer> {
         public ColorListAdapter(@NonNull Context context, int resource) {
             super(context, resource);
         }
         public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId) {
             super(context, resource, textViewResourceId);
         }
-        public ColorListAdapter(@NonNull Context context, int resource, @NonNull String[] objects) {
+        public ColorListAdapter(@NonNull Context context, int resource,
+                                @NonNull Integer[] objects) {
             super(context, resource, objects);
         }
         public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId,
-                                @NonNull String[] objects) {
+                                @NonNull Integer[] objects) {
             super(context, resource, textViewResourceId, objects);
         }
         public ColorListAdapter(@NonNull Context context, int resource,
-                                @NonNull List<String> objects) {
+                                @NonNull List<Integer> objects) {
             super(context, resource, objects);
         }
         public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId,
-                                @NonNull List<String> objects) {
+                                @NonNull List<Integer> objects) {
             super(context, resource, textViewResourceId, objects);
         }
-        @NotNull
         @Override
-        public View getView(int position, View convertView, @NotNull ViewGroup parent) {
-            String hueStr = getItem(position);
-            int hue = (hueStr == null) ? -1 : Integer.valueOf(hueStr);
+        public @NonNull
+        View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            Integer hueDeg = getItem(position);
+            int hue = ((hueDeg == null) || (hueDeg == -1)) ? Colors.DEFAULT_HUE_DEG : hueDeg;
             @ColorInt int primaryColor = Colors.getPrimaryColorForHue(hue);
 
             View view = convertView;
             if (convertView == null) {
-                view = getLayoutInflater().inflate(R.layout.color_selector_item, parent);
+                view = getLayoutInflater().inflate(R.layout.color_selector_item, null);
             }
 
-            view.setBackgroundColor(primaryColor);
+            view.setBackground(new ColorDrawable(primaryColor));
             return view;
         }
     }
