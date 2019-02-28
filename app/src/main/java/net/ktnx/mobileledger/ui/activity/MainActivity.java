@@ -71,7 +71,7 @@ public class MainActivity extends CrashReportingActivity {
     private static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     DrawerLayout drawer;
     private LinearLayout profileListContainer;
-    private View profileListHeadArrow;
+    private View profileListHeadArrow, profileListHeadMore, profileListHeadCancel;
     private FragmentManager fragmentManager;
     private TextView tvLastUpdate;
     private RetrieveTransactionsTask retrieveTransactionsTask;
@@ -117,6 +117,8 @@ public class MainActivity extends CrashReportingActivity {
         fab = findViewById(R.id.btn_add_transaction);
         profileListContainer = findViewById(R.id.nav_profile_list_container);
         profileListHeadArrow = findViewById(R.id.nav_profiles_arrow);
+        profileListHeadMore = findViewById(R.id.nav_profiles_start_edit);
+        profileListHeadCancel = findViewById(R.id.nav_profiles_cancel_edit);
         drawer = findViewById(R.id.drawer_layout);
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
@@ -244,24 +246,28 @@ public class MainActivity extends CrashReportingActivity {
                 if (mProfileListAdapter.isEditingProfiles()) {
                     profileListHeadArrow.clearAnimation();
                     profileListHeadArrow.setVisibility(View.GONE);
+                    profileListHeadMore.setVisibility(View.GONE);
 //                    findViewById(R.id.nav_profiles_arrow).setAlpha(0f);
-                    findViewById(R.id.nav_profiles_cancel_edit).setVisibility(View.VISIBLE);
+                    profileListHeadCancel.setVisibility(View.VISIBLE);
                 }
                 else {
                     profileListHeadArrow.setVisibility(View.VISIBLE);
 //                    findViewById(R.id.nav_profiles_arrow).setAlpha(1f);
-                    findViewById(R.id.nav_profiles_cancel_edit).setVisibility(View.GONE);
+                    profileListHeadCancel.setVisibility(View.GONE);
+                    profileListHeadMore.setVisibility(View.GONE);
+                    profileListHeadMore
+                            .setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
                 }
             }
         });
 
-        findViewById(R.id.nav_profiles_cancel_edit).setOnClickListener((v) -> {
-            mProfileListAdapter.stopEditingProfiles();
-        });
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
+
+        profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.startEditingProfiles());
+        profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.stopEditingProfiles());
     }
     private void profileThemeChanged() {
         setupProfileColors();
@@ -474,6 +480,8 @@ public class MainActivity extends CrashReportingActivity {
         profileListContainer.setVisibility(View.VISIBLE);
         profileListContainer.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_down));
         profileListHeadArrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180));
+        profileListHeadMore.setVisibility(View.VISIBLE);
+        profileListHeadMore.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
     }
     private void collapseProfileList() {
         profileListExpanded = false;
@@ -496,6 +504,7 @@ public class MainActivity extends CrashReportingActivity {
         profileListContainer.startAnimation(animation);
         profileListHeadArrow
                 .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
+        profileListHeadMore.setVisibility(View.GONE);
 
         mProfileListAdapter.stopEditingProfiles();
     }
