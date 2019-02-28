@@ -59,6 +59,7 @@
         android:layout_marginStart="8dp"
         android:layout_weight="9"
         android:background="@drawable/ic_unfold_more_black_24dp"
+        android:contentDescription="@string/profile_list_rearrange_handle_label"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
