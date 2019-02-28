@@ -23,7 +23,7 @@
     android:layout_height="@dimen/thumb_row_height"
     android:paddingEnd="@dimen/activity_horizontal_margin">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:id="@+id/nav_profile_list_head_buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/nav_profiles_label"
