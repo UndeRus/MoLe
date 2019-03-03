@@ -177,7 +177,7 @@ public class ProfilesRecyclerViewAdapter
 
         holder.mEditButton.setOnClickListener(mOnClickListener);
 
-        final boolean sameProfile = currentProfile.equals(profile);
+        final boolean sameProfile = (currentProfile != null) && currentProfile.equals(profile);
         holder.itemView
                 .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles.get()) {
