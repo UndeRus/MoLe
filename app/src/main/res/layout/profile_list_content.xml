@@ -20,7 +20,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/profile_list_item"
-    android:alpha="0.50"
     android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="@dimen/thumb_row_height"

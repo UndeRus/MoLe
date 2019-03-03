@@ -146,7 +146,6 @@ public class ProfilesRecyclerViewAdapter
             MobileLedgerProfile myProfile = (MobileLedgerProfile) holder.itemView.getTag();
             final MobileLedgerProfile currentProfile = Data.profile.get();
             final boolean sameProfile = currentProfile.equals(myProfile);
-            view.setAlpha(sameProfile ? 1 : 0.5f);
         });
 
         View.OnTouchListener dragStarter = (v, event) -> {
@@ -179,7 +178,6 @@ public class ProfilesRecyclerViewAdapter
         holder.mEditButton.setOnClickListener(mOnClickListener);
 
         final boolean sameProfile = currentProfile.equals(profile);
-        holder.itemView.setAlpha(sameProfile ? 1 : 0.5f);
         holder.itemView
                 .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles.get()) {
