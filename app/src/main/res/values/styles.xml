@@ -296,5 +296,5 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
-    <dimen name="thumb_row_height">40dp</dimen>
+    <dimen name="thumb_row_height">48dp</dimen>
 </resources>
