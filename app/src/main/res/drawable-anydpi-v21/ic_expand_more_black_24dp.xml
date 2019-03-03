@@ -12,6 +12,8 @@
   ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
+  ~
+  ~ Modified/adapted by Damyan Ivanov for MoLe
   -->
 
 <vector android:height="24dp" android:tint="?colorAccent"
