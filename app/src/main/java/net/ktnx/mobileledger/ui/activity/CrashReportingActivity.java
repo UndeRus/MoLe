@@ -1,29 +1,20 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import net.ktnx.mobileledger.ui.CrashReportDialogFragment;
-import net.ktnx.mobileledger.utils.Colors;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 public abstract class CrashReportingActivity extends AppCompatActivity {
-    protected void setupProfileColors() {
-        Colors.setupTheme(this);
-    }
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Colors.refreshColors(getTheme());
-    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Colors.setupTheme(this);
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override

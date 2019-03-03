@@ -30,6 +30,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
+import net.ktnx.mobileledger.utils.Colors;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
@@ -41,10 +42,22 @@ import androidx.appcompat.widget.Toolbar;
  * in a {@link ProfileListActivity}.
  */
 public class ProfileDetailActivity extends CrashReportingActivity {
-    private MobileLedgerProfile profile;
+    private MobileLedgerProfile profile = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        final int index = getIntent().getIntExtra(ProfileDetailFragment.ARG_ITEM_ID, -1);
+
+        if (index != -1) {
+            profile = Data.profiles.get(index);
+            if (profile == null) throw new AssertionError(
+                    String.format("Can't get profile " + "(index:%d) from the global list", index));
+
+            Log.d("profiles", String.format("Editing profile %s (%s); hue=%d", profile.getName(),
+                    profile.getUuid(), profile.getThemeId()));
+        }
+
         super.onCreate(savedInstanceState);
+        Colors.setupTheme(this, profile);
         setContentView(R.layout.activity_profile_detail);
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
@@ -74,15 +87,6 @@ public class ProfileDetailActivity extends CrashReportingActivity {
         // http://developer.android.com/guide/components/fragments.html
         //
         if (savedInstanceState == null) {
-            final int index = getIntent().getIntExtra(ProfileDetailFragment.ARG_ITEM_ID, -1);
-
-            if (index != -1) {
-                profile = Data.profiles.get(index);
-                if (profile == null) throw new AssertionError(
-                        String.format("Can't get profile " + "(index:%d) from the global list",
-                                index));
-            }
-
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();

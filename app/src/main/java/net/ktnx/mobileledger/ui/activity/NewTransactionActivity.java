@@ -21,11 +21,6 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -44,6 +39,10 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
@@ -66,6 +65,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+
 /*
  * TODO: nicer progress while transaction is submitted
  * TODO: reports
@@ -74,7 +76,7 @@ import java.util.Objects;
  * TODO: nicer swiping removal with visual feedback
  *  */
 
-public class NewTransactionActivity extends CrashReportingActivity
+public class NewTransactionActivity extends ProfileThemedActivity
         implements TaskCallback, DescriptionSelectedCallback {
     private static SaveTransactionTask saver;
     private TableLayout table;

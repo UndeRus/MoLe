@@ -66,7 +66,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-public class MainActivity extends CrashReportingActivity {
+public class MainActivity extends ProfileThemedActivity {
     private static final String STATE_CURRENT_PAGE = "current_page";
     private static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     DrawerLayout drawer;
