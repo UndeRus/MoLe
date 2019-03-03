@@ -115,8 +115,8 @@ public class Colors {
         if (h < 6) return tupleToColor(c + m, 0 + m, x + m);
 
         throw new IllegalArgumentException(String.format(
-                "Unexpected value for h (%d) while converting hsl(%1.2f, %1.2f, %1.2f) to rgb", h,
-                hue, saturation, lightness));
+                "Unexpected value for h (%1.3f) while converting hsl(%1.3f, %1.3f, %1.3f) to rgb",
+                h, hue, saturation, lightness));
     }
 
     public static @ColorInt
