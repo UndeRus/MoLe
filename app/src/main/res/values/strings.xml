@@ -144,4 +144,9 @@
     <string name="btn_show_report">Show report</string>
     <string name="color_label">Color</string>
     <string name="profile_list_rearrange_handle_label">Rearrange items handle</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="default_color_btn">Default</string>
+    <string name="profile_color_label">Profile color</string>
+    <string name="btn_select_label">Select</string>
 </resources>
