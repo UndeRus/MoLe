@@ -493,6 +493,9 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadArrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180));
         profileListHeadMore.setVisibility(View.VISIBLE);
         profileListHeadMore.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
+        findViewById(R.id.nav_profile_list).setMinimumHeight(
+                (int) (getResources().getDimension(R.dimen.thumb_row_height) *
+                       Data.profiles.size()));
     }
     private void collapseProfileList() {
         profileListExpanded = false;
