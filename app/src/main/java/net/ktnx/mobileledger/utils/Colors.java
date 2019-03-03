@@ -141,8 +141,12 @@ public class Colors {
     }
     public static void setupTheme(Activity activity) {
         MobileLedgerProfile profile = Data.profile.get();
+        setupTheme(activity, profile);
+    }
+    public static void setupTheme(Activity activity, MobileLedgerProfile profile) {
         if (profile != null) {
-            switch (Data.profile.get().getThemeId()) {
+            final int themeId = profile.getThemeId();
+            switch (themeId) {
                 case 0:
                     activity.setTheme(R.style.AppTheme_NoActionBar_0);
                     break;
@@ -217,9 +221,14 @@ public class Colors {
                     break;
                 default:
                     activity.setTheme(R.style.AppTheme_NoActionBar);
+                    Log.d("profiles", String.format("Theme hue %d not supported, using the default",
+                            themeId));
             }
         }
-        else activity.setTheme(R.style.AppTheme_NoActionBar);
+        else {
+            Log.d("profiles", "No profile given, using default theme");
+            activity.setTheme(R.style.AppTheme_NoActionBar);
+        }
 
         refreshColors(activity.getTheme());
     }
