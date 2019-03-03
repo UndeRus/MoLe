@@ -536,7 +536,7 @@ public class MainActivity extends ProfileThemedActivity {
         for (int i = 0; i < profileList.getChildCount(); i++) {
             View aRow = profileList.getChildAt(i);
             aRow.findViewById(R.id.profile_list_edit_button).setVisibility(View.GONE);
-            aRow.findViewById(R.id.profile_list_rearrange_handle).setVisibility(View.GONE);
+            aRow.findViewById(R.id.profile_list_rearrange_handle).setVisibility(View.INVISIBLE);
         }
         // FIXME disable rearranging
 

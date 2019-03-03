@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
@@ -155,8 +156,8 @@ public class ProfilesRecyclerViewAdapter
             }
             return false;
         };
-        holder.mRearrangeHandle.setOnTouchListener(dragStarter);
-        holder.mColorTag.setOnTouchListener(dragStarter);
+
+        holder.tagAndHandleLayout.setOnTouchListener(dragStarter);
         return holder;
     }
     @Override
@@ -186,7 +187,7 @@ public class ProfilesRecyclerViewAdapter
             holder.mEditButton.setVisibility(View.VISIBLE);
         }
         else {
-            holder.mRearrangeHandle.setVisibility(View.GONE);
+            holder.mRearrangeHandle.setVisibility(View.INVISIBLE);
             holder.mEditButton.setVisibility(View.GONE);
         }
     }
@@ -200,6 +201,7 @@ public class ProfilesRecyclerViewAdapter
     class ProfileListViewHolder extends RecyclerView.ViewHolder {
         final TextView mEditButton;
         final TextView mTitle, mColorTag;
+        final LinearLayout tagAndHandleLayout;
         final ImageView mRearrangeHandle;
 
         ProfileListViewHolder(View view) {
@@ -208,6 +210,7 @@ public class ProfilesRecyclerViewAdapter
             mTitle = view.findViewById(R.id.title);
             mColorTag = view.findViewById(R.id.colorTag);
             mRearrangeHandle = view.findViewById(R.id.profile_list_rearrange_handle);
+            tagAndHandleLayout = view.findViewById(R.id.handle_and_tag);
         }
     }
 }
