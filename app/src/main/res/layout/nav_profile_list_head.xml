@@ -21,7 +21,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/thumb_row_height"
-    android:paddingEnd="@dimen/activity_horizontal_margin">
+    android:onClick="navProfilesHeadClicked">
 
     <ImageView
         android:id="@+id/nav_profiles_arrow"
@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/ic_expand_more_black_24dp"
         android:gravity="start|center_vertical"
-        android:onClick="navProfilesHeadClicked"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/nav_profiles_label"
         app:layout_constraintTop_toTopOf="parent" />
@@ -37,9 +36,11 @@
     <LinearLayout
         android:id="@+id/nav_profile_list_head_buttons"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">

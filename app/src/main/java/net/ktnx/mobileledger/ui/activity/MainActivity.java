@@ -72,6 +72,7 @@ public class MainActivity extends ProfileThemedActivity {
     DrawerLayout drawer;
     private LinearLayout profileListContainer;
     private View profileListHeadArrow, profileListHeadMore, profileListHeadCancel;
+    private LinearLayout profileListHeadMoreAndCancel;
     private FragmentManager fragmentManager;
     private TextView tvLastUpdate;
     private RetrieveTransactionsTask retrieveTransactionsTask;
@@ -119,6 +120,7 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadArrow = findViewById(R.id.nav_profiles_arrow);
         profileListHeadMore = findViewById(R.id.nav_profiles_start_edit);
         profileListHeadCancel = findViewById(R.id.nav_profiles_cancel_edit);
+        profileListHeadMoreAndCancel = findViewById(R.id.nav_profile_list_head_buttons);
         drawer = findViewById(R.id.drawer_layout);
         tvLastUpdate = findViewById(R.id.transactions_last_update);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
@@ -265,8 +267,9 @@ public class MainActivity extends ProfileThemedActivity {
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
 
-        profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.startEditingProfiles());
-        profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.stopEditingProfiles());
+        profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
+        profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
+        profileListHeadMoreAndCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
 
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
