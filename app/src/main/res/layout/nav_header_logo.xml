@@ -23,5 +23,5 @@
     android:contentDescription="@string/nav_header_desc"
     android:visibility="visible"
     android:id="@+id/app_icon"
-    app:srcCompat="@drawable/ic_app_icon_dynamic"
+    app:srcCompat="@drawable/app_icon_dynamic"
     tools:showIn="@layout/activity_main" />
