@@ -269,7 +269,8 @@ public class MainActivity extends ProfileThemedActivity {
 
         profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
         profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
-        profileListHeadMoreAndCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
+        profileListHeadMoreAndCancel
+                .setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
 
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
