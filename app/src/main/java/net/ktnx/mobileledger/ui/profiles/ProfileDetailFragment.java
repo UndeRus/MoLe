@@ -18,8 +18,6 @@
 package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,10 +28,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -44,22 +39,22 @@ import com.google.android.material.textfield.TextInputLayout;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.HueRingDialog;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
-import java.util.List;
+import java.util.Objects;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 /**
  * A fragment representing a single Profile detail screen.
- *  a {@link ProfileDetailActivity}
+ * a {@link ProfileDetailActivity}
  * on handsets.
  */
-public class ProfileDetailFragment extends Fragment {
+public class ProfileDetailFragment extends Fragment implements HueRingDialog.HueSelectedListener {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -81,8 +76,7 @@ public class ProfileDetailFragment extends Fragment {
     private TextInputLayout passwordLayout;
     private TextView profileName;
     private TextInputLayout profileNameLayout;
-    private FloatingActionButton fab;
-    private Spinner colorSpinner;
+    private View huePickerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -131,7 +125,7 @@ public class ProfileDetailFragment extends Fragment {
         Activity context = getActivity();
         if (context == null) return;
 
-        fab = context.findViewById(R.id.fab);
+        FloatingActionButton fab = context.findViewById(R.id.fab);
         fab.setOnClickListener(v -> {
             if (!checkValidity()) return;
 
@@ -142,7 +136,7 @@ public class ProfileDetailFragment extends Fragment {
                 mProfile.setAuthEnabled(useAuthentication.isChecked());
                 mProfile.setAuthUserName(userName.getText());
                 mProfile.setAuthPassword(password.getText());
-                mProfile.setThemeId(colorSpinner.getSelectedItem());
+                mProfile.setThemeId(huePickerView.getTag());
 //                Log.d("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
                 mProfile.storeInDB();
                 Log.d("profiles", "profile stored in DB");
@@ -158,8 +152,7 @@ public class ProfileDetailFragment extends Fragment {
                 mProfile =
                         new MobileLedgerProfile(profileName.getText(), postingPermitted.isChecked(),
                                 url.getText(), useAuthentication.isChecked(), userName.getText(),
-                                password.getText(),
-                                Integer.valueOf((String) colorSpinner.getSelectedItem()));
+                                password.getText(), (int) huePickerView.getTag());
                 mProfile.storeInDB();
                 Data.profiles.add(mProfile);
                 MobileLedgerProfile.storeProfilesOrder();
@@ -190,41 +183,7 @@ public class ProfileDetailFragment extends Fragment {
         userNameLayout = rootView.findViewById(R.id.auth_user_name_layout);
         password = rootView.findViewById(R.id.password);
         passwordLayout = rootView.findViewById(R.id.password_layout);
-        colorSpinner = rootView.findViewById(R.id.colorSpinner);
-
-        ColorListAdapter adapter =
-                new ColorListAdapter(rootView.getContext(), R.layout.color_selector_item);
-        adapter.add(-1);
-        for (int i = 0; i < 360; i += 15) adapter.add(i);
-        Log.d("profiles", String.format("color count: %s", adapter.getCount()));
-//        adapter.setDropDownViewResource(R.layout.color_selector_item);
-        colorSpinner.setAdapter(adapter);
-        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                final int primaryColor;
-                final int degrees = (Integer) parent.getAdapter().getItem(position);
-                if (degrees < 0) {
-                    primaryColor = Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG);
-                }
-                else primaryColor = Colors.getPrimaryColorForHue(degrees);
-
-                if (colorSpinner != null) {
-                    colorSpinner.setBackgroundColor(primaryColor);
-//                    for (int i = 0; i < colorSpinner.getChildCount(); i++) {
-//                        View v = colorSpinner.getChildAt(i);
-//
-//                        if (v instanceof TextView) {
-//                            ((TextView) v).setTextColor(Color.TRANSPARENT);
-//                        }
-//                    }
-                }
-            }
-        });
+        huePickerView = rootView.findViewById(R.id.btn_pick_ring_color);
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d("profiles", isChecked ? "auth enabled " : "auth disabled");
@@ -246,20 +205,9 @@ public class ProfileDetailFragment extends Fragment {
             userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
             password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
 
-            colorSpinner.setSelection(0);
-            int i = 0;
-            int sought = mProfile.getThemeId();
-//            Log.d("profiles", String.format("Looking for %d",sought));
-            while (i < adapter.getCount()) {
-                int item = Integer.valueOf(String.valueOf(adapter.getItem(i)));
-//                Log.d("profiles", String.format("Item %d is %d", i, item));
-                if (item == sought) {
-                    colorSpinner.setSelection(i);
-                    break;
-                }
-
-                i++;
-            }
+            huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(
+                    (mProfile.getThemeId() == -1) ? Colors.DEFAULT_HUE_DEG
+                                                  : mProfile.getThemeId()));
         }
         else {
             profileName.setText("");
@@ -269,9 +217,20 @@ public class ProfileDetailFragment extends Fragment {
             authParams.setVisibility(View.GONE);
             userName.setText("");
             password.setText("");
-            colorSpinner.setSelection(0);
+            huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
         }
 
+        int profileThemeId = (mProfile == null) ? -1 : mProfile.getThemeId();
+        final int hue = (profileThemeId == -1) ? Colors.DEFAULT_HUE_DEG : profileThemeId;
+        final int profileColor = Colors.getPrimaryColorForHue(hue);
+
+        huePickerView.setBackgroundColor(profileColor);
+        huePickerView.setOnClickListener(v -> {
+            HueRingDialog d = new HueRingDialog(
+                    Objects.requireNonNull(ProfileDetailFragment.this.getContext()), hue);
+            d.show();
+            d.setColorSelectedListener(this);
+        });
         return rootView;
     }
     private void hookClearErrorOnFocusListener(TextView view, TextInputLayout layout) {
@@ -291,7 +250,7 @@ public class ProfileDetailFragment extends Fragment {
             }
         });
     }
-    boolean checkValidity() {
+    private boolean checkValidity() {
         boolean valid = true;
 
         String val = String.valueOf(profileName.getText());
@@ -323,43 +282,9 @@ public class ProfileDetailFragment extends Fragment {
 
         return valid;
     }
-    private class ColorListAdapter extends ArrayAdapter<Integer> {
-        public ColorListAdapter(@NonNull Context context, int resource) {
-            super(context, resource);
-        }
-        public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId) {
-            super(context, resource, textViewResourceId);
-        }
-        public ColorListAdapter(@NonNull Context context, int resource,
-                                @NonNull Integer[] objects) {
-            super(context, resource, objects);
-        }
-        public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId,
-                                @NonNull Integer[] objects) {
-            super(context, resource, textViewResourceId, objects);
-        }
-        public ColorListAdapter(@NonNull Context context, int resource,
-                                @NonNull List<Integer> objects) {
-            super(context, resource, objects);
-        }
-        public ColorListAdapter(@NonNull Context context, int resource, int textViewResourceId,
-                                @NonNull List<Integer> objects) {
-            super(context, resource, textViewResourceId, objects);
-        }
-        @Override
-        public @NonNull
-        View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-            Integer hueDeg = getItem(position);
-            int hue = ((hueDeg == null) || (hueDeg == -1)) ? Colors.DEFAULT_HUE_DEG : hueDeg;
-            @ColorInt int primaryColor = Colors.getPrimaryColorForHue(hue);
-
-            View view = convertView;
-            if (convertView == null) {
-                view = getLayoutInflater().inflate(R.layout.color_selector_item, null);
-            }
-
-            view.setBackground(new ColorDrawable(primaryColor));
-            return view;
-        }
+    @Override
+    public void onHueSelected(int hue) {
+        huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
+        huePickerView.setTag(hue);
     }
 }
