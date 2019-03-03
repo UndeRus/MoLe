@@ -135,7 +135,8 @@
                         android:id="@+id/textView5"
                         style="@style/nav_button"
                         android:drawableStart="@drawable/ic_assignment_black_24dp"
-                        android:text="@string/nav_reports_title" />
+                        android:text="@string/nav_reports_title"
+                        android:visibility="gone" />
 
                     <include layout="@layout/nav_profile_list_head" />
 
