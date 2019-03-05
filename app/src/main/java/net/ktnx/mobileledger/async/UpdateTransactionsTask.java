@@ -35,11 +35,11 @@ import java.util.Date;
 
 public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String[] filterAccName) {
-        Data.backgroundTaskCount.incrementAndGet();
         final MobileLedgerProfile profile = Data.profile.get();
         if (profile == null) return "Profile not configured";
 
         String profile_uuid = profile.getUuid();
+        Data.backgroundTaskCount.incrementAndGet();
         try {
             ArrayList<TransactionListItem> newList = new ArrayList<>();
 
