@@ -46,6 +46,7 @@ import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -442,6 +443,7 @@ public class MainActivity extends ProfileThemedActivity {
             updateLastUpdateTextFromDB();
 
             new RefreshDescriptionsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            TransactionListViewModel.scheduleTransactionListReload();
         }
         else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }

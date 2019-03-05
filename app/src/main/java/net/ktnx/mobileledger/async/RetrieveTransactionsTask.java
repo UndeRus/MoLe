@@ -359,7 +359,6 @@ public class RetrieveTransactionsTask
                         Date now = new Date();
                         profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
                         Data.lastUpdateDate.set(now);
-                        TransactionListViewModel.scheduleTransactionListReload();
 
                         return null;
                     }
