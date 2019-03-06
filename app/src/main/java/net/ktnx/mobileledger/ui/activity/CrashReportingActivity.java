@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -38,6 +39,9 @@ public abstract class CrashReportingActivity extends AppCompatActivity {
             public void uncaughtException(Thread t, Throwable e) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
+
+                pw.format("OS version: %s; API level %d\n\n", Build.VERSION.RELEASE,
+                        Build.VERSION.SDK_INT);
                 e.printStackTrace(pw);
 
                 Log.e(null, sw.toString());
