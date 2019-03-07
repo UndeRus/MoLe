@@ -284,7 +284,8 @@ public class RetrieveTransactionsTask
                                         if (matchedTransactionsCount ==
                                             MATCHING_TRANSACTIONS_LIMIT)
                                         {
-                                            profile.markTransactionsBeforeTransactionAsPresent(db, transaction);
+                                            profile.markTransactionsBeforeTransactionAsPresent(db,
+                                                    transaction);
                                             progress.setTotal(progress.getProgress());
                                             publishProgress(progress);
                                             break LINES;
