@@ -166,7 +166,7 @@ public class RetrieveTransactionsTask
                                     lastAccount = profile.loadAccount(acct_name);
                                     if (lastAccount == null) {
                                         lastAccount = new LedgerAccount(acct_name);
-                                        profile.storeAccount(lastAccount);
+                                        profile.storeAccount(db, lastAccount);
                                     }
 
                                     // make sure the parent account(s) are present,
@@ -188,7 +188,7 @@ public class RetrieveTransactionsTask
                                                 accountList.add(acc);
                                             L(String.format("gap-filling with %s", aName));
                                             accountNames.put(aName, null);
-                                            profile.storeAccount(acc);
+                                            profile.storeAccount(db, acc);
                                         }
                                     }
 
@@ -213,7 +213,7 @@ public class RetrieveTransactionsTask
                                     if (currency == null) currency = "";
                                     value = value.replace(',', '.');
                                     L("curr=" + currency + ", value=" + value);
-                                    profile.storeAccountValue(lastAccount.getName(), currency,
+                                    profile.storeAccountValue(db, lastAccount.getName(), currency,
                                             Float.valueOf(value));
                                     lastAccount.addAmount(Float.parseFloat(value), currency);
                                 }
@@ -291,7 +291,7 @@ public class RetrieveTransactionsTask
                                         }
                                     }
                                     else {
-                                        profile.storeTransaction(transaction);
+                                        profile.storeTransaction(db, transaction);
                                         matchedTransactionsCount = 0;
                                         progress.setTotal(maxTransactionId);
                                     }
@@ -380,9 +380,9 @@ public class RetrieveTransactionsTask
                         if (parsedAccount == null) break;
 
                         LedgerAccount acc = new LedgerAccount(parsedAccount.getAname());
-                        profile.storeAccount(acc);
+                        profile.storeAccount(db, acc);
                         for (ParsedBalance b : parsedAccount.getAebalance()) {
-                            profile.storeAccountValue(acc.getName(), b.getAcommodity(),
+                            profile.storeAccountValue(db, acc.getName(), b.getAcommodity(),
                                     b.getAquantity().asFloat());
                         }
 
@@ -445,7 +445,7 @@ public class RetrieveTransactionsTask
                             }
                         }
                         else {
-                            profile.storeTransaction(transaction);
+                            profile.storeTransaction(db, transaction);
                             matchedTransactionsCount = 0;
                             progress.setTotal(maxTransactionId);
                         }

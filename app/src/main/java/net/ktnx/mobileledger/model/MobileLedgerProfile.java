@@ -182,9 +182,7 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public void storeAccount(LedgerAccount acc) {
-        SQLiteDatabase db = MLDB.getWritableDatabase();
-
+    public void storeAccount(SQLiteDatabase db, LedgerAccount acc) {
         // replace into is a bad idea because it would reset hidden to its default value
         // we like the default, but for new accounts only
         db.execSQL("update accounts set level = ?, keep = 1 where profile=? and name = ?",
@@ -195,14 +193,12 @@ public final class MobileLedgerProfile {
                              acc.getLevel()
                 });
     }
-    public void storeAccountValue(String name, String currency, Float amount) {
-        SQLiteDatabase db = MLDB.getWritableDatabase();
+    public void storeAccountValue(SQLiteDatabase db, String name, String currency, Float amount) {
         db.execSQL("replace into account_values(profile, account, " +
                    "currency, value, keep) values(?, ?, ?, ?, 1);",
                 new Object[]{uuid, name, currency, amount});
     }
-    public void storeTransaction(LedgerTransaction tr) {
-        SQLiteDatabase db = MLDB.getWritableDatabase();
+    public void storeTransaction(SQLiteDatabase db, LedgerTransaction tr) {
         tr.fillDataHash();
         db.execSQL("DELETE from transactions WHERE profile=? and id=?",
                 new Object[]{uuid, tr.getId()});
