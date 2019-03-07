@@ -422,9 +422,12 @@ public class RetrieveTransactionsTask
         http.setAllowUserInteraction(false);
         publishProgress(progress);
         switch (http.getResponseCode()) {
-            case 200: break;
-            case 404: return false;
-            default:  throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
+            case 200:
+                break;
+            case 404:
+                return false;
+            default:
+                throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
         try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
             try (InputStream resp = http.getInputStream()) {
