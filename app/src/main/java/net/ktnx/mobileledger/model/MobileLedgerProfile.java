@@ -312,4 +312,32 @@ public final class MobileLedgerProfile {
     public void setThemeId(Object o) {
         setThemeId(Integer.valueOf(String.valueOf(o)).intValue());
     }
+    public void markTransactionsAsNotPresent(SQLiteDatabase db) {
+        db.execSQL("UPDATE transactions set keep=0 where profile=?", new String[]{uuid});
+
+    }
+    public void markAccountsAsNotPresent(SQLiteDatabase db) {
+        db.execSQL("update account_values set keep=0 where profile=?;", new String[]{uuid});
+        db.execSQL("update accounts set keep=0 where profile=?;", new String[]{uuid});
+
+    }
+    public void deleteNotPresentAccounts(SQLiteDatabase db) {
+        db.execSQL("delete from account_values where keep=0 and profile=?", new String[]{uuid});
+        db.execSQL("delete from accounts where keep=0 and profile=?", new String[]{uuid});
+    }
+    public void markTransactionAsPresent(SQLiteDatabase db, LedgerTransaction transaction) {
+        db.execSQL("UPDATE transactions SET keep = 1 WHERE profile = ? and id=?",
+                new Object[]{uuid, transaction.getId()
+                });
+    }
+    public void markTransactionsBeforeTransactionAsPresent(SQLiteDatabase db,
+                                                           LedgerTransaction transaction) {
+        db.execSQL("UPDATE transactions SET keep=1 WHERE profile = ? and id < ?",
+                new Object[]{uuid, transaction.getId()
+                });
+
+    }
+    public void deleteNotPresentTransactions(SQLiteDatabase db) {
+        db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0", new String[]{uuid});
+    }
 }
