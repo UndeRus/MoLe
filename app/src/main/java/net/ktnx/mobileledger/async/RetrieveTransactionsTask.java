@@ -430,6 +430,7 @@ public class RetrieveTransactionsTask
                                 progress.setTotal(progress.getProgress());
                                 publishProgress(progress);
                                 db.setTransactionSuccessful();
+                                profile.setLastUpdateStamp();
                                 return true;
                             }
                         }
@@ -445,6 +446,7 @@ public class RetrieveTransactionsTask
 
                     profile.deleteNotPresentTransactions(db);
                     db.setTransactionSuccessful();
+                    profile.setLastUpdateStamp();
                 }
                 finally {
                     db.endTransaction();
