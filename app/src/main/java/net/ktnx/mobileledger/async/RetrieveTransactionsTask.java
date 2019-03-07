@@ -374,6 +374,7 @@ public class RetrieveTransactionsTask
                     AccountListParser parser = new AccountListParser(resp);
 
                     while (true) {
+                        throwIfCancelled();
                         ParsedLedgerAccount parsedAccount = parser.nextAccount();
                         if (parsedAccount == null) break;
 
@@ -384,8 +385,10 @@ public class RetrieveTransactionsTask
                                     b.getAquantity().asFloat());
                         }
                     }
+                    throwIfCancelled();
 
                     profile.deleteNotPresentAccounts(db);
+                    throwIfCancelled();
                     db.setTransactionSuccessful();
                 }
                 finally {
@@ -408,6 +411,7 @@ public class RetrieveTransactionsTask
             try (InputStream resp = http.getInputStream()) {
                 if (http.getResponseCode() != 200)
                     throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
+                throwIfCancelled();
                 db.beginTransaction();
                 try {
                     profile.markTransactionsAsNotPresent(db);
@@ -418,7 +422,9 @@ public class RetrieveTransactionsTask
                     int processedTransactionCount = 0;
 
                     while (true) {
+                        throwIfCancelled();
                         ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
+                        throwIfCancelled();
                         if (parsedTransaction == null) break;
                         LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
                         if (transaction.existsInDb(db)) {
@@ -444,7 +450,9 @@ public class RetrieveTransactionsTask
                         publishProgress(progress);
                     }
 
+                    throwIfCancelled();
                     profile.deleteNotPresentTransactions(db);
+                    throwIfCancelled();
                     db.setTransactionSuccessful();
                     profile.setLastUpdateStamp();
                 }
