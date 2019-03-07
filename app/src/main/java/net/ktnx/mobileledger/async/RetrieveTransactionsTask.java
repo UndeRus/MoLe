@@ -23,6 +23,7 @@ import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 import android.util.Log;
 
+import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.AccountListParser;
 import net.ktnx.mobileledger.json.ParsedBalance;
 import net.ktnx.mobileledger.json.ParsedLedgerAccount;
@@ -38,7 +39,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -357,11 +357,20 @@ public class RetrieveTransactionsTask
                 new String[]{profile.getUuid()});
         db.execSQL("update accounts set keep=0 where profile=?;", new String[]{profile.getUuid()});
     }
-    private boolean retrieveAccountList(MobileLedgerProfile profile) throws IOException {
+    private boolean retrieveAccountList(MobileLedgerProfile profile)
+            throws IOException, HTTPException {
         Progress progress = new Progress();
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
         http.setAllowUserInteraction(false);
+        switch (http.getResponseCode()) {
+            case 200:
+                break;
+            case 404:
+                return false;
+            default:
+                throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
+        }
         publishProgress(progress);
         try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
             try (InputStream resp = http.getInputStream()) {
@@ -405,13 +414,18 @@ public class RetrieveTransactionsTask
         return true;
     }
     private boolean retrieveTransactionList(MobileLedgerProfile profile)
-            throws IOException, ParseException {
+            throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "transactions");
         http.setAllowUserInteraction(false);
         publishProgress(progress);
+        switch (http.getResponseCode()) {
+            case 200: break;
+            case 404: return false;
+            default:  throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
+        }
         try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
             try (InputStream resp = http.getInputStream()) {
                 if (http.getResponseCode() != 200)
@@ -483,13 +497,13 @@ public class RetrieveTransactionsTask
             e.printStackTrace();
             return "Invalid server URL";
         }
-        catch (FileNotFoundException e) {
+        catch (HTTPException e) {
             e.printStackTrace();
-            return "Invalid user name or password";
+            return String.format("HTTP error %d: %s", e.getResponseCode(), e.getResponseMessage());
         }
         catch (IOException e) {
             e.printStackTrace();
-            return "Network error";
+            return "Parse error";
         }
         catch (ParseException e) {
             e.printStackTrace();
