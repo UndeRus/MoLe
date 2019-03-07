@@ -372,6 +372,7 @@ public class RetrieveTransactionsTask
                     profile.markAccountsAsNotPresent(db);
 
                     AccountListParser parser = new AccountListParser(resp);
+                    ArrayList<LedgerAccount> accountList = new ArrayList<>();
 
                     while (true) {
                         throwIfCancelled();
@@ -384,12 +385,15 @@ public class RetrieveTransactionsTask
                             profile.storeAccountValue(acc.getName(), b.getAcommodity(),
                                     b.getAquantity().asFloat());
                         }
+
+                        accountList.add(acc);
                     }
                     throwIfCancelled();
 
                     profile.deleteNotPresentAccounts(db);
                     throwIfCancelled();
                     db.setTransactionSuccessful();
+                    Data.accounts.set(accountList);
                 }
                 finally {
                     db.endTransaction();
