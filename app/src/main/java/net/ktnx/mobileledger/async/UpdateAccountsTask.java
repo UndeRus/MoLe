@@ -43,7 +43,10 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
             SQLiteDatabase db = MLDB.getReadableDatabase();
             try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
                 while (cursor.moveToNext()) {
-                    LedgerAccount acc = new LedgerAccount(cursor.getString(0));
+                    final String accName = cursor.getString(0);
+//                    Log.d("accounts",
+//                            String.format("Read account '%s' from DB [%s]", accName, profileUUID));
+                    LedgerAccount acc = new LedgerAccount(accName);
                     acc.setHidden(cursor.getInt(1) == 1);
                     try (Cursor c2 = db.rawQuery(
                             "SELECT value, currency FROM account_values WHERE profile = ? " +

@@ -192,6 +192,7 @@ public final class MobileLedgerProfile {
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
                              acc.getLevel()
                 });
+//        Log.d("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
     public void storeAccountValue(SQLiteDatabase db, String name, String currency, Float amount) {
         db.execSQL("replace into account_values(profile, account, " +
