@@ -25,6 +25,7 @@ import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -339,5 +340,11 @@ public final class MobileLedgerProfile {
     }
     public void deleteNotPresentTransactions(SQLiteDatabase db) {
         db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0", new String[]{uuid});
+    }
+    public void setLastUpdateStamp() {
+        Log.d("db", "Updating transaction value stamp");
+        Date now = new Date();
+        setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
+        Data.lastUpdateDate.set(now);
     }
 }

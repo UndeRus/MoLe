@@ -49,7 +49,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -340,10 +339,7 @@ public class RetrieveTransactionsTask
                     profile.deleteNotPresentTransactions(db);
                     db.setTransactionSuccessful();
 
-                    Log.d("db", "Updating transaction value stamp");
-                    Date now = new Date();
-                    profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
-                    Data.lastUpdateDate.set(now);
+                    profile.setLastUpdateStamp();
 
                     return null;
                 }
