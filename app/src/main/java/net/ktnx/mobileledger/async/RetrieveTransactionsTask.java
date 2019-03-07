@@ -107,7 +107,7 @@ public class RetrieveTransactionsTask
         context.onRetrieveDone(null);
     }
     private String retrieveTransactionListLegacy(MobileLedgerProfile profile)
-            throws IOException, ParseException {
+            throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
@@ -118,6 +118,12 @@ public class RetrieveTransactionsTask
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "journal");
         http.setAllowUserInteraction(false);
         publishProgress(progress);
+        switch (http.getResponseCode()) {
+            case 200:
+                break;
+            default:
+                throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
+        }
         try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
             try (InputStream resp = http.getInputStream()) {
                 if (http.getResponseCode() != 200)
