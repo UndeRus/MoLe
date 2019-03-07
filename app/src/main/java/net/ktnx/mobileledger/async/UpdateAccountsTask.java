@@ -31,9 +31,9 @@ import java.util.ArrayList;
 public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAccount>> {
     protected ArrayList<LedgerAccount> doInBackground(Void... params) {
         Data.backgroundTaskCount.incrementAndGet();
-        String profileUUID = Data.profile.get().getUuid();
-        boolean onlyStarred = Data.optShowOnlyStarred.get();
         try {
+            String profileUUID = Data.profile.get().getUuid();
+            boolean onlyStarred = Data.optShowOnlyStarred.get();
             ArrayList<LedgerAccount> newList = new ArrayList<>();
 
             String sql = "SELECT name, hidden FROM accounts WHERE profile = ?";
