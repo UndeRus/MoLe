@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.json;
 
+import android.util.Log;
+
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -35,6 +37,13 @@ public class AccountListParser {
         iter = reader.readValues(input);
     }
     public ParsedLedgerAccount nextAccount() throws IOException {
-        return iter.hasNext() ? iter.next() : null;
+        if (!iter.hasNext()) return null;
+
+        ParsedLedgerAccount next = iter.next();
+
+        if (next.getAname().equalsIgnoreCase("root")) return nextAccount();
+
+        Log.d("accounts", String.format("Got account '%s'", next.getAname()));
+        return next;
     }
 }
