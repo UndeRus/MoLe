@@ -38,6 +38,13 @@ public final class Globals {
                     return new SimpleDateFormat("yyyy/MM/dd", Locale.US);
                 }
             };
+    private static final ThreadLocal<SimpleDateFormat> isoDateFormatter =
+            new ThreadLocal<SimpleDateFormat>() {
+                @Override
+                protected SimpleDateFormat initialValue() {
+                    return new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                }
+            };
     public static String[] monthNames;
     public static String developerEmail = "dam+mole-crash@ktnx.net";
     private static Pattern reLedgerDate =
@@ -74,6 +81,9 @@ public final class Globals {
         else toParse = dateString;
 
         return dateFormatter.get().parse(toParse);
+    }
+    public static Date parseIsoDate(String dateString) throws ParseException {
+        return isoDateFormatter.get().parse(dateString);
     }
     public static String formatLedgerDate(Date date) {
         return dateFormatter.get().format(date);
