@@ -23,13 +23,17 @@ import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 import android.util.Log;
 
+import net.ktnx.mobileledger.json.AccountListParser;
+import net.ktnx.mobileledger.json.ParsedBalance;
+import net.ktnx.mobileledger.json.ParsedLedgerAccount;
+import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
+import net.ktnx.mobileledger.json.TransactionListParser;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -103,217 +107,200 @@ public class RetrieveTransactionsTask
         if (context == null) return;
         context.onRetrieveDone(null);
     }
-    @SuppressLint("DefaultLocale")
-    @Override
-    protected String doInBackground(Void... params) {
-        MobileLedgerProfile profile = Data.profile.get();
+    private String retrieveTransactionListLegacy(MobileLedgerProfile profile)
+            throws IOException, ParseException {
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
         HashMap<String, Void> accountNames = new HashMap<>();
         LedgerAccount lastAccount = null;
         boolean onlyStarred = Data.optShowOnlyStarred.get();
-        Data.backgroundTaskCount.incrementAndGet();
-        try {
-            HttpURLConnection http = NetworkUtil.prepareConnection("journal");
-            http.setAllowUserInteraction(false);
-            publishProgress(progress);
-            MainActivity ctx = getContext();
-            if (ctx == null) return null;
-            try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
-                try (InputStream resp = http.getInputStream()) {
-                    if (http.getResponseCode() != 200) throw new IOException(
-                            String.format("HTTP error %d", http.getResponseCode()));
-                    db.beginTransaction();
-                    try {
-                        db.execSQL("UPDATE transactions set keep=0");
-                        db.execSQL("update account_values set keep=0;");
-                        db.execSQL("update accounts set keep=0;");
 
-                        ParserState state = ParserState.EXPECTING_ACCOUNT;
-                        String line;
-                        BufferedReader buf = new BufferedReader(
-                                new InputStreamReader(resp, StandardCharsets.UTF_8));
+        HttpURLConnection http = NetworkUtil.prepareConnection(profile, "journal");
+        http.setAllowUserInteraction(false);
+        publishProgress(progress);
+        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
+            try (InputStream resp = http.getInputStream()) {
+                if (http.getResponseCode() != 200)
+                    throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
+                db.beginTransaction();
+                try {
+                    prepareDbForRetrieval(db, profile);
 
-                        int processedTransactionCount = 0;
-                        int transactionId = 0;
-                        int matchedTransactionsCount = 0;
-                        LedgerTransaction transaction = null;
-                        LINES:
-                        while ((line = buf.readLine()) != null) {
-                            throwIfCancelled();
-                            Matcher m;
-                            m = reComment.matcher(line);
-                            if (m.find()) {
-                                // TODO: comments are ignored for now
-                                Log.v("transaction-parser", "Ignoring comment");
-                                continue;
-                            }
-                            //L(String.format("State is %d", updating));
-                            switch (state) {
-                                case EXPECTING_ACCOUNT:
-                                    if (line.equals("<h2>General Journal</h2>")) {
-                                        state = ParserState.EXPECTING_TRANSACTION;
-                                        L("→ expecting transaction");
-                                        Data.accounts.set(accountList);
-                                        continue;
+                    int matchedTransactionsCount = 0;
+
+
+                    ParserState state = ParserState.EXPECTING_ACCOUNT;
+                    String line;
+                    BufferedReader buf =
+                            new BufferedReader(new InputStreamReader(resp, StandardCharsets.UTF_8));
+
+                    int processedTransactionCount = 0;
+                    int transactionId = 0;
+                    LedgerTransaction transaction = null;
+                    LINES:
+                    while ((line = buf.readLine()) != null) {
+                        throwIfCancelled();
+                        Matcher m;
+                        m = reComment.matcher(line);
+                        if (m.find()) {
+                            // TODO: comments are ignored for now
+                            Log.v("transaction-parser", "Ignoring comment");
+                            continue;
+                        }
+                        //L(String.format("State is %d", updating));
+                        switch (state) {
+                            case EXPECTING_ACCOUNT:
+                                if (line.equals("<h2>General Journal</h2>")) {
+                                    state = ParserState.EXPECTING_TRANSACTION;
+                                    L("→ expecting transaction");
+                                    Data.accounts.set(accountList);
+                                    continue;
+                                }
+                                m = reAccountName.matcher(line);
+                                if (m.find()) {
+                                    String acct_encoded = m.group(1);
+                                    String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
+                                    acct_name = acct_name.replace("\"", "");
+                                    L(String.format("found account: %s", acct_name));
+
+                                    lastAccount = profile.loadAccount(acct_name);
+                                    if (lastAccount == null) {
+                                        lastAccount = new LedgerAccount(acct_name);
+                                        profile.storeAccount(lastAccount);
                                     }
-                                    m = reAccountName.matcher(line);
-                                    if (m.find()) {
-                                        String acct_encoded = m.group(1);
-                                        String acct_name = URLDecoder.decode(acct_encoded, "UTF-8");
-                                        acct_name = acct_name.replace("\"", "");
-                                        L(String.format("found account: %s", acct_name));
 
-                                        lastAccount = profile.loadAccount(acct_name);
-                                        if (lastAccount == null) {
-                                            lastAccount = new LedgerAccount(acct_name);
-                                            profile.storeAccount(lastAccount);
+                                    // make sure the parent account(s) are present,
+                                    // synthesising them if necessary
+                                    String parentName = lastAccount.getParentName();
+                                    if (parentName != null) {
+                                        Stack<String> toAppend = new Stack<>();
+                                        while (parentName != null) {
+                                            if (accountNames.containsKey(parentName)) break;
+                                            toAppend.push(parentName);
+                                            parentName =
+                                                    new LedgerAccount(parentName).getParentName();
                                         }
-
-                                        // make sure the parent account(s) are present,
-                                        // synthesising them if necessary
-                                        String parentName = lastAccount.getParentName();
-                                        if (parentName != null) {
-                                            Stack<String> toAppend = new Stack<>();
-                                            while (parentName != null) {
-                                                if (accountNames.containsKey(parentName)) break;
-                                                toAppend.push(parentName);
-                                                parentName = new LedgerAccount(parentName)
-                                                        .getParentName();
-                                            }
-                                            while (!toAppend.isEmpty()) {
-                                                String aName = toAppend.pop();
-                                                LedgerAccount acc = new LedgerAccount(aName);
-                                                acc.setHidden(lastAccount.isHidden());
-                                                if (!onlyStarred || !acc.isHidden())
-                                                    accountList.add(acc);
-                                                L(String.format("gap-filling with %s", aName));
-                                                accountNames.put(aName, null);
-                                                profile.storeAccount(acc);
-                                            }
+                                        while (!toAppend.isEmpty()) {
+                                            String aName = toAppend.pop();
+                                            LedgerAccount acc = new LedgerAccount(aName);
+                                            acc.setHidden(lastAccount.isHidden());
+                                            if (!onlyStarred || !acc.isHidden())
+                                                accountList.add(acc);
+                                            L(String.format("gap-filling with %s", aName));
+                                            accountNames.put(aName, null);
+                                            profile.storeAccount(acc);
                                         }
-
-                                        if (!onlyStarred || !lastAccount.isHidden())
-                                            accountList.add(lastAccount);
-                                        accountNames.put(acct_name, null);
-
-                                        state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
-                                        L("→ expecting account amount");
-                                    }
-                                    break;
-
-                                case EXPECTING_ACCOUNT_AMOUNT:
-                                    m = reAccountValue.matcher(line);
-                                    boolean match_found = false;
-                                    while (m.find()) {
-                                        throwIfCancelled();
-
-                                        match_found = true;
-                                        String value = m.group(1);
-                                        String currency = m.group(2);
-                                        if (currency == null) currency = "";
-                                        value = value.replace(',', '.');
-                                        L("curr=" + currency + ", value=" + value);
-                                        profile.storeAccountValue(lastAccount.getName(), currency,
-                                                Float.valueOf(value));
-                                        lastAccount.addAmount(Float.parseFloat(value), currency);
                                     }
 
-                                    if (match_found) {
-                                        state = ParserState.EXPECTING_ACCOUNT;
-                                        L("→ expecting account");
+                                    if (!onlyStarred || !lastAccount.isHidden())
+                                        accountList.add(lastAccount);
+                                    accountNames.put(acct_name, null);
+
+                                    state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
+                                    L("→ expecting account amount");
+                                }
+                                break;
+
+                            case EXPECTING_ACCOUNT_AMOUNT:
+                                m = reAccountValue.matcher(line);
+                                boolean match_found = false;
+                                while (m.find()) {
+                                    throwIfCancelled();
+
+                                    match_found = true;
+                                    String value = m.group(1);
+                                    String currency = m.group(2);
+                                    if (currency == null) currency = "";
+                                    value = value.replace(',', '.');
+                                    L("curr=" + currency + ", value=" + value);
+                                    profile.storeAccountValue(lastAccount.getName(), currency,
+                                            Float.valueOf(value));
+                                    lastAccount.addAmount(Float.parseFloat(value), currency);
+                                }
+
+                                if (match_found) {
+                                    state = ParserState.EXPECTING_ACCOUNT;
+                                    L("→ expecting account");
+                                }
+
+                                break;
+
+                            case EXPECTING_TRANSACTION:
+                                if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                                m = reTransactionStart.matcher(line);
+                                if (m.find()) {
+                                    transactionId = Integer.valueOf(m.group(1));
+                                    state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
+                                    L(String.format("found transaction %d → expecting description",
+                                            transactionId));
+                                    progress.setProgress(++processedTransactionCount);
+                                    if (maxTransactionId < transactionId)
+                                        maxTransactionId = transactionId;
+                                    if ((progress.getTotal() == Progress.INDETERMINATE) ||
+                                        (progress.getTotal() < transactionId))
+                                        progress.setTotal(transactionId);
+                                    publishProgress(progress);
+                                }
+                                m = reEnd.matcher(line);
+                                if (m.find()) {
+                                    L("--- transaction value complete ---");
+                                    break LINES;
+                                }
+                                break;
+
+                            case EXPECTING_TRANSACTION_DESCRIPTION:
+                                if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                                m = reTransactionDescription.matcher(line);
+                                if (m.find()) {
+                                    if (transactionId == 0) throw new TransactionParserException(
+                                            "Transaction Id is 0 while expecting " + "description");
+
+                                    String date = m.group(1);
+                                    try {
+                                        int equalsIndex = date.indexOf('=');
+                                        if (equalsIndex >= 0)
+                                            date = date.substring(equalsIndex + 1);
+                                        transaction = new LedgerTransaction(transactionId, date,
+                                                m.group(2));
                                     }
-
-                                    break;
-
-                                case EXPECTING_TRANSACTION:
-                                    if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
-                                    m = reTransactionStart.matcher(line);
-                                    if (m.find()) {
-                                        transactionId = Integer.valueOf(m.group(1));
-                                        state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
-                                        L(String.format(
-                                                "found transaction %d → expecting description",
-                                                transactionId));
-                                        progress.setProgress(++processedTransactionCount);
-                                        if (maxTransactionId < transactionId)
-                                            maxTransactionId = transactionId;
-                                        if ((progress.getTotal() == Progress.INDETERMINATE) ||
-                                            (progress.getTotal() < transactionId))
-                                            progress.setTotal(transactionId);
-                                        publishProgress(progress);
+                                    catch (ParseException e) {
+                                        e.printStackTrace();
+                                        return String.format("Error parsing date '%s'", date);
                                     }
-                                    m = reEnd.matcher(line);
-                                    if (m.find()) {
-                                        L("--- transaction value complete ---");
-                                        break LINES;
-                                    }
-                                    break;
+                                    state = ParserState.EXPECTING_TRANSACTION_DETAILS;
+                                    L(String.format("transaction %d created for %s (%s) →" +
+                                                    " expecting details", transactionId, date,
+                                            m.group(2)));
+                                }
+                                break;
 
-                                case EXPECTING_TRANSACTION_DESCRIPTION:
-                                    if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
-                                    m = reTransactionDescription.matcher(line);
-                                    if (m.find()) {
-                                        if (transactionId == 0)
-                                            throw new TransactionParserException(
-                                                    "Transaction Id is 0 while expecting " +
-                                                    "description");
+                            case EXPECTING_TRANSACTION_DETAILS:
+                                if (line.isEmpty()) {
+                                    // transaction data collected
+                                    if (transaction.existsInDb(db)) {
+                                        profile.markTransactionAsPresent(db, transaction);
+                                        matchedTransactionsCount++;
 
-                                        String date = m.group(1);
-                                        try {
-                                            int equalsIndex = date.indexOf('=');
-                                            if (equalsIndex >= 0)
-                                                date = date.substring(equalsIndex + 1);
-                                            transaction = new LedgerTransaction(transactionId, date,
-                                                    m.group(2));
+                                        if (matchedTransactionsCount ==
+                                            MATCHING_TRANSACTIONS_LIMIT)
+                                        {
+                                            profile.markTransactionsBeforeTransactionAsPresent(db, transaction);
+                                            progress.setTotal(progress.getProgress());
+                                            publishProgress(progress);
+                                            break LINES;
                                         }
-                                        catch (ParseException e) {
-                                            e.printStackTrace();
-                                            return String.format("Error parsing date '%s'", date);
-                                        }
-                                        state = ParserState.EXPECTING_TRANSACTION_DETAILS;
-                                        L(String.format("transaction %d created for %s (%s) →" +
-                                                        " expecting details", transactionId, date,
-                                                m.group(2)));
                                     }
-                                    break;
+                                    else {
+                                        profile.storeTransaction(transaction);
+                                        matchedTransactionsCount = 0;
+                                        progress.setTotal(maxTransactionId);
+                                    }
 
-                                case EXPECTING_TRANSACTION_DETAILS:
-                                    if (line.isEmpty()) {
-                                        // transaction data collected
-                                        if (transaction.existsInDb(db)) {
-                                            db.execSQL("UPDATE transactions SET keep = 1 WHERE " +
-                                                       "profile = ? and id=?",
-                                                    new Object[]{profile.getUuid(),
-                                                                 transaction.getId()
-                                                    });
-                                            matchedTransactionsCount++;
-
-                                            if (matchedTransactionsCount ==
-                                                MATCHING_TRANSACTIONS_LIMIT)
-                                            {
-                                                db.execSQL("UPDATE transactions SET keep=1 WHERE " +
-                                                           "profile = ? and id < ?",
-                                                        new Object[]{profile.getUuid(),
-                                                                     transaction.getId()
-                                                        });
-                                                progress.setTotal(progress.getProgress());
-                                                publishProgress(progress);
-                                                break LINES;
-                                            }
-                                        }
-                                        else {
-                                            profile.storeTransaction(transaction);
-                                            matchedTransactionsCount = 0;
-                                            progress.setTotal(maxTransactionId);
-                                        }
-
-                                        state = ParserState.EXPECTING_TRANSACTION;
-                                        L(String.format(
-                                                "transaction %s saved → expecting transaction",
-                                                transaction.getId()));
-                                        transaction.finishLoading();
+                                    state = ParserState.EXPECTING_TRANSACTION;
+                                    L(String.format("transaction %s saved → expecting transaction",
+                                            transaction.getId()));
+                                    transaction.finishLoading();
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
 // for example, when you add the initial seeding transaction after entering some others
@@ -322,51 +309,164 @@ public class RetrieveTransactionsTask
 //                                                  "parser");
 //                                                break LINES;
 //                                            }
+                                }
+                                else {
+                                    m = reTransactionDetails.matcher(line);
+                                    if (m.find()) {
+                                        String acc_name = m.group(1);
+                                        String amount = m.group(2);
+                                        String currency = m.group(3);
+                                        if (currency == null) currency = "";
+                                        amount = amount.replace(',', '.');
+                                        transaction.addAccount(
+                                                new LedgerTransactionAccount(acc_name,
+                                                        Float.valueOf(amount), currency));
+                                        L(String.format("%d: %s = %s", transaction.getId(),
+                                                acc_name, amount));
                                     }
-                                    else {
-                                        m = reTransactionDetails.matcher(line);
-                                        if (m.find()) {
-                                            String acc_name = m.group(1);
-                                            String amount = m.group(2);
-                                            String currency = m.group(3);
-                                            if (currency == null) currency = "";
-                                            amount = amount.replace(',', '.');
-                                            transaction.addAccount(
-                                                    new LedgerTransactionAccount(acc_name,
-                                                            Float.valueOf(amount), currency));
-                                            L(String.format("%d: %s = %s", transaction.getId(),
-                                                    acc_name, amount));
-                                        }
-                                        else throw new IllegalStateException(String.format(
-                                                "Can't parse transaction %d " + "details: %s",
-                                                transactionId, line));
-                                    }
-                                    break;
-                                default:
-                                    throw new RuntimeException(
-                                            String.format("Unknown parser updating %s",
-                                                    state.name()));
-                            }
+                                    else throw new IllegalStateException(String.format(
+                                            "Can't parse transaction %d " + "details: %s",
+                                            transactionId, line));
+                                }
+                                break;
+                            default:
+                                throw new RuntimeException(
+                                        String.format("Unknown parser updating %s", state.name()));
                         }
-
-                        throwIfCancelled();
-
-                        db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0",
-                                new String[]{profile.getUuid()});
-                        db.setTransactionSuccessful();
-
-                        Log.d("db", "Updating transaction value stamp");
-                        Date now = new Date();
-                        profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
-                        Data.lastUpdateDate.set(now);
-
-                        return null;
                     }
-                    finally {
-                        db.endTransaction();
-                    }
+
+                    throwIfCancelled();
+
+                    profile.deleteNotPresentTransactions(db);
+                    db.setTransactionSuccessful();
+
+                    Log.d("db", "Updating transaction value stamp");
+                    Date now = new Date();
+                    profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
+                    Data.lastUpdateDate.set(now);
+
+                    return null;
+                }
+                finally {
+                    db.endTransaction();
                 }
             }
+        }
+    }
+    private void prepareDbForRetrieval(SQLiteDatabase db, MobileLedgerProfile profile) {
+        db.execSQL("UPDATE transactions set keep=0 where profile=?",
+                new String[]{profile.getUuid()});
+        db.execSQL("update account_values set keep=0 where profile=?;",
+                new String[]{profile.getUuid()});
+        db.execSQL("update accounts set keep=0 where profile=?;", new String[]{profile.getUuid()});
+    }
+    private boolean retrieveAccountList(MobileLedgerProfile profile) throws IOException {
+        Progress progress = new Progress();
+
+        HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
+        http.setAllowUserInteraction(false);
+        publishProgress(progress);
+        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
+            try (InputStream resp = http.getInputStream()) {
+                if (http.getResponseCode() != 200)
+                    throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
+
+                db.beginTransaction();
+                try {
+                    profile.markAccountsAsNotPresent(db);
+
+                    AccountListParser parser = new AccountListParser(resp);
+
+                    while (true) {
+                        ParsedLedgerAccount parsedAccount = parser.nextAccount();
+                        if (parsedAccount == null) break;
+
+                        LedgerAccount acc = new LedgerAccount(parsedAccount.getAname());
+                        profile.storeAccount(acc);
+                        for (ParsedBalance b : parsedAccount.getAebalance()) {
+                            profile.storeAccountValue(acc.getName(), b.getAcommodity(),
+                                    b.getAquantity().asFloat());
+                        }
+                    }
+
+                    profile.deleteNotPresentAccounts(db);
+                    db.setTransactionSuccessful();
+                }
+                finally {
+                    db.endTransaction();
+                }
+            }
+        }
+
+        return true;
+    }
+    private boolean retrieveTransactionList(MobileLedgerProfile profile)
+            throws IOException, ParseException {
+        Progress progress = new Progress();
+        int maxTransactionId = Progress.INDETERMINATE;
+
+        HttpURLConnection http = NetworkUtil.prepareConnection(profile, "transactions");
+        http.setAllowUserInteraction(false);
+        publishProgress(progress);
+        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
+            try (InputStream resp = http.getInputStream()) {
+                if (http.getResponseCode() != 200)
+                    throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
+                db.beginTransaction();
+                try {
+                    profile.markTransactionsAsNotPresent(db);
+
+                    int matchedTransactionsCount = 0;
+                    TransactionListParser parser = new TransactionListParser(resp);
+
+                    int processedTransactionCount = 0;
+
+                    while (true) {
+                        ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
+                        if (parsedTransaction == null) break;
+                        LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
+                        if (transaction.existsInDb(db)) {
+                            profile.markTransactionAsPresent(db, transaction);
+                            matchedTransactionsCount++;
+
+                            if (matchedTransactionsCount == MATCHING_TRANSACTIONS_LIMIT) {
+                                profile.markTransactionsBeforeTransactionAsPresent(db, transaction);
+                                progress.setTotal(progress.getProgress());
+                                publishProgress(progress);
+                                db.setTransactionSuccessful();
+                                return true;
+                            }
+                        }
+                        else {
+                            profile.storeTransaction(transaction);
+                            matchedTransactionsCount = 0;
+                            progress.setTotal(maxTransactionId);
+                        }
+
+                        progress.setProgress(++processedTransactionCount);
+                        publishProgress(progress);
+                    }
+
+                    profile.deleteNotPresentTransactions(db);
+                    db.setTransactionSuccessful();
+                }
+                finally {
+                    db.endTransaction();
+                }
+            }
+        }
+
+        return true;
+    }
+    @SuppressLint("DefaultLocale")
+    @Override
+    protected String doInBackground(Void... params) {
+        MobileLedgerProfile profile = Data.profile.get();
+        Data.backgroundTaskCount.incrementAndGet();
+        try {
+            if (!retrieveAccountList(profile) || !retrieveTransactionList(profile))
+                return retrieveTransactionListLegacy(profile);
+            return null;
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
@@ -377,6 +477,10 @@ public class RetrieveTransactionsTask
             return "Invalid user name or password";
         }
         catch (IOException e) {
+            e.printStackTrace();
+            return "Network error";
+        }
+        catch (ParseException e) {
             e.printStackTrace();
             return "Network error";
         }

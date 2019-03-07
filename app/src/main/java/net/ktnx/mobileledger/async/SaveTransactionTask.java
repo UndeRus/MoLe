@@ -54,7 +54,7 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         taskCallback = callback;
     }
     private boolean sendOK() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepareConnection("add");
+        HttpURLConnection http = NetworkUtil.prepareConnection(Data.profile.get(), "add");
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         http.setRequestProperty("Accept", "*/*");

@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.utils;
 import android.util.Base64;
 import android.util.Log;
 
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import java.io.IOException;
@@ -30,8 +29,7 @@ import java.nio.charset.StandardCharsets;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
-    public static HttpURLConnection prepareConnection(String path) throws IOException {
-        MobileLedgerProfile profile = Data.profile.get();
+    public static HttpURLConnection prepareConnection(MobileLedgerProfile profile, String path) throws IOException {
         final String backend_url = profile.getUrl();
         final boolean use_auth = profile.isAuthEnabled();
         Log.d("network", "Connecting to " + backend_url + "/" + path);
