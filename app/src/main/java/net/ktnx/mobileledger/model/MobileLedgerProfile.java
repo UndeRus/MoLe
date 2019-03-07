@@ -187,8 +187,8 @@ public final class MobileLedgerProfile {
         // we like the default, but for new accounts only
         db.execSQL("update accounts set level = ?, keep = 1 where profile=? and name = ?",
                 new Object[]{acc.getLevel(), uuid, acc.getName()});
-        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level) " +
-                   "select ?,?,?,?,? where (select changes() = 0)",
+        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, keep) " +
+                   "select ?,?,?,?,?,1 where (select changes() = 0)",
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
                              acc.getLevel()
                 });
