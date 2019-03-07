@@ -53,7 +53,9 @@ public final class Globals {
     }
     public static Date parseLedgerDate(String dateString) throws ParseException {
         Matcher m = reLedgerDate.matcher(dateString);
-        if (!m.matches()) throw new ParseException(dateString, 0);
+        if (!m.matches()) throw new ParseException(
+                String.format("'%s' does not match expected pattern '%s'", dateString,
+                        reLedgerDate.toString()), 0);
 
         String year = m.group(1);
         String month = m.group(2);
