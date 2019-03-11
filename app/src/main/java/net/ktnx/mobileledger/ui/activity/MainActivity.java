@@ -91,7 +91,6 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onStart() {
         super.onStart();
 
-        Data.lastUpdateDate.set(null);
         updateLastUpdateTextFromDB();
         Date lastUpdate = Data.lastUpdateDate.get();
 
