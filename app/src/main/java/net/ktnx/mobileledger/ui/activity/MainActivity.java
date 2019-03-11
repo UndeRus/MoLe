@@ -115,6 +115,8 @@ public class MainActivity extends ProfileThemedActivity {
 
         setContentView(R.layout.activity_main);
 
+        setupProfile();
+
         fab = findViewById(R.id.btn_add_transaction);
         profileListContainer = findViewById(R.id.nav_profile_list_container);
         profileListHeadArrow = findViewById(R.id.nav_profiles_arrow);
@@ -290,11 +292,6 @@ public class MainActivity extends ProfileThemedActivity {
         Intent intent = new Intent(this, this.getClass());
         intent.putExtra(BUNDLE_SAVED_STATE, bundle);
         startActivity(intent);
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setupProfile();
     }
     public void startEditProfileActivity(MobileLedgerProfile profile) {
         Intent intent = new Intent(this, ProfileDetailActivity.class);
