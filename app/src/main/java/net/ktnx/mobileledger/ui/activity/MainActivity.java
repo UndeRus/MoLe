@@ -91,6 +91,8 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onStart() {
         super.onStart();
 
+        setupProfile();
+
         updateLastUpdateTextFromDB();
         Date lastUpdate = Data.lastUpdateDate.get();
 
@@ -114,8 +116,6 @@ public class MainActivity extends ProfileThemedActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        setupProfile();
 
         fab = findViewById(R.id.btn_add_transaction);
         profileListContainer = findViewById(R.id.nav_profile_list_container);
