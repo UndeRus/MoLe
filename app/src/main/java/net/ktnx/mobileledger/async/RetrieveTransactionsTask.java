@@ -516,7 +516,7 @@ public class RetrieveTransactionsTask
         }
         catch (IOException e) {
             e.printStackTrace();
-            return "Parse error";
+            return e.getLocalizedMessage();
         }
         catch (ParseException e) {
             e.printStackTrace();
