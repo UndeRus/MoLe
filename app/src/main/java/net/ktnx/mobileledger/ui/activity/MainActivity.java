@@ -216,18 +216,10 @@ public class MainActivity extends ProfileThemedActivity {
 
         Data.lastUpdateDate.addObserver((o, arg) -> {
             Log.d("main", "lastUpdateDate changed");
-            runOnUiThread(() -> {
-                Date date = Data.lastUpdateDate.get();
-                if (date == null) {
-                    tvLastUpdate.setText(R.string.transaction_last_update_never);
-                }
-                else {
-                    final String text = DateFormat.getDateTimeInstance().format(date);
-                    tvLastUpdate.setText(text);
-                    Log.d("despair", String.format("Date formatted: %s", text));
-                }
-            });
+            runOnUiThread(this::updateLastUpdateDisplay);
         });
+
+        updateLastUpdateDisplay();
 
         findViewById(R.id.btn_no_profiles_add)
                 .setOnClickListener(v -> startEditProfileActivity(null));
@@ -281,6 +273,19 @@ public class MainActivity extends ProfileThemedActivity {
                 collapseProfileList();
             }
         });
+    }
+    private void updateLastUpdateDisplay() {
+        TextView v = findViewById(R.id.transactions_last_update);
+        Date date = Data.lastUpdateDate.get();
+        if (date == null) {
+            v.setText(R.string.transaction_last_update_never);
+            Log.d("main", "no last update date :(");
+        }
+        else {
+            final String text = DateFormat.getDateTimeInstance().format(date);
+            v.setText(text);
+            Log.d("main", String.format("Date formatted: %s", text));
+        }
     }
     private void profileThemeChanged() {
         setupProfileColors();
