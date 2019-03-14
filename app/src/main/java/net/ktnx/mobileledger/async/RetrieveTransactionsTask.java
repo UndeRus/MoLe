@@ -172,8 +172,7 @@ public class RetrieveTransactionsTask
                                     lastAccount = profile.tryLoadAccount(db, acct_name);
                                     if (lastAccount == null)
                                         lastAccount = new LedgerAccount(acct_name);
-                                    else
-                                        lastAccount.removeAmounts();
+                                    else lastAccount.removeAmounts();
                                     profile.storeAccount(db, lastAccount);
 
                                     // make sure the parent account(s) are present,
@@ -191,15 +190,16 @@ public class RetrieveTransactionsTask
                                             String aName = toAppend.pop();
                                             LedgerAccount acc = new LedgerAccount(aName);
                                             acc.setHiddenByStar(lastAccount.isHiddenByStar());
-                                            if (!onlyStarred || !acc.isHiddenByStar())
-                                                accountList.add(acc);
+                                            if ((!onlyStarred || !acc.isHiddenByStar()) &&
+                                                acc.isVisible(accountList)) accountList.add(acc);
                                             L(String.format("gap-filling with %s", aName));
                                             accountNames.put(aName, null);
                                             profile.storeAccount(db, acc);
                                         }
                                     }
 
-                                    if (!onlyStarred || !lastAccount.isHiddenByStar())
+                                    if ((!onlyStarred || !lastAccount.isHiddenByStar()) &&
+                                        lastAccount.isVisible(accountList))
                                         accountList.add(lastAccount);
                                     accountNames.put(acct_name, null);
 
