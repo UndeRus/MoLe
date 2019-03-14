@@ -161,6 +161,6 @@ public class LedgerAccount {
         expanded = !expanded;
     }
     public void removeAmounts() {
-        amounts.clear();
+        if (amounts != null) amounts.clear();
     }
 }

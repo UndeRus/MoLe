@@ -396,14 +396,17 @@ public class RetrieveTransactionsTask
                         ParsedLedgerAccount parsedAccount = parser.nextAccount();
                         if (parsedAccount == null) break;
 
-                        LedgerAccount acc = new LedgerAccount(parsedAccount.getAname());
+                        LedgerAccount acc = profile.tryLoadAccount(db, parsedAccount.getAname());
+                        if (acc == null) acc = new LedgerAccount(parsedAccount.getAname());
+                        else acc.removeAmounts();
+
                         profile.storeAccount(db, acc);
                         for (ParsedBalance b : parsedAccount.getAebalance()) {
                             profile.storeAccountValue(db, acc.getName(), b.getAcommodity(),
                                     b.getAquantity().asFloat());
                         }
 
-                        accountList.add(acc);
+                        if (acc.isVisible(accountList)) accountList.add(acc);
                     }
                     throwIfCancelled();
 
