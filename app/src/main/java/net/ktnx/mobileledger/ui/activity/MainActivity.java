@@ -571,6 +571,7 @@ public class MainActivity extends ProfileThemedActivity {
 
             if (wasExpanded) {
                 Log.d("accounts", String.format("Collapsing account '%s'", acc.getName()));
+                view.setRotation(0);
                 animator.rotationBy(180);
 
                 // removing all child accounts from the view
@@ -604,6 +605,7 @@ public class MainActivity extends ProfileThemedActivity {
             }
             else {
                 Log.d("accounts", String.format("Expanding account '%s'", acc.getName()));
+                view.setRotation(180);
                 animator.rotationBy(-180);
                 ArrayList<LedgerAccount> accounts = Data.accounts.get();
                 List<LedgerAccount> children = Data.profile.get().loadVisibleChildAccountsOf(acc);
