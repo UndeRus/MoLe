@@ -64,14 +64,19 @@ public final class MLDB {
     public static synchronized SQLiteDatabase getDatabase(DatabaseMode mode) {
         checkState();
 
+        SQLiteDatabase db;
+
         if (mode == READ) {
             if (helperForReading == null) helperForReading = new MobileLedgerDatabase(context);
-            return helperForReading.getReadableDatabase();
+            db = helperForReading.getReadableDatabase();
         }
         else {
             if (helperForWriting == null) helperForWriting = new MobileLedgerDatabase(context);
-            return helperForWriting.getWritableDatabase();
+            db = helperForWriting.getWritableDatabase();
         }
+
+        db.execSQL("pragma case_sensitive_like=ON;");
+        return db;
     }
     public static SQLiteDatabase getReadableDatabase() {
         return getDatabase(READ);
