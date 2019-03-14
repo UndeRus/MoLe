@@ -29,6 +29,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public final class MobileLedgerProfile {
     private String uuid;
     private String name;
@@ -185,12 +188,16 @@ public final class MobileLedgerProfile {
     public void storeAccount(SQLiteDatabase db, LedgerAccount acc) {
         // replace into is a bad idea because it would reset hidden to its default value
         // we like the default, but for new accounts only
-        db.execSQL("update accounts set level = ?, keep = 1 where profile=? and name = ?",
-                new Object[]{acc.getLevel(), uuid, acc.getName()});
-        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, keep) " +
-                   "select ?,?,?,?,?,1 where (select changes() = 0)",
+        db.execSQL("update accounts set level = ?, keep = 1, hidden=?, expanded=? " +
+                   "where profile=? and name = ?",
+                new Object[]{acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded(), uuid,
+                             acc.getName()
+                });
+        db.execSQL(
+                "insert into accounts(profile, name, name_upper, parent_name, level, hidden, expanded, keep) " +
+                "select ?,?,?,?,?,?,?,1 where (select changes() = 0)",
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
-                             acc.getLevel()
+                             acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded()
                 });
 //        Log.d("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
@@ -278,20 +285,50 @@ public final class MobileLedgerProfile {
         Log.d("db", String.format("removing progile %s from DB", uuid));
         db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
     }
+    @NonNull
     public LedgerAccount loadAccount(String name) {
         SQLiteDatabase db = MLDB.getReadableDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT hidden from accounts where profile=? and name=?",
-                new String[]{uuid, name}))
+        return loadAccount(db, name);
+    }
+    @Nullable
+    public LedgerAccount tryLoadAccount(String acct_name) {
+        SQLiteDatabase db = MLDB.getReadableDatabase();
+        return loadAccount(acct_name);
+    }
+    @NonNull
+    public LedgerAccount loadAccount(SQLiteDatabase db, String accName) {
+        LedgerAccount acc = tryLoadAccount(db, accName);
+
+        if (acc == null) throw new RuntimeException("Unable to load account with name "+accName);
+
+        return acc;
+    }
+    @Nullable
+    public LedgerAccount tryLoadAccount(SQLiteDatabase db, String accName) {
+        try (Cursor cursor = db.rawQuery(
+                "SELECT a.hidden, a.expanded, (select 1 from accounts a2 " +
+                "where a2.profile = a.profile and a2.name like a.name||':%' limit 1) " +
+                "FROM accounts a WHERE a.profile = ? and a.name=?", new String[]{uuid, accName}))
         {
             if (cursor.moveToFirst()) {
-                LedgerAccount acc = new LedgerAccount(name);
-                acc.setHidden(cursor.getInt(0) == 1);
+                LedgerAccount acc = new LedgerAccount(accName);
+                acc.setHiddenByStar(cursor.getInt(0) == 1);
+                acc.setExpanded(cursor.getInt(1) == 1);
+                acc.setHasSubAccounts(cursor.getInt(2) == 1);
+
+                try (Cursor c2 = db.rawQuery(
+                        "SELECT value, currency FROM account_values WHERE profile = ? " +
+                        "AND account = ?", new String[]{uuid, accName}))
+                {
+                    while (c2.moveToNext()) {
+                        acc.addAmount(c2.getFloat(0), c2.getString(1));
+                    }
+                }
 
                 return acc;
             }
+            return null;
         }
-
-        return null;
     }
     public LedgerTransaction loadTransaction(int transactionId) {
         LedgerTransaction tr = new LedgerTransaction(transactionId, this.uuid);
@@ -343,5 +380,41 @@ public final class MobileLedgerProfile {
         Date now = new Date();
         setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
         Data.lastUpdateDate.set(now);
+    }
+    public List<LedgerAccount> loadChildAccountsOf(LedgerAccount acc) {
+        List<LedgerAccount> result = new ArrayList<>();
+        SQLiteDatabase db = MLDB.getReadableDatabase();
+        try (Cursor c = db.rawQuery(
+                "SELECT a.name FROM accounts a WHERE a.profile = ? and a.name like ?||':%'",
+                new String[]{uuid, acc.getName()}))
+        {
+            while (c.moveToNext()) {
+                LedgerAccount a = loadAccount(db, c.getString(0));
+                result.add(a);
+            }
+        }
+
+        return result;
+    }
+    public List<LedgerAccount> loadVisibleChildAccountsOf(LedgerAccount acc) {
+        List<LedgerAccount> result = new ArrayList<>();
+        ArrayList<LedgerAccount> visibleList = new ArrayList<>();
+        visibleList.add(acc);
+
+        SQLiteDatabase db = MLDB.getReadableDatabase();
+        try (Cursor c = db.rawQuery(
+                "SELECT a.name FROM accounts a WHERE a.profile = ? and a.name like ?||':%'",
+                new String[]{uuid, acc.getName()}))
+        {
+            while (c.moveToNext()) {
+                LedgerAccount a = loadAccount(db, c.getString(0));
+                if (a.isVisible(visibleList)) {
+                    result.add(a);
+                    visibleList.add(a);
+                }
+            }
+        }
+
+        return result;
     }
 }

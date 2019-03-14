@@ -33,17 +33,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
-import net.ktnx.mobileledger.ui.RecyclerItemListener;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
-import java.util.List;
 import java.util.Observer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,7 +50,7 @@ import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_O
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
     MenuItem mShowOnlyStarred;
-    private AccountSummaryAdapter modelAdapter;
+    public AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
     private FloatingActionButton fab;
     private Observer backgroundTaskCountObserver;
@@ -101,48 +99,51 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         modelAdapter = new AccountSummaryAdapter();
 
+        mActivity.mAccountSummaryFragment = this;
         root = mActivity.findViewById(R.id.account_root);
         LinearLayoutManager llm = new LinearLayoutManager(mActivity);
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
         root.setAdapter(modelAdapter);
+        DividerItemDecoration did = new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
+        root.addItemDecoration(did);
 
         fab = mActivity.findViewById(R.id.btn_add_transaction);
 
-        root.addOnItemTouchListener(new RecyclerItemListener(mActivity, root,
-                new RecyclerItemListener.RecyclerTouchListener() {
-                    @Override
-                    public void onClickItem(View v, int position) {
-                        Log.d("value", String.format("item %d clicked", position));
-                        if (modelAdapter.isSelectionActive()) {
-                            modelAdapter.selectItem(position);
-                        }
-                        else {
-                            List<LedgerAccount> accounts = Data.accounts.get();
-                            if (accounts != null) {
-                                LedgerAccount account = accounts.get(position);
-
-                                mActivity.showAccountTransactions(account);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onLongClickItem(View v, int position) {
-                        Log.d("value", String.format("item %d long-clicked", position));
-                        modelAdapter.startSelection();
-                        if (optMenu != null) {
-                            optMenu.findItem(R.id.menu_acc_summary_cancel_selection)
-                                    .setVisible(true);
-                            optMenu.findItem(R.id.menu_acc_summary_confirm_selection)
-                                    .setVisible(true);
-                            optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(false);
-                        }
-                        {
-                            if (fab != null) fab.hide();
-                        }
-                    }
-                }));
+//        root.addOnItemTouchListener(new RecyclerItemListener(mActivity, root,
+//                new RecyclerItemListener.RecyclerTouchListener() {
+//                    @Override
+//                    public void onClickItem(View v, int position) {
+//                        Log.d("value", String.format("item %d clicked", position));
+//                        if (modelAdapter.isSelectionActive()) {
+//                            modelAdapter.selectItem(position);
+//                        }
+//                        else {
+//                            List<LedgerAccount> accounts = Data.accounts.get();
+//                            if (accounts != null) {
+//                                LedgerAccount account = accounts.get(position);
+//
+//                                mActivity.showAccountTransactions(account);
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onLongClickItem(View v, int position) {
+//                        Log.d("value", String.format("item %d long-clicked", position));
+//                        modelAdapter.startSelection();
+//                        if (optMenu != null) {
+//                            optMenu.findItem(R.id.menu_acc_summary_cancel_selection)
+//                                    .setVisible(true);
+//                            optMenu.findItem(R.id.menu_acc_summary_confirm_selection)
+//                                    .setVisible(true);
+//                            optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(false);
+//                        }
+//                        {
+//                            if (fab != null) fab.hide();
+//                        }
+//                    }
+//                }));
 
         mActivity.fabShouldShow();
         root.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -155,8 +156,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             }
         });
         swiper = mActivity.findViewById(R.id.account_swiper);
-        Colors.themeWatch.addObserver(
-                (o, arg) -> swiper.setColorSchemeColors(Colors.primary));
+        Colors.themeWatch.addObserver((o, arg) -> swiper.setColorSchemeColors(Colors.primary));
         swiper.setColorSchemeColors(Colors.primary);
         swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing accounts via swipe");

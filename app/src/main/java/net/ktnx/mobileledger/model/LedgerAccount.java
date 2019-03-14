@@ -25,40 +25,56 @@ import java.util.regex.Pattern;
 import androidx.annotation.NonNull;
 
 public class LedgerAccount {
+    static Pattern reHigherAccount = Pattern.compile("^[^:]+:");
     private String name;
     private String shortName;
     private int level;
     private String parentName;
-    private boolean hidden;
-    private boolean hiddenToBe;
+    private boolean hiddenByStar;
+    private boolean hiddenByStarToBe;
+    private boolean expanded;
     private List<LedgerAmount> amounts;
-    static Pattern reHigherAccount = Pattern.compile("^[^:]+:");
+    private boolean hasSubAccounts;
 
     public LedgerAccount(String name) {
         this.setName(name);
-        hidden = false;
-    }
-
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
+        hiddenByStar = false;
     }
 
     public LedgerAccount(String name, float amount) {
         this.setName(name);
-        this.hidden = false;
+        this.hiddenByStar = false;
+        this.expanded = true;
         this.amounts = new ArrayList<LedgerAmount>();
         this.addAmount(amount);
     }
+    // an account is visible if:
+    //  - it is starred (not hidden by a star)
+    //  - and it has an expanded parent or is a top account
+    public boolean isVisible() {
+        if (hiddenByStar) return false;
 
-    public void setName(String name) {
-        this.name = name;
-        stripName();
+        if (level == 0) return true;
+
+        return isVisible(Data.accounts.get());
     }
-
+    public boolean isVisible(ArrayList<LedgerAccount> list) {
+        for (LedgerAccount acc : list) {
+            if (acc.isParentOf(this)) {
+                if (!acc.isExpanded()) return false;
+            }
+        }
+        return true;
+    }
+    public boolean isParentOf(LedgerAccount potentialChild) {
+        return potentialChild.getName().startsWith(name + ":");
+    }
+    public boolean isHiddenByStar() {
+        return hiddenByStar;
+    }
+    public void setHiddenByStar(boolean hiddenByStar) {
+        this.hiddenByStar = hiddenByStar;
+    }
     private void stripName() {
         level = 0;
         shortName = name;
@@ -76,13 +92,15 @@ public class LedgerAccount {
             parentName = parentBuilder.substring(0, parentBuilder.length() - 1);
         else parentName = null;
     }
-
     public String getName() {
         return name;
     }
-
+    public void setName(String name) {
+        this.name = name;
+        stripName();
+    }
     public void addAmount(float amount, String currency) {
-        if (amounts == null ) amounts = new ArrayList<>();
+        if (amounts == null) amounts = new ArrayList<>();
         amounts.add(new LedgerAmount(amount, currency));
     }
     public void addAmount(float amount) {
@@ -93,7 +111,7 @@ public class LedgerAccount {
         if ((amounts == null) || amounts.isEmpty()) return "";
 
         StringBuilder builder = new StringBuilder();
-        for( LedgerAmount amount : amounts ) {
+        for (LedgerAmount amount : amounts) {
             String amt = amount.toString();
             if (builder.length() > 0) builder.append('\n');
             builder.append(amt);
@@ -115,16 +133,31 @@ public class LedgerAccount {
         return parentName;
     }
     public void togglehidden() {
-        hidden = !hidden;
+        hiddenByStar = !hiddenByStar;
     }
 
-    public boolean isHiddenToBe() {
-        return hiddenToBe;
+    public boolean isHiddenByStarToBe() {
+        return hiddenByStarToBe;
     }
-    public void setHiddenToBe(boolean hiddenToBe) {
-        this.hiddenToBe = hiddenToBe;
+    public void setHiddenByStarToBe(boolean hiddenByStarToBe) {
+        this.hiddenByStarToBe = hiddenByStarToBe;
     }
     public void toggleHiddenToBe() {
-        setHiddenToBe(!hiddenToBe);
+        setHiddenByStarToBe(!hiddenByStarToBe);
+    }
+    public boolean hasSubAccounts() {
+        return hasSubAccounts;
+    }
+    public void setHasSubAccounts(boolean hasSubAccounts) {
+        this.hasSubAccounts = hasSubAccounts;
+    }
+    public boolean isExpanded() {
+        return expanded;
+    }
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
+    }
+    public void toggleExpanded() {
+        expanded = !expanded;
     }
 }

@@ -169,11 +169,11 @@ public class RetrieveTransactionsTask
                                     acct_name = acct_name.replace("\"", "");
                                     L(String.format("found account: %s", acct_name));
 
-                                    lastAccount = profile.loadAccount(acct_name);
+                                    lastAccount = profile.tryLoadAccount(db, acct_name);
                                     if (lastAccount == null) {
                                         lastAccount = new LedgerAccount(acct_name);
-                                        profile.storeAccount(db, lastAccount);
                                     }
+                                    profile.storeAccount(db, lastAccount);
 
                                     // make sure the parent account(s) are present,
                                     // synthesising them if necessary
@@ -189,8 +189,8 @@ public class RetrieveTransactionsTask
                                         while (!toAppend.isEmpty()) {
                                             String aName = toAppend.pop();
                                             LedgerAccount acc = new LedgerAccount(aName);
-                                            acc.setHidden(lastAccount.isHidden());
-                                            if (!onlyStarred || !acc.isHidden())
+                                            acc.setHiddenByStar(lastAccount.isHiddenByStar());
+                                            if (!onlyStarred || !acc.isHiddenByStar())
                                                 accountList.add(acc);
                                             L(String.format("gap-filling with %s", aName));
                                             accountNames.put(aName, null);
@@ -198,7 +198,7 @@ public class RetrieveTransactionsTask
                                         }
                                     }
 
-                                    if (!onlyStarred || !lastAccount.isHidden())
+                                    if (!onlyStarred || !lastAccount.isHiddenByStar())
                                         accountList.add(lastAccount);
                                     accountNames.put(acct_name, null);
 

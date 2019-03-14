@@ -21,42 +21,77 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/account_summary_row"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:showIn="@id/account_root">
+    android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/account_summary_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="?attr/android:actionBarSize"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
+    <CheckBox
+        android:id="@+id/account_row_check"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:button="@drawable/checkbox_star_black"
+        android:onClick="onAccountSummaryRowViewClicked"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/account_row_acc_name"
+        style="@style/account_summary_account_name"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:onClick="onAccountSummaryRowViewClicked"
+        android:paddingStart="8dp"
+        android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/account_row_check"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
+
+    <FrameLayout
+        android:id="@+id/account_expander_container"
+        android:layout_width="@dimen/thumb_row_height"
+        android:layout_height="@dimen/thumb_row_height"
+        android:foregroundGravity="center_vertical"
+        android:minHeight="@dimen/thumb_row_height"
+        android:onClick="onAccountSummaryRowViewClicked"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/account_row_acc_name"
         app:layout_constraintTop_toTopOf="parent">
 
-        <CheckBox
-            android:id="@+id/account_row_check"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/account_expander"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:button="@drawable/checkbox_star_black" />
+            android:layout_margin="8dp"
+            android:background="@drawable/ic_expand_less_black_24dp" />
+    </FrameLayout>
 
-        <TextView
-            android:id="@+id/account_row_acc_name"
-            style="@style/account_summary_account_name"
-            android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
-            tools:ignore="HardcodedText" />
+    <TextView
+        android:id="@+id/account_row_filler1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/account_row_acc_amounts"
+        app:layout_constraintStart_toEndOf="@id/account_expander_container"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/account_row_acc_amounts"
-            style="@style/account_summary_amounts"
-            android:text="123,45\n678,90"
-            tools:ignore="HardcodedText" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/account_row_acc_amounts"
+        style="@style/account_summary_amounts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="0"
+        android:gravity="center_vertical"
+        android:onClick="onAccountSummaryRowViewClicked"
+        android:text="123,45\n678,90"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText" />
 
     <View
         android:id="@+id/account_summary_trailer"

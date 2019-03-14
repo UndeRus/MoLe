@@ -24,6 +24,7 @@ import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
@@ -32,13 +33,14 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
     protected ArrayList<LedgerAccount> doInBackground(Void... params) {
         Data.backgroundTaskCount.incrementAndGet();
         try {
-            String profileUUID = Data.profile.get().getUuid();
+            MobileLedgerProfile profile = Data.profile.get();
+            String profileUUID = profile.getUuid();
             boolean onlyStarred = Data.optShowOnlyStarred.get();
             ArrayList<LedgerAccount> newList = new ArrayList<>();
 
-            String sql = "SELECT name, hidden FROM accounts WHERE profile = ?";
-            if (onlyStarred) sql += " AND hidden = 0";
-            sql += " ORDER BY name";
+            String sql = "SELECT a.name from accounts a WHERE a.profile = ?";
+            if (onlyStarred) sql += " AND a.hidden = 0";
+            sql += " ORDER BY a.name";
 
             SQLiteDatabase db = MLDB.getReadableDatabase();
             try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
@@ -46,17 +48,8 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
                     final String accName = cursor.getString(0);
 //                    Log.d("accounts",
 //                            String.format("Read account '%s' from DB [%s]", accName, profileUUID));
-                    LedgerAccount acc = new LedgerAccount(accName);
-                    acc.setHidden(cursor.getInt(1) == 1);
-                    try (Cursor c2 = db.rawQuery(
-                            "SELECT value, currency FROM account_values WHERE profile = ? " +
-                            "AND account = ?", new String[]{profileUUID, acc.getName()}))
-                    {
-                        while (c2.moveToNext()) {
-                            acc.addAmount(c2.getFloat(0), c2.getString(1));
-                        }
-                    }
-                    newList.add(acc);
+                    LedgerAccount acc = profile.loadAccount(db, accName);
+                    if (acc.isVisible(newList)) newList.add(acc);
                 }
             }
 

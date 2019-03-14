@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -52,7 +53,9 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -70,6 +73,7 @@ import androidx.viewpager.widget.ViewPager;
 public class MainActivity extends ProfileThemedActivity {
     private static final String STATE_CURRENT_PAGE = "current_page";
     private static final String BUNDLE_SAVED_STATE = "bundle_savedState";
+    public AccountSummaryFragment mAccountSummaryFragment;
     DrawerLayout drawer;
     private LinearLayout profileListContainer;
     private View profileListHeadArrow, profileListHeadMore, profileListHeadCancel;
@@ -86,7 +90,6 @@ public class MainActivity extends ProfileThemedActivity {
     private boolean profileModificationEnabled = false;
     private boolean profileListExpanded = false;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -551,6 +554,68 @@ public class MainActivity extends ProfileThemedActivity {
         // FIXME disable rearranging
 
     }
+    public void onAccountSummaryRowViewClicked(View view) {
+        ViewGroup row = (ViewGroup) view.getParent();
+        if (view.getId() == R.id.account_expander_container) {
+            Log.d("accounts", "Account expander clicked");
+            LedgerAccount acc = (LedgerAccount) row.getTag();
+            if (!acc.hasSubAccounts()) return;
+
+            boolean wasExpanded = acc.isExpanded();
+
+            view.clearAnimation();
+            ViewPropertyAnimator animator = view.animate();
+
+            acc.toggleExpanded();
+            Data.profile.get().storeAccount(MLDB.getWritableDatabase(), acc);
+
+            if (wasExpanded) {
+                Log.d("accounts", String.format("Collapsing account '%s'", acc.getName()));
+                animator.rotationBy(180);
+
+                // removing all child accounts from the view
+                int start = -1, count = 0;
+                int i = 0;
+                final ArrayList<LedgerAccount> accountList = Data.accounts.get();
+                for (LedgerAccount a : accountList) {
+                    if (acc.isParentOf(a)) {
+                        if (start == -1) {
+                            start = i;
+                        }
+                        count++;
+                    }
+                    else {
+                        if (start != -1) {
+                            break;
+                        }
+                    }
+                    i++;
+                }
+
+                if (start != -1) {
+                    for (int j = 0; j < count; j++) {
+                        Log.d("accounts", String.format("Removing item %d: %s", start + j,
+                                accountList.get(start).getName()));
+                        accountList.remove(start);
+                    }
+
+                    mAccountSummaryFragment.modelAdapter.notifyItemRangeRemoved(start, count);
+                }
+            }
+            else {
+                Log.d("accounts", String.format("Expanding account '%s'", acc.getName()));
+                animator.rotationBy(-180);
+                ArrayList<LedgerAccount> accounts = Data.accounts.get();
+                List<LedgerAccount> children = Data.profile.get().loadVisibleChildAccountsOf(acc);
+                int parentPos = accounts.indexOf(acc);
+                if (parentPos == -1) throw new RuntimeException(
+                        "Can't find index of clicked account " + acc.getName());
+                accounts.addAll(parentPos + 1, children);
+                mAccountSummaryFragment.modelAdapter
+                        .notifyItemRangeInserted(parentPos + 1, children.size());
+            }
+        }
+    }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -563,7 +628,8 @@ public class MainActivity extends ProfileThemedActivity {
             Log.d("main", String.format("Switching to fragment %d", position));
             switch (position) {
                 case 0:
-                    return new AccountSummaryFragment();
+//                    Log.d("flow", "Creating account summary fragment");
+                    return mAccountSummaryFragment = new AccountSummaryFragment();
                 case 1:
                     return new TransactionListFragment();
                 default:
@@ -577,5 +643,4 @@ public class MainActivity extends ProfileThemedActivity {
             return 2;
         }
     }
-
 }

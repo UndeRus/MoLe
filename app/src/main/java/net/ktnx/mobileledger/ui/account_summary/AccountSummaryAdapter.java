@@ -24,20 +24,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.utils.Colors;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
+public class AccountSummaryAdapter
+        extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     private boolean selectionActive;
 
     AccountSummaryAdapter() {
@@ -51,15 +53,20 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
             Context ctx = holder.row.getContext();
             Resources rm = ctx.getResources();
 
+            holder.row.setTag(acc);
             holder.row.setVisibility(View.VISIBLE);
             holder.vTrailer.setVisibility(View.GONE);
             holder.tvAccountName.setText(acc.getShortName());
-            holder.tvAccountName.setPadding(
-                    acc.getLevel() * rm.getDimensionPixelSize(R.dimen.activity_horizontal_margin) /
-                    2, 0, 0, 0);
+            ConstraintLayout.LayoutParams lp =
+                    (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
+            lp.setMarginStart(
+                    acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 2);
+            holder.expanderContainer
+                    .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.INVISIBLE);
+            holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
             holder.tvAccountAmounts.setText(acc.getAmountsString());
 
-            if (acc.isHidden()) {
+            if (acc.isHiddenByStar()) {
                 holder.tvAccountName.setTypeface(null, Typeface.ITALIC);
                 holder.tvAccountAmounts.setTypeface(null, Typeface.ITALIC);
             }
@@ -68,15 +75,8 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
                 holder.tvAccountAmounts.setTypeface(null, Typeface.NORMAL);
             }
 
-            if (position % 2 == 0) {
-                holder.row.setBackgroundColor(Colors.tableRowDarkBG);
-            }
-            else {
-                holder.row.setBackgroundColor(Colors.tableRowLightBG);
-            }
-
             holder.selectionCb.setVisibility(selectionActive ? View.VISIBLE : View.GONE);
-            holder.selectionCb.setChecked(!acc.isHiddenToBe());
+            holder.selectionCb.setChecked(!acc.isHiddenByStarToBe());
 
             holder.row.setTag(R.id.POS, position);
         }
@@ -99,7 +99,7 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
         return Data.accounts.get().size() + 1;
     }
     public void startSelection() {
-        for (LedgerAccount acc : Data.accounts.get()) acc.setHiddenToBe(acc.isHidden());
+        for (LedgerAccount acc : Data.accounts.get()) acc.setHiddenByStarToBe(acc.isHiddenByStar());
         this.selectionActive = true;
         notifyDataSetChanged();
     }
@@ -116,14 +116,14 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
     public void selectItem(int position) {
         LedgerAccount acc = Data.accounts.get().get(position);
         acc.toggleHiddenToBe();
-        toggleChildrenOf(acc, acc.isHiddenToBe(), position);
+        toggleChildrenOf(acc, acc.isHiddenByStarToBe(), position);
         notifyItemChanged(position);
     }
     void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
         int i = parentPosition + 1;
         for (LedgerAccount acc : Data.accounts.get()) {
             if (acc.getName().startsWith(parent.getName() + ":")) {
-                acc.setHiddenToBe(hiddenToBe);
+                acc.setHiddenByStarToBe(hiddenToBe);
                 notifyItemChanged(i);
                 toggleChildrenOf(acc, hiddenToBe, i);
                 i++;
@@ -134,8 +134,10 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
     class LedgerRowHolder extends RecyclerView.ViewHolder {
         CheckBox selectionCb;
         TextView tvAccountName, tvAccountAmounts;
-        LinearLayout row;
+        ConstraintLayout row;
         View vTrailer;
+        FrameLayout expanderContainer;
+        ImageView expander;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
             this.row = itemView.findViewById(R.id.account_summary_row);
@@ -143,6 +145,19 @@ class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.L
             this.tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
             this.selectionCb = itemView.findViewById(R.id.account_row_check);
             this.vTrailer = itemView.findViewById(R.id.account_summary_trailer);
+            this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
+            this.expander = itemView.findViewById(R.id.account_expander);
+
+            expanderContainer.addOnLayoutChangeListener(
+                    (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+                        int w = right - left;
+                        int h = bottom - top;
+                        if (h > w) {
+                            int p = (h - w) / 2;
+                            v.setPadding(0, p, 0, p);
+                        }
+                        else v.setPadding(0, 0, 0, 0);
+                    });
         }
     }
 }

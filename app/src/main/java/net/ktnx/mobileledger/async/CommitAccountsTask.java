@@ -40,12 +40,12 @@ public class CommitAccountsTask
             try {
                 for (LedgerAccount acc : params[0].accountList) {
                     Log.d("CAT", String.format("Setting %s to %s", acc.getName(),
-                            acc.isHiddenToBe() ? "hidden" : "starred"));
+                            acc.isHiddenByStarToBe() ? "hidden" : "starred"));
                     db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
-                            new Object[]{acc.isHiddenToBe() ? 1 : 0, profile, acc.getName()});
+                            new Object[]{acc.isHiddenByStarToBe() ? 1 : 0, profile, acc.getName()});
 
-                    acc.setHidden(acc.isHiddenToBe());
-                    if (!params[0].showOnlyStarred || !acc.isHidden()) newList.add(acc);
+                    acc.setHiddenByStar(acc.isHiddenByStarToBe());
+                    if (!params[0].showOnlyStarred || !acc.isHiddenByStar()) newList.add(acc);
                 }
                 db.setTransactionSuccessful();
             }
