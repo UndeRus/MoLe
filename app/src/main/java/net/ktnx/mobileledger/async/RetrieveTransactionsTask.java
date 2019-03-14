@@ -170,9 +170,10 @@ public class RetrieveTransactionsTask
                                     L(String.format("found account: %s", acct_name));
 
                                     lastAccount = profile.tryLoadAccount(db, acct_name);
-                                    if (lastAccount == null) {
+                                    if (lastAccount == null)
                                         lastAccount = new LedgerAccount(acct_name);
-                                    }
+                                    else
+                                        lastAccount.removeAmounts();
                                     profile.storeAccount(db, lastAccount);
 
                                     // make sure the parent account(s) are present,

@@ -160,4 +160,7 @@ public class LedgerAccount {
     public void toggleExpanded() {
         expanded = !expanded;
     }
+    public void removeAmounts() {
+        amounts.clear();
+    }
 }
