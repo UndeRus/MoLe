@@ -196,6 +196,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         hookClearErrorOnFocusListener(userName, userNameLayout);
         hookClearErrorOnFocusListener(password, passwordLayout);
 
+        int profileThemeId;
         if (mProfile != null) {
             profileName.setText(mProfile.getName());
             postingPermitted.setChecked(mProfile.isPostingPermitted());
@@ -204,10 +205,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
             userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
             password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
-
-            huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(
-                    (mProfile.getThemeId() == -1) ? Colors.DEFAULT_HUE_DEG
-                                                  : mProfile.getThemeId()));
+            profileThemeId = mProfile.getThemeId();
         }
         else {
             profileName.setText("");
@@ -217,14 +215,14 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             authParams.setVisibility(View.GONE);
             userName.setText("");
             password.setText("");
-            huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
+            profileThemeId = -1;
         }
 
-        int profileThemeId = (mProfile == null) ? -1 : mProfile.getThemeId();
         final int hue = (profileThemeId == -1) ? Colors.DEFAULT_HUE_DEG : profileThemeId;
         final int profileColor = Colors.getPrimaryColorForHue(hue);
 
         huePickerView.setBackgroundColor(profileColor);
+        huePickerView.setTag(profileThemeId);
         huePickerView.setOnClickListener(v -> {
             HueRingDialog d = new HueRingDialog(
                     Objects.requireNonNull(ProfileDetailFragment.this.getContext()), hue);
