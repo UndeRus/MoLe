@@ -1,0 +1,7 @@
+ - account list is a tree with collapsible nodes
+ - account's transactions still available by tapping on amounts
+ - add support for hledger-web's JSON API for retrieving accounts and transactions
+ - better handling of HTTP errors
+ - better display of network errors
+ - some async tasks improvements
+ - add version/API level info to the crash report
