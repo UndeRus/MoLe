@@ -1,5 +1,14 @@
 # Changes
 
+## [0.8] - 2019-03-17
+ - account list is a tree with collapsible nodes
+ - account's transactions still available by tapping on amounts
+ - add support for hledger-web's JSON API for retrieving accounts and transactions
+ - better handling of HTTP errors
+ - better display of network errors
+ - some async task improvements
+ - add version/API level info to the crash report
+
 ## [0.7] - 2019-03-03
  - add crash handling dialog with optional sending of the crash to the author
  - a couple of crashes fixed
