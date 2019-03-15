@@ -556,66 +556,75 @@ public class MainActivity extends ProfileThemedActivity {
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row = (ViewGroup) view.getParent();
-        if (view.getId() == R.id.account_expander_container) {
-            Log.d("accounts", "Account expander clicked");
-            LedgerAccount acc = (LedgerAccount) row.getTag();
-            if (!acc.hasSubAccounts()) return;
+        LedgerAccount acc = (LedgerAccount) row.getTag();
+        switch (view.getId()) {
+            case R.id.account_row_acc_name:
+            case R.id.account_expander_container:
+                Log.d("accounts", "Account expander clicked");
+                if (!acc.hasSubAccounts()) return;
 
-            boolean wasExpanded = acc.isExpanded();
+                boolean wasExpanded = acc.isExpanded();
 
-            view.clearAnimation();
-            ViewPropertyAnimator animator = view.animate();
+                View arrow = row.findViewById(R.id.account_expander_container);
 
-            acc.toggleExpanded();
-            Data.profile.get().storeAccount(MLDB.getWritableDatabase(), acc);
+                arrow.clearAnimation();
+                ViewPropertyAnimator animator = arrow.animate();
 
-            if (wasExpanded) {
-                Log.d("accounts", String.format("Collapsing account '%s'", acc.getName()));
-                view.setRotation(0);
-                animator.rotationBy(180);
+                acc.toggleExpanded();
+                Data.profile.get().storeAccount(MLDB.getWritableDatabase(), acc);
 
-                // removing all child accounts from the view
-                int start = -1, count = 0;
-                int i = 0;
-                final ArrayList<LedgerAccount> accountList = Data.accounts.get();
-                for (LedgerAccount a : accountList) {
-                    if (acc.isParentOf(a)) {
-                        if (start == -1) {
-                            start = i;
+                if (wasExpanded) {
+                    Log.d("accounts", String.format("Collapsing account '%s'", acc.getName()));
+                    arrow.setRotation(0);
+                    animator.rotationBy(180);
+
+                    // removing all child accounts from the view
+                    int start = -1, count = 0;
+                    int i = 0;
+                    final ArrayList<LedgerAccount> accountList = Data.accounts.get();
+                    for (LedgerAccount a : accountList) {
+                        if (acc.isParentOf(a)) {
+                            if (start == -1) {
+                                start = i;
+                            }
+                            count++;
                         }
-                        count++;
-                    }
-                    else {
-                        if (start != -1) {
-                            break;
+                        else {
+                            if (start != -1) {
+                                break;
+                            }
                         }
-                    }
-                    i++;
-                }
-
-                if (start != -1) {
-                    for (int j = 0; j < count; j++) {
-                        Log.d("accounts", String.format("Removing item %d: %s", start + j,
-                                accountList.get(start).getName()));
-                        accountList.remove(start);
+                        i++;
                     }
 
-                    mAccountSummaryFragment.modelAdapter.notifyItemRangeRemoved(start, count);
+                    if (start != -1) {
+                        for (int j = 0; j < count; j++) {
+                            Log.d("accounts", String.format("Removing item %d: %s", start + j,
+                                    accountList.get(start).getName()));
+                            accountList.remove(start);
+                        }
+
+                        mAccountSummaryFragment.modelAdapter.notifyItemRangeRemoved(start, count);
+                    }
                 }
-            }
-            else {
-                Log.d("accounts", String.format("Expanding account '%s'", acc.getName()));
-                view.setRotation(180);
-                animator.rotationBy(-180);
-                ArrayList<LedgerAccount> accounts = Data.accounts.get();
-                List<LedgerAccount> children = Data.profile.get().loadVisibleChildAccountsOf(acc);
-                int parentPos = accounts.indexOf(acc);
-                if (parentPos == -1) throw new RuntimeException(
-                        "Can't find index of clicked account " + acc.getName());
-                accounts.addAll(parentPos + 1, children);
-                mAccountSummaryFragment.modelAdapter
-                        .notifyItemRangeInserted(parentPos + 1, children.size());
-            }
+                else {
+                    Log.d("accounts", String.format("Expanding account '%s'", acc.getName()));
+                    arrow.setRotation(180);
+                    animator.rotationBy(-180);
+                    ArrayList<LedgerAccount> accounts = Data.accounts.get();
+                    List<LedgerAccount> children =
+                            Data.profile.get().loadVisibleChildAccountsOf(acc);
+                    int parentPos = accounts.indexOf(acc);
+                    if (parentPos == -1) throw new RuntimeException(
+                            "Can't find index of clicked account " + acc.getName());
+                    accounts.addAll(parentPos + 1, children);
+                    mAccountSummaryFragment.modelAdapter
+                            .notifyItemRangeInserted(parentPos + 1, children.size());
+                }
+                break;
+            case R.id.account_row_acc_amounts:
+                showAccountTransactions(acc);
+                break;
         }
     }
 
