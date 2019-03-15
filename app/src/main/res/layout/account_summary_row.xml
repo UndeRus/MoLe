@@ -88,6 +88,7 @@
         android:gravity="center_vertical"
         android:onClick="onAccountSummaryRowViewClicked"
         android:text="123,45\n678,90"
+        android:minWidth="@dimen/thumb_row_height"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
