@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+set -u
+
+SRC="art/app-banner.svg"
+DST="metadata/en-US/images/featureGraphic.png"
+
+convert "$SRC" "$DST"
+optipng "$DST"
