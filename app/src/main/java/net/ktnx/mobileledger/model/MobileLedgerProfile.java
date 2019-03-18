@@ -304,7 +304,7 @@ public final class MobileLedgerProfile {
     @Nullable
     public LedgerAccount tryLoadAccount(String acct_name) {
         SQLiteDatabase db = MLDB.getReadableDatabase();
-        return loadAccount(acct_name);
+        return tryLoadAccount(db, acct_name);
     }
     @NonNull
     public LedgerAccount loadAccount(SQLiteDatabase db, String accName) {
