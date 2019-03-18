@@ -282,8 +282,19 @@ public final class MobileLedgerProfile {
     }
     public void removeFromDB() {
         SQLiteDatabase db = MLDB.getWritableDatabase();
-        Log.d("db", String.format("removing progile %s from DB", uuid));
-        db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
+        Log.d("db", String.format("removing profile %s from DB", uuid));
+        try {
+            db.beginTransaction();
+            db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
+            db.execSQL("delete from accounts where profile=?", new Object[]{uuid});
+            db.execSQL("delete from account_values where profile=?", new Object[]{uuid});
+            db.execSQL("delete from transactions where profile=?", new Object[]{uuid});
+            db.execSQL("delete from transaction_accounts where profile=?", new Object[]{uuid});
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
     }
     @NonNull
     public LedgerAccount loadAccount(String name) {
