@@ -29,12 +29,14 @@ import java.nio.charset.StandardCharsets;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
-    public static HttpURLConnection prepareConnection(MobileLedgerProfile profile, String path) throws IOException {
-        final String backend_url = profile.getUrl();
+    public static HttpURLConnection prepareConnection(MobileLedgerProfile profile, String path)
+            throws IOException {
+        final String url = profile.getUrl();
         final boolean use_auth = profile.isAuthEnabled();
-        Log.d("network", "Connecting to " + backend_url + "/" + path);
-        HttpURLConnection http =
-                (HttpURLConnection) new URL(backend_url + "/" + path).openConnection();
+        if (!url.endsWith("/")) url.concat("/");
+        url.concat(path);
+        Log.d("network", "Connecting to " + url);
+        HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
         if (use_auth) {
             final String auth_user = profile.getAuthUserName();
             final String auth_password = profile.getAuthPassword();
