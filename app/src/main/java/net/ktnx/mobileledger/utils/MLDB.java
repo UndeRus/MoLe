@@ -145,8 +145,7 @@ public final class MLDB {
     public static void hookAutocompletionAdapter(final Context context,
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
-                                                 final boolean profileSpecific,
-                                                 final View nextView,
+                                                 final boolean profileSpecific, final View nextView,
                                                  final DescriptionSelectedCallback callback) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
