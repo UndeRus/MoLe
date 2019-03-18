@@ -31,10 +31,10 @@ public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
     public static HttpURLConnection prepareConnection(MobileLedgerProfile profile, String path)
             throws IOException {
-        final String url = profile.getUrl();
+        String url = profile.getUrl();
         final boolean use_auth = profile.isAuthEnabled();
-        if (!url.endsWith("/")) url.concat("/");
-        url.concat(path);
+        if (!url.endsWith("/")) url += "/";
+        url += path;
         Log.d("network", "Connecting to " + url);
         HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
         if (use_auth) {
