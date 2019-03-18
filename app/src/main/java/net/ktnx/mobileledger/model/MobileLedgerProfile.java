@@ -310,7 +310,7 @@ public final class MobileLedgerProfile {
     public LedgerAccount loadAccount(SQLiteDatabase db, String accName) {
         LedgerAccount acc = tryLoadAccount(db, accName);
 
-        if (acc == null) throw new RuntimeException("Unable to load account with name "+accName);
+        if (acc == null) throw new RuntimeException("Unable to load account with name " + accName);
 
         return acc;
     }
