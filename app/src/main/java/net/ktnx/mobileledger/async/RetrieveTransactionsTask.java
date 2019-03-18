@@ -112,7 +112,7 @@ public class RetrieveTransactionsTask
         int maxTransactionId = Progress.INDETERMINATE;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
         HashMap<String, Void> accountNames = new HashMap<>();
-        LedgerAccount lastAccount = null;
+        LedgerAccount lastAccount = null, prevAccount = null;
         boolean onlyStarred = Data.optShowOnlyStarred.get();
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "journal");
@@ -169,12 +169,15 @@ public class RetrieveTransactionsTask
                                     acct_name = acct_name.replace("\"", "");
                                     L(String.format("found account: %s", acct_name));
 
+                                    prevAccount = lastAccount;
                                     lastAccount = profile.tryLoadAccount(db, acct_name);
                                     if (lastAccount == null)
                                         lastAccount = new LedgerAccount(acct_name);
                                     else lastAccount.removeAmounts();
                                     profile.storeAccount(db, lastAccount);
 
+                                    if (prevAccount != null) prevAccount
+                                            .setHasSubAccounts(prevAccount.isParentOf(lastAccount));
                                     // make sure the parent account(s) are present,
                                     // synthesising them if necessary
                                     String parentName = lastAccount.getParentName();
@@ -190,6 +193,7 @@ public class RetrieveTransactionsTask
                                             String aName = toAppend.pop();
                                             LedgerAccount acc = new LedgerAccount(aName);
                                             acc.setHiddenByStar(lastAccount.isHiddenByStar());
+                                            acc.setHasSubAccounts(true);
                                             if ((!onlyStarred || !acc.isHiddenByStar()) &&
                                                 acc.isVisible(accountList)) accountList.add(acc);
                                             L(String.format("gap-filling with %s", aName));
@@ -391,6 +395,8 @@ public class RetrieveTransactionsTask
                     AccountListParser parser = new AccountListParser(resp);
                     ArrayList<LedgerAccount> accountList = new ArrayList<>();
 
+                    LedgerAccount prevAccount = null;
+
                     while (true) {
                         throwIfCancelled();
                         ParsedLedgerAccount parsedAccount = parser.nextAccount();
@@ -407,6 +413,13 @@ public class RetrieveTransactionsTask
                         }
 
                         if (acc.isVisible(accountList)) accountList.add(acc);
+
+                        if (prevAccount != null) {
+                            prevAccount.setHasSubAccounts(
+                                    acc.getName().startsWith(prevAccount.getName() + ":"));
+                        }
+
+                        prevAccount = acc;
                     }
                     throwIfCancelled();
 
