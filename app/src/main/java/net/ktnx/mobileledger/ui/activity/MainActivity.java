@@ -166,6 +166,12 @@ public class MainActivity extends ProfileThemedActivity {
                 }
             });
         });
+        Data.profiles.addObserver((o, arg) -> {
+            findViewById(R.id.nav_profile_list).setMinimumHeight(
+                    (int) (getResources().getDimension(R.dimen.thumb_row_height) *
+                           Data.profiles.size()));
+            mProfileListAdapter.notifyDataSetChanged();
+        });
 
         ActionBarDrawerToggle toggle =
                 new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
