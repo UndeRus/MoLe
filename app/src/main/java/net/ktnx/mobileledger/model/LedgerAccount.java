@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class LedgerAccount {
     static Pattern reHigherAccount = Pattern.compile("^[^:]+:");
@@ -47,6 +48,17 @@ public class LedgerAccount {
         this.expanded = true;
         this.amounts = new ArrayList<LedgerAmount>();
         this.addAmount(amount);
+    }
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null) return false;
+
+        return obj.getClass().equals(this.getClass()) &&
+               name.equals(((LedgerAccount) obj).getName());
     }
     // an account is visible if:
     //  - it is starred (not hidden by a star)
