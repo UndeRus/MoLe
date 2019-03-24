@@ -45,9 +45,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
-import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.READ;
-import static net.ktnx.mobileledger.utils.MLDB.DatabaseMode.WRITE;
-
 public final class MLDB {
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
@@ -55,34 +52,22 @@ public final class MLDB {
     @NonNls
     public static final String OPT_PROFILE_UUID = "profile_uuid";
     private static final String NO_PROFILE = "-";
-    private static MobileLedgerDatabase helperForReading, helperForWriting;
+    private static MobileLedgerDatabase dbHelper;
     private static Application context;
     private static void checkState() {
         if (context == null)
             throw new IllegalStateException("First call init with a valid context");
     }
-    public static synchronized SQLiteDatabase getDatabase(DatabaseMode mode) {
+    public static synchronized SQLiteDatabase getDatabase() {
         checkState();
 
         SQLiteDatabase db;
 
-        if (mode == READ) {
-            if (helperForReading == null) helperForReading = new MobileLedgerDatabase(context);
-            db = helperForReading.getReadableDatabase();
-        }
-        else {
-            if (helperForWriting == null) helperForWriting = new MobileLedgerDatabase(context);
-            db = helperForWriting.getWritableDatabase();
-        }
+        if (dbHelper == null) dbHelper = new MobileLedgerDatabase(context);
+        db = dbHelper.getWritableDatabase();
 
         db.execSQL("pragma case_sensitive_like=ON;");
         return db;
-    }
-    public static SQLiteDatabase getReadableDatabase() {
-        return getDatabase(READ);
-    }
-    public static SQLiteDatabase getWritableDatabase() {
-        return getDatabase(WRITE);
     }
     static public int getIntOption(String name, int default_value) {
         String s = getOption(name, String.valueOf(default_value));
@@ -106,7 +91,7 @@ public final class MLDB {
     }
     static public String getOption(String name, String default_value) {
         Log.d("db", "about to fetch option " + name);
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = getDatabase();
         try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
                 new String[]{NO_PROFILE, name}))
         {
@@ -127,7 +112,7 @@ public final class MLDB {
     }
     static public void setOption(String name, String value) {
         Log.d("option", String.format("%s := %s", name, value));
-        SQLiteDatabase db = MLDB.getWritableDatabase();
+        SQLiteDatabase db = MLDB.getDatabase();
         db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{NO_PROFILE, name, value});
     }
@@ -182,7 +167,7 @@ public final class MLDB {
                 params = new String[]{str, str, str, str};
             }
             Log.d("autocompletion", sql);
-            SQLiteDatabase db = MLDB.getReadableDatabase();
+            SQLiteDatabase db = MLDB.getDatabase();
 
             try (Cursor matches = db.rawQuery(sql, params)) {
                 int i = 0;
@@ -215,13 +200,11 @@ public final class MLDB {
         MLDB.context = context;
     }
     public static void done() {
-        if (helperForReading != null) helperForReading.close();
-
-        if ((helperForWriting != helperForReading) && (helperForWriting != null))
-            helperForWriting.close();
+        if (dbHelper != null) {
+            Log.d("db", "Closing DB helper");
+            dbHelper.close();
+        }
     }
-
-    public enum DatabaseMode {READ, WRITE}
 }
 
 class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {

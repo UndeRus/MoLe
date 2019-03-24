@@ -35,7 +35,7 @@ public class CommitAccountsTask
         String profile = Data.profile.get().getUuid();
         try {
 
-            SQLiteDatabase db = MLDB.getWritableDatabase();
+            SQLiteDatabase db = MLDB.getDatabase();
             db.beginTransaction();
             try {
                 for (LedgerAccount acc : params[0].accountList) {

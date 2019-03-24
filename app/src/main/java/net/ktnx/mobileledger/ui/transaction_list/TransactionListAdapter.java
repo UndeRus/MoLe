@@ -144,7 +144,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             LedgerTransaction tr = p[0].transaction;
             boolean odd = p[0].odd;
 
-            SQLiteDatabase db = MLDB.getReadableDatabase();
+            SQLiteDatabase db = MLDB.getDatabase();
             tr.loadData(db);
 
             publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, odd));

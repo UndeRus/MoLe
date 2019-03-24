@@ -483,7 +483,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         Log.d("descr selected", description);
         if (!inputStateIsInitial()) return;
 
-        try (Cursor c = MLDB.getReadableDatabase().rawQuery(
+        try (Cursor c = MLDB.getDatabase().rawQuery(
                 "select profile, id from transactions where description=? order by date desc " +
                 "limit 1", new String[]{description}))
         {

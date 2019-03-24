@@ -124,7 +124,7 @@ public class RetrieveTransactionsTask
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
-        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
+        try (SQLiteDatabase db = MLDB.getDatabase()) {
             try (InputStream resp = http.getInputStream()) {
                 if (http.getResponseCode() != 200)
                     throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
@@ -383,54 +383,53 @@ public class RetrieveTransactionsTask
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
         publishProgress(progress);
-        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
-            try (InputStream resp = http.getInputStream()) {
-                if (http.getResponseCode() != 200)
-                    throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
+        SQLiteDatabase db = MLDB.getDatabase();
+        try (InputStream resp = http.getInputStream()) {
+            if (http.getResponseCode() != 200)
+                throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
 
-                db.beginTransaction();
-                try {
-                    profile.markAccountsAsNotPresent(db);
+            db.beginTransaction();
+            try {
+                profile.markAccountsAsNotPresent(db);
 
-                    AccountListParser parser = new AccountListParser(resp);
-                    ArrayList<LedgerAccount> accountList = new ArrayList<>();
+                AccountListParser parser = new AccountListParser(resp);
+                ArrayList<LedgerAccount> accountList = new ArrayList<>();
 
-                    LedgerAccount prevAccount = null;
+                LedgerAccount prevAccount = null;
 
-                    while (true) {
-                        throwIfCancelled();
-                        ParsedLedgerAccount parsedAccount = parser.nextAccount();
-                        if (parsedAccount == null) break;
+                while (true) {
+                    throwIfCancelled();
+                    ParsedLedgerAccount parsedAccount = parser.nextAccount();
+                    if (parsedAccount == null) break;
 
-                        LedgerAccount acc = profile.tryLoadAccount(db, parsedAccount.getAname());
-                        if (acc == null) acc = new LedgerAccount(parsedAccount.getAname());
-                        else acc.removeAmounts();
+                    LedgerAccount acc = profile.tryLoadAccount(db, parsedAccount.getAname());
+                    if (acc == null) acc = new LedgerAccount(parsedAccount.getAname());
+                    else acc.removeAmounts();
 
-                        profile.storeAccount(db, acc);
-                        for (ParsedBalance b : parsedAccount.getAebalance()) {
-                            profile.storeAccountValue(db, acc.getName(), b.getAcommodity(),
-                                    b.getAquantity().asFloat());
-                        }
-
-                        if (acc.isVisible(accountList)) accountList.add(acc);
-
-                        if (prevAccount != null) {
-                            prevAccount.setHasSubAccounts(
-                                    acc.getName().startsWith(prevAccount.getName() + ":"));
-                        }
-
-                        prevAccount = acc;
+                    profile.storeAccount(db, acc);
+                    for (ParsedBalance b : parsedAccount.getAebalance()) {
+                        profile.storeAccountValue(db, acc.getName(), b.getAcommodity(),
+                                b.getAquantity().asFloat());
                     }
-                    throwIfCancelled();
 
-                    profile.deleteNotPresentAccounts(db);
-                    throwIfCancelled();
-                    db.setTransactionSuccessful();
-                    Data.accounts.set(accountList);
+                    if (acc.isVisible(accountList)) accountList.add(acc);
+
+                    if (prevAccount != null) {
+                        prevAccount.setHasSubAccounts(
+                                acc.getName().startsWith(prevAccount.getName() + ":"));
+                    }
+
+                    prevAccount = acc;
                 }
-                finally {
-                    db.endTransaction();
-                }
+                throwIfCancelled();
+
+                profile.deleteNotPresentAccounts(db);
+                throwIfCancelled();
+                db.setTransactionSuccessful();
+                Data.accounts.set(accountList);
+            }
+            finally {
+                db.endTransaction();
             }
         }
 
@@ -452,7 +451,7 @@ public class RetrieveTransactionsTask
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
-        try (SQLiteDatabase db = MLDB.getWritableDatabase()) {
+        try (SQLiteDatabase db = MLDB.getDatabase()) {
             try (InputStream resp = http.getInputStream()) {
                 if (http.getResponseCode() != 200)
                     throw new IOException(String.format("HTTP error %d", http.getResponseCode()));

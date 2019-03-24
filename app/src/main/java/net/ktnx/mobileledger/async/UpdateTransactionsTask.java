@@ -62,7 +62,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             }
 
             Log.d("UTT", sql);
-            SQLiteDatabase db = MLDB.getReadableDatabase();
+            SQLiteDatabase db = MLDB.getDatabase();
             String lastDateString = Globals.formatLedgerDate(new Date());
             Date lastDate = Globals.parseLedgerDate(lastDateString);
             boolean odd = true;

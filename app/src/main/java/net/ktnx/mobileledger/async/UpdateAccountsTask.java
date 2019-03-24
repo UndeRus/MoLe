@@ -42,7 +42,7 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
             if (onlyStarred) sql += " AND a.hidden = 0";
             sql += " ORDER BY a.name";
 
-            SQLiteDatabase db = MLDB.getReadableDatabase();
+            SQLiteDatabase db = MLDB.getDatabase();
             try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
                 while (cursor.moveToNext()) {
                     final String accName = cursor.getString(0);

@@ -34,7 +34,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
         Map<String, Boolean> unique = new HashMap<>();
 
         Log.d("descriptions", "Starting refresh");
-        SQLiteDatabase db = MLDB.getWritableDatabase();
+        SQLiteDatabase db = MLDB.getDatabase();
 
         Data.backgroundTaskCount.incrementAndGet();
         try {
