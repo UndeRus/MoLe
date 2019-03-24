@@ -49,8 +49,6 @@ public class HueRingDialog extends Dialog {
             dismiss();
         });
 
-        findViewById(R.id.btn_cancel).setOnClickListener(v -> dismiss());
-
         findViewById(R.id.btn_default)
                 .setOnClickListener(v -> hueRing.setHue(Colors.DEFAULT_HUE_DEG));
     }
