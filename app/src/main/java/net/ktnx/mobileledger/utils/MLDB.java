@@ -58,12 +58,11 @@ public final class MLDB {
         if (context == null)
             throw new IllegalStateException("First call init with a valid context");
     }
-    public static synchronized SQLiteDatabase getDatabase() {
+    public static SQLiteDatabase getDatabase() {
         checkState();
 
         SQLiteDatabase db;
 
-        if (dbHelper == null) dbHelper = new MobileLedgerDatabase(context);
         db = dbHelper.getWritableDatabase();
 
         db.execSQL("pragma case_sensitive_like=ON;");
@@ -196,13 +195,16 @@ public final class MLDB {
             });
         }
     }
-    public static void init(Application context) {
+    public static synchronized void init(Application context) {
         MLDB.context = context;
+        if (dbHelper != null) throw new IllegalStateException("It appears init() was already called");
+        dbHelper = new MobileLedgerDatabase(context);
     }
-    public static void done() {
+    public static synchronized void done() {
         if (dbHelper != null) {
             Log.d("db", "Closing DB helper");
             dbHelper.close();
+            dbHelper = null;
         }
     }
 }
