@@ -159,7 +159,13 @@ public class RetrieveTransactionsTask
                                 if (line.equals("<h2>General Journal</h2>")) {
                                     state = ParserState.EXPECTING_TRANSACTION;
                                     L("→ expecting transaction");
+                                    // commit the current transaction and start a new one
+                                    // the account list in the UI should reflect the (committed)
+                                    // state of the database
+                                    db.setTransactionSuccessful();
+                                    db.endTransaction();
                                     Data.accounts.set(accountList);
+                                    db.beginTransaction();
                                     continue;
                                 }
                                 m = reAccountName.matcher(line);
