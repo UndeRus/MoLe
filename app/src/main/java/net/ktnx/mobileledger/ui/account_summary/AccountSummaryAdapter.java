@@ -31,6 +31,7 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.utils.LockHolder;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -45,41 +46,43 @@ public class AccountSummaryAdapter
     }
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
-        if (position < Data.accounts.size()) {
-            LedgerAccount acc = Data.accounts.get(position);
-            Context ctx = holder.row.getContext();
-            Resources rm = ctx.getResources();
+        try (LockHolder lh = Data.accounts.lockForReading()) {
+            if (position < Data.accounts.size()) {
+                LedgerAccount acc = Data.accounts.get(position);
+                Context ctx = holder.row.getContext();
+                Resources rm = ctx.getResources();
 
-            holder.row.setTag(acc);
-            holder.row.setVisibility(View.VISIBLE);
-            holder.vTrailer.setVisibility(View.GONE);
-            holder.tvAccountName.setText(acc.getShortName());
-            ConstraintLayout.LayoutParams lp =
-                    (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
-            lp.setMarginStart(
-                    acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 2);
-            holder.expanderContainer
-                    .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.INVISIBLE);
-            holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
-            holder.tvAccountAmounts.setText(acc.getAmountsString());
+                holder.row.setTag(acc);
+                holder.row.setVisibility(View.VISIBLE);
+                holder.vTrailer.setVisibility(View.GONE);
+                holder.tvAccountName.setText(acc.getShortName());
+                ConstraintLayout.LayoutParams lp =
+                        (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
+                lp.setMarginStart(
+                        acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 2);
+                holder.expanderContainer
+                        .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.INVISIBLE);
+                holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
+                holder.tvAccountAmounts.setText(acc.getAmountsString());
 
-            if (acc.isHiddenByStar()) {
-                holder.tvAccountName.setTypeface(null, Typeface.ITALIC);
-                holder.tvAccountAmounts.setTypeface(null, Typeface.ITALIC);
+                if (acc.isHiddenByStar()) {
+                    holder.tvAccountName.setTypeface(null, Typeface.ITALIC);
+                    holder.tvAccountAmounts.setTypeface(null, Typeface.ITALIC);
+                }
+                else {
+                    holder.tvAccountName.setTypeface(null, Typeface.NORMAL);
+                    holder.tvAccountAmounts.setTypeface(null, Typeface.NORMAL);
+                }
+
+                holder.selectionCb.setVisibility(selectionActive ? View.VISIBLE : View.GONE);
+                holder.selectionCb.setChecked(!acc.isHiddenByStarToBe());
+
+                holder.row.setTag(R.id.POS, position);
             }
             else {
-                holder.tvAccountName.setTypeface(null, Typeface.NORMAL);
-                holder.tvAccountAmounts.setTypeface(null, Typeface.NORMAL);
+                holder.vTrailer.setVisibility(View.VISIBLE);
+                holder.row.setVisibility(View.GONE);
             }
-
-            holder.selectionCb.setVisibility(selectionActive ? View.VISIBLE : View.GONE);
-            holder.selectionCb.setChecked(!acc.isHiddenByStarToBe());
-
-            holder.row.setTag(R.id.POS, position);
-        }
-        else {
-            holder.vTrailer.setVisibility(View.VISIBLE);
-            holder.row.setVisibility(View.GONE);
         }
     }
 
@@ -96,12 +99,15 @@ public class AccountSummaryAdapter
         return Data.accounts.size() + 1;
     }
     public void startSelection() {
-        for (int i = 0; i < Data.accounts.size(); i++ ) {
-            LedgerAccount acc = Data.accounts.get(i);
-            acc.setHiddenByStarToBe(acc.isHiddenByStar());
+        try (LockHolder lh = Data.accounts.lockForWriting()) {
+            for (int i = 0; i < Data.accounts.size(); i++) {
+                LedgerAccount acc = Data.accounts.get(i);
+                acc.setHiddenByStarToBe(acc.isHiddenByStar());
+            }
+            this.selectionActive = true;
+            lh.downgrade();
+            notifyDataSetChanged();
         }
-        this.selectionActive = true;
-        notifyDataSetChanged();
     }
 
     public void stopSelection() {
@@ -114,20 +120,24 @@ public class AccountSummaryAdapter
     }
 
     public void selectItem(int position) {
-        LedgerAccount acc = Data.accounts.get(position);
-        acc.toggleHiddenToBe();
-        toggleChildrenOf(acc, acc.isHiddenByStarToBe(), position);
-        notifyItemChanged(position);
+        try (LockHolder lh = Data.accounts.lockForWriting()) {
+            LedgerAccount acc = Data.accounts.get(position);
+            acc.toggleHiddenToBe();
+            toggleChildrenOf(acc, acc.isHiddenByStarToBe(), position);
+            notifyItemChanged(position);
+        }
     }
     void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
         int i = parentPosition + 1;
-        for (int j = 0; j < Data.accounts.size(); j++) {
-            LedgerAccount acc = Data.accounts.get(j);
-            if (acc.getName().startsWith(parent.getName() + ":")) {
-                acc.setHiddenByStarToBe(hiddenToBe);
-                notifyItemChanged(i);
-                toggleChildrenOf(acc, hiddenToBe, i);
-                i++;
+        try (LockHolder lh = Data.accounts.lockForWriting()) {
+            for (int j = 0; j < Data.accounts.size(); j++) {
+                LedgerAccount acc = Data.accounts.get(j);
+                if (acc.getName().startsWith(parent.getName() + ":")) {
+                    acc.setHiddenByStarToBe(hiddenToBe);
+                    notifyItemChanged(i);
+                    toggleChildrenOf(acc, hiddenToBe, i);
+                    i++;
+                }
             }
         }
     }

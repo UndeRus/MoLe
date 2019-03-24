@@ -56,12 +56,12 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -492,20 +492,22 @@ public class NewTransactionActivity extends ProfileThemedActivity
             String profileUUID = c.getString(0);
             int transactionId = c.getInt(1);
             LedgerTransaction tr;
+            try(LockHolder lh = Data.profiles.lockForReading()) {
                 MobileLedgerProfile profile = null;
                 for (int i = 0; i < Data.profiles.size(); i++) {
                     MobileLedgerProfile p = Data.profiles.get(i);
                     if (p.getUuid().equals(profileUUID)) {
                         profile = p;
                         break;
+                    }
                 }
-            }
                 if (profile == null) throw new RuntimeException(String.format(
                         "Unable to find profile %s, which is supposed to contain " +
                         "transaction %d with description %s", profileUUID, transactionId,
                         description));
 
                 tr = profile.loadTransaction(transactionId);
+            }
             int i = 0;
             table = findViewById(R.id.new_transaction_accounts_table);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();

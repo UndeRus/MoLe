@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.model;
 
+import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableAtomicInteger;
 import net.ktnx.mobileledger.utils.ObservableList;
@@ -41,12 +42,13 @@ public final class Data {
         profile.set(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
+        try(LockHolder lh = profiles.lockForReading()) {
             for (int i = 0; i < profiles.size(); i++) {
                 MobileLedgerProfile p = profiles.get(i);
                 if (p.equals(profile)) return i;
+            }
 
+            return -1;
         }
-
-        return -1;
     }
 }

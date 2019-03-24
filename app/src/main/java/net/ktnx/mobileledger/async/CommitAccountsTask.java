@@ -23,6 +23,7 @@ import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class CommitAccountsTask
             SQLiteDatabase db = MLDB.getDatabase();
             db.beginTransaction();
             try {
+                try (LockHolder lh = params[0].accountList.lockForWriting()) {
                     for (int i = 0; i < params[0].accountList.size(); i++ ){
                         LedgerAccount acc = params[0].accountList.get(i);
                         Log.d("CAT", String.format("Setting %s to %s", acc.getName(),
@@ -48,6 +50,7 @@ public class CommitAccountsTask
 
                         acc.setHiddenByStar(acc.isHiddenByStarToBe());
                         if (!params[0].showOnlyStarred || !acc.isHiddenByStar()) newList.add(acc);
+                    }
                     db.setTransactionSuccessful();
                 }
             }

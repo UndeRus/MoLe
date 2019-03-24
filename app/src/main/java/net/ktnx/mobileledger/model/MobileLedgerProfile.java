@@ -21,7 +21,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
@@ -101,12 +103,14 @@ public final class MobileLedgerProfile {
         db.beginTransaction();
         try {
             int orderNo = 0;
+            try (LockHolder lh = Data.profiles.lockForReading()) {
                 for (int i = 0; i < Data.profiles.size(); i++) {
                     MobileLedgerProfile p = Data.profiles.get(i);
                     db.execSQL("update profiles set order_no=? where uuid=?",
                             new Object[]{orderNo, p.getUuid()});
                     p.orderNo = orderNo;
                     orderNo++;
+                }
             }
             db.setTransactionSuccessful();
         }
@@ -126,20 +130,20 @@ public final class MobileLedgerProfile {
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
     public void setName(CharSequence text) {
         setName(String.valueOf(text));
+    }
+    public void setName(String name) {
+        this.name = name;
     }
     public String getUrl() {
         return url;
     }
-    public void setUrl(String url) {
-        this.url = url;
-    }
     public void setUrl(CharSequence text) {
         setUrl(String.valueOf(text));
+    }
+    public void setUrl(String url) {
+        this.url = url;
     }
     public boolean isAuthEnabled() {
         return authEnabled;
@@ -150,20 +154,20 @@ public final class MobileLedgerProfile {
     public String getAuthUserName() {
         return authUserName;
     }
-    public void setAuthUserName(String authUserName) {
-        this.authUserName = authUserName;
-    }
     public void setAuthUserName(CharSequence text) {
         setAuthUserName(String.valueOf(text));
+    }
+    public void setAuthUserName(String authUserName) {
+        this.authUserName = authUserName;
     }
     public String getAuthPassword() {
         return authPassword;
     }
-    public void setAuthPassword(String authPassword) {
-        this.authPassword = authPassword;
-    }
     public void setAuthPassword(CharSequence text) {
         setAuthPassword(String.valueOf(text));
+    }
+    public void setAuthPassword(String authPassword) {
+        this.authPassword = authPassword;
     }
     public void storeInDB() {
         SQLiteDatabase db = MLDB.getDatabase();
@@ -274,8 +278,7 @@ public final class MobileLedgerProfile {
     }
     public void setOption(String name, String value) {
         Log.d("profile", String.format("setting option %s=%s", name, value));
-        SQLiteDatabase db = MLDB.getDatabase();
-        db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
+        DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{uuid, name, value});
     }
     public void setLongOption(String name, long value) {
@@ -352,12 +355,12 @@ public final class MobileLedgerProfile {
 //        Log.d("profile", String.format("Profile.getThemeId() returning %d", themeId));
         return this.themeId;
     }
+    public void setThemeId(Object o) {
+        setThemeId(Integer.valueOf(String.valueOf(o)).intValue());
+    }
     public void setThemeId(int themeId) {
 //        Log.d("profile", String.format("Profile.setThemeId(%d) called", themeId));
         this.themeId = themeId;
-    }
-    public void setThemeId(Object o) {
-        setThemeId(Integer.valueOf(String.valueOf(o)).intValue());
     }
     public void markTransactionsAsNotPresent(SQLiteDatabase db) {
         db.execSQL("UPDATE transactions set keep=0 where profile=?", new String[]{uuid});

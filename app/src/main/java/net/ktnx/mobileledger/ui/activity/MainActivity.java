@@ -50,6 +50,7 @@ import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
@@ -588,6 +589,7 @@ public class MainActivity extends ProfileThemedActivity {
 
                     // removing all child accounts from the view
                     int start = -1, count = 0;
+                    try (LockHolder lh = Data.accounts.lockForWriting()) {
                         for (int i = 0; i < Data.accounts.size(); i++) {
                             if (acc.isParentOf(Data.accounts.get(i))) {
 //                                Log.d("accounts", String.format("Found a child '%s' at position %d",
@@ -616,6 +618,7 @@ public class MainActivity extends ProfileThemedActivity {
 
                             mAccountSummaryFragment.modelAdapter
                                     .notifyItemRangeRemoved(start, count);
+                        }
                     }
                 }
                 else {
@@ -624,6 +627,7 @@ public class MainActivity extends ProfileThemedActivity {
                     animator.rotationBy(-180);
                     List<LedgerAccount> children =
                             Data.profile.get().loadVisibleChildAccountsOf(acc);
+                    try (LockHolder lh = Data.accounts.lockForWriting()) {
                         int parentPos = Data.accounts.indexOf(acc);
                         if (parentPos != -1) {
                             // may have disappeared in a concurrent refresh operation
@@ -631,6 +635,7 @@ public class MainActivity extends ProfileThemedActivity {
                             mAccountSummaryFragment.modelAdapter
                                     .notifyItemRangeInserted(parentPos + 1, children.size());
                         }
+                    }
                 }
                 break;
             case R.id.account_row_acc_amounts:
