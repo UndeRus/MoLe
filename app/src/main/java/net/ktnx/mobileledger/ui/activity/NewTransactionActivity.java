@@ -491,20 +491,21 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
             String profileUUID = c.getString(0);
             int transactionId = c.getInt(1);
-            List<MobileLedgerProfile> profiles = Data.profiles.getList();
-            MobileLedgerProfile profile = null;
-            for (int i = 0; i < profiles.size(); i++) {
-                MobileLedgerProfile p = profiles.get(i);
-                if (p.getUuid().equals(profileUUID)) {
-                    profile = p;
-                    break;
+            LedgerTransaction tr;
+                MobileLedgerProfile profile = null;
+                for (int i = 0; i < Data.profiles.size(); i++) {
+                    MobileLedgerProfile p = Data.profiles.get(i);
+                    if (p.getUuid().equals(profileUUID)) {
+                        profile = p;
+                        break;
                 }
             }
-            if (profile == null) throw new RuntimeException(String.format(
-                    "Unable to find profile %s, which is supposed to contain " +
-                    "transaction %d with description %s", profileUUID, transactionId, description));
+                if (profile == null) throw new RuntimeException(String.format(
+                        "Unable to find profile %s, which is supposed to contain " +
+                        "transaction %d with description %s", profileUUID, transactionId,
+                        description));
 
-            LedgerTransaction tr = profile.loadTransaction(transactionId);
+                tr = profile.loadTransaction(transactionId);
             int i = 0;
             table = findViewById(R.id.new_transaction_accounts_table);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();

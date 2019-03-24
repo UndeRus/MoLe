@@ -54,7 +54,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Observable;
@@ -324,7 +323,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
 
-        if (Data.profiles.getList().isEmpty()) {
+        if (Data.profiles.isEmpty()) {
             findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
             findViewById(R.id.pager_layout).setVisibility(View.GONE);
             return;
@@ -589,46 +588,49 @@ public class MainActivity extends ProfileThemedActivity {
 
                     // removing all child accounts from the view
                     int start = -1, count = 0;
-                    int i = 0;
-                    final ArrayList<LedgerAccount> accountList = Data.accounts.get();
-                    for (LedgerAccount a : accountList) {
-                        if (acc.isParentOf(a)) {
-                            if (start == -1) {
-                                start = i;
+                        for (int i = 0; i < Data.accounts.size(); i++) {
+                            if (acc.isParentOf(Data.accounts.get(i))) {
+//                                Log.d("accounts", String.format("Found a child '%s' at position %d",
+//                                        Data.accounts.get(i).getName(), i));
+                                if (start == -1) {
+                                    start = i;
+                                }
+                                count++;
                             }
-                            count++;
-                        }
-                        else {
-                            if (start != -1) {
-                                break;
+                            else {
+                                if (start != -1) {
+//                                    Log.d("accounts",
+//                                            String.format("Found a non-child '%s' at position %d",
+//                                                    Data.accounts.get(i).getName(), i));
+                                    break;
+                                }
                             }
-                        }
-                        i++;
-                    }
-
-                    if (start != -1) {
-                        for (int j = 0; j < count; j++) {
-                            Log.d("accounts", String.format("Removing item %d: %s", start + j,
-                                    accountList.get(start).getName()));
-                            accountList.remove(start);
                         }
 
-                        mAccountSummaryFragment.modelAdapter.notifyItemRangeRemoved(start, count);
+                        if (start != -1) {
+                            for (int j = 0; j < count; j++) {
+//                                Log.d("accounts", String.format("Removing item %d: %s", start + j,
+//                                        Data.accounts.get(start).getName()));
+                                Data.accounts.removeQuietly(start);
+                            }
+
+                            mAccountSummaryFragment.modelAdapter
+                                    .notifyItemRangeRemoved(start, count);
                     }
                 }
                 else {
                     Log.d("accounts", String.format("Expanding account '%s'", acc.getName()));
                     arrow.setRotation(180);
                     animator.rotationBy(-180);
-                    ArrayList<LedgerAccount> accounts = Data.accounts.get();
                     List<LedgerAccount> children =
                             Data.profile.get().loadVisibleChildAccountsOf(acc);
-                    int parentPos = accounts.indexOf(acc);
-                    if (parentPos == -1) throw new RuntimeException(
-                            "Can't find index of clicked account " + acc.getName());
-                    accounts.addAll(parentPos + 1, children);
-                    mAccountSummaryFragment.modelAdapter
-                            .notifyItemRangeInserted(parentPos + 1, children.size());
+                        int parentPos = Data.accounts.indexOf(acc);
+                        if (parentPos != -1) {
+                            // may have disappeared in a concurrent refresh operation
+                            Data.accounts.addAllQuietly(parentPos + 1, children);
+                            mAccountSummaryFragment.modelAdapter
+                                    .notifyItemRangeInserted(parentPos + 1, children.size());
+                        }
                 }
                 break;
             case R.id.account_row_acc_amounts:

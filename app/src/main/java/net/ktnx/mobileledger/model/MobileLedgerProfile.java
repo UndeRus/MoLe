@@ -101,11 +101,12 @@ public final class MobileLedgerProfile {
         db.beginTransaction();
         try {
             int orderNo = 0;
-            for (MobileLedgerProfile p : Data.profiles.getList()) {
-                db.execSQL("update profiles set order_no=? where uuid=?",
-                        new Object[]{orderNo, p.getUuid()});
-                p.orderNo = orderNo;
-                orderNo++;
+                for (int i = 0; i < Data.profiles.size(); i++) {
+                    MobileLedgerProfile p = Data.profiles.get(i);
+                    db.execSQL("update profiles set order_no=? where uuid=?",
+                            new Object[]{orderNo, p.getUuid()});
+                    p.orderNo = orderNo;
+                    orderNo++;
             }
             db.setTransactionSuccessful();
         }

@@ -38,16 +38,18 @@ public class CommitAccountsTask
             SQLiteDatabase db = MLDB.getDatabase();
             db.beginTransaction();
             try {
-                for (LedgerAccount acc : params[0].accountList) {
-                    Log.d("CAT", String.format("Setting %s to %s", acc.getName(),
-                            acc.isHiddenByStarToBe() ? "hidden" : "starred"));
-                    db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
-                            new Object[]{acc.isHiddenByStarToBe() ? 1 : 0, profile, acc.getName()});
+                    for (int i = 0; i < params[0].accountList.size(); i++ ){
+                        LedgerAccount acc = params[0].accountList.get(i);
+                        Log.d("CAT", String.format("Setting %s to %s", acc.getName(),
+                                acc.isHiddenByStarToBe() ? "hidden" : "starred"));
+                        db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
+                                new Object[]{acc.isHiddenByStarToBe() ? 1 : 0, profile, acc.getName()
+                                });
 
-                    acc.setHiddenByStar(acc.isHiddenByStarToBe());
-                    if (!params[0].showOnlyStarred || !acc.isHiddenByStar()) newList.add(acc);
+                        acc.setHiddenByStar(acc.isHiddenByStarToBe());
+                        if (!params[0].showOnlyStarred || !acc.isHiddenByStar()) newList.add(acc);
+                    db.setTransactionSuccessful();
                 }
-                db.setTransactionSuccessful();
             }
             finally {
                 db.endTransaction();

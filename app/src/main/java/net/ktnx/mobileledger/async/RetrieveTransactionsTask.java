@@ -164,7 +164,7 @@ public class RetrieveTransactionsTask
                                     // state of the database
                                     db.setTransactionSuccessful();
                                     db.endTransaction();
-                                    Data.accounts.set(accountList);
+                                    Data.accounts.setList(accountList);
                                     db.beginTransaction();
                                     continue;
                                 }
@@ -390,6 +390,8 @@ public class RetrieveTransactionsTask
         }
         publishProgress(progress);
         SQLiteDatabase db = MLDB.getDatabase();
+        ArrayList<LedgerAccount> accountList = new ArrayList<>();
+        boolean listFilledOK = false;
         try (InputStream resp = http.getInputStream()) {
             if (http.getResponseCode() != 200)
                 throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
@@ -399,7 +401,6 @@ public class RetrieveTransactionsTask
                 profile.markAccountsAsNotPresent(db);
 
                 AccountListParser parser = new AccountListParser(resp);
-                ArrayList<LedgerAccount> accountList = new ArrayList<>();
 
                 LedgerAccount prevAccount = null;
 
@@ -432,12 +433,16 @@ public class RetrieveTransactionsTask
                 profile.deleteNotPresentAccounts(db);
                 throwIfCancelled();
                 db.setTransactionSuccessful();
-                Data.accounts.set(accountList);
+                listFilledOK = true;
             }
             finally {
                 db.endTransaction();
             }
         }
+        // should not be set in the DB transaction, because of a possible deadlock
+        // with the main and DbOpQueueRunner threads
+        if (listFilledOK) Data.accounts.setList(accountList);
+
         return true;
     }
     private boolean retrieveTransactionList(MobileLedgerProfile profile)
@@ -456,62 +461,61 @@ public class RetrieveTransactionsTask
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
-        try (SQLiteDatabase db = MLDB.getDatabase()) {
-            try (InputStream resp = http.getInputStream()) {
-                if (http.getResponseCode() != 200)
-                    throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
-                throwIfCancelled();
-                db.beginTransaction();
-                try {
-                    profile.markTransactionsAsNotPresent(db);
+        SQLiteDatabase db = MLDB.getDatabase();
+        try (InputStream resp = http.getInputStream()) {
+            if (http.getResponseCode() != 200)
+                throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
+            throwIfCancelled();
+            db.beginTransaction();
+            try {
+                profile.markTransactionsAsNotPresent(db);
 
-                    int matchedTransactionsCount = 0;
-                    TransactionListParser parser = new TransactionListParser(resp);
+                int matchedTransactionsCount = 0;
+                TransactionListParser parser = new TransactionListParser(resp);
 
-                    int processedTransactionCount = 0;
+                int processedTransactionCount = 0;
 
-                    while (true) {
-                        throwIfCancelled();
-                        ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
-                        throwIfCancelled();
-                        if (parsedTransaction == null) break;
-                        LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
-                        if (transaction.existsInDb(db)) {
-                            profile.markTransactionAsPresent(db, transaction);
-                            matchedTransactionsCount++;
+                while (true) {
+                    throwIfCancelled();
+                    ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
+                    throwIfCancelled();
+                    if (parsedTransaction == null) break;
+                    LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
+                    if (transaction.existsInDb(db)) {
+                        profile.markTransactionAsPresent(db, transaction);
+                        matchedTransactionsCount++;
 
-                            if (matchedTransactionsCount == MATCHING_TRANSACTIONS_LIMIT) {
-                                profile.markTransactionsBeforeTransactionAsPresent(db, transaction);
-                                progress.setTotal(progress.getProgress());
-                                publishProgress(progress);
-                                db.setTransactionSuccessful();
-                                profile.setLastUpdateStamp();
-                                return true;
-                            }
+                        if (matchedTransactionsCount == MATCHING_TRANSACTIONS_LIMIT) {
+                            profile.markTransactionsBeforeTransactionAsPresent(db, transaction);
+                            progress.setTotal(progress.getProgress());
+                            publishProgress(progress);
+                            db.setTransactionSuccessful();
+                            profile.setLastUpdateStamp();
+                            return true;
                         }
-                        else {
-                            profile.storeTransaction(db, transaction);
-                            matchedTransactionsCount = 0;
-                            progress.setTotal(maxTransactionId);
-                        }
-
-                        if ((progress.getTotal() == Progress.INDETERMINATE) ||
-                            (progress.getTotal() < transaction.getId()))
-                            progress.setTotal(transaction.getId());
-
-                        progress.setProgress(++processedTransactionCount);
-                        publishProgress(progress);
+                    }
+                    else {
+                        profile.storeTransaction(db, transaction);
+                        matchedTransactionsCount = 0;
+                        progress.setTotal(maxTransactionId);
                     }
 
-                    throwIfCancelled();
-                    profile.deleteNotPresentTransactions(db);
-                    throwIfCancelled();
-                    db.setTransactionSuccessful();
-                    profile.setLastUpdateStamp();
+                    if ((progress.getTotal() == Progress.INDETERMINATE) ||
+                        (progress.getTotal() < transaction.getId()))
+                        progress.setTotal(transaction.getId());
+
+                    progress.setProgress(++processedTransactionCount);
+                    publishProgress(progress);
                 }
-                finally {
-                    db.endTransaction();
-                }
+
+                throwIfCancelled();
+                profile.deleteNotPresentTransactions(db);
+                throwIfCancelled();
+                db.setTransactionSuccessful();
+                profile.setLastUpdateStamp();
+            }
+            finally {
+                db.endTransaction();
             }
         }
 

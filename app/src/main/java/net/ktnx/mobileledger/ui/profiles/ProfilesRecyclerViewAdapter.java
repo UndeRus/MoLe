@@ -74,7 +74,7 @@ public class ProfilesRecyclerViewAdapter
             public boolean onMove(@NonNull RecyclerView recyclerView,
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
-                Collections.swap(Data.profiles.getList(), viewHolder.getAdapterPosition(),
+                Collections.swap(Data.profiles, viewHolder.getAdapterPosition(),
                         target.getAdapterPosition());
                 MobileLedgerProfile.storeProfilesOrder();
                 notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());

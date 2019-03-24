@@ -32,8 +32,6 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,9 +45,8 @@ public class AccountSummaryAdapter
     }
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
-        List<LedgerAccount> accounts = Data.accounts.get();
-        if (position < accounts.size()) {
-            LedgerAccount acc = accounts.get(position);
+        if (position < Data.accounts.size()) {
+            LedgerAccount acc = Data.accounts.get(position);
             Context ctx = holder.row.getContext();
             Resources rm = ctx.getResources();
 
@@ -96,10 +93,13 @@ public class AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return Data.accounts.get().size() + 1;
+        return Data.accounts.size() + 1;
     }
     public void startSelection() {
-        for (LedgerAccount acc : Data.accounts.get()) acc.setHiddenByStarToBe(acc.isHiddenByStar());
+        for (int i = 0; i < Data.accounts.size(); i++ ) {
+            LedgerAccount acc = Data.accounts.get(i);
+            acc.setHiddenByStarToBe(acc.isHiddenByStar());
+        }
         this.selectionActive = true;
         notifyDataSetChanged();
     }
@@ -114,14 +114,15 @@ public class AccountSummaryAdapter
     }
 
     public void selectItem(int position) {
-        LedgerAccount acc = Data.accounts.get().get(position);
+        LedgerAccount acc = Data.accounts.get(position);
         acc.toggleHiddenToBe();
         toggleChildrenOf(acc, acc.isHiddenByStarToBe(), position);
         notifyItemChanged(position);
     }
     void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
         int i = parentPosition + 1;
-        for (LedgerAccount acc : Data.accounts.get()) {
+        for (int j = 0; j < Data.accounts.size(); j++) {
+            LedgerAccount acc = Data.accounts.get(j);
             if (acc.getName().startsWith(parent.getName() + ":")) {
                 acc.setHiddenByStarToBe(hiddenToBe);
                 notifyItemChanged(i);

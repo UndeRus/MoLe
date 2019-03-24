@@ -68,9 +68,9 @@ public class LedgerAccount {
 
         if (level == 0) return true;
 
-        return isVisible(Data.accounts.get());
+        return isVisible(Data.accounts);
     }
-    public boolean isVisible(ArrayList<LedgerAccount> list) {
+    public boolean isVisible(List<LedgerAccount> list) {
         for (LedgerAccount acc : list) {
             if (acc.isParentOf(this)) {
                 if (!acc.isExpanded()) return false;

@@ -35,7 +35,7 @@ public class AccountSummaryViewModel extends ViewModel {
     static void commitSelections(Context context) {
         CAT task = new CAT();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                new CommitAccountsTaskParams(Data.accounts.get(), Data.optShowOnlyStarred.get()));
+                new CommitAccountsTaskParams(Data.accounts, Data.optShowOnlyStarred.get()));
     }
     static public void scheduleAccountListReload() {
         if (Data.profile.get() == null) return;
@@ -51,7 +51,7 @@ public class AccountSummaryViewModel extends ViewModel {
             super.onPostExecute(list);
             if (list != null) {
                 Log.d("acc", "setting updated account list");
-                Data.accounts.set(list);
+                Data.accounts.setList(list);
             }
         }
     }
@@ -62,7 +62,7 @@ public class AccountSummaryViewModel extends ViewModel {
             super.onPostExecute(list);
             if (list != null) {
                 Log.d("acc", "setting new account list");
-                Data.accounts.set(list);
+                Data.accounts.setList(list);
             }
         }
     }

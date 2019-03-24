@@ -18,9 +18,6 @@
 package net.ktnx.mobileledger.utils;
 
 import android.os.Build;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import android.util.Log;
 
 import java.util.Collection;
@@ -35,7 +32,11 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-public class ObservableList<T> extends Observable {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
+public class ObservableList<T> extends Observable implements List<T> {
     private List<T> list;
     public ObservableList(List<T> list) {
         this.list = list;
@@ -57,6 +58,7 @@ public class ObservableList<T> extends Observable {
     public boolean contains(@Nullable Object o) {
         return list.contains(o);
     }
+    @NonNull
     public Iterator<T> iterator() {
         return list.iterator();
     }
@@ -76,6 +78,9 @@ public class ObservableList<T> extends Observable {
         if (result) forceNotify();
         return result;
     }
+    public T removeQuietly(int index) {
+        return list.remove(index);
+    }
     public boolean containsAll(@NonNull Collection<?> c) {
         return list.containsAll(c);
     }
@@ -88,6 +93,9 @@ public class ObservableList<T> extends Observable {
         boolean result = list.addAll(index, c);
         if (result) forceNotify();
         return result;
+    }
+    public boolean addAllQuietly(int index, Collection<? extends T> c) {
+        return list.addAll(index, c);
     }
     public boolean removeAll(@NonNull Collection<?> c) {
         boolean result = list.removeAll(c);

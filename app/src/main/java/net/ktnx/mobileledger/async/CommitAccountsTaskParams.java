@@ -18,13 +18,12 @@
 package net.ktnx.mobileledger.async;
 
 import net.ktnx.mobileledger.model.LedgerAccount;
-
-import java.util.List;
+import net.ktnx.mobileledger.utils.ObservableList;
 
 public class CommitAccountsTaskParams {
-    List<LedgerAccount> accountList;
+    ObservableList<LedgerAccount> accountList;
     boolean showOnlyStarred;
-    public CommitAccountsTaskParams(List<LedgerAccount> accountList, boolean showOnlyStarred) {
+    public CommitAccountsTaskParams(ObservableList<LedgerAccount> accountList, boolean showOnlyStarred) {
         this.accountList = accountList;
         this.showOnlyStarred = showOnlyStarred;
     }
