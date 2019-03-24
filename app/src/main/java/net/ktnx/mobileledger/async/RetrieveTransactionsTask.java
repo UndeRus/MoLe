@@ -438,7 +438,6 @@ public class RetrieveTransactionsTask
                 db.endTransaction();
             }
         }
-
         return true;
     }
     private boolean retrieveTransactionList(MobileLedgerProfile profile)

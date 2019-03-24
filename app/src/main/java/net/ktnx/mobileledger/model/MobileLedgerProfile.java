@@ -283,8 +283,8 @@ public final class MobileLedgerProfile {
     public void removeFromDB() {
         SQLiteDatabase db = MLDB.getDatabase();
         Log.d("db", String.format("removing profile %s from DB", uuid));
+        db.beginTransaction();
         try {
-            db.beginTransaction();
             db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
             db.execSQL("delete from accounts where profile=?", new Object[]{uuid});
             db.execSQL("delete from account_values where profile=?", new Object[]{uuid});
