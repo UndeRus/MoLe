@@ -578,7 +578,9 @@ public class MainActivity extends ProfileThemedActivity {
                 ViewPropertyAnimator animator = arrow.animate();
 
                 acc.toggleExpanded();
-                Data.profile.get().storeAccount(MLDB.getDatabase(), acc);
+                DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
+                        new Object[]{acc.isExpanded(), acc.getName(), Data.profile.get().getUuid()
+                        });
 
                 if (wasExpanded) {
                     Log.d("accounts", String.format("Collapsing account '%s'", acc.getName()));
