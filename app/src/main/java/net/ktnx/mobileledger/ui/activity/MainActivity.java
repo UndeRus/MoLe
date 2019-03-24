@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
