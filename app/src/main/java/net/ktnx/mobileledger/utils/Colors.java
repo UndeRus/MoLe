@@ -165,6 +165,7 @@ public class Colors {
             final int themeId = profile.getThemeId();
             switch (themeId) {
                 case 0:
+                case 360:
                     activity.setTheme(R.style.AppTheme_NoActionBar_0);
                     break;
                 case 15:
