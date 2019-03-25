@@ -20,6 +20,8 @@ package net.ktnx.mobileledger.utils;
 import android.os.Build;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -203,21 +205,25 @@ public class ObservableList<T> extends Observable implements List<T> {
             return list.lastIndexOf(o);
         }
     }
+    @NotNull
     public ListIterator<T> listIterator() {
         if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
                 "Iterators break encapsulation and ignore locking. Write-lock first");
         return list.listIterator();
     }
+    @NotNull
     public ListIterator<T> listIterator(int index) {
         if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
                 "Iterators break encapsulation and ignore locking. Write-lock first");
         return list.listIterator(index);
     }
+    @NotNull
     public List<T> subList(int fromIndex, int toIndex) {
         try (LockHolder lh = lockForReading()) {
             return list.subList(fromIndex, toIndex);
         }
     }
+    @NotNull
     @RequiresApi(api = Build.VERSION_CODES.N)
     public Spliterator<T> spliterator() {
         if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
