@@ -414,7 +414,7 @@ public class RetrieveTransactionsTask
                     else acc.removeAmounts();
 
                     profile.storeAccount(db, acc);
-                    for (ParsedBalance b : parsedAccount.getAebalance()) {
+                    for (ParsedBalance b : parsedAccount.getAibalance()) {
                         profile.storeAccountValue(db, acc.getName(), b.getAcommodity(),
                                 b.getAquantity().asFloat());
                     }

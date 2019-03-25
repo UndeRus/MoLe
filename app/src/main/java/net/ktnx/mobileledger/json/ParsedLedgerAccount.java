@@ -24,14 +24,21 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedLedgerAccount {
     private List<ParsedBalance> aebalance;
+    private List<ParsedBalance> aibalance;
     private String aname;
     public ParsedLedgerAccount() {
     }
     public List<ParsedBalance> getAebalance() {
         return aebalance;
     }
+    public List<ParsedBalance> getAibalance() {
+        return aibalance;
+    }
     public void setAebalance(List<ParsedBalance> aebalance) {
         this.aebalance = aebalance;
+    }
+    public void setAibalance(List<ParsedBalance> aibalance) {
+        this.aibalance = aibalance;
     }
     public String getAname() {
         return aname;
