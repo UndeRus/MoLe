@@ -212,6 +212,7 @@ public final class MLDB {
 class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     private static final String DB_NAME = "MoLe.db";
     private static final int LATEST_REVISION = 20;
+    private static final String CREATE_DB_SQL = "create-db.sql";
 
     private final Application mContext;
 
@@ -225,7 +226,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d("db", "onCreate called");
-        onUpgrade(db, -1, LATEST_REVISION);
+        applyRevisionFile(db, CREATE_DB_SQL);
     }
 
     @Override
@@ -235,15 +236,18 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
     }
 
     private void applyRevision(SQLiteDatabase db, int rev_no) {
-        final Resources rm = mContext.getResources();
         String rev_file = String.format(Locale.US, "sql_%d", rev_no);
 
+        applyRevisionFile(db, rev_file);
+    }
+    private void applyRevisionFile(SQLiteDatabase db, String rev_file) {
+        final Resources rm = mContext.getResources();
         int res_id = rm.getIdentifier(rev_file, "raw", mContext.getPackageName());
         if (res_id == 0)
-            throw new SQLException(String.format(Locale.US, "No resource for revision %d", rev_no));
+            throw new SQLException(String.format(Locale.US, "No resource for %s", rev_file));
         db.beginTransaction();
         try (InputStream res = rm.openRawResource(res_id)) {
-            Log.d("db", "Applying revision " + String.valueOf(rev_no));
+            Log.d("db", "Applying " + rev_file);
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 
@@ -263,8 +267,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
                 }
                 catch (Exception e) {
                     throw new RuntimeException(
-                            String.format("Error applying revision %d, line %d", rev_no, line_no),
-                            e);
+                            String.format("Error applying %s, line %d", rev_file, line_no), e);
                 }
                 line_no++;
             }
@@ -272,7 +275,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
             db.setTransactionSuccessful();
         }
         catch (IOException e) {
-            Log.e("db", String.format("Error opening raw resource for revision %d", rev_no));
+            Log.e("db", String.format("Error opening raw resource for %s", rev_file));
             e.printStackTrace();
         }
         finally {
