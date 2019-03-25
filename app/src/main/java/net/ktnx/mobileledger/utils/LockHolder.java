@@ -17,10 +17,9 @@
 
 package net.ktnx.mobileledger.utils;
 
-import java.io.Closeable;
 import java.util.concurrent.locks.Lock;
 
-public class LockHolder implements Closeable {
+public class LockHolder implements AutoCloseable {
     private Lock rLock, wLock;
     LockHolder(Lock rLock) {
         this.rLock = rLock;
