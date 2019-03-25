@@ -209,7 +209,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         }
         else {
             profileName.setText("");
-            url.setText("");
+            url.setText("https://");
             postingPermitted.setChecked(true);
             useAuthentication.setChecked(false);
             authParams.setVisibility(View.GONE);
