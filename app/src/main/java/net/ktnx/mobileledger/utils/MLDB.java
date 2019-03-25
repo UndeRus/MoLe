@@ -197,7 +197,8 @@ public final class MLDB {
     }
     public static synchronized void init(Application context) {
         MLDB.context = context;
-        if (dbHelper != null) throw new IllegalStateException("It appears init() was already called");
+        if (dbHelper != null)
+            throw new IllegalStateException("It appears init() was already called");
         dbHelper = new MobileLedgerDatabase(context);
     }
     public static synchronized void done() {
