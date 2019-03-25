@@ -25,7 +25,7 @@ public class LockHolder implements AutoCloseable {
         this.rLock = rLock;
         this.wLock = null;
     }
-    public LockHolder(Lock rLock, Lock wLock) {
+    LockHolder(Lock rLock, Lock wLock) {
         this.rLock = rLock;
         this.wLock = wLock;
     }
