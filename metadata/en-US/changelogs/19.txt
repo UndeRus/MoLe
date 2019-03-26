@@ -1,0 +1,9 @@
+Fixes:
+ * Avoid double slashes when constructing backend URLs
+ * Remove all data belonging to deleted profiles
+ * Update profile list when profile list data changes
+ * Fixed "has sub-accounts" internal flag when refreshing account list
+ * Fix icon for f-droid
+ * Cleaner color selection dialog
+ * Internal reorganization of database access. Should reduce the deadlocks significantly
+ * Show accumulated balance in parent accounts retrieved via the JSON API

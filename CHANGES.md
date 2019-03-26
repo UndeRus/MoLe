@@ -1,5 +1,15 @@
 # Changes
 
+## [0.8.1] - 2019-03-26
+ * Avoid double slashes when constructing backend URLs
+ * Remove all data belonging to deleted profiles
+ * Update profile list when profile list data changes
+ * Fixed "has sub-accounts" internal flag when refreshing account list
+ * Fix icon for f-droid
+ * Cleaner color selection dialog
+ * Internal reorganization of database access. Should reduce the deadlocks significantly
+ * Show accumulated balance in parent accounts retrieved via the JSON API
+
 ## [0.8] - 2019-03-17
  - account list is a tree with collapsible nodes
  - account's transactions still available by tapping on amounts
