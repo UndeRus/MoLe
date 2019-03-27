@@ -23,8 +23,8 @@ android {
         applicationId "net.ktnx.mobileledger"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 19
-        versionName '0.8.1'
+        versionCode 20
+        versionName '0.9'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
