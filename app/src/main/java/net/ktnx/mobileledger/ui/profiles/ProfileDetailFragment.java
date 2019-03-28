@@ -142,13 +142,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             if (!checkValidity()) return;
 
             if (mProfile != null) {
-                mProfile.setName(profileName.getText());
-                mProfile.setUrl(url.getText());
-                mProfile.setPostingPermitted(postingPermitted.isChecked());
-                mProfile.setAuthEnabled(useAuthentication.isChecked());
-                mProfile.setAuthUserName(userName.getText());
-                mProfile.setAuthPassword(password.getText());
-                mProfile.setThemeId(huePickerView.getTag());
+                updateProfileFromUI();
 //                Log.d("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
                 mProfile.storeInDB();
                 Log.d("profiles", "profile stored in DB");
@@ -179,6 +173,14 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
 
         profileName.requestFocus();
     }
+    private void updateProfileFromUI() {
+        mProfile.setName(profileName.getText());
+        mProfile.setUrl(url.getText());
+        mProfile.setPostingPermitted(postingPermitted.isChecked());
+        mProfile.setAuthEnabled(useAuthentication.isChecked());
+        mProfile.setAuthUserName(userName.getText());
+        mProfile.setAuthPassword(password.getText());
+        mProfile.setThemeId(huePickerView.getTag());
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
