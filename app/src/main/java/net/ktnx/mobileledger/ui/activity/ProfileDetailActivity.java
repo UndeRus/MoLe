@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,10 +38,11 @@ import androidx.appcompat.widget.Toolbar;
  * An activity representing a single Profile detail screen. This
  * activity is only used on narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link ProfileListActivity}.
+ * in a ProfileListActivity (not really).
  */
 public class ProfileDetailActivity extends CrashReportingActivity {
     private MobileLedgerProfile profile = null;
+    private ProfileDetailFragment mFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         final int index = getIntent().getIntExtra(ProfileDetailFragment.ARG_ITEM_ID, -1);
@@ -91,31 +91,17 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             // using a fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putInt(ProfileDetailFragment.ARG_ITEM_ID, index);
-            ProfileDetailFragment fragment = new ProfileDetailFragment();
-            fragment.setArguments(arguments);
+            mFragment = new ProfileDetailFragment();
+            mFragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.profile_detail_container, fragment).commit();
+                    .add(R.id.profile_detail_container, mFragment).commit();
         }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         Log.d("profiles", "[activity] Creating profile details options menu");
-        getMenuInflater().inflate(R.menu.profile_details, menu);
-        MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
-        menuDeleteProfile.setOnMenuItemClickListener(item -> {
-            Log.d("profiles", String.format("[activity] deleting profile %s", profile.getUuid()));
-            profile.removeFromDB();
-            Data.profiles.remove(profile);
-            if (Data.profile.get().equals(profile)) {
-                Log.d("profiles", "[activity] selecting profile 0");
-                Data.setCurrentProfile(Data.profiles.get(0));
-            }
-            finish();
-            return true;
-        });
-
-        menuDeleteProfile.setVisible((profile != null) && (Data.profiles.size() > 1));
+        mFragment.onCreateOptionsMenu(menu, getMenuInflater());
 
         return true;
     }
