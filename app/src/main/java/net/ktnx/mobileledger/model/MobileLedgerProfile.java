@@ -38,6 +38,7 @@ public final class MobileLedgerProfile {
     private String uuid;
     private String name;
     private boolean permitPosting;
+    private String preferredAccountsFilter;
     private String url;
     private boolean authEnabled;
     private String authUserName;
@@ -57,7 +58,8 @@ public final class MobileLedgerProfile {
         List<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = MLDB.getDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
-                                         "auth_password, permit_posting, theme, order_no FROM " +
+                                         "auth_password, permit_posting, theme, order_no, " +
+                                         "preferred_accounts_filter FROM " +
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
@@ -70,6 +72,7 @@ public final class MobileLedgerProfile {
                 item.setPostingPermitted(cursor.getInt(6) == 1);
                 item.setThemeId(cursor.getInt(7));
                 item.orderNo = cursor.getInt(8);
+                item.setPreferredAccountsFilter(cursor.getString(9));
                 list.add(item);
                 if (item.getUuid().equals(currentProfileUUID)) result = item;
             }
@@ -96,6 +99,15 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public String getPreferredAccountsFilter() {
+        return preferredAccountsFilter;
+    }
+    public void setPreferredAccountsFilter(String preferredAccountsFilter) {
+        this.preferredAccountsFilter = preferredAccountsFilter;
+    }
+    public void setPreferredAccountsFilter(CharSequence preferredAccountsFilter) {
+        setPreferredAccountsFilter(String.valueOf(preferredAccountsFilter));
     }
     public boolean isPostingPermitted() {
         return permitPosting;
@@ -158,10 +170,12 @@ public final class MobileLedgerProfile {
 //                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeId));
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, " +
-                       "auth_password, theme, order_no) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       "auth_password, theme, order_no, preferred_accounts_filter) " +
+                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
-                                 authEnabled ? authPassword : null, themeId, orderNo
+                                 authEnabled ? authPassword : null, themeId, orderNo,
+                                 preferredAccountsFilter
                     });
             db.setTransactionSuccessful();
         }

@@ -1,0 +1,1 @@
+alter table profiles add preferred_accounts_filter varchar;
