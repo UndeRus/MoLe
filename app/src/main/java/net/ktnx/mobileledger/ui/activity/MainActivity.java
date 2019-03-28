@@ -44,6 +44,7 @@ import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.account_summary.AccountSummaryAdapter;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
@@ -72,8 +73,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 public class MainActivity extends ProfileThemedActivity {
-    private static final String STATE_CURRENT_PAGE = "current_page";
-    private static final String BUNDLE_SAVED_STATE = "bundle_savedState";
+    public static final String STATE_CURRENT_PAGE = "current_page";
+    public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
+    public static final String STATE_ACC_FILTER = "account_filter";
     public AccountSummaryFragment mAccountSummaryFragment;
     DrawerLayout drawer;
     private LinearLayout profileListContainer;
@@ -91,6 +93,8 @@ public class MainActivity extends ProfileThemedActivity {
     private boolean profileModificationEnabled = false;
     private boolean profileListExpanded = false;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
+    private int mCurrentPage;
+    private String mAccountFilter;
     @Override
     protected void onStart() {
         super.onStart();
@@ -109,11 +113,17 @@ public class MainActivity extends ProfileThemedActivity {
 
             scheduleTransactionListRetrieval();
         }
+
+        mViewPager.setCurrentItem(mCurrentPage, false);
+        if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
+
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
+        if (TransactionListFragment.accountFilter.get() != null)
+            outState.putString(STATE_ACC_FILTER, TransactionListFragment.accountFilter.get());
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,11 +227,13 @@ public class MainActivity extends ProfileThemedActivity {
             }
         });
 
+        mCurrentPage = 0;
         if (savedInstanceState != null) {
             int currentPage = savedInstanceState.getInt(STATE_CURRENT_PAGE, -1);
             if (currentPage != -1) {
-                mViewPager.setCurrentItem(currentPage, false);
+                mCurrentPage = currentPage;
             }
+            mAccountFilter = savedInstanceState.getString(STATE_ACC_FILTER, null);
         }
 
         Data.lastUpdateDate.addObserver((o, arg) -> {
