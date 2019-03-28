@@ -95,6 +95,7 @@ public class MainActivity extends ProfileThemedActivity {
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
     private String mAccountFilter;
+    private boolean mBackMeansToAccountList = false;
     @Override
     protected void onStart() {
         super.onStart();
@@ -421,6 +422,7 @@ public class MainActivity extends ProfileThemedActivity {
 //        currentFragment = transactionListFragment;
     }
     public void showAccountTransactions(LedgerAccount account) {
+        mBackMeansToAccountList = true;
         showTransactionsFragment(account);
     }
     @Override
@@ -430,10 +432,16 @@ public class MainActivity extends ProfileThemedActivity {
             drawer.closeDrawer(GravityCompat.START);
         }
         else {
-            Log.d("fragments",
-                    String.format("manager stack: %d", fragmentManager.getBackStackEntryCount()));
+            if (mBackMeansToAccountList && (mViewPager.getCurrentItem() == 1)) {
+                TransactionListFragment.accountFilter.set(null);
+                showAccountSummaryFragment();
+                mBackMeansToAccountList = false;
+            }
+            else {
+                Log.d("fragments", String.format("manager stack: %d", fragmentManager.getBackStackEntryCount()));
 
-            super.onBackPressed();
+                super.onBackPressed();
+            }
         }
     }
     public void updateLastUpdateTextFromDB() {
