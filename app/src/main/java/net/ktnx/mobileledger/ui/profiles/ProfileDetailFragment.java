@@ -78,6 +78,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private TextInputLayout passwordLayout;
     private TextView profileName;
     private TextInputLayout profileNameLayout;
+    private TextView preferredAccountsFilter;
+    private TextInputLayout preferredAccountsFilterLayout;
     private View huePickerView;
 
     /**
@@ -175,10 +177,12 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         mProfile.setName(profileName.getText());
         mProfile.setUrl(url.getText());
         mProfile.setPostingPermitted(postingPermitted.isChecked());
+        mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getText());
         mProfile.setAuthEnabled(useAuthentication.isChecked());
         mProfile.setAuthUserName(userName.getText());
         mProfile.setAuthPassword(password.getText());
         mProfile.setThemeId(huePickerView.getTag());
+    }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -196,12 +200,20 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         password = rootView.findViewById(R.id.password);
         passwordLayout = rootView.findViewById(R.id.password_layout);
         huePickerView = rootView.findViewById(R.id.btn_pick_ring_color);
+        preferredAccountsFilter = rootView.findViewById(R.id.preferred_accounts_filter_filter);
+        preferredAccountsFilterLayout =
+                rootView.findViewById(R.id.preferred_accounts_accounts_filter_layout);
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             Log.d("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (isChecked) userName.requestFocus();
         });
+
+        preferredAccountsFilter.setText(mProfile.getPreferredAccountsFilter());
+        postingPermitted.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        }));
 
         hookClearErrorOnFocusListener(profileName, profileNameLayout);
         hookClearErrorOnFocusListener(url, urlLayout);
