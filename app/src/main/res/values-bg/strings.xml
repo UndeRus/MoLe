@@ -107,5 +107,8 @@
     <string name="btn_ok">Добре</string>
     <string name="profile_list_rearrange_handle_label">Манипулатор за промяна на подредбата</string>
     <string name="color_label">Цвят</string>
+    <string name="pref_preferred_autocompletion_account_filter_hint" >Филтър при избор на предишна трансакция</string>
+    <string name="remove_profile_dialog_message">Потвърдете окончателното премахване на профила</string>
+    <string name="Remove">Премахване</string>
 
 </resources>

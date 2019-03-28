@@ -149,4 +149,7 @@
     <string name="default_color_btn">Default</string>
     <string name="profile_color_label">Profile color</string>
     <string name="btn_select_label">Select</string>
+    <string name="pref_preferred_autocompletion_account_filter_hint">Filter for transaction auto-completion</string>
+    <string name="remove_profile_dialog_message">Permanently remove this profile?</string>
+    <string name="Remove">Remove</string>
 </resources>

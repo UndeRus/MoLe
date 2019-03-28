@@ -18,6 +18,8 @@
 package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -91,13 +93,23 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         inflater.inflate(R.menu.profile_details, menu);
         final MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
         menuDeleteProfile.setOnMenuItemClickListener(item -> {
-            Log.d("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
-            mProfile.removeFromDB();
-            Data.profiles.remove(mProfile);
-            if (Data.profile.get().equals(mProfile)) {
-                Log.d("profiles", "[fragment] setting current profile to 0");
-                Data.setCurrentProfile(Data.profiles.get(0));
-            }
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(mProfile.getName());
+            builder.setMessage(R.string.remove_profile_dialog_message);
+            builder.setPositiveButton(R.string.Remove, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Log.d("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
+                    mProfile.removeFromDB();
+                    Data.profiles.remove(mProfile);
+                    if (Data.profile.get().equals(mProfile)) {
+                        Log.d("profiles", "[fragment] setting current profile to 0");
+                        Data.setCurrentProfile(Data.profiles.get(0));
+                    }
+                    getActivity().finish();
+                }
+            });
+            builder.show();
             return false;
         });
         menuDeleteProfile.setVisible((mProfile != null) && (Data.profiles.size() > 1));
