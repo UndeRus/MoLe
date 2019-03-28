@@ -101,7 +101,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             builder.setPositiveButton(R.string.Remove, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Log.d("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
+                    Log.d("profiles",
+                            String.format("[fragment] removing profile %s", mProfile.getUuid()));
                     mProfile.removeFromDB();
                     Data.profiles.remove(mProfile);
                     if (Data.profile.get().equals(mProfile)) {
