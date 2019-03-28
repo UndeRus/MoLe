@@ -1,0 +1,1 @@
+alter table accounts add amounts_expanded boolean default 0;

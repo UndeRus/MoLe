@@ -1,4 +1,4 @@
-create table accounts(profile varchar not null, name varchar not null, name_upper varchar not null, hidden boolean not null default 0, keep boolean not null default 0, level integer not null, parent_name varchar, expanded default 1);
+create table accounts(profile varchar not null, name varchar not null, name_upper varchar not null, hidden boolean not null default 0, keep boolean not null default 0, level integer not null, parent_name varchar, expanded default 1, amounts_expanded boolean default 0);
 create unique index un_accounts on accounts(profile, name);
 create table options(profile varchar not null, name varchar not null, value varchar);
 create unique index un_options on options(profile,name);

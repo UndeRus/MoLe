@@ -36,6 +36,7 @@ public class LedgerAccount {
     private boolean expanded;
     private List<LedgerAmount> amounts;
     private boolean hasSubAccounts;
+    private boolean amountsExpanded;
 
     public LedgerAccount(String name) {
         this.setName(name);
@@ -175,4 +176,7 @@ public class LedgerAccount {
     public void removeAmounts() {
         if (amounts != null) amounts.clear();
     }
+    public boolean amountsExpanded() { return amountsExpanded; }
+    public void setAmountsExpanded(boolean flag) { amountsExpanded = flag; }
+    public void toggleAmountsExpanded() { amountsExpanded = !amountsExpanded; }
 }
