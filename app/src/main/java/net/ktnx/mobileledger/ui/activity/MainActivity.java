@@ -378,14 +378,18 @@ public class MainActivity extends ProfileThemedActivity {
     public void onLatestTransactionsClicked(View view) {
         drawer.closeDrawers();
 
-        showTransactionsFragment(null);
+        showTransactionsFragment((String) null);
     }
     private void resetFragmentBackStack() {
 //        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
-    private void showTransactionsFragment(LedgerAccount account) {
-        if (account != null) TransactionListFragment.accountFilter.set(account.getName());
+    private void showTransactionsFragment(String accName) {
+        TransactionListFragment.accountFilter.set(accName);
+        TransactionListFragment.accountFilter.notifyObservers();
         mViewPager.setCurrentItem(1, true);
+    }
+    private void showTransactionsFragment(LedgerAccount account) {
+        showTransactionsFragment((account == null) ? (String) null : account.getName());
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        if (transactionListFragment == null) {
 //            Log.d("flow", "MainActivity creating TransactionListFragment");

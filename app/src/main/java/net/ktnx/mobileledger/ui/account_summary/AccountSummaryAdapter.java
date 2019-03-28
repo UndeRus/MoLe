@@ -31,9 +31,11 @@ import android.widget.TextView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.LockHolder;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -159,6 +161,8 @@ public class AccountSummaryAdapter
             this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
             this.expander = itemView.findViewById(R.id.account_expander);
 
+            MainActivity activity = (MainActivity) row.getContext();
+
             expanderContainer.addOnLayoutChangeListener(
                     (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
                         int w = right - left;
@@ -169,6 +173,27 @@ public class AccountSummaryAdapter
                         }
                         else v.setPadding(0, 0, 0, 0);
                     });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+                    LedgerAccount acc =
+                            (LedgerAccount) v.findViewById(R.id.account_summary_row).getTag();
+                    builder.setTitle(acc.getName());
+                    builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
+                        switch(which) {
+                            case 0:
+                                // show transactions
+                                activity.showAccountTransactions(acc);
+                                break;
+                        }
+                        dialog.dismiss();
+                    });
+                    builder.show();
+                    return true;
+                }
+            });
         }
     }
 }

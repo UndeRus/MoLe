@@ -23,6 +23,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/account_summary_row"
     android:layout_width="match_parent"
+    android:longClickable="true"
     android:layout_height="wrap_content">
 
     <CheckBox
