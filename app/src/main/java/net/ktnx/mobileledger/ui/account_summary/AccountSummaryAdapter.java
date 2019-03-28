@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
+    public static final int AMOUNT_LIMIT = 3;
     private boolean selectionActive;
 
     AccountSummaryAdapter() {
@@ -65,7 +66,15 @@ public class AccountSummaryAdapter
                 holder.expanderContainer
                         .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.INVISIBLE);
                 holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
-                holder.tvAccountAmounts.setText(acc.getAmountsString());
+                int amounts = acc.getAmountCount();
+                if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
+                    holder.tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
+                    holder.accountExpanderContainer.setVisibility(View.VISIBLE);
+                }
+                else {
+                    holder.tvAccountAmounts.setText(acc.getAmountsString());
+                    holder.accountExpanderContainer.setVisibility(View.GONE);
+                }
 
                 if (acc.isHiddenByStar()) {
                     holder.tvAccountName.setTypeface(null, Typeface.ITALIC);
@@ -151,6 +160,7 @@ public class AccountSummaryAdapter
         View vTrailer;
         FrameLayout expanderContainer;
         ImageView expander;
+        FrameLayout accountExpanderContainer;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
             this.row = itemView.findViewById(R.id.account_summary_row);
@@ -160,6 +170,7 @@ public class AccountSummaryAdapter
             this.vTrailer = itemView.findViewById(R.id.account_summary_trailer);
             this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
             this.expander = itemView.findViewById(R.id.account_expander);
+            this.accountExpanderContainer = itemView.findViewById(R.id.account_row_amounts_expander_container);
 
             MainActivity activity = (MainActivity) row.getContext();
 

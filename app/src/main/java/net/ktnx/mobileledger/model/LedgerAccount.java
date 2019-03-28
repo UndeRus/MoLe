@@ -119,7 +119,7 @@ public class LedgerAccount {
     public void addAmount(float amount) {
         this.addAmount(amount, null);
     }
-
+    public int getAmountCount() { return amounts.size(); }
     public String getAmountsString() {
         if ((amounts == null) || amounts.isEmpty()) return "";
 
@@ -132,7 +132,21 @@ public class LedgerAccount {
 
         return builder.toString();
     }
+    public String getAmountsString(int limit) {
+        if ((amounts == null) || amounts.isEmpty()) return "";
 
+        int included = 0;
+        StringBuilder builder = new StringBuilder();
+        for (LedgerAmount amount : amounts) {
+            String amt = amount.toString();
+            if (builder.length() > 0) builder.append('\n');
+            builder.append(amt);
+            included++;
+            if (included == limit) break;
+        }
+
+        return builder.toString();
+    }
     public int getLevel() {
         return level;
     }

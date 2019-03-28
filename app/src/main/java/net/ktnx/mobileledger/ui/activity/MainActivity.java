@@ -643,7 +643,15 @@ public class MainActivity extends ProfileThemedActivity {
                 }
                 break;
             case R.id.account_row_acc_amounts:
-                showAccountTransactions(acc);
+                if (acc.getAmountCount() > AccountSummaryAdapter.AMOUNT_LIMIT) {
+                    acc.toggleAmountsExpanded();
+                    DbOpQueue
+                            .add("update accounts set amounts_expanded=? where name=? and profile=?",
+                                    new Object[]{acc.amountsExpanded(), acc.getName(),
+                                                 Data.profile.get().getUuid()
+                                    });
+                    Data.accounts.triggerItemChangedNotification(acc);
+                }
                 break;
         }
     }

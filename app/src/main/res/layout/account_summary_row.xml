@@ -87,13 +87,31 @@
         android:layout_marginEnd="8dp"
         android:layout_weight="0"
         android:gravity="center_vertical"
+        android:minWidth="@dimen/thumb_row_height"
         android:onClick="onAccountSummaryRowViewClicked"
         android:text="123,45\n678,90"
-        android:minWidth="@dimen/thumb_row_height"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
+
+    <FrameLayout
+        android:id="@+id/account_row_amounts_expander_container"
+        android:layout_width="0dp"
+        android:layout_height="12sp"
+        app:layout_constraintStart_toStartOf="@id/account_row_acc_amounts"
+        app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
+        app:layout_constraintBottom_toBottomOf="@id/account_row_acc_amounts"
+        android:background="@drawable/fade_down_white">
+
+        <!--<ImageView-->
+            <!--android:layout_gravity="center_vertical|end"-->
+            <!--android:id="@+id/account_row_amounts_expander"-->
+            <!--android:layout_width="20dp"-->
+            <!--android:layout_height="20dp"-->
+            <!--android:background="@drawable/ic_expand_more_black_24dp" />-->
+
+    </FrameLayout>
 
     <View
         android:id="@+id/account_summary_trailer"
