@@ -155,10 +155,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                 }
             }
             else {
-                mProfile =
-                        new MobileLedgerProfile(profileName.getText(), postingPermitted.isChecked(),
-                                url.getText(), useAuthentication.isChecked(), userName.getText(),
-                                password.getText(), (int) huePickerView.getTag());
+                mProfile = new MobileLedgerProfile();
+                updateProfileFromUI();
                 mProfile.storeInDB();
                 Data.profiles.add(mProfile);
                 MobileLedgerProfile.storeProfilesOrder();

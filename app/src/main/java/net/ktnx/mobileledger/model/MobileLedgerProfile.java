@@ -44,36 +44,11 @@ public final class MobileLedgerProfile {
     private String authPassword;
     private int themeId;
     private int orderNo = -1;
-    public MobileLedgerProfile(String uuid, String name, boolean permitPosting, String url,
-                               boolean authEnabled, String authUserName, String authPassword) {
-        this(uuid, name, permitPosting, url, authEnabled, authUserName, authPassword, -1);
-
-    }
-    public MobileLedgerProfile(String uuid, String name, boolean permitPosting, String url,
-                               boolean authEnabled, String authUserName, String authPassword,
-                               int themeId) {
-        this.uuid = uuid;
-        this.name = name;
-        this.permitPosting = permitPosting;
-        this.url = url;
-        this.authEnabled = authEnabled;
-        this.authUserName = authUserName;
-        this.authPassword = authPassword;
-        this.themeId = themeId;
-        this.orderNo = -1;
-    }
-    public MobileLedgerProfile(CharSequence name, boolean permitPosting, CharSequence url,
-                               boolean authEnabled, CharSequence authUserName,
-                               CharSequence authPassword, int themeId) {
+    public MobileLedgerProfile() {
         this.uuid = String.valueOf(UUID.randomUUID());
-        this.name = String.valueOf(name);
-        this.permitPosting = permitPosting;
-        this.url = String.valueOf(url);
-        this.authEnabled = authEnabled;
-        this.authUserName = String.valueOf(authUserName);
-        this.authPassword = String.valueOf(authPassword);
-        this.themeId = themeId;
-        this.orderNo = -1;
+    }
+    public MobileLedgerProfile(String uuid) {
+        this.uuid = uuid;
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
@@ -86,10 +61,14 @@ public final class MobileLedgerProfile {
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
-                MobileLedgerProfile item =
-                        new MobileLedgerProfile(cursor.getString(0), cursor.getString(1),
-                                cursor.getInt(6) == 1, cursor.getString(2), cursor.getInt(3) == 1,
-                                cursor.getString(4), cursor.getString(5), cursor.getInt(7));
+                MobileLedgerProfile item = new MobileLedgerProfile(cursor.getString(0));
+                item.setName(cursor.getString(1));
+                item.setUrl(cursor.getString(2));
+                item.setAuthEnabled(cursor.getInt(3) == 1);
+                item.setAuthUserName(cursor.getString(4));
+                item.setAuthPassword(cursor.getString(5));
+                item.setPostingPermitted(cursor.getInt(6) == 1);
+                item.setThemeId(cursor.getInt(7));
                 item.orderNo = cursor.getInt(8);
                 list.add(item);
                 if (item.getUuid().equals(currentProfileUUID)) result = item;
