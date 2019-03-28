@@ -268,11 +268,12 @@ public final class MobileLedgerProfile {
         Log.d("db", String.format("removing profile %s from DB", uuid));
         db.beginTransaction();
         try {
-            db.execSQL("delete from profiles where uuid=?", new Object[]{uuid});
-            db.execSQL("delete from accounts where profile=?", new Object[]{uuid});
-            db.execSQL("delete from account_values where profile=?", new Object[]{uuid});
-            db.execSQL("delete from transactions where profile=?", new Object[]{uuid});
-            db.execSQL("delete from transaction_accounts where profile=?", new Object[]{uuid});
+            Object[] uuid_param = new Object[]{uuid};
+            db.execSQL("delete from profiles where uuid=?", uuid_param);
+            db.execSQL("delete from accounts where profile=?", uuid_param);
+            db.execSQL("delete from account_values where profile=?", uuid_param);
+            db.execSQL("delete from transactions where profile=?", uuid_param);
+            db.execSQL("delete from transaction_accounts where profile=?", uuid_param);
             db.setTransactionSuccessful();
         }
         finally {
