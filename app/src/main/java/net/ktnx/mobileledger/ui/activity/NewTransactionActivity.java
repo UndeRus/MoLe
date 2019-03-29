@@ -496,7 +496,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             String profileUUID = c.getString(0);
             int transactionId = c.getInt(1);
             LedgerTransaction tr;
-            try(LockHolder lh = Data.profiles.lockForReading()) {
+            try (LockHolder lh = Data.profiles.lockForReading()) {
                 MobileLedgerProfile profile = null;
                 for (int i = 0; i < Data.profiles.size(); i++) {
                     MobileLedgerProfile p = Data.profiles.get(i);
@@ -558,7 +558,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
         return true;
     }
-    private class AsyncCrasher extends AsyncTask<Void, Void, Void>{
+    private class AsyncCrasher extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             throw new RuntimeException("Simulated crash");
