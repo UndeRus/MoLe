@@ -454,7 +454,8 @@ public class MainActivity extends ProfileThemedActivity {
                 mBackMeansToAccountList = false;
             }
             else {
-                Log.d("fragments", String.format("manager stack: %d", fragmentManager.getBackStackEntryCount()));
+                Log.d("fragments", String.format("manager stack: %d",
+                        fragmentManager.getBackStackEntryCount()));
 
                 super.onBackPressed();
             }
