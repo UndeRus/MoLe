@@ -96,6 +96,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/transactions_last_update_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:elevation="24dp"

@@ -298,15 +298,17 @@ public class MainActivity extends ProfileThemedActivity {
         });
     }
     private void updateLastUpdateDisplay() {
+        LinearLayout l = findViewById(R.id.transactions_last_update_layout);
         TextView v = findViewById(R.id.transactions_last_update);
         Date date = Data.lastUpdateDate.get();
         if (date == null) {
-            v.setText(R.string.transaction_last_update_never);
+            l.setVisibility(View.INVISIBLE);
             Log.d("main", "no last update date :(");
         }
         else {
             final String text = DateFormat.getDateTimeInstance().format(date);
             v.setText(text);
+            l.setVisibility(View.VISIBLE);
             Log.d("main", String.format("Date formatted: %s", text));
         }
     }
