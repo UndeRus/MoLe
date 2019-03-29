@@ -169,6 +169,20 @@ public class MainActivity extends ProfileThemedActivity {
                     fab.hide();
                 }
 
+                int old_index = -1;
+                int new_index = -1;
+                if (arg != null) {
+                    MobileLedgerProfile old = (MobileLedgerProfile) arg;
+                    old_index = Data.getProfileIndex(old);
+                    new_index = Data.getProfileIndex(profile);
+                }
+
+                if ((old_index != -1) && (new_index != -1)) {
+                    mProfileListAdapter.notifyItemChanged(old_index);
+                    mProfileListAdapter.notifyItemChanged(new_index);
+                }
+                else mProfileListAdapter.notifyDataSetChanged();
+
                 int newProfileTheme = profile.getThemeId();
                 if (newProfileTheme != Colors.profileThemeId) {
                     Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
