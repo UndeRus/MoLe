@@ -73,7 +73,6 @@ import androidx.fragment.app.DialogFragment;
  * TODO: reports
  * TODO: get rid of the custom session/cookie and auth code?
  *         (the last problem with the POST was the missing content-length header)
- * TODO: nicer swiping removal with visual feedback
  *  */
 
 public class NewTransactionActivity extends ProfileThemedActivity
