@@ -17,12 +17,14 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import net.ktnx.mobileledger.utils.Colors;
 
 import androidx.annotation.Nullable;
 
+@SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
     protected void setupProfileColors() {
         Colors.setupTheme(this);
