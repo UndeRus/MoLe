@@ -65,6 +65,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("flow", "AccountSummaryFragment.onCreate()");
         setHasOptionsMenu(true);
 
         if (backgroundTaskCountObserver == null) {
@@ -82,6 +83,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     }
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d("flow", "AccountSummaryFragment.onAttach()");
         mActivity = (MainActivity) context;
     }
     @Override

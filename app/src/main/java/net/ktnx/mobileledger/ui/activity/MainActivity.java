@@ -100,6 +100,7 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onStart() {
         super.onStart();
 
+        Log.d("flow", "MainActivity.onStart()");
         setupProfile();
 
         updateLastUpdateTextFromDB();
@@ -129,7 +130,7 @@ public class MainActivity extends ProfileThemedActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.d("flow", "MainActivity.onCreate()");
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.btn_add_transaction);
