@@ -131,6 +131,9 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("flow", "MainActivity.onCreate()");
+        int profileColor = Data.retrieveCurrentThemeIdFromDb();
+        Colors.setupTheme(this, profileColor);
+        Colors.profileThemeId = profileColor;
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.btn_add_transaction);

@@ -17,6 +17,9 @@
 
 package net.ktnx.mobileledger.model;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableAtomicInteger;
@@ -49,5 +52,16 @@ public final class Data {
 
             return -1;
         }
+    }
+    public static int retrieveCurrentThemeIdFromDb() {
+        String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
+        if (profileUUID == null) return -1;
+
+        SQLiteDatabase db = MLDB.getDatabase();
+        try(Cursor c = db.rawQuery("SELECT theme from profiles where uuid=?", new String[]{profileUUID})) {
+            if (c.moveToNext()) return c.getInt(0);
+        }
+
+        return -1;
     }
 }
