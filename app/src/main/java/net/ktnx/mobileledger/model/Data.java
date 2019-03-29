@@ -29,8 +29,7 @@ import java.util.List;
 
 public final class Data {
     public static ObservableList<TransactionListItem> transactions = new ObservableList<>(new ArrayList<>());
-    public static ObservableList<LedgerAccount> accounts =
-            new ObservableList<>(new ArrayList<>());
+    public static ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
     public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
     public static ObservableValue<Date> lastUpdateDate = new ObservableValue<>();
     public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
@@ -42,7 +41,7 @@ public final class Data {
         profile.set(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
-        try(LockHolder lh = profiles.lockForReading()) {
+        try (LockHolder lh = profiles.lockForReading()) {
             for (int i = 0; i < profiles.size(); i++) {
                 MobileLedgerProfile p = profiles.get(i);
                 if (p.equals(profile)) return i;
