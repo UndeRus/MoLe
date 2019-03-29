@@ -198,7 +198,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             accountFilter.addObserver(accountFilterObserver);
         }
 
-        TransactionListViewModel.scheduleTransactionListReload();
         TransactionListViewModel.updating.addObserver(
                 (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
         TransactionListViewModel.updateError.addObserver(new Observer() {

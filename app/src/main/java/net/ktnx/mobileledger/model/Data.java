@@ -28,7 +28,6 @@ import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public final class Data {
     public static ObservableList<TransactionListItem> transactions = new ObservableList<>(new ArrayList<>());
@@ -48,6 +47,16 @@ public final class Data {
             for (int i = 0; i < profiles.size(); i++) {
                 MobileLedgerProfile p = profiles.get(i);
                 if (p.equals(profile)) return i;
+            }
+
+            return -1;
+        }
+    }
+    public static int getProfileIndex(String profileUUID) {
+        try (LockHolder lh = profiles.lockForReading()) {
+            for (int i = 0; i < profiles.size(); i++) {
+                MobileLedgerProfile p = profiles.get(i);
+                if (p.getUuid().equals(profileUUID)) return i;
             }
 
             return -1;

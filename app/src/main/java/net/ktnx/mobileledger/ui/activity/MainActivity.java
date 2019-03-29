@@ -158,64 +158,81 @@ public class MainActivity extends ProfileThemedActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        profileObserver = (o, arg) -> {
-            MobileLedgerProfile profile = Data.profile.get();
-            MainActivity.this.runOnUiThread(() -> {
-                if (profile == null) MainActivity.this.setTitle(R.string.app_name);
-                else MainActivity.this.setTitle(profile.getName());
-                MainActivity.this.updateLastUpdateTextFromDB();
-                if (profile.isPostingPermitted()) {
-                    toolbar.setSubtitle(null);
-                    fab.show();
-                }
-                else {
-                    toolbar.setSubtitle(R.string.profile_subitlte_read_only);
-                    fab.hide();
-                }
+        if (profileObserver == null) {
+            profileObserver = (o, arg) -> {
+                MobileLedgerProfile profile = Data.profile.get();
+                MainActivity.this.runOnUiThread(() -> {
 
-                int old_index = -1;
-                int new_index = -1;
-                if (arg != null) {
-                    MobileLedgerProfile old = (MobileLedgerProfile) arg;
-                    old_index = Data.getProfileIndex(old);
-                    new_index = Data.getProfileIndex(profile);
-                }
+                    Data.transactions.clear();
+                    Log.d("transactions", "requesting list reload");
+                    TransactionListViewModel.scheduleTransactionListReload();
 
-                if ((old_index != -1) && (new_index != -1)) {
-                    mProfileListAdapter.notifyItemChanged(old_index);
-                    mProfileListAdapter.notifyItemChanged(new_index);
-                }
-                else mProfileListAdapter.notifyDataSetChanged();
+                    Data.accounts.clear();
+                    AccountSummaryViewModel.scheduleAccountListReload();
 
-                MainActivity.this.collapseProfileList();
+                    if (profile == null) MainActivity.this.setTitle(R.string.app_name);
+                    else MainActivity.this.setTitle(profile.getName());
+                    MainActivity.this.updateLastUpdateTextFromDB();
+                    int old_index = -1;
+                    int new_index = -1;
+                    if (arg != null) {
+                        MobileLedgerProfile old = (MobileLedgerProfile) arg;
+                        old_index = Data.getProfileIndex(old);
+                        new_index = Data.getProfileIndex(profile);
+                    }
 
-                int newProfileTheme = profile.getThemeId();
-                if (newProfileTheme != Colors.profileThemeId) {
-                    Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
-                            newProfileTheme));
-                    MainActivity.this.profileThemeChanged();
-                    Colors.profileThemeId = newProfileTheme;
-                }
-                else drawer.closeDrawers();
+                    if ((old_index != -1) && (new_index != -1)) {
+                        mProfileListAdapter.notifyItemChanged(old_index);
+                        mProfileListAdapter.notifyItemChanged(new_index);
+                    }
+                    else mProfileListAdapter.notifyDataSetChanged();
 
-                Log.d("transactions", "requesting list reload");
-                TransactionListViewModel.scheduleTransactionListReload();
+                    MainActivity.this.collapseProfileList();
 
-                AccountSummaryViewModel.scheduleAccountListReload();
+                    int newProfileTheme = (profile == null) ? -1 : profile.getThemeId();
+                    if (newProfileTheme != Colors.profileThemeId) {
+                        Log.d("profiles",
+                                String.format("profile theme %d → %d", Colors.profileThemeId,
+                                        newProfileTheme));
+                        MainActivity.this.profileThemeChanged();
+                        Colors.profileThemeId = newProfileTheme;
+                        // profileThemeChanged would restart the activity, so no need to reload the
+                        // data sets below
+                        return;
+                    }
+                    drawer.closeDrawers();
 
-            });
-        };
-        Data.profile.addObserver(profileObserver);
-        profilesObserver = (o, arg) -> {
-            findViewById(R.id.nav_profile_list).setMinimumHeight(
-                    (int) (getResources().getDimension(R.dimen.thumb_row_height) *
-                           Data.profiles.size()));
+                    if (profile == null) {
+                        toolbar.setSubtitle(null);
+                        fab.hide();
+                    }
+                    else {
+                        if (profile.isPostingPermitted()) {
+                            toolbar.setSubtitle(null);
+                            fab.show();
+                        }
+                        else {
+                            toolbar.setSubtitle(R.string.profile_subitlte_read_only);
+                            fab.hide();
+                        }
+                    }
+                });
+            };
+            Data.profile.addObserver(profileObserver);
+        }
 
-            Log.d("profiles", "profile list changed");
-            if (arg == null) mProfileListAdapter.notifyDataSetChanged();
-            else mProfileListAdapter.notifyItemChanged((int) arg);
-        };
-        Data.profiles.addObserver(profilesObserver);
+        if (profilesObserver == null) {
+            profilesObserver = (o, arg) -> {
+                findViewById(R.id.nav_profile_list).setMinimumHeight(
+                        (int) (getResources().getDimension(R.dimen.thumb_row_height) *
+                               Data.profiles.size()));
+
+                Log.d("profiles", "profile list changed");
+                if (arg == null) mProfileListAdapter.notifyDataSetChanged();
+                else mProfileListAdapter.notifyItemChanged((int) arg);
+            };
+            Data.profiles.addObserver(profilesObserver);
+        }
 
         ActionBarDrawerToggle toggle =
                 new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
@@ -356,6 +373,20 @@ public class MainActivity extends ProfileThemedActivity {
             Log.d("main", String.format("Date formatted: %s", text));
         }
     }
+    @Override
+    public void finish() {
+        if (profilesObserver != null) {
+            Data.profiles.deleteObserver(profilesObserver);
+            profilesObserver = null;
+        }
+
+        if (profileObserver != null) {
+            Data.profile.deleteObserver(profileObserver);
+            profileObserver = null;
+        }
+
+        super.finish();
+    }
     private void profileThemeChanged() {
         setupProfileColors();
 
@@ -381,7 +412,16 @@ public class MainActivity extends ProfileThemedActivity {
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
         MobileLedgerProfile profile;
 
-        profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
+        if (Data.profiles.isEmpty()) {
+            profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
+        }
+        else {
+            try(LockHolder lh = Data.profiles.lockForReading()) {
+                int i = Data.getProfileIndex(profileUUID);
+                if (i == -1 ) i = 0;
+                profile = Data.profiles.get(i);
+            }
+        }
 
         if (Data.profiles.isEmpty()) {
             findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);

@@ -167,7 +167,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         Data.accounts.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
-        update_account_table();
     }
     private void update_account_table() {
         if (this.getContext() == null) return;

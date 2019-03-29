@@ -22,6 +22,7 @@ import android.os.AsyncTask;
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TransactionListItem;
+import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import androidx.lifecycle.ViewModel;
