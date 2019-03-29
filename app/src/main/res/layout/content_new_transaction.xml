@@ -87,6 +87,7 @@
 
             <TableLayout
                 android:id="@+id/new_transaction_accounts_table"
+                android:animateLayoutChanges="true"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
