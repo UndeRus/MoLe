@@ -487,10 +487,28 @@ public class NewTransactionActivity extends ProfileThemedActivity
         Log.d("descr selected", description);
         if (!inputStateIsInitial()) return;
 
-        try (Cursor c = MLDB.getDatabase().rawQuery(
-                "select profile, id from transactions where description=? order by date desc " +
-                "limit 1", new String[]{description}))
-        {
+        MobileLedgerProfile currentProfile = Data.profile.get();
+        String accFilter = currentProfile.getPreferredAccountsFilter();
+
+        ArrayList<String> params = new ArrayList<>();
+        StringBuilder sb = new StringBuilder(
+                "select t.profile, t.id from transactions t where t.description=?");
+        params.add(description);
+
+        if (accFilter != null) {
+            sb.append(" AND EXISTS (").append("SELECT 1 FROM transaction_accounts ta ")
+                    .append("WHERE ta.profile = t.profile").append(" AND ta.transaction_id = t.id")
+                    .append(" AND UPPER(ta.account_name) LIKE '%'||?||'%')");
+            params.add(accFilter.toUpperCase());
+        }
+
+        sb.append(" ORDER BY date desc limit 1");
+
+        final String sql = sb.toString();
+        Log.d("descr", sql);
+        Log.d("descr", params.toString());
+
+        try (Cursor c = MLDB.getDatabase().rawQuery(sql, params.toArray(new String[]{}))) {
             if (!c.moveToNext()) return;
 
             String profileUUID = c.getString(0);
