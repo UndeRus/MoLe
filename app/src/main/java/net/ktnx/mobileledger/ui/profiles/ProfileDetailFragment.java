@@ -211,7 +211,6 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             if (isChecked) userName.requestFocus();
         });
 
-        preferredAccountsFilter.setText(mProfile.getPreferredAccountsFilter());
         postingPermitted.setOnCheckedChangeListener(((buttonView, isChecked) -> {
             preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         }));
@@ -230,6 +229,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
             userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
             password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
+            preferredAccountsFilter.setText(mProfile.getPreferredAccountsFilter());
             profileThemeId = mProfile.getThemeId();
         }
         else {
@@ -240,6 +240,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             authParams.setVisibility(View.GONE);
             userName.setText("");
             password.setText("");
+            preferredAccountsFilter.setText(null);
             profileThemeId = -1;
         }
 
