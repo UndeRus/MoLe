@@ -202,8 +202,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
     }
     private void hookSwipeListener(final TableRow row) {
         row.getChildAt(0).setOnTouchListener(new OnSwipeTouchListener(this) {
-            public void onSwipeLeft() {
-//                Log.d("swipe", "LEFT" + row.getId());
+            private void onSwipeAside() {
                 if (table.getChildCount() > 2) {
                     TableRow prev_row = (TableRow) table.getChildAt(table.indexOfChild(row) - 1);
                     TableRow next_row = (TableRow) table.getChildAt(table.indexOfChild(row) + 1);
@@ -236,6 +235,12 @@ public class NewTransactionActivity extends ProfileThemedActivity
                     Snackbar.make(table, R.string.msg_at_least_two_accounts_are_required,
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 }
+            }
+            public void onSwipeLeft() {
+                onSwipeAside();
+            }
+            public void onSwipeRight() {
+                onSwipeAside();
             }
             //            @Override
 //            public boolean performClick(View view, MotionEvent m) {
