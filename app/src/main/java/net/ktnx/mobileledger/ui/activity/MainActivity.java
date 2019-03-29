@@ -46,6 +46,7 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryAdapter;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
+import net.ktnx.mobileledger.ui.account_summary.AccountSummaryViewModel;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
@@ -58,7 +59,6 @@ import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -96,26 +96,14 @@ public class MainActivity extends ProfileThemedActivity {
     private int mCurrentPage;
     private String mAccountFilter;
     private boolean mBackMeansToAccountList = false;
+    private Observer profileObserver;
+    private Observer profilesObserver;
+    private Observer lastUpdateDateObserver;
     @Override
     protected void onStart() {
         super.onStart();
 
         Log.d("flow", "MainActivity.onStart()");
-        setupProfile();
-
-        updateLastUpdateTextFromDB();
-        Date lastUpdate = Data.lastUpdateDate.get();
-
-        long now = new Date().getTime();
-        if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
-            if (lastUpdate == null) Log.d("db::", "WEB data never fetched. scheduling a fetch");
-            else Log.d("db",
-                    String.format("WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
-                            lastUpdate.getTime() / 1000f, now / 1000f));
-
-            scheduleTransactionListRetrieval();
-        }
-
         mViewPager.setCurrentItem(mCurrentPage, false);
         if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
 
@@ -126,6 +114,18 @@ public class MainActivity extends ProfileThemedActivity {
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
         if (TransactionListFragment.accountFilter.get() != null)
             outState.putString(STATE_ACC_FILTER, TransactionListFragment.accountFilter.get());
+    }
+    @Override
+    protected void onDestroy() {
+        mSectionsPagerAdapter = null;
+        Data.profile.deleteObserver(profileObserver);
+        profileObserver = null;
+        Data.profiles.deleteObserver(profilesObserver);
+        profilesObserver = null;
+        Data.lastUpdateDate.deleteObserver(lastUpdateDateObserver);
+        RecyclerView root = findViewById(R.id.nav_profile_list);
+        if (root != null) root.setAdapter(null);
+        super.onDestroy();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,12 +155,12 @@ public class MainActivity extends ProfileThemedActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Data.profile.addObserver((o, arg) -> {
+        profileObserver = (o, arg) -> {
             MobileLedgerProfile profile = Data.profile.get();
-            runOnUiThread(() -> {
-                if (profile == null) setTitle(R.string.app_name);
-                else setTitle(profile.getName());
-                updateLastUpdateTextFromDB();
+            MainActivity.this.runOnUiThread(() -> {
+                if (profile == null) MainActivity.this.setTitle(R.string.app_name);
+                else MainActivity.this.setTitle(profile.getName());
+                MainActivity.this.updateLastUpdateTextFromDB();
                 if (profile.isPostingPermitted()) {
                     toolbar.setSubtitle(null);
                     fab.show();
@@ -184,25 +184,35 @@ public class MainActivity extends ProfileThemedActivity {
                 }
                 else mProfileListAdapter.notifyDataSetChanged();
 
-                collapseProfileList();
+                MainActivity.this.collapseProfileList();
 
                 int newProfileTheme = profile.getThemeId();
                 if (newProfileTheme != Colors.profileThemeId) {
                     Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
                             newProfileTheme));
-                    profileThemeChanged();
+                    MainActivity.this.profileThemeChanged();
                     Colors.profileThemeId = newProfileTheme;
                 }
-                else
-                    drawer.closeDrawers();
+                else drawer.closeDrawers();
+
+                Log.d("transactions", "requesting list reload");
+                TransactionListViewModel.scheduleTransactionListReload();
+
+                AccountSummaryViewModel.scheduleAccountListReload();
+
             });
-        });
-        Data.profiles.addObserver((o, arg) -> {
+        };
+        Data.profile.addObserver(profileObserver);
+        profilesObserver = (o, arg) -> {
             findViewById(R.id.nav_profile_list).setMinimumHeight(
                     (int) (getResources().getDimension(R.dimen.thumb_row_height) *
                            Data.profiles.size()));
-            mProfileListAdapter.notifyDataSetChanged();
-        });
+
+            Log.d("profiles", "profile list changed");
+            if (arg == null) mProfileListAdapter.notifyDataSetChanged();
+            else mProfileListAdapter.notifyItemChanged((int) arg);
+        };
+        Data.profiles.addObserver(profilesObserver);
 
         ActionBarDrawerToggle toggle =
                 new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
@@ -256,10 +266,11 @@ public class MainActivity extends ProfileThemedActivity {
             mAccountFilter = savedInstanceState.getString(STATE_ACC_FILTER, null);
         }
 
-        Data.lastUpdateDate.addObserver((o, arg) -> {
+        lastUpdateDateObserver = (o, arg) -> {
             Log.d("main", "lastUpdateDate changed");
             runOnUiThread(this::updateLastUpdateDisplay);
-        });
+        };
+        Data.lastUpdateDate.addObserver(lastUpdateDateObserver);
 
         updateLastUpdateDisplay();
 
@@ -275,26 +286,22 @@ public class MainActivity extends ProfileThemedActivity {
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
 
-        mProfileListAdapter = new ProfilesRecyclerViewAdapter();
+        if (mProfileListAdapter == null) mProfileListAdapter = new ProfilesRecyclerViewAdapter();
         root.setAdapter(mProfileListAdapter);
 
-        mProfileListAdapter.addEditingProfilesObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                if (mProfileListAdapter.isEditingProfiles()) {
-                    profileListHeadArrow.clearAnimation();
-                    profileListHeadArrow.setVisibility(View.GONE);
-                    profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadCancel.setVisibility(View.VISIBLE);
-                }
-                else {
-                    profileListHeadArrow.setRotation(180f);
-                    profileListHeadArrow.setVisibility(View.VISIBLE);
-                    profileListHeadCancel.setVisibility(View.GONE);
-                    profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadMore
-                            .setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
-                }
+        mProfileListAdapter.addEditingProfilesObserver((o, arg) -> {
+            if (mProfileListAdapter.isEditingProfiles()) {
+                profileListHeadArrow.clearAnimation();
+                profileListHeadArrow.setVisibility(View.GONE);
+                profileListHeadMore.setVisibility(View.GONE);
+                profileListHeadCancel.setVisibility(View.VISIBLE);
+            }
+            else {
+                profileListHeadArrow.setRotation(180f);
+                profileListHeadArrow.setVisibility(View.VISIBLE);
+                profileListHeadCancel.setVisibility(View.GONE);
+                profileListHeadMore.setVisibility(View.GONE);
+                profileListHeadMore.setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
             }
         });
 
@@ -315,6 +322,21 @@ public class MainActivity extends ProfileThemedActivity {
                 collapseProfileList();
             }
         });
+
+        setupProfile();
+
+        updateLastUpdateTextFromDB();
+        Date lastUpdate = Data.lastUpdateDate.get();
+
+        long now = new Date().getTime();
+        if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
+            if (lastUpdate == null) Log.d("db::", "WEB data never fetched. scheduling a fetch");
+            else Log.d("db",
+                    String.format("WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
+                            lastUpdate.getTime() / 1000f, now / 1000f));
+
+            scheduleTransactionListRetrieval();
+        }
     }
     private void updateLastUpdateDisplay() {
         LinearLayout l = findViewById(R.id.transactions_last_update_layout);

@@ -49,20 +49,10 @@ public class ProfilesRecyclerViewAdapter
         editProfile(view, profile);
     };
     private ObservableValue<Boolean> editingProfiles = new ObservableValue<>(false);
-    public void addEditingProfilesObserver(Observer o) {
-        editingProfiles.addObserver(o);
-    }
-    public void deleteEditingProfilesObserver(Observer o) {
-        editingProfiles.deleteObserver(o);
-    }
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     public ProfilesRecyclerViewAdapter() {
-        Data.profiles.addObserver((o, arg) -> {
-            Log.d("profiles", "profile list changed");
-            if (arg == null) notifyDataSetChanged();
-            else notifyItemChanged((int) arg);
-        });
+        Log.d("flow", "ProfilesRecyclerViewAdapter.new()");
 
         ItemTouchHelper.Callback cb = new ItemTouchHelper.Callback() {
             @Override
@@ -85,6 +75,12 @@ public class ProfilesRecyclerViewAdapter
             }
         };
         rearrangeHelper = new ItemTouchHelper(cb);
+    }
+    public void addEditingProfilesObserver(Observer o) {
+        editingProfiles.addObserver(o);
+    }
+    public void deleteEditingProfilesObserver(Observer o) {
+        editingProfiles.deleteObserver(o);
     }
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {

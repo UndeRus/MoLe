@@ -20,11 +20,6 @@ package net.ktnx.mobileledger.ui.transaction_list;
 import android.content.Context;
 import android.database.MatrixCursor;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,6 +30,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
@@ -48,6 +45,11 @@ import net.ktnx.mobileledger.utils.ObservableValue;
 import java.util.Observable;
 import java.util.Observer;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class TransactionListFragment extends MobileLedgerListFragment {
@@ -58,6 +60,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     private View vAccountFilter;
     private AutoCompleteTextView accNameFilter;
     private Observer backgroundTaskCountObserver;
+    private Observer accountFilterObserver;
     private static void update(Observable o, Object arg) {
     }
     @Override
@@ -184,18 +187,16 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             Globals.hideSoftKeyboard(mActivity);
         });
 
-        accountFilter.addObserver((o, arg) -> {
-            String accountName = accountFilter.get();
-            modelAdapter.setBoldAccountName(accountName);
-            setShowOnlyAccountName(accountName);
-            TransactionListViewModel.scheduleTransactionListReload();
-            if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
-        });
-
-        Data.profile.addObserver((o, arg) -> mActivity.runOnUiThread(() -> {
-            Log.d("transactions", "requesting list reload");
-            TransactionListViewModel.scheduleTransactionListReload();
-        }));
+        if (accountFilterObserver == null) {
+            accountFilterObserver = (o, arg) -> {
+                String accountName = accountFilter.get();
+                modelAdapter.setBoldAccountName(accountName);
+                setShowOnlyAccountName(accountName);
+                TransactionListViewModel.scheduleTransactionListReload();
+                if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
+            };
+            accountFilter.addObserver(accountFilterObserver);
+        }
 
         TransactionListViewModel.scheduleTransactionListReload();
         TransactionListViewModel.updating.addObserver(
