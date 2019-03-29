@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
@@ -126,7 +127,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
     @Override
     public int getItemCount() {
-        return TransactionListViewModel.getTransactionCount() + 1;
+        return Data.transactions.size() + 1;
     }
     public void setBoldAccountName(String boldAccountName) {
         this.boldAccountName = boldAccountName;

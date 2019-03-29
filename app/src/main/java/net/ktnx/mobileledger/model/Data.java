@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 public final class Data {
-    public static TransactionList transactions = new TransactionList();
+    public static ObservableList<TransactionListItem> transactions = new ObservableList<>(new ArrayList<>());
     public static ObservableList<LedgerAccount> accounts =
             new ObservableList<>(new ArrayList<>());
     public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);

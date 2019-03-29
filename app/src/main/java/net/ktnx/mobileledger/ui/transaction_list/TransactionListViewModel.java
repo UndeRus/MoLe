@@ -40,11 +40,12 @@ public class TransactionListViewModel extends ViewModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, filter);
     }
     public static TransactionListItem getTransactionListItem(int position) {
-        List<TransactionListItem> transactions = Data.transactions.get();
-        if (transactions == null) return null;
-        if (position >= transactions.size() + 1) return null;
-        if (position == transactions.size()) return new TransactionListItem();
-        return transactions.get(position);
+        try(LockHolder lh = Data.transactions.lockForReading()) {
+            if (Data.transactions == null) return null;
+            if (position >= Data.transactions.size() + 1) return null;
+            if (position == Data.transactions.size()) return new TransactionListItem();
+            return Data.transactions.get(position);
+        }
     }
     public static int getTransactionCount() {
         List<TransactionListItem> transactions = Data.transactions.get();

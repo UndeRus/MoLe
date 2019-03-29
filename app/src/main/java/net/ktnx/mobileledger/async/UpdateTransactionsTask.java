@@ -87,7 +87,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                     lastDateString = dateString;
                     odd = !odd;
                 }
-                Data.transactions.set(newList);
+                Data.transactions.setList(newList);
                 Log.d("UTT", "transaction list value updated");
             }
 
