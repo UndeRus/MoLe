@@ -24,8 +24,6 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
-import java.util.List;
-
 import androidx.lifecycle.ViewModel;
 
 public class TransactionListViewModel extends ViewModel {
@@ -46,11 +44,6 @@ public class TransactionListViewModel extends ViewModel {
             if (position == Data.transactions.size()) return new TransactionListItem();
             return Data.transactions.get(position);
         }
-    }
-    public static int getTransactionCount() {
-        List<TransactionListItem> transactions = Data.transactions.get();
-        if (transactions == null) return 0;
-        return transactions.size();
     }
     private static class UTT extends UpdateTransactionsTask {
         @Override
