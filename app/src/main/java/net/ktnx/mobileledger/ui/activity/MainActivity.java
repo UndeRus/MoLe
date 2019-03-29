@@ -183,6 +183,8 @@ public class MainActivity extends ProfileThemedActivity {
                 }
                 else mProfileListAdapter.notifyDataSetChanged();
 
+                collapseProfileList();
+
                 int newProfileTheme = profile.getThemeId();
                 if (newProfileTheme != Colors.profileThemeId) {
                     Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
@@ -190,6 +192,8 @@ public class MainActivity extends ProfileThemedActivity {
                     profileThemeChanged();
                     Colors.profileThemeId = newProfileTheme;
                 }
+                else
+                    drawer.closeDrawers();
             });
         });
         Data.profiles.addObserver((o, arg) -> {
