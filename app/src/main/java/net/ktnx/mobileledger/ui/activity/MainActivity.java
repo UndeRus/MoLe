@@ -99,6 +99,7 @@ public class MainActivity extends ProfileThemedActivity {
     private Observer profileObserver;
     private Observer profilesObserver;
     private Observer lastUpdateDateObserver;
+    private Toolbar mToolbar;
     @Override
     protected void onStart() {
         super.onStart();
@@ -106,14 +107,15 @@ public class MainActivity extends ProfileThemedActivity {
         Log.d("flow", "MainActivity.onStart()");
         mViewPager.setCurrentItem(mCurrentPage, false);
         if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
+        else Data.accountFilter.set(null);
 
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
-        if (TransactionListFragment.accountFilter.get() != null)
-            outState.putString(STATE_ACC_FILTER, TransactionListFragment.accountFilter.get());
+        if (Data.accountFilter.get() != null)
+            outState.putString(STATE_ACC_FILTER, Data.accountFilter.get());
     }
     @Override
     protected void onDestroy() {
@@ -155,87 +157,21 @@ public class MainActivity extends ProfileThemedActivity {
         if (extra != null && savedInstanceState == null) savedInstanceState = extra;
 
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         if (profileObserver == null) {
-            profileObserver = (o, arg) -> {
-                MobileLedgerProfile profile = Data.profile.get();
-                MainActivity.this.runOnUiThread(() -> {
-
-                    Data.transactions.clear();
-                    Log.d("transactions", "requesting list reload");
-                    TransactionListViewModel.scheduleTransactionListReload();
-
-                    Data.accounts.clear();
-                    AccountSummaryViewModel.scheduleAccountListReload();
-
-                    if (profile == null) MainActivity.this.setTitle(R.string.app_name);
-                    else MainActivity.this.setTitle(profile.getName());
-                    MainActivity.this.updateLastUpdateTextFromDB();
-                    int old_index = -1;
-                    int new_index = -1;
-                    if (arg != null) {
-                        MobileLedgerProfile old = (MobileLedgerProfile) arg;
-                        old_index = Data.getProfileIndex(old);
-                        new_index = Data.getProfileIndex(profile);
-                    }
-
-                    if ((old_index != -1) && (new_index != -1)) {
-                        mProfileListAdapter.notifyItemChanged(old_index);
-                        mProfileListAdapter.notifyItemChanged(new_index);
-                    }
-                    else mProfileListAdapter.notifyDataSetChanged();
-
-                    MainActivity.this.collapseProfileList();
-
-                    int newProfileTheme = (profile == null) ? -1 : profile.getThemeId();
-                    if (newProfileTheme != Colors.profileThemeId) {
-                        Log.d("profiles",
-                                String.format("profile theme %d → %d", Colors.profileThemeId,
-                                        newProfileTheme));
-                        MainActivity.this.profileThemeChanged();
-                        Colors.profileThemeId = newProfileTheme;
-                        // profileThemeChanged would restart the activity, so no need to reload the
-                        // data sets below
-                        return;
-                    }
-                    drawer.closeDrawers();
-
-                    if (profile == null) {
-                        toolbar.setSubtitle(null);
-                        fab.hide();
-                    }
-                    else {
-                        if (profile.isPostingPermitted()) {
-                            toolbar.setSubtitle(null);
-                            fab.show();
-                        }
-                        else {
-                            toolbar.setSubtitle(R.string.profile_subitlte_read_only);
-                            fab.hide();
-                        }
-                    }
-                });
-            };
+            profileObserver = (o, arg) -> onProfileChanged(arg);
             Data.profile.addObserver(profileObserver);
         }
 
         if (profilesObserver == null) {
-            profilesObserver = (o, arg) -> {
-                findViewById(R.id.nav_profile_list).setMinimumHeight(
-                        (int) (getResources().getDimension(R.dimen.thumb_row_height) *
-                               Data.profiles.size()));
-
-                Log.d("profiles", "profile list changed");
-                if (arg == null) mProfileListAdapter.notifyDataSetChanged();
-                else mProfileListAdapter.notifyItemChanged((int) arg);
-            };
+            profilesObserver = (o, arg) -> onProfileListChanged(arg);
             Data.profiles.addObserver(profilesObserver);
         }
 
         ActionBarDrawerToggle toggle =
-                new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
+                new ActionBarDrawerToggle(this, drawer, mToolbar, R.string.navigation_drawer_open,
                         R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -285,6 +221,7 @@ public class MainActivity extends ProfileThemedActivity {
             }
             mAccountFilter = savedInstanceState.getString(STATE_ACC_FILTER, null);
         }
+        else mAccountFilter = null;
 
         lastUpdateDateObserver = (o, arg) -> {
             Log.d("main", "lastUpdateDate changed");
@@ -357,6 +294,73 @@ public class MainActivity extends ProfileThemedActivity {
 
             scheduleTransactionListRetrieval();
         }
+    }
+    private void onProfileListChanged(Object arg) {
+        findViewById(R.id.nav_profile_list).setMinimumHeight(
+                (int) (getResources().getDimension(R.dimen.thumb_row_height) *
+                       Data.profiles.size()));
+
+        Log.d("profiles", "profile list changed");
+        if (arg == null) mProfileListAdapter.notifyDataSetChanged();
+        else mProfileListAdapter.notifyItemChanged((int) arg);
+    }
+    private void onProfileChanged(Object arg) {
+        MobileLedgerProfile profile = Data.profile.get();
+        MainActivity.this.runOnUiThread(() -> {
+
+            Data.transactions.clear();
+            Log.d("transactions", "requesting list reload");
+            TransactionListViewModel.scheduleTransactionListReload();
+
+            Data.accounts.clear();
+            AccountSummaryViewModel.scheduleAccountListReload();
+
+            if (profile == null) MainActivity.this.setTitle(R.string.app_name);
+            else MainActivity.this.setTitle(profile.getName());
+            MainActivity.this.updateLastUpdateTextFromDB();
+            int old_index = -1;
+            int new_index = -1;
+            if (arg != null) {
+                MobileLedgerProfile old = (MobileLedgerProfile) arg;
+                old_index = Data.getProfileIndex(old);
+                new_index = Data.getProfileIndex(profile);
+            }
+
+            if ((old_index != -1) && (new_index != -1)) {
+                mProfileListAdapter.notifyItemChanged(old_index);
+                mProfileListAdapter.notifyItemChanged(new_index);
+            }
+            else mProfileListAdapter.notifyDataSetChanged();
+
+            MainActivity.this.collapseProfileList();
+
+            int newProfileTheme = (profile == null) ? -1 : profile.getThemeId();
+            if (newProfileTheme != Colors.profileThemeId) {
+                Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
+                        newProfileTheme));
+                MainActivity.this.profileThemeChanged();
+                Colors.profileThemeId = newProfileTheme;
+                // profileThemeChanged would restart the activity, so no need to reload the
+                // data sets below
+                return;
+            }
+            drawer.closeDrawers();
+
+            if (profile == null) {
+                mToolbar.setSubtitle(null);
+                fab.hide();
+            }
+            else {
+                if (profile.isPostingPermitted()) {
+                    mToolbar.setSubtitle(null);
+                    fab.show();
+                }
+                else {
+                    mToolbar.setSubtitle(R.string.profile_subitlte_read_only);
+                    fab.hide();
+                }
+            }
+        });
     }
     private void updateLastUpdateDisplay() {
         LinearLayout l = findViewById(R.id.transactions_last_update_layout);
@@ -467,7 +471,7 @@ public class MainActivity extends ProfileThemedActivity {
     }
     private void showAccountSummaryFragment() {
         mViewPager.setCurrentItem(0, true);
-        TransactionListFragment.accountFilter.set(null);
+        Data.accountFilter.set(null);
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        accountSummaryFragment = new AccountSummaryFragment();
 //        ft.replace(R.id.root_frame, accountSummaryFragment);
@@ -483,8 +487,8 @@ public class MainActivity extends ProfileThemedActivity {
 //        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
     private void showTransactionsFragment(String accName) {
-        TransactionListFragment.accountFilter.set(accName);
-        TransactionListFragment.accountFilter.notifyObservers();
+        Data.accountFilter.set(accName);
+        Data.accountFilter.notifyObservers();
         mViewPager.setCurrentItem(1, true);
     }
     private void showTransactionsFragment(LedgerAccount account) {
@@ -519,7 +523,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
         else {
             if (mBackMeansToAccountList && (mViewPager.getCurrentItem() == 1)) {
-                TransactionListFragment.accountFilter.set(null);
+                Data.accountFilter.set(null);
                 showAccountSummaryFragment();
                 mBackMeansToAccountList = false;
             }

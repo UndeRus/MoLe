@@ -38,6 +38,7 @@ public final class Data {
     public static ObservableList<MobileLedgerProfile> profiles =
             new ObservableList<>(new ArrayList<>());
     public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
+    public static ObservableValue<String> accountFilter = new ObservableValue<>();
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
         profile.set(newProfile);

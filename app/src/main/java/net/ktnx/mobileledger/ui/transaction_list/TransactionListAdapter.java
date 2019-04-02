@@ -52,7 +52,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowHolder> {
-    private String boldAccountName;
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
         TransactionListItem item = TransactionListViewModel.getTransactionListItem(position);
 
@@ -74,7 +73,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
                 TransactionLoader loader = new TransactionLoader();
                 loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                        new TransactionLoaderParams(tr, holder, position, boldAccountName,
+                        new TransactionLoaderParams(tr, holder, position, Data.accountFilter.get(),
                                 item.isOdd()));
 
                 // WORKAROUND what seems to be a bug in CardHolder somewhere
@@ -129,15 +128,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     public int getItemCount() {
         return Data.transactions.size() + 1;
     }
-    public void setBoldAccountName(String boldAccountName) {
-        this.boldAccountName = boldAccountName;
-    }
-    public void resetBoldAccountName() {
-        this.boldAccountName = null;
-    }
-
     enum LoaderStep {HEAD, ACCOUNTS, DONE}
-
     private static class TransactionLoader
             extends AsyncTask<TransactionLoaderParams, TransactionLoaderStep, Void> {
         @Override
