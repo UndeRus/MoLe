@@ -677,10 +677,14 @@ public class MainActivity extends ProfileThemedActivity {
 
     }
     public void onAccountSummaryRowViewClicked(View view) {
-        ViewGroup row = (ViewGroup) view.getParent();
+        ViewGroup row;
+        if ( view.getId() == R.id.account_expander ) row = (ViewGroup) view.getParent().getParent();
+        else row = (ViewGroup) view.getParent();
+
         LedgerAccount acc = (LedgerAccount) row.getTag();
         switch (view.getId()) {
             case R.id.account_row_acc_name:
+            case R.id.account_expander:
             case R.id.account_expander_container:
                 Log.d("accounts", "Account expander clicked");
                 if (!acc.hasSubAccounts()) return;
