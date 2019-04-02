@@ -420,9 +420,9 @@ public class MainActivity extends ProfileThemedActivity {
             profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
         }
         else {
-            try(LockHolder lh = Data.profiles.lockForReading()) {
+            try (LockHolder lh = Data.profiles.lockForReading()) {
                 int i = Data.getProfileIndex(profileUUID);
-                if (i == -1 ) i = 0;
+                if (i == -1) i = 0;
                 profile = Data.profiles.get(i);
             }
         }
