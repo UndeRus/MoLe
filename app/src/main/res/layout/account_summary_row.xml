@@ -44,6 +44,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:onClick="onAccountSummaryRowViewClicked"
+        android:longClickable="true"
         android:paddingStart="8dp"
         android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
         app:layout_constraintBottom_toBottomOf="parent"

@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.account_summary;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -170,9 +171,8 @@ public class AccountSummaryAdapter
             this.vTrailer = itemView.findViewById(R.id.account_summary_trailer);
             this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
             this.expander = itemView.findViewById(R.id.account_expander);
-            this.accountExpanderContainer = itemView.findViewById(R.id.account_row_amounts_expander_container);
-
-            MainActivity activity = (MainActivity) row.getContext();
+            this.accountExpanderContainer =
+                    itemView.findViewById(R.id.account_row_amounts_expander_container);
 
             expanderContainer.addOnLayoutChangeListener(
                     (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
@@ -185,26 +185,49 @@ public class AccountSummaryAdapter
                         else v.setPadding(0, 0, 0, 0);
                     });
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
-                    LedgerAccount acc =
-                            (LedgerAccount) v.findViewById(R.id.account_summary_row).getTag();
-                    builder.setTitle(acc.getName());
-                    builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
-                        switch(which) {
-                            case 0:
-                                // show transactions
-                                activity.showAccountTransactions(acc);
-                                break;
-                        }
-                        dialog.dismiss();
-                    });
-                    builder.show();
-                    return true;
+            itemView.setOnLongClickListener(this::onItemLongClick);
+            tvAccountName.setOnLongClickListener(this::onItemLongClick);
+            tvAccountAmounts.setOnLongClickListener(this::onItemLongClick);
+            expanderContainer.setOnLongClickListener(this::onItemLongClick);
+            expander.setOnLongClickListener(this::onItemLongClick);
+        }
+        private boolean onItemLongClick(View v) {
+            MainActivity activity = (MainActivity) v.getContext();
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            View row;
+            int id = v.getId();
+            switch (id) {
+                case R.id.account_summary_row:
+                    row = v;
+                    break;
+                case R.id.account_root:
+                    row = v.findViewById(R.id.account_summary_row);
+                    break;
+                case R.id.account_row_acc_name:
+                case R.id.account_row_acc_amounts:
+                case R.id.account_expander_container:
+                    row = (View) v.getParent();
+                    break;
+                case R.id.account_expander:
+                    row = (View) v.getParent().getParent();
+                    break;
+                default:
+                    Log.e("error", String.format("Don't know how to handle long click on id ", id));
+                    return false;
+            }
+            LedgerAccount acc = (LedgerAccount) row.findViewById(R.id.account_summary_row).getTag();
+            builder.setTitle(acc.getName());
+            builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
+                switch (which) {
+                    case 0:
+                        // show transactions
+                        activity.showAccountTransactions(acc);
+                        break;
                 }
+                dialog.dismiss();
             });
+            builder.show();
+            return true;
         }
     }
 }
