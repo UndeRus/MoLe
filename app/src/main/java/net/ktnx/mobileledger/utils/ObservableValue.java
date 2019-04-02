@@ -53,10 +53,17 @@ public class ObservableValue<T> {
     public int countObservers() {
         return impl.countObservers();
     }
+    public void forceNotifyObservers() {
+        impl.setChanged();
+        impl.notifyObservers();
+    }
     private class ObservableValueImpl<T> extends Observable {
         protected T value;
         public void setValue(T newValue) {
             setValue(newValue, true);
+        }
+        protected void setChanged() {
+            super.setChanged();
         }
         private synchronized void setValue(T newValue, boolean notify) {
             if ((newValue == null) && (value == null)) return;
