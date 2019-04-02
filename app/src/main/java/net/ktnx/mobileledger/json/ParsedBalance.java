@@ -19,6 +19,8 @@ package net.ktnx.mobileledger.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import androidx.annotation.NonNull;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedBalance {
     private ParsedQuantity aquantity;
@@ -32,8 +34,9 @@ public class ParsedBalance {
     public void setAquantity(ParsedQuantity aquantity) {
         this.aquantity = aquantity;
     }
+    @NonNull
     public String getAcommodity() {
-        return acommodity;
+        return (acommodity == null) ? "" : acommodity;
     }
     public void setAcommodity(String acommodity) {
         this.acommodity = acommodity;

@@ -414,9 +414,26 @@ public class RetrieveTransactionsTask
                     else acc.removeAmounts();
 
                     profile.storeAccount(db, acc);
+                    String lastCurrency = null;
+                    float lastCurrencyAmount = 0;
                     for (ParsedBalance b : parsedAccount.getAibalance()) {
-                        profile.storeAccountValue(db, acc.getName(), b.getAcommodity(),
-                                b.getAquantity().asFloat());
+                        final String currency = b.getAcommodity();
+                        final float amount = b.getAquantity().asFloat();
+                        if (currency.equals(lastCurrency)) lastCurrencyAmount += amount;
+                        else {
+                            if (lastCurrency != null) {
+                                profile.storeAccountValue(db, acc.getName(), lastCurrency,
+                                        lastCurrencyAmount);
+                                acc.addAmount(lastCurrencyAmount, lastCurrency);
+                            }
+                            lastCurrency = currency;
+                            lastCurrencyAmount = amount;
+                        }
+                    }
+                    if (lastCurrency != null) {
+                        profile.storeAccountValue(db, acc.getName(), lastCurrency,
+                                lastCurrencyAmount);
+                        acc.addAmount(lastCurrencyAmount, lastCurrency);
                     }
 
                     if (acc.isVisible(accountList)) accountList.add(acc);
