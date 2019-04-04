@@ -2,7 +2,8 @@
 
 ## [0.9] - 2019-04-04
  * NEW:
-  - Account list: Accounts with many commodities have their commodity list collapsed to avoid  filling too much of the screen with one account
+  - App shortcuts to the New transaction screen on Android 7.1+
+  - Account list: Accounts with many commodities have their commodity list collapsed to avoid filling too much of the screen with one account
   - Account list: Viewing account's transactions migrated to a context menu
   - Auto-filling of the accounts in the new transaction screen can be limitted to the transactions using accounts corresponding to a filter -- the filter is set in the profile details
  * IMPROVED:
@@ -16,6 +17,7 @@
   - Transaction list: keep account name filter when the device is rotated
   - Avoid a restart upon app startup when the active profile uses a non-default colour theme
   - Account commodities no longer disappear after updating the data from the remote backend via the JSON API
+  - Fix legacy account parser when handling missing parent accounts
   - Removed a couple of memory leaks
 
 ## [0.8.1] - 2019-03-26
