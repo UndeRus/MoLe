@@ -512,6 +512,7 @@ public class RetrieveTransactionsTask
                             Log.d("rtt", String.format(
                                     "Detected native file order after %d transactions (factor %d)",
                                     processedTransactionCount, orderAccumulator));
+                            progress.setTotal(Data.transactions.size());
                         }
                         else if (orderAccumulator < -30) {
                             transactionOrder = DetectedTransactionOrder.REVERSE_CHRONOLOGICAL;
@@ -542,8 +543,10 @@ public class RetrieveTransactionsTask
                         progress.setTotal(maxTransactionId);
                     }
 
-                    if ((progress.getTotal() == Progress.INDETERMINATE) ||
-                        (progress.getTotal() < transaction.getId()))
+
+                    if ((transactionOrder != DetectedTransactionOrder.UNKNOWN) &&
+                        ((progress.getTotal() == Progress.INDETERMINATE) ||
+                         (progress.getTotal() < transaction.getId())))
                         progress.setTotal(transaction.getId());
 
                     progress.setProgress(++processedTransactionCount);
