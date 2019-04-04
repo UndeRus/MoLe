@@ -23,15 +23,54 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.utils.Globals;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedLedgerTransaction {
-    private String tdate, tdate2, tdescription, tcomment;
+    private String tdate;
+    private String tdate2;
+    private String tdescription;
+    private String tcomment;
+    private String tcode = "";
+    private String tstatus = "Unmarked";
+    private String tprecedingcomment;
     private int tindex;
     private List<ParsedPosting> tpostings;
+    private List<String> ttags = new ArrayList<>();
+    private ParsedSourcePos tsourcepos = new ParsedSourcePos();
     public ParsedLedgerTransaction() {
+    }
+    public String getTcode() {
+        return tcode;
+    }
+    public void setTcode(String tcode) {
+        this.tcode = tcode;
+    }
+    public String getTstatus() {
+        return tstatus;
+    }
+    public void setTstatus(String tstatus) {
+        this.tstatus = tstatus;
+    }
+    public List<String> getTtags() {
+        return ttags;
+    }
+    public void setTtags(List<String> ttags) {
+        this.ttags = ttags;
+    }
+    public ParsedSourcePos getTsourcepos() {
+        return tsourcepos;
+    }
+    public void setTsourcepos(ParsedSourcePos tsourcepos) {
+        this.tsourcepos = tsourcepos;
+    }
+    public String getTprecedingcomment() {
+        return tprecedingcomment;
+    }
+    public void setTprecedingcomment(String tprecedingcomment) {
+        this.tprecedingcomment = tprecedingcomment;
     }
     public String getTdate() {
         return tdate;

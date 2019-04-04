@@ -25,7 +25,14 @@ public class ParsedAmount {
     private ParsedQuantity aquantity;
     private boolean aismultiplier;
     private ParsedStyle astyle;
+    private ParsedPrice aprice = new ParsedPrice();
     public ParsedAmount() {
+    }
+    public ParsedPrice getAprice() {
+        return aprice;
+    }
+    public void setAprice(ParsedPrice aprice) {
+        this.aprice = aprice;
     }
     public String getAcommodity() {
         return acommodity;

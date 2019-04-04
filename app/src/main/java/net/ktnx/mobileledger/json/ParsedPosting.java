@@ -21,13 +21,63 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedPosting {
+    private Void pbalanceassertion;
+    private String pstatus = "Unmarked";
     private String paccount;
     private List<ParsedAmount> pamount;
+    private String pdate = null;
+    private String ptype = "RegularPosting";
+    private String pcomment = "";
+    private ArrayList<String> ptags = new ArrayList<>();
+    private String poriginal = null;
     public ParsedPosting() {
+    }
+    public String getPdate() {
+        return pdate;
+    }
+    public void setPdate(String pdate) {
+        this.pdate = pdate;
+    }
+    public String getPtype() {
+        return ptype;
+    }
+    public void setPtype(String ptype) {
+        this.ptype = ptype;
+    }
+    public String getPcomment() {
+        return pcomment;
+    }
+    public void setPcomment(String pcomment) {
+        this.pcomment = pcomment;
+    }
+    public ArrayList<String> getPtags() {
+        return ptags;
+    }
+    public void setPtags(ArrayList<String> ptags) {
+        this.ptags = ptags;
+    }
+    public String getPoriginal() {
+        return poriginal;
+    }
+    public void setPoriginal(String poriginal) {
+        this.poriginal = poriginal;
+    }
+    public String getPstatus() {
+        return pstatus;
+    }
+    public void setPstatus(String pstatus) {
+        this.pstatus = pstatus;
+    }
+    public Void getPbalanceassertion() {
+        return pbalanceassertion;
+    }
+    public void setPbalanceassertion(Void pbalanceassertion) {
+        this.pbalanceassertion = pbalanceassertion;
     }
     public String getPaccount() {
         return paccount;

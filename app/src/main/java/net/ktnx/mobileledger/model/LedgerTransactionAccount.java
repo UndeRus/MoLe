@@ -17,6 +17,13 @@
 
 package net.ktnx.mobileledger.model;
 
+import net.ktnx.mobileledger.json.ParsedAmount;
+import net.ktnx.mobileledger.json.ParsedPosting;
+import net.ktnx.mobileledger.json.ParsedQuantity;
+import net.ktnx.mobileledger.json.ParsedStyle;
+
+import java.util.ArrayList;
+
 import androidx.annotation.NonNull;
 
 public class LedgerTransactionAccount {
@@ -84,5 +91,26 @@ public class LedgerTransactionAccount {
         sb.append(String.format("%,1.2f", amount));
 
         return sb.toString();
+    }
+    public ParsedPosting asParsedPosting() {
+        ParsedPosting result = new ParsedPosting();
+        result.setPaccount(accountName);
+        ArrayList<ParsedAmount> amounts = new ArrayList<>();
+        ParsedAmount amt = new ParsedAmount();
+        amt.setAcommodity((currency == null) ? "" : currency);
+        amt.setAismultiplier(false);
+        ParsedQuantity qty = new ParsedQuantity();
+        qty.setDecimalPlaces(2);
+        qty.setDecimalMantissa(Math.round(amount * 100));
+        amt.setAquantity(qty);
+        ParsedStyle style = new ParsedStyle();
+        style.setAscommodityside('L');
+        style.setAscommodityspaced(false);
+        style.setAsprecision(2);
+        style.setAsdecimalpoint('.');
+        amt.setAstyle(style);
+        amounts.add(amt);
+        result.setPamount(amounts);
+        return result;
     }
 }

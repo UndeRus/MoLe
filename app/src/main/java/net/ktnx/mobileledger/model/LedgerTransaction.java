@@ -21,6 +21,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
+import net.ktnx.mobileledger.json.ParsedPosting;
 import net.ktnx.mobileledger.utils.Digest;
 import net.ktnx.mobileledger.utils.Globals;
 
@@ -185,5 +187,22 @@ public class LedgerTransaction {
     }
     public void finishLoading() {
         dataLoaded = true;
+    }
+    public ParsedLedgerTransaction toParsedLedgerTransaction() {
+        ParsedLedgerTransaction result = new ParsedLedgerTransaction();
+        result.setTcomment("");
+        result.setTprecedingcomment("");
+
+        ArrayList<ParsedPosting> postings = new ArrayList<>();
+        for (LedgerTransactionAccount acc : accounts) {
+            if (!acc.getAccountName().isEmpty()) postings.add(acc.asParsedPosting());
+        }
+
+        result.setTpostings(postings);
+        result.setTdate(Globals.formatIsoDate(date));
+        result.setTdate2(null);
+        result.setTindex(1);
+        result.setTdescription(description);
+        return result;
     }
 }
