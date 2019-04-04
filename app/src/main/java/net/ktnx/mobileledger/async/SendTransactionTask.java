@@ -20,6 +20,10 @@ package net.ktnx.mobileledger.async;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
+import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
@@ -40,20 +44,66 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.Thread.sleep;
+import static android.os.SystemClock.sleep;
 
-public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
+public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private final TaskCallback taskCallback;
     protected String error;
     private String token;
     private String session;
-    private String backendUrl;
     private LedgerTransaction ltr;
 
-    public SaveTransactionTask(TaskCallback callback) {
+    public SendTransactionTask(TaskCallback callback) {
         taskCallback = callback;
     }
     private boolean sendOK() throws IOException {
+        HttpURLConnection http = NetworkUtil.prepareConnection(Data.profile.get(), "add");
+        http.setRequestMethod("PUT");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "*/*");
+
+        ParsedLedgerTransaction jsonTransaction;
+        jsonTransaction = ltr.toParsedLedgerTransaction();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writerFor(ParsedLedgerTransaction.class);
+        String body = writer.writeValueAsString(jsonTransaction);
+
+        byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+        http.setDoOutput(true);
+        http.setDoInput(true);
+        http.addRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
+
+        Log.d("network", "request header: " + http.getRequestProperties().toString());
+
+        try (OutputStream req = http.getOutputStream()) {
+            Log.d("network", "Request body: " + body);
+            req.write(bodyBytes);
+
+            final int responseCode = http.getResponseCode();
+            Log.d("network",
+                    String.format("Response: %d %s", responseCode, http.getResponseMessage()));
+
+            try (InputStream resp = http.getErrorStream()) {
+
+                switch (responseCode) {
+                    case 200:
+                    case 201:
+                        break;
+                    case 405:
+                        return false; // will cause a retry with the legacy method
+                    default:
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
+                        String line = reader.readLine();
+                        Log.d("network", "Response content: " + line);
+                        throw new IOException(
+                                String.format("Error response code %d", responseCode));
+                }
+            }
+        }
+
+        return true;
+    }
+    private boolean legacySendOK() throws IOException {
         HttpURLConnection http = NetworkUtil.prepareConnection(Data.profile.get(), "add");
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -144,19 +194,15 @@ public class SaveTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
         error = null;
         try {
-            backendUrl = Data.profile.get().getUrl();
             ltr = ledgerTransactions[0];
 
-            int tried = 0;
-            while (!sendOK()) {
-                try {
-                    tried++;
-                    if (tried >= 2)
-                        throw new IOException(String.format("aborting after %d tries", tried));
-                    sleep(100);
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
+            if (!sendOK()) {
+                int tried = 0;
+                while (!legacySendOK()) {
+                        tried++;
+                        if (tried >= 2)
+                            throw new IOException(String.format("aborting after %d tries", tried));
+                        sleep(100);
                 }
             }
         }

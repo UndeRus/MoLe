@@ -47,7 +47,7 @@ import com.google.android.material.snackbar.Snackbar;
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
-import net.ktnx.mobileledger.async.SaveTransactionTask;
+import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -77,7 +77,7 @@ import androidx.fragment.app.DialogFragment;
 
 public class NewTransactionActivity extends ProfileThemedActivity
         implements TaskCallback, DescriptionSelectedCallback {
-    private static SaveTransactionTask saver;
+    private static SendTransactionTask saver;
     private TableLayout table;
     private ProgressBar progress;
     private FloatingActionButton fab;
@@ -149,7 +149,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         progress.setVisibility(View.VISIBLE);
         try {
 
-            saver = new SaveTransactionTask(this);
+            saver = new SendTransactionTask(this);
 
             String dateString = tvDate.getText().toString();
             Date date;
@@ -158,16 +158,29 @@ public class NewTransactionActivity extends ProfileThemedActivity
             LedgerTransaction tr = new LedgerTransaction(date, tvDescription.getText().toString());
 
             TableLayout table = findViewById(R.id.new_transaction_accounts_table);
+            LedgerTransactionAccount emptyAmountAccount = null;
+            float emptyAmountAccountBalance = 0;
             for (int i = 0; i < table.getChildCount(); i++) {
                 TableRow row = (TableRow) table.getChildAt(i);
                 String acc = ((TextView) row.getChildAt(0)).getText().toString();
+                if (acc.isEmpty()) continue;
+
                 String amt = ((TextView) row.getChildAt(1)).getText().toString();
-                LedgerTransactionAccount item =
-                        amt.length() > 0 ? new LedgerTransactionAccount(acc, Float.parseFloat(amt))
-                                         : new LedgerTransactionAccount(acc);
+                LedgerTransactionAccount item;
+                if (amt.length() > 0) {
+                    final float amount = Float.parseFloat(amt);
+                    item = new LedgerTransactionAccount(acc, amount);
+                    emptyAmountAccountBalance += amount;
+                }
+                else {
+                    item = new LedgerTransactionAccount(acc);
+                    emptyAmountAccount = item;
+                }
 
                 tr.addAccount(item);
             }
+
+            if (emptyAmountAccount != null) emptyAmountAccount.setAmount(-emptyAmountAccountBalance);
             saver.execute(tr);
         }
         catch (ParseException e) {
