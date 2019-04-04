@@ -1,5 +1,23 @@
 # Changes
 
+## [0.9] - 2019-04-04
+ * NEW:
+  - Account list: Accounts with many commodities have their commodity list collapsed to avoid  filling too much of the screen with one account
+  - Account list: Viewing account's transactions migrated to a context menu
+  - Auto-filling of the accounts in the new transaction screen can be limitted to the transactions using accounts corresponding to a filter -- the filter is set in the profile details
+ * IMPROVED:
+  - Transaction list: Back now returns to the accounts list when activated after viewing account's transactions
+  - Profile details: deleting a profile requires confirmation
+  - Enable animations when adding/removing rows in the new transaction screen
+  - Better visual feedback when removing transaction details rows by side-swiping
+  - New transactions are now sent via the JSON API if it is available
+  - Better progress handling while downloading transactions via the JSON API
+ * FIXED:
+  - Transaction list: keep account name filter when the device is rotated
+  - Avoid a restart upon app startup when the active profile uses a non-default colour theme
+  - Account commodities no longer disappear after updating the data from the remote backend via the JSON API
+  - Removed a couple of memory leaks
+
 ## [0.8.1] - 2019-03-26
  * Avoid double slashes when constructing backend URLs
  * Remove all data belonging to deleted profiles
