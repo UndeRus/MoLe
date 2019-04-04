@@ -64,10 +64,15 @@ public class ProfilesRecyclerViewAdapter
             public boolean onMove(@NonNull RecyclerView recyclerView,
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
-                Collections.swap(Data.profiles, viewHolder.getAdapterPosition(),
-                        target.getAdapterPosition());
-                MobileLedgerProfile.storeProfilesOrder();
-                notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                Data.profiles.blockNotifications();
+                try {
+                    Collections.swap(Data.profiles, viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                    MobileLedgerProfile.storeProfilesOrder();
+                    notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                }
+                finally {
+                    Data.profiles.unblockNotifications();
+                }
                 return true;
             }
             @Override
