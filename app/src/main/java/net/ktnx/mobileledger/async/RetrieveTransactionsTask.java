@@ -112,6 +112,7 @@ public class RetrieveTransactionsTask
         int maxTransactionId = Progress.INDETERMINATE;
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
         HashMap<String, Void> accountNames = new HashMap<>();
+        HashMap<String, LedgerAccount> syntheticAccounts = new HashMap<>();
         LedgerAccount lastAccount = null, prevAccount = null;
         boolean onlyStarred = Data.optShowOnlyStarred.get();
 
@@ -186,6 +187,9 @@ public class RetrieveTransactionsTask
                                             .setHasSubAccounts(prevAccount.isParentOf(lastAccount));
                                     // make sure the parent account(s) are present,
                                     // synthesising them if necessary
+                                    // this happens when the (missing-in-HTML) parent account has
+                                    // only one child so we create a synthetic parent account record,
+                                    // copying the amounts when child's amounts are parsed
                                     String parentName = lastAccount.getParentName();
                                     if (parentName != null) {
                                         Stack<String> toAppend = new Stack<>();
@@ -195,16 +199,24 @@ public class RetrieveTransactionsTask
                                             parentName =
                                                     new LedgerAccount(parentName).getParentName();
                                         }
+                                        syntheticAccounts.clear();
                                         while (!toAppend.isEmpty()) {
                                             String aName = toAppend.pop();
-                                            LedgerAccount acc = new LedgerAccount(aName);
-                                            acc.setHiddenByStar(lastAccount.isHiddenByStar());
+                                            LedgerAccount acc = profile.tryLoadAccount(db, aName);
+                                            if (acc == null) {
+                                                acc = new LedgerAccount(aName);
+                                                acc.setHiddenByStar(lastAccount.isHiddenByStar());
+                                                acc.setExpanded(!lastAccount.hasSubAccounts() ||
+                                                                lastAccount.isExpanded());
+                                            }
                                             acc.setHasSubAccounts(true);
+                                            acc.removeAmounts();    // filled below when amounts are parsed
                                             if ((!onlyStarred || !acc.isHiddenByStar()) &&
                                                 acc.isVisible(accountList)) accountList.add(acc);
                                             L(String.format("gap-filling with %s", aName));
                                             accountNames.put(aName, null);
                                             profile.storeAccount(db, acc);
+                                            syntheticAccounts.put(aName, acc);
                                         }
                                     }
 
@@ -230,9 +242,14 @@ public class RetrieveTransactionsTask
                                     if (currency == null) currency = "";
                                     value = value.replace(',', '.');
                                     L("curr=" + currency + ", value=" + value);
+                                    final float val = Float.parseFloat(value);
                                     profile.storeAccountValue(db, lastAccount.getName(), currency,
-                                            Float.valueOf(value));
-                                    lastAccount.addAmount(Float.parseFloat(value), currency);
+                                            val);
+                                    lastAccount.addAmount(val, currency);
+                                    for (LedgerAccount syn : syntheticAccounts.values()) {
+                                        syn.addAmount(val, currency);
+                                        profile.storeAccountValue(db, syn.getName(), currency, val);
+                                    }
                                 }
 
                                 if (match_found) {
