@@ -119,7 +119,7 @@ public class LedgerAccount {
     public void addAmount(float amount) {
         this.addAmount(amount, null);
     }
-    public int getAmountCount() { return amounts.size(); }
+    public int getAmountCount() { return (amounts != null) ? amounts.size() : 0; }
     public String getAmountsString() {
         if ((amounts == null) || amounts.isEmpty()) return "";
 
@@ -193,4 +193,5 @@ public class LedgerAccount {
     public boolean amountsExpanded() { return amountsExpanded; }
     public void setAmountsExpanded(boolean flag) { amountsExpanded = flag; }
     public void toggleAmountsExpanded() { amountsExpanded = !amountsExpanded; }
+
 }
