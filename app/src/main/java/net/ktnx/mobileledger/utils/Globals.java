@@ -88,4 +88,7 @@ public final class Globals {
     public static String formatLedgerDate(Date date) {
         return dateFormatter.get().format(date);
     }
+    public static String formatIsoDate(Date date) {
+        return isoDateFormatter.get().format(date);
+    }
 }
