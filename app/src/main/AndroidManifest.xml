@@ -56,10 +56,6 @@
                 android:value="net.ktnx.mobileledger.ui.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.activity.ProfileListActivity"
-            android:label="@string/title_profile_list"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
             android:name=".ui.activity.ProfileDetailActivity"
             android:label="@string/title_profile_details"
             android:parentActivityName=".ui.activity.MainActivity"
