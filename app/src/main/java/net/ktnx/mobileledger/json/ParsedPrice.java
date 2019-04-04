@@ -19,13 +19,59 @@ package net.ktnx.mobileledger.json;
 
 class ParsedPrice {
     private String tag;
+    private Contents contents;
     public ParsedPrice() {
         tag = "NoPrice";
+    }
+    public Contents getContents() {
+        return contents;
+    }
+    public void setContents(Contents contents) {
+        this.contents = contents;
     }
     public String getTag() {
         return tag;
     }
     public void setTag(String tag) {
         this.tag = tag;
+    }
+    private class Contents {
+        private ParsedPrice aprice;
+        private ParsedQuantity aquantity;
+        private String acommodity;
+        private boolean aismultiplier;
+        private ParsedStyle astyle;
+        public Contents() {
+        }
+        public ParsedPrice getAprice() {
+            return aprice;
+        }
+        public void setAprice(ParsedPrice aprice) {
+            this.aprice = aprice;
+        }
+        public ParsedQuantity getAquantity() {
+            return aquantity;
+        }
+        public void setAquantity(ParsedQuantity aquantity) {
+            this.aquantity = aquantity;
+        }
+        public String getAcommodity() {
+            return acommodity;
+        }
+        public void setAcommodity(String acommodity) {
+            this.acommodity = acommodity;
+        }
+        public boolean isAismultiplier() {
+            return aismultiplier;
+        }
+        public void setAismultiplier(boolean aismultiplier) {
+            this.aismultiplier = aismultiplier;
+        }
+        public ParsedStyle getAstyle() {
+            return astyle;
+        }
+        public void setAstyle(ParsedStyle astyle) {
+            this.astyle = astyle;
+        }
     }
 }
