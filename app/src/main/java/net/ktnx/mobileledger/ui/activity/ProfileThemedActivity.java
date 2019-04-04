@@ -20,14 +20,17 @@ package net.ktnx.mobileledger.ui.activity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
 
 import androidx.annotation.Nullable;
 
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
+    protected MobileLedgerProfile mProfile;
     protected void setupProfileColors() {
-        Colors.setupTheme(this);
+        Colors.setupTheme(this, mProfile);
     }
     @Override
     protected void onStart() {
@@ -35,7 +38,11 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         Colors.refreshColors(getTheme());
     }
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        initProfile();
         super.onCreate(savedInstanceState);
-        Colors.setupTheme(this);
+        setupProfileColors();
+    }
+    protected void initProfile() {
+        mProfile = Data.profile.get();
     }
 }

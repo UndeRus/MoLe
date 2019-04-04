@@ -19,8 +19,12 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -57,6 +61,7 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Observer;
@@ -281,6 +286,7 @@ public class MainActivity extends ProfileThemedActivity {
         });
 
         setupProfile();
+        onProfileChanged(null);
 
         updateLastUpdateTextFromDB();
         Date lastUpdate = Data.lastUpdateDate.get();
@@ -295,6 +301,27 @@ public class MainActivity extends ProfileThemedActivity {
             scheduleTransactionListRetrieval();
         }
     }
+    private void createShortcuts() {
+        Resources rm = getResources();
+        List<ShortcutInfo> shortcuts = new ArrayList<>();
+        try (LockHolder lh = Data.profiles.lockForReading()) {
+            for (int i = 0; i < Data.profiles.size(); i++) {
+                MobileLedgerProfile p = Data.profiles.get(i);
+                if (!p.isPostingPermitted()) continue;
+
+                ShortcutInfo si = new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid())
+                        .setShortLabel(p.getName())
+                        .setIcon(Icon.createWithResource(this, R.drawable.svg_thick_plus_white))
+                        .setIntent(new Intent(Intent.ACTION_VIEW, null, this,
+                                NewTransactionActivity.class).putExtra("profile_uuid", p.getUuid()))
+                        .setRank(i)
+                        .build();
+                shortcuts.add(si);
+            }
+        }
+        ShortcutManager sm = getSystemService(ShortcutManager.class);
+        sm.setDynamicShortcuts(shortcuts);
+    }
     private void onProfileListChanged(Object arg) {
         findViewById(R.id.nav_profile_list).setMinimumHeight(
                 (int) (getResources().getDimension(R.dimen.thumb_row_height) *
@@ -303,6 +330,8 @@ public class MainActivity extends ProfileThemedActivity {
         Log.d("profiles", "profile list changed");
         if (arg == null) mProfileListAdapter.notifyDataSetChanged();
         else mProfileListAdapter.notifyItemChanged((int) arg);
+
+        createShortcuts();
     }
     private void onProfileChanged(Object arg) {
         MobileLedgerProfile profile = Data.profile.get();
@@ -669,7 +698,7 @@ public class MainActivity extends ProfileThemedActivity {
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;
-        if ( view.getId() == R.id.account_expander ) row = (ViewGroup) view.getParent().getParent();
+        if (view.getId() == R.id.account_expander) row = (ViewGroup) view.getParent().getParent();
         else row = (ViewGroup) view.getParent();
 
         LedgerAccount acc = (LedgerAccount) row.getTag();

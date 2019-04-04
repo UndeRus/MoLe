@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
@@ -52,12 +52,14 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     private String token;
     private String session;
     private LedgerTransaction ltr;
+    private MobileLedgerProfile mProfile;
 
-    public SendTransactionTask(TaskCallback callback) {
+    public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile) {
         taskCallback = callback;
+        mProfile = profile;
     }
     private boolean sendOK() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepareConnection(Data.profile.get(), "add");
+        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("PUT");
         http.setRequestProperty("Content-Type", "application/json");
         http.setRequestProperty("Accept", "*/*");
@@ -104,7 +106,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         return true;
     }
     private boolean legacySendOK() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepareConnection(Data.profile.get(), "add");
+        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         http.setRequestProperty("Accept", "*/*");

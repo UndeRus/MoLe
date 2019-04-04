@@ -93,7 +93,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         setContentView(R.layout.activity_new_transaction);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setSubtitle(Data.profile.get().getName());
+        toolbar.setSubtitle(mProfile.getName());
 
         tvDate = findViewById(R.id.new_transaction_date);
         tvDate.setOnFocusChangeListener((v, hasFocus) -> {
@@ -122,7 +122,16 @@ public class NewTransactionActivity extends ProfileThemedActivity
 //            Log.d("swipe", "hooked to row "+i);
         }
     }
+    @Override
+    protected void initProfile() {
+        String profileUUID = getIntent().getStringExtra("profile_uuid");
 
+        if (profileUUID != null) {
+            mProfile = Data.getProfile(profileUUID);
+            if (mProfile == null) finish();
+        }
+        else super.initProfile();
+    }
     @Override
     public void finish() {
         super.finish();
@@ -149,7 +158,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         progress.setVisibility(View.VISIBLE);
         try {
 
-            saver = new SendTransactionTask(this);
+            saver = new SendTransactionTask(this, mProfile);
 
             String dateString = tvDate.getText().toString();
             Date date;
@@ -180,7 +189,8 @@ public class NewTransactionActivity extends ProfileThemedActivity
                 tr.addAccount(item);
             }
 
-            if (emptyAmountAccount != null) emptyAmountAccount.setAmount(-emptyAmountAccountBalance);
+            if (emptyAmountAccount != null)
+                emptyAmountAccount.setAmount(-emptyAmountAccountBalance);
             saver.execute(tr);
         }
         catch (ParseException e) {
