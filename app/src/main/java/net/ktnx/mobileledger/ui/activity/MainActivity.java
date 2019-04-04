@@ -416,16 +416,7 @@ public class MainActivity extends ProfileThemedActivity {
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
         MobileLedgerProfile profile;
 
-        if (Data.profiles.isEmpty()) {
-            profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
-        }
-        else {
-            try (LockHolder lh = Data.profiles.lockForReading()) {
-                int i = Data.getProfileIndex(profileUUID);
-                if (i == -1) i = 0;
-                profile = Data.profiles.get(i);
-            }
-        }
+        profile = Data.getProfile(profileUUID);
 
         if (Data.profiles.isEmpty()) {
             findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);

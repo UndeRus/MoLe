@@ -74,4 +74,18 @@ public final class Data {
 
         return -1;
     }
+    public static MobileLedgerProfile getProfile(String profileUUID) {
+        MobileLedgerProfile profile;
+        if (profiles.isEmpty()) {
+            profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
+        }
+        else {
+            try (LockHolder lh = profiles.lockForReading()) {
+                int i = getProfileIndex(profileUUID);
+                if (i == -1) i = 0;
+                profile = profiles.get(i);
+            }
+        }
+        return profile;
+    }
 }
