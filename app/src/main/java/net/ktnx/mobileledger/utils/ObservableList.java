@@ -42,14 +42,21 @@ import androidx.annotation.RequiresApi;
 public class ObservableList<T> extends Observable implements List<T> {
     private List<T> list;
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private int notificationBlocks = 0;
+    private boolean notificationWasBlocked = false;
     public ObservableList(List<T> list) {
         this.list = list;
     }
     private void forceNotify() {
+        if (notificationBlocked()) return;
         setChanged();
         notifyObservers();
     }
+    private boolean notificationBlocked() {
+        return notificationWasBlocked = (notificationBlocks > 0);
+    }
     private void forceNotify(int index) {
+        if (notificationBlocked()) return;
         setChanged();
         notifyObservers(index);
     }
@@ -296,5 +303,12 @@ public class ObservableList<T> extends Observable implements List<T> {
         ReentrantReadWriteLock.ReadLock rLock = lock.readLock();
         rLock.lock();
         return new LockHolder(rLock);
+    }
+    public void blockNotifications() {
+        notificationBlocks++;
+    }
+    public void unblockNotifications() {
+        notificationBlocks--;
+        if ((notificationBlocks == 0) && notificationWasBlocked) notifyObservers();
     }
 }
