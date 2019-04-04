@@ -492,17 +492,42 @@ public class RetrieveTransactionsTask
 
                 int processedTransactionCount = 0;
 
+                DetectedTransactionOrder transactionOrder = DetectedTransactionOrder.UNKNOWN;
+                int orderAccumulator = 0;
+                int lastTransactionId = 0;
+
                 while (true) {
                     throwIfCancelled();
                     ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
                     throwIfCancelled();
                     if (parsedTransaction == null) break;
+
                     LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
+                    if (transaction.getId() > lastTransactionId) orderAccumulator++;
+                    else orderAccumulator--;
+                    lastTransactionId = transaction.getId();
+                    if (transactionOrder == DetectedTransactionOrder.UNKNOWN) {
+                        if (orderAccumulator > 30) {
+                            transactionOrder = DetectedTransactionOrder.FILE;
+                            Log.d("rtt", String.format(
+                                    "Detected native file order after %d transactions (factor %d)",
+                                    processedTransactionCount, orderAccumulator));
+                        }
+                        else if (orderAccumulator < -30) {
+                            transactionOrder = DetectedTransactionOrder.REVERSE_CHRONOLOGICAL;
+                            Log.d("rtt", String.format(
+                                    "Detected reverse chronological order after %d transactions (factor %d)",
+                                    processedTransactionCount, orderAccumulator));
+                        }
+                    }
+
                     if (transaction.existsInDb(db)) {
                         profile.markTransactionAsPresent(db, transaction);
                         matchedTransactionsCount++;
 
-                        if (matchedTransactionsCount == MATCHING_TRANSACTIONS_LIMIT) {
+                        if ((transactionOrder == DetectedTransactionOrder.REVERSE_CHRONOLOGICAL) &&
+                            (matchedTransactionsCount == MATCHING_TRANSACTIONS_LIMIT))
+                        {
                             profile.markTransactionsBeforeTransactionAsPresent(db, transaction);
                             progress.setTotal(progress.getProgress());
                             publishProgress(progress);
@@ -538,6 +563,8 @@ public class RetrieveTransactionsTask
 
         return true;
     }
+
+    ;
     @SuppressLint("DefaultLocale")
     @Override
     protected String doInBackground(Void... params) {
@@ -578,6 +605,7 @@ public class RetrieveTransactionsTask
     private void throwIfCancelled() {
         if (isCancelled()) throw new OperationCanceledException(null);
     }
+    enum DetectedTransactionOrder {UNKNOWN, REVERSE_CHRONOLOGICAL, FILE}
 
     private enum ParserState {
         EXPECTING_ACCOUNT, EXPECTING_ACCOUNT_AMOUNT, EXPECTING_JOURNAL, EXPECTING_TRANSACTION,
