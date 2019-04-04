@@ -105,6 +105,10 @@ public class MainActivity extends ProfileThemedActivity {
     private Observer profilesObserver;
     private Observer lastUpdateDateObserver;
     private Toolbar mToolbar;
+    private DrawerLayout.SimpleDrawerListener drawerListener;
+    private ActionBarDrawerToggle barDrawerToggle;
+    private ViewPager.SimpleOnPageChangeListener pageChangeListener;
+    private Observer editingProfilesObserver;
     @Override
     protected void onStart() {
         super.onStart();
@@ -130,8 +134,17 @@ public class MainActivity extends ProfileThemedActivity {
         Data.profiles.deleteObserver(profilesObserver);
         profilesObserver = null;
         Data.lastUpdateDate.deleteObserver(lastUpdateDateObserver);
+        lastUpdateDateObserver = null;
         RecyclerView root = findViewById(R.id.nav_profile_list);
         if (root != null) root.setAdapter(null);
+        if (drawer != null) drawer.removeDrawerListener(drawerListener);
+        drawerListener = null;
+        if (drawer != null) drawer.removeDrawerListener(barDrawerToggle);
+        barDrawerToggle = null;
+        if (mViewPager != null) mViewPager.removeOnPageChangeListener(pageChangeListener);
+        pageChangeListener = null;
+        if (mProfileListAdapter != null) mProfileListAdapter.deleteEditingProfilesObserver(editingProfilesObserver);
+        editingProfilesObserver = null;
         super.onDestroy();
     }
     @Override
@@ -175,11 +188,12 @@ public class MainActivity extends ProfileThemedActivity {
             Data.profiles.addObserver(profilesObserver);
         }
 
-        ActionBarDrawerToggle toggle =
-                new ActionBarDrawerToggle(this, drawer, mToolbar, R.string.navigation_drawer_open,
-                        R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        if (barDrawerToggle == null) {
+            barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar, R.string.navigation_drawer_open,
+                    R.string.navigation_drawer_close);
+            drawer.addDrawerListener(barDrawerToggle);
+        }
+        barDrawerToggle.syncState();
 
         TextView ver = drawer.findViewById(R.id.drawer_version_text);
 
@@ -200,23 +214,27 @@ public class MainActivity extends ProfileThemedActivity {
         markDrawerItemCurrent(R.id.nav_account_summary);
 
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                switch (position) {
-                    case 0:
-                        markDrawerItemCurrent(R.id.nav_account_summary);
-                        break;
-                    case 1:
-                        markDrawerItemCurrent(R.id.nav_latest_transactions);
-                        break;
-                    default:
-                        Log.e("MainActivity", String.format("Unexpected page index %d", position));
-                }
 
-                super.onPageSelected(position);
-            }
-        });
+        if (pageChangeListener == null) {
+            pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    switch (position) {
+                        case 0:
+                            markDrawerItemCurrent(R.id.nav_account_summary);
+                            break;
+                        case 1:
+                            markDrawerItemCurrent(R.id.nav_latest_transactions);
+                            break;
+                        default:
+                            Log.e("MainActivity", String.format("Unexpected page index %d", position));
+                    }
+
+                    super.onPageSelected(position);
+                }
+            };
+            mViewPager.addOnPageChangeListener(pageChangeListener);
+        }
 
         mCurrentPage = 0;
         if (savedInstanceState != null) {
@@ -228,11 +246,13 @@ public class MainActivity extends ProfileThemedActivity {
         }
         else mAccountFilter = null;
 
-        lastUpdateDateObserver = (o, arg) -> {
-            Log.d("main", "lastUpdateDate changed");
-            runOnUiThread(this::updateLastUpdateDisplay);
-        };
-        Data.lastUpdateDate.addObserver(lastUpdateDateObserver);
+        if (lastUpdateDateObserver == null) {
+            lastUpdateDateObserver = (o, arg) -> {
+                Log.d("main", "lastUpdateDate changed");
+                runOnUiThread(this::updateLastUpdateDisplay);
+            };
+            Data.lastUpdateDate.addObserver(lastUpdateDateObserver);
+        }
 
         updateLastUpdateDisplay();
 
@@ -251,21 +271,24 @@ public class MainActivity extends ProfileThemedActivity {
         if (mProfileListAdapter == null) mProfileListAdapter = new ProfilesRecyclerViewAdapter();
         root.setAdapter(mProfileListAdapter);
 
-        mProfileListAdapter.addEditingProfilesObserver((o, arg) -> {
-            if (mProfileListAdapter.isEditingProfiles()) {
-                profileListHeadArrow.clearAnimation();
-                profileListHeadArrow.setVisibility(View.GONE);
-                profileListHeadMore.setVisibility(View.GONE);
-                profileListHeadCancel.setVisibility(View.VISIBLE);
-            }
-            else {
-                profileListHeadArrow.setRotation(180f);
-                profileListHeadArrow.setVisibility(View.VISIBLE);
-                profileListHeadCancel.setVisibility(View.GONE);
-                profileListHeadMore.setVisibility(View.GONE);
-                profileListHeadMore.setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
-            }
-        });
+        if (editingProfilesObserver == null) {
+            editingProfilesObserver = (o, arg) -> {
+                if (mProfileListAdapter.isEditingProfiles()) {
+                    profileListHeadArrow.clearAnimation();
+                    profileListHeadArrow.setVisibility(View.GONE);
+                    profileListHeadMore.setVisibility(View.GONE);
+                    profileListHeadCancel.setVisibility(View.VISIBLE);
+                }
+                else {
+                    profileListHeadArrow.setRotation(180f);
+                    profileListHeadArrow.setVisibility(View.VISIBLE);
+                    profileListHeadCancel.setVisibility(View.GONE);
+                    profileListHeadMore.setVisibility(View.GONE);
+                    profileListHeadMore.setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
+                }
+            };
+            mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
+        }
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
@@ -277,13 +300,16 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadMoreAndCancel
                 .setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
 
-        drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                collapseProfileList();
-            }
-        });
+        if (drawerListener == null) {
+            drawerListener = new DrawerLayout.SimpleDrawerListener() {
+                @Override
+                public void onDrawerClosed(View drawerView) {
+                    super.onDrawerClosed(drawerView);
+                    collapseProfileList();
+                }
+            };
+            drawer.addDrawerListener(drawerListener);
+        }
 
         setupProfile();
         onProfileChanged(null);
