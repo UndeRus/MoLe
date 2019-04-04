@@ -143,7 +143,8 @@ public class MainActivity extends ProfileThemedActivity {
         barDrawerToggle = null;
         if (mViewPager != null) mViewPager.removeOnPageChangeListener(pageChangeListener);
         pageChangeListener = null;
-        if (mProfileListAdapter != null) mProfileListAdapter.deleteEditingProfilesObserver(editingProfilesObserver);
+        if (mProfileListAdapter != null)
+            mProfileListAdapter.deleteEditingProfilesObserver(editingProfilesObserver);
         editingProfilesObserver = null;
         super.onDestroy();
     }
@@ -189,8 +190,8 @@ public class MainActivity extends ProfileThemedActivity {
         }
 
         if (barDrawerToggle == null) {
-            barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar, R.string.navigation_drawer_open,
-                    R.string.navigation_drawer_close);
+            barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar,
+                    R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.addDrawerListener(barDrawerToggle);
         }
         barDrawerToggle.syncState();
@@ -227,7 +228,8 @@ public class MainActivity extends ProfileThemedActivity {
                             markDrawerItemCurrent(R.id.nav_latest_transactions);
                             break;
                         default:
-                            Log.e("MainActivity", String.format("Unexpected page index %d", position));
+                            Log.e("MainActivity",
+                                    String.format("Unexpected page index %d", position));
                     }
 
                     super.onPageSelected(position);
@@ -284,7 +286,8 @@ public class MainActivity extends ProfileThemedActivity {
                     profileListHeadArrow.setVisibility(View.VISIBLE);
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadMore.setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
+                    profileListHeadMore
+                            .setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
                 }
             };
             mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
@@ -340,8 +343,7 @@ public class MainActivity extends ProfileThemedActivity {
                         .setIcon(Icon.createWithResource(this, R.drawable.svg_thick_plus_white))
                         .setIntent(new Intent(Intent.ACTION_VIEW, null, this,
                                 NewTransactionActivity.class).putExtra("profile_uuid", p.getUuid()))
-                        .setRank(i)
-                        .build();
+                        .setRank(i).build();
                 shortcuts.add(si);
             }
         }
