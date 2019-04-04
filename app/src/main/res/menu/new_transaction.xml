@@ -25,14 +25,6 @@
         android:visible="false"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_add_account"
-        android:icon="@drawable/svg_thick_plus_white"
-        android:onClick="addTransactionAccountFromMenu"
-        android:orderInCategory="100"
-        android:title="@string/menu_add_account"
-        android:visible="false"
-        app:showAsAction="never|ifRoom" />
-    <item
         android:id="@+id/action_reset_new_transaction_activity"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:onClick="resetTransactionFromMenu"
