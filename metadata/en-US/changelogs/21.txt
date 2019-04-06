@@ -1,0 +1,2 @@
+ * FIXED
+  - fix a crash when the new transaction is invoked by an app shortcut and the main app is not running
