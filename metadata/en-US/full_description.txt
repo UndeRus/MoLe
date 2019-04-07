@@ -1,4 +1,4 @@
-Work with your <a href="http://hledger.org/hledger-web.html">hledger-web</a> instance conveniently.
+Work with your <a href="https://hledger.org/hledger-web.html">hledger-web</a> instance conveniently.
 
 hledger-web is a web interface to hledger - a plain text based accounting system.
 
