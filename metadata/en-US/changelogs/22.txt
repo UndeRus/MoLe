@@ -1,0 +1,1 @@
+ - fix account name auto-completion when the new transaction screen is invoked by an app shortcut and the main app is not running
