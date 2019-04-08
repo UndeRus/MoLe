@@ -100,7 +100,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         });
         tvDescription = findViewById(R.id.new_transaction_description);
         MLDB.hookAutocompletionAdapter(this, tvDescription, MLDB.DESCRIPTION_HISTORY_TABLE,
-                "description", false, findViewById(R.id.new_transaction_acc_1), this);
+                "description", false, findViewById(R.id.new_transaction_acc_1), this, mProfile);
         hookTextChangeListener(tvDescription);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -115,7 +115,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             TextView tvAmount = (TextView) row.getChildAt(1);
             hookSwipeListener(row);
             MLDB.hookAutocompletionAdapter(this, tvAccountName, MLDB.ACCOUNTS_TABLE, "name", true,
-                    tvAmount, null);
+                    tvAmount, null, mProfile);
             hookTextChangeListener(tvAccountName);
             hookTextChangeListener(tvAmount);
 //            Log.d("swipe", "hooked to row "+i);
@@ -361,7 +361,8 @@ public class NewTransactionActivity extends ProfileThemedActivity
         if (focus) acc.requestFocus();
 
         hookSwipeListener(row);
-        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt, null);
+        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt, null,
+                mProfile);
         hookTextChangeListener(acc);
         hookTextChangeListener(amt);
 

@@ -36,6 +36,7 @@ import android.widget.SimpleCursorAdapter;
 
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import org.jetbrains.annotations.NonNls;
 
@@ -123,14 +124,15 @@ public final class MLDB {
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
                                                  final boolean profileSpecific) {
-        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null, null);
+        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null, null, Data.profile.get());
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hookAutocompletionAdapter(final Context context,
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
                                                  final boolean profileSpecific, final View nextView,
-                                                 final DescriptionSelectedCallback callback) {
+                                                 final DescriptionSelectedCallback callback,
+                                                 final MobileLedgerProfile profile) {
         String[] from = {field};
         int[] to = {android.R.id.text1};
         SimpleCursorAdapter adapter =
@@ -155,7 +157,7 @@ public final class MLDB {
                                     "FROM %s " +
                                     "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
                                     "ORDER BY 2, 1;", field, field, field, field, table, field);
-                params = new String[]{str, str, str, Data.profile.get().getUuid(), str};
+                params = new String[]{str, str, str, profile.getUuid(), str};
             }
             else {
                 sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
