@@ -2,7 +2,7 @@
 
 ## [0.9.1] - 2019-04-06
  * FIXED
-  - fix a crash when the new transaction is invoked by an app shortcut and the main app is not running
+  - fix a crash when the new transaction screen is invoked by an app shortcut and the main app is not running
 
 ## [0.9] - 2019-04-04
  * NEW:
