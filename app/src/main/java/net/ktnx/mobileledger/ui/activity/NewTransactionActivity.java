@@ -163,7 +163,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             Date date;
             if (dateString.isEmpty()) date = new Date();
             else date = Globals.parseLedgerDate(dateString);
-            LedgerTransaction tr = new LedgerTransaction(date, tvDescription.getText().toString());
+            LedgerTransaction tr = new LedgerTransaction(null, date, tvDescription.getText().toString(), mProfile);
 
             TableLayout table = findViewById(R.id.new_transaction_accounts_table);
             LedgerTransactionAccount emptyAmountAccount = null;

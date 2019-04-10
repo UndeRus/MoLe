@@ -57,14 +57,17 @@ public class LedgerTransaction {
             throws ParseException {
         this(id, Globals.parseLedgerDate(dateString), description);
     }
-    public LedgerTransaction(Integer id, Date date, String description) {
-        this.profile = Data.profile.get().getUuid();
+    public LedgerTransaction(Integer id, Date date, String description, MobileLedgerProfile profile) {
+        this.profile = profile.getUuid();
         this.id = id;
         this.date = date;
         this.description = description;
         this.accounts = new ArrayList<>();
         this.dataHash = null;
         dataLoaded = false;
+    }
+    public LedgerTransaction(Integer id, Date date, String description) {
+        this(id, date, description, Data.profile.get());
     }
     public LedgerTransaction(Date date, String description) {
         this(null, date, description);
