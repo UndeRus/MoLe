@@ -1,0 +1,2 @@
+ * FIXED:
+  - fix saving of new transactions from the app shortcut when the main app is not running

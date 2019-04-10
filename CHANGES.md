@@ -1,5 +1,10 @@
 # Changes
 
+## [0.9.3] - 2019-04-10
+
+ * FIXED
+  - fix saving of new transactions from the app shortcut when the main app is not running
+
 ## [0.9.2] - 2019-04-08
  * FIXED
   - fix account name auto-completion when the new transaction screen is invoked by an app shortcut and the main app is not running
