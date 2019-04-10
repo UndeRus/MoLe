@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
 
 public class RetrieveTransactionsTask
         extends AsyncTask<Void, RetrieveTransactionsTask.Progress, String> {
-    private static final int MATCHING_TRANSACTIONS_LIMIT = 50;
+    private static final int MATCHING_TRANSACTIONS_LIMIT = 150;
     private static final Pattern reComment = Pattern.compile("^\\s*;");
     private static final Pattern reTransactionStart = Pattern.compile("<tr class=\"title\" " +
                                                                       "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
@@ -584,7 +584,6 @@ public class RetrieveTransactionsTask
         return true;
     }
 
-    ;
     @SuppressLint("DefaultLocale")
     @Override
     protected String doInBackground(Void... params) {
