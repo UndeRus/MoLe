@@ -319,8 +319,11 @@ public class MainActivity extends ProfileThemedActivity {
         onProfileChanged(null);
 
         updateLastUpdateTextFromDB();
-        Date lastUpdate = Data.lastUpdateDate.get();
 
+        scheduleDataRetrievalIfStale();
+    }
+    private void scheduleDataRetrievalIfStale() {
+        Date lastUpdate = Data.lastUpdateDate.get();
         long now = new Date().getTime();
         if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
             if (lastUpdate == null) Log.d("db::", "WEB data never fetched. scheduling a fetch");
@@ -366,6 +369,11 @@ public class MainActivity extends ProfileThemedActivity {
     private void onProfileChanged(Object arg) {
         MobileLedgerProfile profile = Data.profile.get();
         MainActivity.this.runOnUiThread(() -> {
+
+            boolean haveProfile = profile != null;
+            findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
+            findViewById(R.id.pager_layout)
+                    .setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
             Data.transactions.clear();
             Log.d("transactions", "requesting list reload");
@@ -419,6 +427,10 @@ public class MainActivity extends ProfileThemedActivity {
                     fab.hide();
                 }
             }
+
+            updateLastUpdateTextFromDB();
+
+            scheduleDataRetrievalIfStale();
         });
     }
     private void updateLastUpdateDisplay() {
