@@ -138,7 +138,9 @@
                         android:text="@string/nav_reports_title"
                         android:visibility="gone" />
 
-                    <include layout="@layout/nav_profile_list_head" />
+                    <include
+                        android:id="@+id/nav_profile_list_head_layout"
+                        layout="@layout/nav_profile_list_head" />
 
                     <LinearLayout
                         android:id="@+id/nav_profile_list_container"

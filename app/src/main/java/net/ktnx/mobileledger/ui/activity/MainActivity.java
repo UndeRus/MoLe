@@ -313,6 +313,8 @@ public class MainActivity extends ProfileThemedActivity {
             drawer.addDrawerListener(drawerListener);
         }
 
+        findViewById(R.id.nav_profile_list_head_layout).setOnClickListener(this::navProfilesHeadClicked);
+        findViewById(R.id.nav_profiles_label).setOnClickListener(this::navProfilesHeadClicked);
         setupProfile();
         onProfileChanged(null);
 
