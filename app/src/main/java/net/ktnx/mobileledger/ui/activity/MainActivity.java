@@ -330,6 +330,8 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     private void createShortcuts() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
+
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         try (LockHolder lh = Data.profiles.lockForReading()) {
             for (int i = 0; i < Data.profiles.size(); i++) {
