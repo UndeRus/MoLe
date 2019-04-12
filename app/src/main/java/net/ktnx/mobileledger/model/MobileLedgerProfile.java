@@ -426,4 +426,20 @@ public final class MobileLedgerProfile {
 
         return result;
     }
+    public void wipeAllData() {
+        SQLiteDatabase db = MLDB.getDatabase();
+        db.beginTransaction();
+        try {
+            String[] pUuid = new String[]{uuid};
+            db.execSQL("delete from options where profile=?", pUuid);
+            db.execSQL("delete from accounts where profile=?", pUuid);
+            db.execSQL("delete from account_values where profile=?", pUuid);
+            db.execSQL("delete from transactions where profile=?", pUuid);
+            db.execSQL("delete from transaction_accounts where profile=?", pUuid);
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
+    }
 }

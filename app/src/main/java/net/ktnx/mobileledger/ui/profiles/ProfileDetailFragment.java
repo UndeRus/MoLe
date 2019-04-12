@@ -38,6 +38,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
+import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -116,6 +117,18 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             return false;
         });
         menuDeleteProfile.setVisible((mProfile != null) && (Data.profiles.size() > 1));
+
+        if (BuildConfig.DEBUG) {
+            final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
+            menuWipeProfileData.setOnMenuItemClickListener(this::onWipeDataMenuClicked);
+            menuWipeProfileData.setVisible(mProfile != null);
+        }
+    }
+    private boolean onWipeDataMenuClicked(MenuItem item) {
+        // this is a development option, so no confirmation
+        mProfile.wipeAllData();
+        Data.profile.forceNotifyObservers();
+        return true;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {

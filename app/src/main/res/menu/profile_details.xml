@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
@@ -17,7 +16,8 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/menuDelete"
@@ -25,4 +25,11 @@
         android:title="@string/delete_profile"
         android:titleCondensed="@string/delete"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menuWipeData"
+        android:title="Wipe profile data"
+        android:titleCondensed="Wipe"
+        app:showAsAction="never"
+        android:visible="false"
+        tools:ignore="HardcodedText" />
 </menu>
