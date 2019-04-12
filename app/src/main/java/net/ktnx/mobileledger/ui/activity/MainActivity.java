@@ -22,7 +22,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.os.AsyncTask;
@@ -331,7 +330,6 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     private void createShortcuts() {
-        Resources rm = getResources();
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         try (LockHolder lh = Data.profiles.lockForReading()) {
             for (int i = 0; i < Data.profiles.size(); i++) {
