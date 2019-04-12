@@ -285,8 +285,7 @@ public class MainActivity extends ProfileThemedActivity {
                     profileListHeadArrow.setVisibility(View.VISIBLE);
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadMore
-                            .setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
+                    profileListHeadMore.setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
                 }
             };
             mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
@@ -313,7 +312,8 @@ public class MainActivity extends ProfileThemedActivity {
             drawer.addDrawerListener(drawerListener);
         }
 
-        findViewById(R.id.nav_profile_list_head_layout).setOnClickListener(this::navProfilesHeadClicked);
+        findViewById(R.id.nav_profile_list_head_layout)
+                .setOnClickListener(this::navProfilesHeadClicked);
         findViewById(R.id.nav_profiles_label).setOnClickListener(this::navProfilesHeadClicked);
         setupProfile();
         onProfileChanged(null);
