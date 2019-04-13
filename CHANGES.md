@@ -1,5 +1,12 @@
 # Changes
 
+## [0.9.4] - 2019-04-13
+
+ * FIXES
+    - don't attempt to create app shortcuts (and crash) on pre 7.1 devices
+    - fixed profile list expansion on pre 7.1 devices
+    - fix first run experience
+
 ## [0.9.3] - 2019-04-10
 
  * FIXED

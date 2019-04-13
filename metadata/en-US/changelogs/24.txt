@@ -1,0 +1,4 @@
+ * FIXES
+    - don't attempt to create app shortcuts (and crash) on pre 7.1 devices
+    - fixed profile list expansion on pre 7.1 devices
+    - fix first run experience
