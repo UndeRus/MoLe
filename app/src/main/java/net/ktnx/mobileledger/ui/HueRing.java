@@ -100,6 +100,8 @@ public class HueRing extends View {
         return hueDegrees;
     }
     public void setHue(int hueDegrees) {
+        if (hueDegrees == -1) hueDegrees = Colors.DEFAULT_HUE_DEG;
+
         if (hueDegrees != Colors.DEFAULT_HUE_DEG) {
             // round to 15 degrees
             int rem = hueDegrees % 15;

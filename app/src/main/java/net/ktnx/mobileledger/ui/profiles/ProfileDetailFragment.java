@@ -264,7 +264,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         huePickerView.setTag(profileThemeId);
         huePickerView.setOnClickListener(v -> {
             HueRingDialog d = new HueRingDialog(
-                    Objects.requireNonNull(ProfileDetailFragment.this.getContext()), hue);
+                    Objects.requireNonNull(ProfileDetailFragment.this.getContext()),
+                    profileThemeId, (Integer) v.getTag());
             d.show();
             d.setColorSelectedListener(this);
         });

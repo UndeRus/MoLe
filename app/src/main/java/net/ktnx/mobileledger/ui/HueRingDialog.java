@@ -27,13 +27,15 @@ import net.ktnx.mobileledger.utils.Colors;
 import androidx.annotation.NonNull;
 
 public class HueRingDialog extends Dialog {
+    private final int currentHue;
     private int initialHue;
     private HueRing hueRing;
     private HueSelectedListener listener;
 
-    public HueRingDialog(@NonNull Context context, int initialHue) {
+    public HueRingDialog(@NonNull Context context, int initialHue, int currentHue) {
         super(context);
         this.initialHue = initialHue;
+        this.currentHue = currentHue;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,7 @@ public class HueRingDialog extends Dialog {
         setContentView(R.layout.hue_dialog);
         hueRing = findViewById(R.id.ring);
         hueRing.setInitialHue(initialHue);
-        hueRing.setHue(initialHue);
+        hueRing.setHue(currentHue);
 
         findViewById(R.id.btn_ok).setOnClickListener(v -> {
             if (listener != null) listener.onHueSelected(hueRing.getHueDegrees());
