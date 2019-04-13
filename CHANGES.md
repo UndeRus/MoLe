@@ -1,5 +1,12 @@
 # Changes
 
+## [0.9.5] - 2019-04-13
+
+ * IMPROVEMENTS
+    - nicer icon for the new transaction floating action button
+ * FIXES
+    - fixes in the color selection dialog, most notable on Android versions before 7
+
 ## [0.9.4] - 2019-04-13
 
  * FIXES
