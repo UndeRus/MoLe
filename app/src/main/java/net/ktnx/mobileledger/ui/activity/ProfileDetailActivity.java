@@ -88,7 +88,7 @@ public class ProfileDetailActivity extends CrashReportingActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         Log.d("profiles", "[activity] Creating profile details options menu");
-        mFragment.onCreateOptionsMenu(menu, getMenuInflater());
+        if (mFragment != null) mFragment.onCreateOptionsMenu(menu, getMenuInflater());
 
         return true;
     }
