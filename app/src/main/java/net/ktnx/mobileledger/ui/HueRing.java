@@ -29,6 +29,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.DimensionUtils;
 
 import androidx.annotation.Nullable;
 
@@ -92,6 +93,8 @@ public class HueRing extends View {
 
         setInitialHue(initialHueDegrees);
         setHue(initialHueDegrees);
+
+        padding = DimensionUtils.dp2px(getContext(), 4);
     }
     public int getColor() {
         return color;
@@ -121,9 +124,10 @@ public class HueRing extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        float center = getWidth() / 2f;
         ringPaint.setStrokeWidth((int) bandWidth);
 
-        canvas.translate(centerX, centerY);
+        canvas.translate(center, center);
         canvas.drawOval(ringRect, ringPaint);
 
         canvas.drawArc(centerRect, 180, 180, true, initialPaint);
@@ -141,17 +145,18 @@ public class HueRing extends View {
         int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
 
-        if (((widthMode == MeasureSpec.AT_MOST) && (heightMode == MeasureSpec.AT_MOST)) ||
-            ((widthMode == MeasureSpec.EXACTLY) && (heightMode == MeasureSpec.EXACTLY)))
-        {
+        if ((widthMode == MeasureSpec.AT_MOST) && (heightMode == MeasureSpec.AT_MOST)) {
             diameter = Math.min(widthSize, heightSize);
+        }
+        else {
+            setMeasuredDimension(MEASURED_STATE_TOO_SMALL, MEASURED_STATE_TOO_SMALL);
+            return;
         }
 
         setMeasuredDimension(diameter, diameter);
 
 //        padding = DimensionUtils.dp2px(getContext(),
 //                getContext().getResources().getDimension(R.dimen.activity_horizontal_margin)) / 2;
-        padding = 0;
         diameter -= 2 * padding;
         radius = diameter / 2f;
         centerX = padding + (int) radius;
