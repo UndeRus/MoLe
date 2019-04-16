@@ -17,14 +17,14 @@
 
 package net.ktnx.mobileledger.json;
 
-import android.util.Log;
-
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountListParser {
 
@@ -43,7 +43,7 @@ public class AccountListParser {
 
         if (next.getAname().equalsIgnoreCase("root")) return nextAccount();
 
-        Log.d("accounts", String.format("Got account '%s'", next.getAname()));
+        debug("accounts", String.format("Got account '%s'", next.getAname()));
         return next;
     }
 }

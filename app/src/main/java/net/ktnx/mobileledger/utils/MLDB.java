@@ -46,6 +46,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 public final class MLDB {
     public static final String ACCOUNTS_TABLE = "accounts";
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
@@ -75,7 +77,7 @@ public final class MLDB {
             return Integer.parseInt(s);
         }
         catch (Exception e) {
-            Log.d("db", "returning default int value of " + name, e);
+            debug("db", "returning default int value of " + name, e);
             return default_value;
         }
     }
@@ -85,12 +87,12 @@ public final class MLDB {
             return Long.parseLong(s);
         }
         catch (Exception e) {
-            Log.d("db", "returning default long value of " + name, e);
+            debug("db", "returning default long value of " + name, e);
             return default_value;
         }
     }
     static public String getOption(String name, String default_value) {
-        Log.d("db", "about to fetch option " + name);
+        debug("db", "about to fetch option " + name);
         SQLiteDatabase db = getDatabase();
         try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
                 new String[]{NO_PROFILE, name}))
@@ -100,18 +102,18 @@ public final class MLDB {
 
                 if (result == null) result = default_value;
 
-                Log.d("db", "option " + name + "=" + result);
+                debug("db", "option " + name + "=" + result);
                 return result;
             }
             else return default_value;
         }
         catch (Exception e) {
-            Log.d("db", "returning default value for " + name, e);
+            debug("db", "returning default value for " + name, e);
             return default_value;
         }
     }
     static public void setOption(String name, String value) {
-        Log.d("option", String.format("%s := %s", name, value));
+        debug("option", String.format("%s := %s", name, value));
         SQLiteDatabase db = MLDB.getDatabase();
         db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{NO_PROFILE, name, value});
@@ -144,7 +146,7 @@ public final class MLDB {
             if (constraint == null) return null;
 
             String str = constraint.toString().toUpperCase();
-            Log.d("autocompletion", "Looking for " + str);
+            debug("autocompletion", "Looking for " + str);
             String[] col_names = {FontsContract.Columns._ID, field};
             MatrixCursor c = new MatrixCursor(col_names);
 
@@ -167,7 +169,7 @@ public final class MLDB {
                                     "ORDER BY 2, 1;", field, field, field, field, table, field);
                 params = new String[]{str, str, str, str};
             }
-            Log.d("autocompletion", sql);
+            debug("autocompletion", sql);
             SQLiteDatabase db = MLDB.getDatabase();
 
             try (Cursor matches = db.rawQuery(sql, params)) {
@@ -175,7 +177,7 @@ public final class MLDB {
                 while (matches.moveToNext()) {
                     String match = matches.getString(0);
                     int order = matches.getInt(1);
-                    Log.d("autocompletion", String.format("match: %s |%d", match, order));
+                    debug("autocompletion", String.format("match: %s |%d", match, order));
                     c.newRow().add(i++).add(match);
                 }
             }
@@ -205,7 +207,7 @@ public final class MLDB {
     }
     public static synchronized void done() {
         if (dbHelper != null) {
-            Log.d("db", "Closing DB helper");
+            debug("db", "Closing DB helper");
             dbHelper.close();
             dbHelper = null;
         }
@@ -221,20 +223,20 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
 
     public MobileLedgerDatabase(Application context) {
         super(context, DB_NAME, null, LATEST_REVISION);
-        Log.d("db", "creating helper instance");
+        debug("db", "creating helper instance");
         mContext = context;
         super.setWriteAheadLoggingEnabled(true);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.d("db", "onCreate called");
+        debug("db", "onCreate called");
         applyRevisionFile(db, CREATE_DB_SQL);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d("db", "onUpgrade called");
+        debug("db", "onUpgrade called");
         for (int i = oldVersion + 1; i <= newVersion; i++) applyRevision(db, i);
     }
 
@@ -250,7 +252,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
             throw new SQLException(String.format(Locale.US, "No resource for %s", rev_file));
         db.beginTransaction();
         try (InputStream res = rm.openRawResource(res_id)) {
-            Log.d("db", "Applying " + rev_file);
+            debug("db", "Applying " + rev_file);
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 

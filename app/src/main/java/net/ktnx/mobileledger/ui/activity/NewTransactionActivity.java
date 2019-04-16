@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
@@ -66,6 +65,8 @@ import java.util.Objects;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /*
  * TODO: nicer progress while transaction is submitted
@@ -118,7 +119,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                     tvAmount, null, mProfile);
             hookTextChangeListener(tvAccountName);
             hookTextChangeListener(tvAmount);
-//            Log.d("swipe", "hooked to row "+i);
+//            debug("swipe", "hooked to row "+i);
         }
     }
     @Override
@@ -193,7 +194,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             saver.execute(tr);
         }
         catch (ParseException e) {
-            Log.d("new-transaction", "Parse error", e);
+            debug("new-transaction", "Parse error", e);
             Toast.makeText(this, getResources().getString(R.string.error_invalid_date),
                     Toast.LENGTH_LONG).show();
             tvDate.requestFocus();
@@ -203,7 +204,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             if (fab != null) fab.setEnabled(true);
         }
         catch (Exception e) {
-            Log.d("new-transaction", "Unknown error", e);
+            debug("new-transaction", "Unknown error", e);
 
             progress.setVisibility(View.GONE);
             toggleAllEditing(true);
@@ -274,7 +275,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
     }
 
     public boolean simulateCrash(MenuItem item) {
-        Log.d("crash", "Will crash intentionally");
+        debug("crash", "Will crash intentionally");
         new AsyncCrasher().execute();
         return true;
     }
@@ -313,7 +314,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-//                Log.d("input", "text changed");
+//                debug("input", "text changed");
                 check_transaction_submittable();
             }
         });
@@ -441,7 +442,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                 doAddAccountRow(false);
             }
 
-            Log.d("submittable", String.format("accounts=%d, accounts_with_values=%s, " +
+            debug("submittable", String.format("accounts=%d, accounts_with_values=%s, " +
                                                "amounts_with_accounts=%d, amounts=%d, running_total=%1.2f, " +
                                                "single_empty_with_acc=%s", accounts,
                     accounts_with_values, amounts_with_accounts, amounts, running_total,
@@ -478,7 +479,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
     @Override
     public void done(String error) {
         progress.setVisibility(View.INVISIBLE);
-        Log.d("visuals", "hiding progress");
+        debug("visuals", "hiding progress");
 
         if (error == null) resetForm();
         else Snackbar.make(findViewById(R.id.new_transaction_accounts_table), error,
@@ -507,7 +508,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
     }
     @Override
     public void descriptionSelected(String description) {
-        Log.d("descr selected", description);
+        debug("descr selected", description);
         if (!inputStateIsInitial()) return;
 
         String accFilter = mProfile.getPreferredAccountsFilter();
@@ -527,8 +528,8 @@ public class NewTransactionActivity extends ProfileThemedActivity
         sb.append(" ORDER BY date desc limit 1");
 
         final String sql = sb.toString();
-        Log.d("descr", sql);
-        Log.d("descr", params.toString());
+        debug("descr", sql);
+        debug("descr", params.toString());
 
         try (Cursor c = MLDB.getDatabase().rawQuery(sql, params.toArray(new String[]{}))) {
             if (!c.moveToNext()) return;

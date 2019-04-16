@@ -78,6 +78,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 public class MainActivity extends ProfileThemedActivity {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
@@ -113,7 +115,7 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onStart() {
         super.onStart();
 
-        Log.d("flow", "MainActivity.onStart()");
+        debug("flow", "MainActivity.onStart()");
         mViewPager.setCurrentItem(mCurrentPage, false);
         if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
         else Data.accountFilter.setValue(null);
@@ -149,7 +151,7 @@ public class MainActivity extends ProfileThemedActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("flow", "MainActivity.onCreate()");
+        debug("flow", "MainActivity.onCreate()");
         int profileColor = Data.retrieveCurrentThemeIdFromDb();
         Colors.setupTheme(this, profileColor);
         Colors.profileThemeId = profileColor;
@@ -315,8 +317,8 @@ public class MainActivity extends ProfileThemedActivity {
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
         if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
-            if (lastUpdate == null) Log.d("db::", "WEB data never fetched. scheduling a fetch");
-            else Log.d("db",
+            if (lastUpdate == null) debug("db::", "WEB data never fetched. scheduling a fetch");
+            else debug("db",
                     String.format("WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
                             lastUpdate.getTime() / 1000f, now / 1000f));
 
@@ -349,7 +351,7 @@ public class MainActivity extends ProfileThemedActivity {
                 (int) (getResources().getDimension(R.dimen.thumb_row_height) *
                        Data.profiles.size()));
 
-        Log.d("profiles", "profile list changed");
+        debug("profiles", "profile list changed");
         if (arg == null) mProfileListAdapter.notifyDataSetChanged();
         else mProfileListAdapter.notifyItemChanged((int) arg);
 
@@ -366,7 +368,7 @@ public class MainActivity extends ProfileThemedActivity {
                     .setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
             Data.transactions.clear();
-            Log.d("transactions", "requesting list reload");
+            debug("transactions", "requesting list reload");
             TransactionListViewModel.scheduleTransactionListReload();
 
             Data.accounts.clear();
@@ -393,7 +395,7 @@ public class MainActivity extends ProfileThemedActivity {
 
             int newProfileTheme = (profile == null) ? -1 : profile.getThemeId();
             if (newProfileTheme != Colors.profileThemeId) {
-                Log.d("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
+                debug("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
                         newProfileTheme));
                 MainActivity.this.profileThemeChanged();
                 Colors.profileThemeId = newProfileTheme;
@@ -426,13 +428,13 @@ public class MainActivity extends ProfileThemedActivity {
         TextView v = findViewById(R.id.transactions_last_update);
         if (newValue == null) {
             l.setVisibility(View.INVISIBLE);
-            Log.d("main", "no last update date :(");
+            debug("main", "no last update date :(");
         }
         else {
             final String text = DateFormat.getDateTimeInstance().format(newValue);
             v.setText(text);
             l.setVisibility(View.VISIBLE);
-            Log.d("main", String.format("Date formatted: %s", text));
+            debug("main", String.format("Date formatted: %s", text));
         }
 
         scheduleDataRetrievalIfStale(newValue);
@@ -545,7 +547,7 @@ public class MainActivity extends ProfileThemedActivity {
         showTransactionsFragment((account == null) ? (String) null : account.getName());
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        if (transactionListFragment == null) {
-//            Log.d("flow", "MainActivity creating TransactionListFragment");
+//            debug("flow", "MainActivity creating TransactionListFragment");
 //            transactionListFragment = new TransactionListFragment();
 //        }
 //        Bundle bundle = new Bundle();
@@ -578,7 +580,7 @@ public class MainActivity extends ProfileThemedActivity {
                 mBackMeansToAccountList = false;
             }
             else {
-                Log.d("fragments", String.format("manager stack: %d",
+                debug("fragments", String.format("manager stack: %d",
                         fragmentManager.getBackStackEntryCount()));
 
                 super.onBackPressed();
@@ -589,7 +591,7 @@ public class MainActivity extends ProfileThemedActivity {
         final MobileLedgerProfile profile = Data.profile.get();
         long last_update = (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
 
-        Log.d("transactions", String.format("Last update = %d", last_update));
+        debug("transactions", String.format("Last update = %d", last_update));
         if (last_update == 0) {
             Data.lastUpdateDate.postValue(null);
         }
@@ -605,7 +607,7 @@ public class MainActivity extends ProfileThemedActivity {
         retrieveTransactionsTask.execute();
     }
     public void onStopTransactionRefreshClick(View view) {
-        Log.d("interactive", "Cancelling transactions refresh");
+        debug("interactive", "Cancelling transactions refresh");
         if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
         bTransactionListCancelDownload.setEnabled(false);
     }
@@ -708,7 +710,7 @@ public class MainActivity extends ProfileThemedActivity {
             case R.id.account_row_acc_name:
             case R.id.account_expander:
             case R.id.account_expander_container:
-                Log.d("accounts", "Account expander clicked");
+                debug("accounts", "Account expander clicked");
                 if (!acc.hasSubAccounts()) return;
 
                 boolean wasExpanded = acc.isExpanded();
@@ -724,7 +726,7 @@ public class MainActivity extends ProfileThemedActivity {
                         });
 
                 if (wasExpanded) {
-                    Log.d("accounts", String.format("Collapsing account '%s'", acc.getName()));
+                    debug("accounts", String.format("Collapsing account '%s'", acc.getName()));
                     arrow.setRotation(0);
                     animator.rotationBy(180);
 
@@ -733,7 +735,7 @@ public class MainActivity extends ProfileThemedActivity {
                     try (LockHolder lh = Data.accounts.lockForWriting()) {
                         for (int i = 0; i < Data.accounts.size(); i++) {
                             if (acc.isParentOf(Data.accounts.get(i))) {
-//                                Log.d("accounts", String.format("Found a child '%s' at position %d",
+//                                debug("accounts", String.format("Found a child '%s' at position %d",
 //                                        Data.accounts.get(i).getName(), i));
                                 if (start == -1) {
                                     start = i;
@@ -742,7 +744,7 @@ public class MainActivity extends ProfileThemedActivity {
                             }
                             else {
                                 if (start != -1) {
-//                                    Log.d("accounts",
+//                                    debug("accounts",
 //                                            String.format("Found a non-child '%s' at position %d",
 //                                                    Data.accounts.get(i).getName(), i));
                                     break;
@@ -752,7 +754,7 @@ public class MainActivity extends ProfileThemedActivity {
 
                         if (start != -1) {
                             for (int j = 0; j < count; j++) {
-//                                Log.d("accounts", String.format("Removing item %d: %s", start + j,
+//                                debug("accounts", String.format("Removing item %d: %s", start + j,
 //                                        Data.accounts.get(start).getName()));
                                 Data.accounts.removeQuietly(start);
                             }
@@ -763,7 +765,7 @@ public class MainActivity extends ProfileThemedActivity {
                     }
                 }
                 else {
-                    Log.d("accounts", String.format("Expanding account '%s'", acc.getName()));
+                    debug("accounts", String.format("Expanding account '%s'", acc.getName()));
                     arrow.setRotation(180);
                     animator.rotationBy(-180);
                     List<LedgerAccount> children =
@@ -802,10 +804,10 @@ public class MainActivity extends ProfileThemedActivity {
         @NotNull
         @Override
         public Fragment getItem(int position) {
-            Log.d("main", String.format("Switching to fragment %d", position));
+            debug("main", String.format("Switching to fragment %d", position));
             switch (position) {
                 case 0:
-//                    Log.d("flow", "Creating account summary fragment");
+//                    debug("flow", "Creating account summary fragment");
                     return mAccountSummaryFragment = new AccountSummaryFragment();
                 case 1:
                     return new TransactionListFragment();

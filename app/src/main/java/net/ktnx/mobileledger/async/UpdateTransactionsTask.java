@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.async;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -32,6 +31,8 @@ import net.ktnx.mobileledger.utils.MLDB;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String[] filterAccName) {
@@ -61,7 +62,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                 params = new String[]{profile_uuid, filterAccName[0]};
             }
 
-            Log.d("UTT", sql);
+            debug("UTT", sql);
             SQLiteDatabase db = MLDB.getDatabase();
             String lastDateString = Globals.formatLedgerDate(new Date());
             Date lastDate = Globals.parseLedgerDate(lastDateString);
@@ -81,14 +82,14 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                     }
                     newList.add(
                             new TransactionListItem(new LedgerTransaction(transaction_id), odd));
-//                    Log.d("UTT", String.format("got transaction %d", transaction_id));
+//                    debug("UTT", String.format("got transaction %d", transaction_id));
 
                     lastDate = date;
                     lastDateString = dateString;
                     odd = !odd;
                 }
                 Data.transactions.setList(newList);
-                Log.d("UTT", "transaction list value updated");
+                debug("UTT", "transaction list value updated");
             }
 
             return null;

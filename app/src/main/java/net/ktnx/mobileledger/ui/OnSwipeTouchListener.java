@@ -18,11 +18,12 @@
 package net.ktnx.mobileledger.ui;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public abstract class OnSwipeTouchListener implements View.OnTouchListener {
     public final GestureDetector gestureDetector;
@@ -37,7 +38,7 @@ public abstract class OnSwipeTouchListener implements View.OnTouchListener {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            Log.d("sw-l", "onDown");
+            debug("sw-l", "onDown");
             return false;
         }
 
@@ -45,7 +46,7 @@ public abstract class OnSwipeTouchListener implements View.OnTouchListener {
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             boolean result = false;
 
-            Log.d("sw-l", "onFling");
+            debug("sw-l", "onFling");
 
             try {
                 float diffX = e2.getX() - e1.getX();
@@ -53,11 +54,11 @@ public abstract class OnSwipeTouchListener implements View.OnTouchListener {
                 if (Math.abs(diffX) > Math.abs(diffY)) {
                     if (Math.abs(diffX) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffX > 0) {
-                            Log.d("sw-l", "calling onSwipeRight");
+                            debug("sw-l", "calling onSwipeRight");
                             onSwipeRight();
                         }
                         else {
-                            Log.d("sw-l", "calling onSwipeLeft");
+                            debug("sw-l", "calling onSwipeLeft");
                             onSwipeLeft();
                         }
                     }
@@ -83,7 +84,7 @@ public abstract class OnSwipeTouchListener implements View.OnTouchListener {
 
     public void onSwipeRight() {}
     public void onSwipeLeft() {
-        Log.d("sw-l", "LEFT");
+        debug("sw-l", "LEFT");
     }
     public void onSwipeUp() {}
     public void onSwipeDown() {}

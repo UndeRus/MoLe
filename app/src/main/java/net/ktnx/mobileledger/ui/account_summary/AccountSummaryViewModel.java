@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import net.ktnx.mobileledger.async.CommitAccountsTask;
 import net.ktnx.mobileledger.async.CommitAccountsTaskParams;
@@ -30,6 +29,8 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import java.util.ArrayList;
 
 import androidx.lifecycle.ViewModel;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryViewModel extends ViewModel {
     static void commitSelections(Context context) {
@@ -50,7 +51,7 @@ public class AccountSummaryViewModel extends ViewModel {
         protected void onPostExecute(ArrayList<LedgerAccount> list) {
             super.onPostExecute(list);
             if (list != null) {
-                Log.d("acc", "setting updated account list");
+                debug("acc", "setting updated account list");
                 Data.accounts.setList(list);
             }
         }
@@ -61,7 +62,7 @@ public class AccountSummaryViewModel extends ViewModel {
         protected void onPostExecute(ArrayList<LedgerAccount> list) {
             super.onPostExecute(list);
             if (list != null) {
-                Log.d("acc", "setting new account list");
+                debug("acc", "setting new account list");
                 Data.accounts.setList(list);
             }
         }

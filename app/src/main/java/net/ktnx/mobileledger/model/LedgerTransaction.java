@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
 import net.ktnx.mobileledger.json.ParsedPosting;
@@ -32,6 +31,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -141,7 +142,7 @@ public class LedgerTransaction {
                 .rawQuery("SELECT 1 from transactions where data_hash = ?", new String[]{dataHash}))
         {
             boolean result = c.moveToFirst();
-            Log.d("db", String.format("Transaction %d (%s) %s", id, dataHash,
+            debug("db", String.format("Transaction %d (%s) %s", id, dataHash,
                     result ? "already present" : "not present"));
             return result;
         }
@@ -172,7 +173,7 @@ public class LedgerTransaction {
                         new String[]{profile, String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {
-//                        Log.d("transactions",
+//                        debug("transactions",
 //                                String.format("Loaded %d: %s %1.2f %s", id, cAcc.getString(0),
 //                                        cAcc.getFloat(1), cAcc.getString(2)));
                         addAccount(new LedgerTransactionAccount(cAcc.getString(0), cAcc.getFloat(1),

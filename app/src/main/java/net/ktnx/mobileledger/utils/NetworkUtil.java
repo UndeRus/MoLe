@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.utils;
 
 import android.util.Base64;
-import android.util.Log;
 
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
@@ -26,6 +25,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
@@ -35,7 +36,7 @@ public final class NetworkUtil {
         final boolean use_auth = profile.isAuthEnabled();
         if (!url.endsWith("/")) url += "/";
         url += path;
-        Log.d("network", "Connecting to " + url);
+        debug("network", "Connecting to " + url);
         HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
         if (use_auth) {
             final String auth_user = profile.getAuthUserName();

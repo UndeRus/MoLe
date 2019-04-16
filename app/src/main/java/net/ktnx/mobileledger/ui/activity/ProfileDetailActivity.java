@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 
 import net.ktnx.mobileledger.R;
@@ -29,6 +28,8 @@ import net.ktnx.mobileledger.utils.Colors;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /**
  * An activity representing a single Profile detail screen. This
@@ -48,7 +49,7 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             if (profile == null) throw new AssertionError(
                     String.format("Can't get profile " + "(index:%d) from the global list", index));
 
-            Log.d("profiles", String.format("Editing profile %s (%s); hue=%d", profile.getName(),
+            debug("profiles", String.format("Editing profile %s (%s); hue=%d", profile.getName(),
                     profile.getUuid(), profile.getThemeId()));
         }
 
@@ -87,7 +88,7 @@ public class ProfileDetailActivity extends CrashReportingActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        Log.d("profiles", "[activity] Creating profile details options menu");
+        debug("profiles", "[activity] Creating profile details options menu");
         if (mFragment != null) mFragment.onCreateOptionsMenu(menu, getMenuInflater());
 
         return true;

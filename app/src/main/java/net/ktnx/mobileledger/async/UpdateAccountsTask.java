@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.async;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -28,6 +27,8 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAccount>> {
     protected ArrayList<LedgerAccount> doInBackground(Void... params) {
@@ -46,7 +47,7 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
             try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
                 while (cursor.moveToNext()) {
                     final String accName = cursor.getString(0);
-//                    Log.d("accounts",
+//                    debug("accounts",
 //                            String.format("Read account '%s' from DB [%s]", accName, profileUUID));
                     LedgerAccount acc = profile.loadAccount(db, accName);
                     if (acc.isVisible(newList)) newList.add(acc);
@@ -56,7 +57,7 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
             return newList;
         }
         finally {
-            Log.d("UAT", "decrementing background task count");
+            debug("UAT", "decrementing background task count");
             Data.backgroundTaskFinished();
         }
     }

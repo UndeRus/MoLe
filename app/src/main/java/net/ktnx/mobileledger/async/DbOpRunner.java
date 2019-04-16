@@ -18,11 +18,12 @@
 package net.ktnx.mobileledger.async;
 
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.concurrent.BlockingQueue;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 class DbOpRunner extends Thread {
     private final BlockingQueue<DbOpItem> queue;
@@ -34,9 +35,9 @@ class DbOpRunner extends Thread {
         while (!interrupted()) {
             try {
                 DbOpItem item = queue.take();
-                Log.d("opQrunner", "Got "+item.sql);
+                debug("opQrunner", "Got "+item.sql);
                 SQLiteDatabase db = MLDB.getDatabase();
-                Log.d("opQrunner", "Executing "+item.sql);
+                debug("opQrunner", "Executing "+item.sql);
                 db.execSQL(item.sql, item.params);
             }
             catch (InterruptedException e) {

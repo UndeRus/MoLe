@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.profiles;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +41,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 public class ProfilesRecyclerViewAdapter
         extends RecyclerView.Adapter<ProfilesRecyclerViewAdapter.ProfileListViewHolder> {
     private final View.OnClickListener mOnClickListener = view -> {
@@ -52,7 +53,7 @@ public class ProfilesRecyclerViewAdapter
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     public ProfilesRecyclerViewAdapter() {
-        Log.d("flow", "ProfilesRecyclerViewAdapter.new()");
+        debug("flow", "ProfilesRecyclerViewAdapter.new()");
 
         ItemTouchHelper.Callback cb = new ItemTouchHelper.Callback() {
             @Override
@@ -136,7 +137,7 @@ public class ProfilesRecyclerViewAdapter
             MobileLedgerProfile profile = (MobileLedgerProfile) row.getTag();
             if (profile == null)
                 throw new IllegalStateException("Profile row without associated profile");
-            Log.d("profiles", "Setting profile to " + profile.getName());
+            debug("profiles", "Setting profile to " + profile.getName());
             Data.setCurrentProfile(profile);
         });
         holder.mTitle.setOnLongClickListener(v -> {
@@ -164,7 +165,7 @@ public class ProfilesRecyclerViewAdapter
     public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
         final MobileLedgerProfile profile = Data.profiles.get(position);
         final MobileLedgerProfile currentProfile = Data.profile.get();
-        Log.d("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
+        debug("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
                 (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
         holder.itemView.setTag(profile);
 

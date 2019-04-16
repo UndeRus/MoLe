@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.transaction_list;
 import android.content.Context;
 import android.database.MatrixCursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -49,6 +48,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class TransactionListFragment extends MobileLedgerListFragment {
     private MenuItem menuTransactionListFilter;
@@ -74,21 +74,21 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("flow", "TransactionListFragment.onResume()");
+        debug("flow", "TransactionListFragment.onResume()");
     }
     @Override
     public void onStop() {
         super.onStop();
-        Log.d("flow", "TransactionListFragment.onStop()");
+        debug("flow", "TransactionListFragment.onStop()");
     }
     @Override
     public void onPause() {
         super.onPause();
-        Log.d("flow", "TransactionListFragment.onPause()");
+        debug("flow", "TransactionListFragment.onPause()");
     }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d("flow", "TransactionListFragment.onActivityCreated called");
+        debug("flow", "TransactionListFragment.onActivityCreated called");
         super.onActivityCreated(savedInstanceState);
 
         swiper = mActivity.findViewById(R.id.transaction_swipe);
@@ -116,7 +116,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         root.setLayoutManager(llm);
 
         swiper.setOnRefreshListener(() -> {
-            Log.d("ui", "refreshing transactions via swipe");
+            debug("ui", "refreshing transactions via swipe");
             mActivity.scheduleTransactionListRetrieval();
         });
 
@@ -128,7 +128,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
         MLDB.hookAutocompletionAdapter(mActivity, accNameFilter, "accounts", "name", true);
         accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
-//                Log.d("tmp", "direct onItemClick");
+//                debug("tmp", "direct onItemClick");
             MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
             Data.accountFilter.setValue(mc.getString(1));
             Globals.hideSoftKeyboard(mActivity);

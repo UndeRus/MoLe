@@ -29,6 +29,8 @@ import java.io.StringWriter;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 public abstract class CrashReportingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,6 +53,6 @@ public abstract class CrashReportingActivity extends AppCompatActivity {
                 df.show(getSupportFragmentManager(), "crash_report");
             }
         });
-        Log.d("crash", "Uncaught exception handler set");
+        debug("crash", "Uncaught exception handler set");
     }
 }

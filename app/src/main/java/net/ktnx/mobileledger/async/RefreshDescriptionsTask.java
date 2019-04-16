@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.async;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -28,12 +27,14 @@ import net.ktnx.mobileledger.utils.MLDB;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         Map<String, Boolean> unique = new HashMap<>();
 
-        Log.d("descriptions", "Starting refresh");
+        debug("descriptions", "Starting refresh");
         SQLiteDatabase db = MLDB.getDatabase();
 
         Data.backgroundTaskStarted();
@@ -57,7 +58,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
                 }
                 db.execSQL("DELETE from description_history where keep=0");
                 db.setTransactionSuccessful();
-                Log.d("descriptions", "Refresh successful");
+                debug("descriptions", "Refresh successful");
             }
             finally {
                 db.endTransaction();
@@ -65,7 +66,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
         }
         finally {
             Data.backgroundTaskFinished();
-            Log.d("descriptions", "Refresh done");
+            debug("descriptions", "Refresh done");
         }
 
         return null;

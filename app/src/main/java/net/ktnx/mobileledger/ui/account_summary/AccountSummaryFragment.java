@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,6 +45,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
@@ -56,27 +56,27 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("flow", "AccountSummaryFragment.onCreate()");
+        debug("flow", "AccountSummaryFragment.onCreate()");
         setHasOptionsMenu(true);
 
         Data.backgroundTasksRunning.observe(this, this::onBackgroundTaskRunningChanged);
     }
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
-        Log.d("flow", "AccountSummaryFragment.onAttach()");
+        debug("flow", "AccountSummaryFragment.onAttach()");
         mActivity = (MainActivity) context;
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        Log.d("flow", "AccountSummaryFragment.onCreateView()");
+        debug("flow", "AccountSummaryFragment.onCreateView()");
         return inflater.inflate(R.layout.account_summary_fragment, container, false);
     }
 
     @Override
 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d("flow", "AccountSummaryFragment.onActivityCreated()");
+        debug("flow", "AccountSummaryFragment.onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
 
         modelAdapter = new AccountSummaryAdapter();
@@ -96,7 +96,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 //                new RecyclerItemListener.RecyclerTouchListener() {
 //                    @Override
 //                    public void onClickItem(View v, int position) {
-//                        Log.d("value", String.format("item %d clicked", position));
+//                        debug("value", String.format("item %d clicked", position));
 //                        if (modelAdapter.isSelectionActive()) {
 //                            modelAdapter.selectItem(position);
 //                        }
@@ -112,7 +112,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 //
 //                    @Override
 //                    public void onLongClickItem(View v, int position) {
-//                        Log.d("value", String.format("item %d long-clicked", position));
+//                        debug("value", String.format("item %d long-clicked", position));
 //                        modelAdapter.startSelection();
 //                        if (optMenu != null) {
 //                            optMenu.findItem(R.id.menu_acc_summary_cancel_selection)
@@ -140,7 +140,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         swiper = mActivity.findViewById(R.id.account_swiper);
         Colors.themeWatch.observe(this, this::themeChanged);
         swiper.setOnRefreshListener(() -> {
-            Log.d("ui", "refreshing accounts via swipe");
+            debug("ui", "refreshing accounts via swipe");
             mActivity.scheduleTransactionListRetrieval();
         });
 
@@ -185,21 +185,21 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         Data.optShowOnlyStarred.addObserver((o, arg) -> {
             boolean newValue = Data.optShowOnlyStarred.get();
-            Log.d("pref", String.format("pref change came (%s)", newValue ? "true" : "false"));
+            debug("pref", String.format("pref change came (%s)", newValue ? "true" : "false"));
             mShowOnlyStarred.setChecked(newValue);
             update_account_table();
         });
 
         mShowOnlyStarred.setChecked(Data.optShowOnlyStarred.get());
 
-        Log.d("menu", "Accounts: onCreateOptionsMenu called");
+        debug("menu", "Accounts: onCreateOptionsMenu called");
 
         mShowOnlyStarred.setOnMenuItemClickListener(item -> {
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mActivity);
             SharedPreferences.Editor editor = pref.edit();
             boolean flag = item.isChecked();
             editor.putBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, !flag);
-            Log.d("pref",
+            debug("pref",
                     "Setting show only starred accounts pref to " + (flag ? "false" : "true"));
             editor.apply();
 

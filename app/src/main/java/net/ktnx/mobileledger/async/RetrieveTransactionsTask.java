@@ -54,6 +54,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 
 public class RetrieveTransactionsTask
         extends AsyncTask<Void, RetrieveTransactionsTask.Progress, String> {
@@ -76,7 +78,7 @@ public class RetrieveTransactionsTask
         this.contextRef = contextRef;
     }
     private static void L(String msg) {
-        //Log.d("transaction-parser", msg);
+        //debug("transaction-parser", msg);
     }
     @Override
     protected void onProgressUpdate(Progress... values) {
@@ -526,14 +528,14 @@ public class RetrieveTransactionsTask
                     if (transactionOrder == DetectedTransactionOrder.UNKNOWN) {
                         if (orderAccumulator > 30) {
                             transactionOrder = DetectedTransactionOrder.FILE;
-                            Log.d("rtt", String.format(
+                            debug("rtt", String.format(
                                     "Detected native file order after %d transactions (factor %d)",
                                     processedTransactionCount, orderAccumulator));
                             progress.setTotal(Data.transactions.size());
                         }
                         else if (orderAccumulator < -30) {
                             transactionOrder = DetectedTransactionOrder.REVERSE_CHRONOLOGICAL;
-                            Log.d("rtt", String.format(
+                            debug("rtt", String.format(
                                     "Detected reverse chronological order after %d transactions (factor %d)",
                                     processedTransactionCount, orderAccumulator));
                         }

@@ -68,7 +68,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 holder.vTrailer.setVisibility(View.GONE);
                 LedgerTransaction tr = item.getTransaction();
 
-                //        Log.d("transactions", String.format("Filling position %d with %d accounts", position,
+                //        debug("transactions", String.format("Filling position %d with %d accounts", position,
                 //                tr.getAccounts().size()));
 
                 TransactionLoader loader = new TransactionLoader();
@@ -118,7 +118,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     @NonNull
     @Override
     public TransactionRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        Log.d("perf", "onCreateViewHolder called");
+//        debug("perf", "onCreateViewHolder called");
         View row = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.transaction_list_row, parent, false);
         return new TransactionRowHolder(row);
@@ -143,7 +143,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
             int rowIndex = 0;
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
-//                Log.d(c.getAccountName(), acc.getAmount()));
+//                debug(c.getAccountName(), acc.getAmount()));
                 publishProgress(new TransactionLoaderStep(p[0].holder, acc, rowIndex++,
                         p[0].boldAccountName));
             }
@@ -202,7 +202,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     LedgerTransactionAccount acc = step.getAccount();
 
 
-//                    Log.d("tmp", String.format("showing acc row %d: %s %1.2f", rowIndex,
+//                    debug("tmp", String.format("showing acc row %d: %s %1.2f", rowIndex,
 //                            acc.getAccountName(), acc.getAmount()));
 
                     String boldAccountName = step.getBoldAccountName();
@@ -232,7 +232,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                                 holder.tableAccounts.getChildCount() - accCount);
                     }
 
-//                    Log.d("transactions",
+//                    debug("transactions",
 //                            String.format("Position %d fill done", step.getPosition()));
             }
         }

@@ -23,7 +23,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -51,6 +50,8 @@ import java.util.Objects;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /**
  * A fragment representing a single Profile detail screen.
@@ -91,7 +92,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Log.d("profiles", "[fragment] Creating profile details options menu");
+        debug("profiles", "[fragment] Creating profile details options menu");
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.profile_details, menu);
         final MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
@@ -102,12 +103,12 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             builder.setPositiveButton(R.string.Remove, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Log.d("profiles",
+                    debug("profiles",
                             String.format("[fragment] removing profile %s", mProfile.getUuid()));
                     mProfile.removeFromDB();
                     Data.profiles.remove(mProfile);
                     if (Data.profile.get().equals(mProfile)) {
-                        Log.d("profiles", "[fragment] setting current profile to 0");
+                        debug("profiles", "[fragment] setting current profile to 0");
                         Data.setCurrentProfile(Data.profiles.get(0));
                     }
                     getActivity().finish();
@@ -159,9 +160,9 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
 
             if (mProfile != null) {
                 updateProfileFromUI();
-//                Log.d("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
+//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
                 mProfile.storeInDB();
-                Log.d("profiles", "profile stored in DB");
+                debug("profiles", "profile stored in DB");
                 Data.profiles.triggerItemChangedNotification(mProfile);
 
 
@@ -219,7 +220,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                 rootView.findViewById(R.id.preferred_accounts_accounts_filter_layout);
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            Log.d("profiles", isChecked ? "auth enabled " : "auth disabled");
+            debug("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (isChecked) userName.requestFocus();
         });

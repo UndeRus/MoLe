@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -31,6 +30,8 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.lifecycle.MutableLiveData;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class Data {
     public static ObservableList<TransactionListItem> transactions =
@@ -46,12 +47,12 @@ public final class Data {
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
-        Log.d("data", String.format("background task count is %d after incrementing", cnt));
+        debug("data", String.format("background task count is %d after incrementing", cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void backgroundTaskFinished() {
         int cnt = backgroundTaskCount.decrementAndGet();
-        Log.d("data", String.format("background task count is %d after decrementing", cnt));
+        debug("data", String.format("background task count is %d after decrementing", cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {

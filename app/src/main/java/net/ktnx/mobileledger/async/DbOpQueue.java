@@ -17,17 +17,17 @@
 
 package net.ktnx.mobileledger.async;
 
-import android.util.Log;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class DbOpQueue {
     static private final BlockingQueue<DbOpItem> queue = new LinkedBlockingQueue<>();
     static private DbOpRunner runner;
     synchronized static public void init() {
         if (runner != null) return;
-        Log.d("opQueue", "Starting runner thread");
+        debug("opQueue", "Starting runner thread");
         runner = new DbOpRunner(queue);
         runner.start();
     }
@@ -36,7 +36,7 @@ public class DbOpQueue {
     }
     public static void add(String sql, Object[] params) {
         init();
-        Log.d("opQueue", "Adding " + sql);
+        debug("opQueue", "Adding " + sql);
         queue.add(new DbOpItem(sql, params));
     }
     static void add(String sql) {

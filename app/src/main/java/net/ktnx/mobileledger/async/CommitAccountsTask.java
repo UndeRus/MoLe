@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.async;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -27,6 +26,8 @@ import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class CommitAccountsTask
         extends AsyncTask<CommitAccountsTaskParams, Void, ArrayList<LedgerAccount>> {
@@ -42,7 +43,7 @@ public class CommitAccountsTask
                 try (LockHolder lh = params[0].accountList.lockForWriting()) {
                     for (int i = 0; i < params[0].accountList.size(); i++ ){
                         LedgerAccount acc = params[0].accountList.get(i);
-                        Log.d("CAT", String.format("Setting %s to %s", acc.getName(),
+                        debug("CAT", String.format("Setting %s to %s", acc.getName(),
                                 acc.isHiddenByStarToBe() ? "hidden" : "starred"));
                         db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
                                 new Object[]{acc.isHiddenByStarToBe() ? 1 : 0, profile, acc.getName()

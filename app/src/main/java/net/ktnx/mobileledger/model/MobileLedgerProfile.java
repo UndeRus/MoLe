@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.utils.Globals;
@@ -33,6 +32,8 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class MobileLedgerProfile {
     private String uuid;
@@ -164,7 +165,7 @@ public final class MobileLedgerProfile {
         SQLiteDatabase db = MLDB.getDatabase();
         db.beginTransaction();
         try {
-//            Log.d("profiles", String.format("Storing profile in DB: uuid=%s, name=%s, " +
+//            debug("profiles", String.format("Storing profile in DB: uuid=%s, name=%s, " +
 //                                            "url=%s, permit_posting=%s, authEnabled=%s, " +
 //                                            "themeId=%d", uuid, name, url,
 //                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeId));
@@ -197,7 +198,7 @@ public final class MobileLedgerProfile {
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
                              acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded()
                 });
-//        Log.d("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
+//        debug("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
     public void storeAccountValue(SQLiteDatabase db, String name, String currency, Float amount) {
         db.execSQL("replace into account_values(profile, account, " +
@@ -224,7 +225,7 @@ public final class MobileLedgerProfile {
                                  item.getCurrency()
                     });
         }
-        Log.d("profile", String.format("Transaction %d stored", tr.getId()));
+        debug("profile", String.format("Transaction %d stored", tr.getId()));
     }
     public String getOption(String name, String default_value) {
         SQLiteDatabase db = MLDB.getDatabase();
@@ -235,17 +236,17 @@ public final class MobileLedgerProfile {
                 String result = cursor.getString(0);
 
                 if (result == null) {
-                    Log.d("profile", "returning default value for " + name);
+                    debug("profile", "returning default value for " + name);
                     result = default_value;
                 }
-                else Log.d("profile", String.format("option %s=%s", name, result));
+                else debug("profile", String.format("option %s=%s", name, result));
 
                 return result;
             }
             else return default_value;
         }
         catch (Exception e) {
-            Log.d("db", "returning default value for " + name, e);
+            debug("db", "returning default value for " + name, e);
             return default_value;
         }
     }
@@ -253,16 +254,16 @@ public final class MobileLedgerProfile {
         long longResult;
         String result = getOption(name, "");
         if ((result == null) || result.isEmpty()) {
-            Log.d("profile", String.format("Returning default value for option %s", name));
+            debug("profile", String.format("Returning default value for option %s", name));
             longResult = default_value;
         }
         else {
             try {
                 longResult = Long.parseLong(result);
-                Log.d("profile", String.format("option %s=%s", name, result));
+                debug("profile", String.format("option %s=%s", name, result));
             }
             catch (Exception e) {
-                Log.d("profile", String.format("Returning default value for option %s", name), e);
+                debug("profile", String.format("Returning default value for option %s", name), e);
                 longResult = default_value;
             }
         }
@@ -270,7 +271,7 @@ public final class MobileLedgerProfile {
         return longResult;
     }
     public void setOption(String name, String value) {
-        Log.d("profile", String.format("setting option %s=%s", name, value));
+        debug("profile", String.format("setting option %s=%s", name, value));
         DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{uuid, name, value});
     }
@@ -279,7 +280,7 @@ public final class MobileLedgerProfile {
     }
     public void removeFromDB() {
         SQLiteDatabase db = MLDB.getDatabase();
-        Log.d("db", String.format("removing profile %s from DB", uuid));
+        debug("db", String.format("removing profile %s from DB", uuid));
         db.beginTransaction();
         try {
             Object[] uuid_param = new Object[]{uuid};
@@ -346,14 +347,14 @@ public final class MobileLedgerProfile {
         return tr;
     }
     public int getThemeId() {
-//        Log.d("profile", String.format("Profile.getThemeId() returning %d", themeId));
+//        debug("profile", String.format("Profile.getThemeId() returning %d", themeId));
         return this.themeId;
     }
     public void setThemeId(Object o) {
         setThemeId(Integer.valueOf(String.valueOf(o)).intValue());
     }
     public void setThemeId(int themeId) {
-//        Log.d("profile", String.format("Profile.setThemeId(%d) called", themeId));
+//        debug("profile", String.format("Profile.setThemeId(%d) called", themeId));
         this.themeId = themeId;
     }
     public void markTransactionsAsNotPresent(SQLiteDatabase db) {
@@ -385,7 +386,7 @@ public final class MobileLedgerProfile {
         db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0", new String[]{uuid});
     }
     public void setLastUpdateStamp() {
-        Log.d("db", "Updating transaction value stamp");
+        debug("db", "Updating transaction value stamp");
         Date now = new Date();
         setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
         Data.lastUpdateDate.postValue(now);

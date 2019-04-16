@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.utils;
 
 import android.os.Build;
-import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +37,8 @@ import java.util.stream.Stream;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class ObservableList<T> extends Observable implements List<T> {
     private List<T> list;
@@ -280,10 +281,10 @@ public class ObservableList<T> extends Observable implements List<T> {
         try (LockHolder lh = lockForReading()) {
             int index = list.indexOf(item);
             if (index == -1) {
-                Log.d("ObList", "??? not sending notifications for item not found in the list");
+                debug("ObList", "??? not sending notifications for item not found in the list");
                 return;
             }
-            Log.d("ObList", "Notifying item change observers");
+            debug("ObList", "Notifying item change observers");
             triggerItemChangedNotification(index);
         }
     }

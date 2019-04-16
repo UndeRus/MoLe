@@ -25,7 +25,6 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -33,6 +32,8 @@ import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.DimensionUtils;
 
 import androidx.annotation.Nullable;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class HueRing extends View {
     private static final int hueStepDegrees = 15;
@@ -224,7 +225,7 @@ public class HueRing extends View {
                 // angleRad is [-𝜋; +𝜋]
                 float hue = (float) (angleRad / (2 * Math.PI));
                 if (hue < 0) hue += 1;
-                Log.d("TMP",
+                debug("TMP",
                         String.format("x=%1.3f, y=%1.3f, angle=%1.3frad, hueDegrees=%1.3f", x, y,
                                 angleRad, hue));
                 setHue(hue);
