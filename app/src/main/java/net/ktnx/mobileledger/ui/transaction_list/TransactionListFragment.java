@@ -148,7 +148,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         vAccountFilter = mActivity.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = mActivity.findViewById(R.id.transaction_filter_account_name);
 
-        TransactionListFragment me = this;
         MLDB.hookAutocompletionAdapter(mActivity, accNameFilter, "accounts", "name", true);
         accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
 //                Log.d("tmp", "direct onItemClick");
