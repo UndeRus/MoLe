@@ -309,8 +309,9 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.nav_profile_list_head_layout)
                 .setOnClickListener(this::navProfilesHeadClicked);
         findViewById(R.id.nav_profiles_label).setOnClickListener(this::navProfilesHeadClicked);
+        boolean initialStart = Data.profile.get() == null;
         setupProfile();
-        onProfileChanged(null);
+        if (!initialStart) onProfileChanged(null);
 
         updateLastUpdateTextFromDB();
     }
@@ -367,13 +368,6 @@ public class MainActivity extends ProfileThemedActivity {
             findViewById(R.id.pager_layout)
                     .setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
-            Data.transactions.clear();
-            debug("transactions", "requesting list reload");
-            TransactionListViewModel.scheduleTransactionListReload();
-
-            Data.accounts.clear();
-            AccountSummaryViewModel.scheduleAccountListReload();
-
             if (profile == null) MainActivity.this.setTitle(R.string.app_name);
             else MainActivity.this.setTitle(profile.getName());
             MainActivity.this.updateLastUpdateTextFromDB();
@@ -404,6 +398,13 @@ public class MainActivity extends ProfileThemedActivity {
                 return;
             }
             drawer.closeDrawers();
+
+            Data.transactions.clear();
+            debug("transactions", "requesting list reload");
+            TransactionListViewModel.scheduleTransactionListReload();
+
+            Data.accounts.clear();
+            AccountSummaryViewModel.scheduleAccountListReload();
 
             if (profile == null) {
                 mToolbar.setSubtitle(null);
