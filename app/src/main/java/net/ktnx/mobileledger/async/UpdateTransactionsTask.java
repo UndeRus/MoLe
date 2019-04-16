@@ -39,7 +39,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
         if (profile == null) return "Profile not configured";
 
         String profile_uuid = profile.getUuid();
-        Data.backgroundTaskCount.incrementAndGet();
+        Data.backgroundTaskStarted();
         try {
             ArrayList<TransactionListItem> newList = new ArrayList<>();
 
@@ -97,7 +97,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             return String.format("Error parsing stored date '%s'", e.getMessage());
         }
         finally {
-            Data.backgroundTaskCount.decrementAndGet();
+            Data.backgroundTaskFinished();
         }
     }
 }

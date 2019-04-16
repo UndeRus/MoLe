@@ -33,4 +33,9 @@ public class MobileLedgerListFragment extends Fragment {
     protected void themeChanged(Integer counter) {
         swiper.setColorSchemeColors(Colors.primary);
     }
+    public void onBackgroundTaskRunningChanged(Boolean isRunning) {
+        if (mActivity == null) return;
+        if (swiper == null) return;
+        swiper.setRefreshing(isRunning);
+    }
 }

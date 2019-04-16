@@ -36,7 +36,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
         Log.d("descriptions", "Starting refresh");
         SQLiteDatabase db = MLDB.getDatabase();
 
-        Data.backgroundTaskCount.incrementAndGet();
+        Data.backgroundTaskStarted();
         try {
             db.beginTransaction();
             try {
@@ -64,7 +64,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
             }
         }
         finally {
-            Data.backgroundTaskCount.decrementAndGet();
+            Data.backgroundTaskFinished();
             Log.d("descriptions", "Refresh done");
         }
 

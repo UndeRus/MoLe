@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAccount>> {
     protected ArrayList<LedgerAccount> doInBackground(Void... params) {
-        Data.backgroundTaskCount.incrementAndGet();
+        Data.backgroundTaskStarted();
         try {
             MobileLedgerProfile profile = Data.profile.get();
             String profileUUID = profile.getUuid();
@@ -57,7 +57,7 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
         }
         finally {
             Log.d("UAT", "decrementing background task count");
-            Data.backgroundTaskCount.decrementAndGet();
+            Data.backgroundTaskFinished();
         }
     }
 }

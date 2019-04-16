@@ -588,7 +588,7 @@ public class RetrieveTransactionsTask
     @Override
     protected String doInBackground(Void... params) {
         MobileLedgerProfile profile = Data.profile.get();
-        Data.backgroundTaskCount.incrementAndGet();
+        Data.backgroundTaskStarted();
         try {
             if (!retrieveAccountList(profile) || !retrieveTransactionList(profile))
                 return retrieveTransactionListLegacy(profile);
@@ -615,7 +615,7 @@ public class RetrieveTransactionsTask
             return "Operation cancelled";
         }
         finally {
-            Data.backgroundTaskCount.decrementAndGet();
+            Data.backgroundTaskFinished();
         }
     }
     private MainActivity getContext() {

@@ -37,7 +37,6 @@ import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
-import java.util.Observer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,33 +52,13 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     public AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
     private FloatingActionButton fab;
-    private Observer backgroundTaskCountObserver;
-    @Override
-    public void onDestroy() {
-        if (backgroundTaskCountObserver != null) {
-            Log.d("acc", "destroying background task count observer");
-            Data.backgroundTaskCount.deleteObserver(backgroundTaskCountObserver);
-        }
-        super.onDestroy();
-    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("flow", "AccountSummaryFragment.onCreate()");
         setHasOptionsMenu(true);
 
-        if (backgroundTaskCountObserver == null) {
-            Log.d("acc", "creating background task count observer");
-            Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = (o, arg) -> {
-                if (mActivity == null) return;
-                if (swiper == null) return;
-                mActivity.runOnUiThread(() -> {
-                    int cnt = Data.backgroundTaskCount.get();
-                    Log.d("acc", String.format("background task count changed to %d", cnt));
-                    swiper.setRefreshing(cnt > 0);
-                });
-            });
-        }
+        Data.backgroundTasksRunning.observe(this, this::onBackgroundTaskRunningChanged);
     }
     public void onAttach(Context context) {
         super.onAttach(context);

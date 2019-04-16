@@ -19,28 +19,41 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
-import net.ktnx.mobileledger.utils.ObservableAtomicInteger;
 import net.ktnx.mobileledger.utils.ObservableList;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.lifecycle.MutableLiveData;
 
 public final class Data {
-    public static ObservableList<TransactionListItem> transactions = new ObservableList<>(new ArrayList<>());
+    public static ObservableList<TransactionListItem> transactions =
+            new ObservableList<>(new ArrayList<>());
     public static ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
-    public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
+    private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
+    public static MutableLiveData<Boolean> backgroundTasksRunning = new MutableLiveData<>(false);
     public static MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
     public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
     public static ObservableList<MobileLedgerProfile> profiles =
             new ObservableList<>(new ArrayList<>());
     public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
+    public static void backgroundTaskStarted() {
+        int cnt = backgroundTaskCount.incrementAndGet();
+        Log.d("data", String.format("background task count is %d after incrementing", cnt));
+        backgroundTasksRunning.postValue(cnt > 0);
+    }
+    public static void backgroundTaskFinished() {
+        int cnt = backgroundTaskCount.decrementAndGet();
+        Log.d("data", String.format("background task count is %d after decrementing", cnt));
+        backgroundTasksRunning.postValue(cnt > 0);
+    }
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
         profile.set(newProfile);

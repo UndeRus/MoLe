@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class CommitAccountsTask
         extends AsyncTask<CommitAccountsTaskParams, Void, ArrayList<LedgerAccount>> {
     protected ArrayList<LedgerAccount> doInBackground(CommitAccountsTaskParams... params) {
-        Data.backgroundTaskCount.incrementAndGet();
+        Data.backgroundTaskStarted();
         ArrayList<LedgerAccount> newList = new ArrayList<>();
         String profile = Data.profile.get().getUuid();
         try {
@@ -59,7 +59,7 @@ public class CommitAccountsTask
             }
         }
         finally {
-            Data.backgroundTaskCount.decrementAndGet();
+            Data.backgroundTaskFinished();
         }
 
         return newList;

@@ -43,8 +43,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Observer;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -56,28 +54,11 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     private MenuItem menuTransactionListFilter;
     private View vAccountFilter;
     private AutoCompleteTextView accNameFilter;
-    private Observer backgroundTaskCountObserver;
-    @Override
-    public void onDestroy() {
-        if (backgroundTaskCountObserver != null) {
-            Log.d("rtl", "destroying background task count observer");
-            Data.backgroundTaskCount.deleteObserver(backgroundTaskCountObserver);
-        }
-        super.onDestroy();
-    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        if (backgroundTaskCountObserver == null) {
-            Log.d("rtl", "creating background task count observer");
-            Data.backgroundTaskCount.addObserver(
-                    backgroundTaskCountObserver = (o, arg) -> mActivity.runOnUiThread(() -> {
-                        int cnt = Data.backgroundTaskCount.get();
-                        Log.d("trl", String.format("background task count changed to %d", cnt));
-                        swiper.setRefreshing(cnt > 0);
-                    }));
-        }
+        Data.backgroundTasksRunning.observe(this, this::onBackgroundTaskRunningChanged);
     }
     @Override
     public void onAttach(@NotNull Context context) {
