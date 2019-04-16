@@ -58,6 +58,8 @@ import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -797,6 +799,7 @@ public class MainActivity extends ProfileThemedActivity {
             super(fm);
         }
 
+        @NotNull
         @Override
         public Fragment getItem(int position) {
             Log.d("main", String.format("Switching to fragment %d", position));
