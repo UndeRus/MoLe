@@ -33,6 +33,8 @@ import static java.lang.Math.abs;
 
 public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
+    private static final float blueLightness = 0.665f;
+    private static final float yellowLightness = 0.350f;
     public static @ColorInt
     int accent;
     @ColorInt
@@ -42,7 +44,6 @@ public class Colors {
     @ColorInt
     public static int primary, defaultTextColor;
     public static int profileThemeId = -1;
-
     public static ObservableValue<Integer> themeWatch = new ObservableValue<>(0);
     public static void refreshColors(Resources.Theme theme) {
         TypedValue tv = new TypedValue();
@@ -75,8 +76,8 @@ public class Colors {
         return 0xff000000 | hsvTriplet(hue, saturation, value);
     }
     public static @ColorInt
-    int hslColor(float hue, float saturation, float lightness) {
-        return 0xff000000 | hslTriplet(hue, saturation, lightness);
+    int hslColor(float hueRatio, float saturation, float lightness) {
+        return 0xff000000 | hslTriplet(hueRatio, saturation, lightness);
     }
     public static @ColorInt
     int hsvTriplet(float hue, float saturation, float value) {
@@ -115,9 +116,9 @@ public class Colors {
         }
     }
     public static @ColorInt
-    int hslTriplet(float hue, float saturation, float lightness) {
+    int hslTriplet(float hueRatio, float saturation, float lightness) {
         @ColorLong long result;
-        float h = hue * 6;
+        float h = hueRatio * 6;
         float c = (1 - abs(2f * lightness - 1)) * saturation;
         float h_mod_2 = h % 2;
         float x = c * (1 - Math.abs(h_mod_2 - 1));
@@ -133,7 +134,7 @@ public class Colors {
 
         throw new IllegalArgumentException(String.format(
                 "Unexpected value for h (%1.3f) while converting hsl(%1.3f, %1.3f, %1.3f) to rgb",
-                h, hue, saturation, lightness));
+                h, hueRatio, saturation, lightness));
     }
 
     public static @ColorInt
@@ -144,16 +145,14 @@ public class Colors {
         return (r_int << 16) | (g_int << 8) | b_int;
     }
     public static @ColorInt
-    int getPrimaryColorForHue(int degrees) {
-        // 0/360f becomes -0.000something for some reason
-        if (degrees == 0) return getPrimaryColorForHue(0f);
-        return getPrimaryColorForHue(degrees / 360f);
-    }
-    public static @ColorInt
-    int getPrimaryColorForHue(float hue) {
-//        int result = hsvColor(hue, 0.61f, 0.95f);
-        int result = hslColor(hue, 0.60f, 0.60f);
-        Log.d("colors", String.format("getPrimaryColorForHue(%1.2f) = %x", hue, result));
+    int getPrimaryColorForHue(int hueDegrees) {
+//        int result = hsvColor(hueDegrees, 0.61f, 0.95f);
+        float y = hueDegrees - 60;
+        if (y < 0) y += 360;
+        float l = yellowLightness + (blueLightness - yellowLightness) *
+                                    (float) Math.cos(Math.toRadians(Math.abs(180 - y) / 2f));
+        int result = hslColor(hueDegrees/360f, 0.845f, l);
+        Log.d("colors", String.format("getPrimaryColorForHue(%d) = %x", hueDegrees, result));
         return result;
     }
     public static void setupTheme(Activity activity) {

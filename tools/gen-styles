@@ -1,6 +1,10 @@
 #!/usr/bin/perl
 
 use strict; use warnings; use utf8;
+use autodie;
+use Math::Trig;
+use File::Basename qw(basename dirname);
+use File::Temp qw(tempfile);
 
 sub hexTuple {
 	my ($r, $g, $b) = @_;
@@ -27,9 +31,10 @@ sub hsvHex {
 # https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
 sub hslHex {
 	my ($hue, $sat, $lig ) = @_;
-	my $h = ($hue * 6);
+	$hue = $hue / 360.0;
+	my $h = ($hue * 6.0);
 	my $c = (1 - abs(2.0*$lig - 1)) * $sat;
-	my $h_mod_2 = $h - 2*int($h/2);
+	my $h_mod_2 = $h - 2.0*int($h/2);
 	my $x = $c * (1 - abs($h_mod_2 - 1));
 	my ($r, $g, $b);
 	my $m = $lig - $c / 2.0;
@@ -65,14 +70,20 @@ sub max {
 	return $max;
 }
 
+sub hexToRGB {
+	my $hexTriplet = shift;
+
+	my @d = $hexTriplet =~ /^#?(.)(.)(.)(.)(.)(.)/;
+
+	return (16 * $hexValue{$d[0]} + $hexValue{$d[1]},
+		16 * $hexValue{$d[2]} + $hexValue{$d[3]},
+		16 * $hexValue{$d[4]} + $hexValue{$d[5]});
+}
+
 sub hexToHSL {
 	my $hexTriplet = shift;
-	my ( $r,$g,$b ) = $hexTriplet =~ /^#?(..)(..)(..)/;
-	for ($r,$g,$b) {
-		my @d = split(//);
-		$_ = 16 * $hexValue{$d[0]} + $hexValue{$d[1]};
-	}
 
+	my ($r,$g,$b) = hexToRGB($hexTriplet);
 	warn "$hexTriplet -> $r:$g:$b";
 
 	for ($r, $g, $b ) { $_ = $_ / 255.0 }
@@ -107,8 +118,25 @@ sub hexToHSL {
 
 my $baseColorHSV = [ hexToHSL('#935ff2') ];
 my $baseColorHue = $baseColorHSV->[0];
-warn sprintf( 'H:%1.4f S:%1.4f L:%1.4f', @$baseColorHSV );
+warn sprintf( 'H:%1.4f S:%1.4f V:%1.4f', @$baseColorHSV );
 warn sprintf( 'H:%1.4f S:%1.4f L:%1.4f', hexToHSL('#3e148c') );
+my @target = hexToRGB('#935ff2');
+my ($best, $min_dist);
+for (my $s = 0.50; $s < 0.90; $s += 0.001) {
+	for ( my $l = 0.50; $l <= 0.80; $l += 0.001 ) {
+		my $hexColor = hslHex($baseColorHue, $s, $l);
+		my ($r,$g,$b) = hexToRGB( $hexColor );
+		my $dist = abs($r-$target[0])
+		         + abs($g-$target[1])
+			 + abs($b-$target[2]);
+		if (not defined($best) or $dist < $min_dist) {
+			$best = [ $s, $l, $hexColor ];
+			$min_dist = $dist;
+		}
+	}
+}
+warn sprintf( 's%1.3f, l%1.3f -> %s',
+	@$best );
 
 my $baseTheme = "AppTheme.NoActionBar";
 
@@ -133,36 +161,93 @@ my $baseTheme = "AppTheme.NoActionBar";
 # }
 
 # HSL
-hslStyleForHue($baseColorHue);
-for( my $hue = 0; $hue < 360; $hue += 15 ) {
-	hslStyleForHue($hue, $baseTheme);
+sub outputThemes {
+	my $out = shift;
+	$out->print(hslStyleForHue($baseColorHue));
+	for( my $hue = 0; $hue < 360; $hue += 15 ) {
+		$out->print(hslStyleForHue($hue, $baseTheme));
+	}
 }
 
 sub hslStyleForHue {
 	my $hue = shift;
 	my $base = shift;
 
+	my $blueL = 0.665;
+	my $yellowL = 0.350;
+
+	my $y = $hue - 60;
+	$y += 360 if $y < 0;
+	my $q = cos(deg2rad(abs($y-180)/2.0));
+	my $l1 = $yellowL + ($blueL - $yellowL) * $q;
+	my $l2 = 0.150 + 0.350 * $q;
+	my $l3 = 0.950;
+	my $l4 = 0.980;
+
+	my $result = "";
+
 	if ($base) {
-		printf "<style name=\"%s.%d\" parent=\"%s\">\n",
-			$baseTheme, $hue, $baseTheme;
+		$result .= sprintf "<style name=\"%s.%d\" parent=\"%s\">\n",
+                        $baseTheme, $hue, $baseTheme;
+        }
+        else {
+                $result .= sprintf "<style name=\"%s\">\n",
+                        $baseTheme;
+                $result .= "  <item name=\"windowActionBar\">false</item>\n";
+                $result .= "  <item name=\"windowNoTitle\">true</item>\n";
+                $result .= "  <item name=\"textColor\">#d0000000</item>\n";
+        }
+        my $S = 0.845;
+        $result .= sprintf "  <item name=\"colorPrimary\">#%s</item>\n",
+                hslHex($hue, $S, $l1);
+        $result .= sprintf "  <item name=\"colorPrimaryTransparent\">#00%s</item>\n",
+                hslHex($hue, $S, $l1);
+        $result .= sprintf "  <item name=\"colorAccent\">#%s</item>\n",
+                hslHex($hue, $S, $l2);
+        $result .= "  <item name=\"drawer_background\">#ffffffff</item>\n";
+        $result .= sprintf "  <item name=\"table_row_dark_bg\">#%s</item>\n",
+                hslHex($hue, $S, $l3);
+        $result .= sprintf "  <item name=\"table_row_light_bg\">#%s</item>\n",
+                hslHex($hue, $S, $l4);
+        $result .= "</style>\n";
+
+        return $result;
+}
+
+my $xml = shift;
+
+if ($xml) {
+	my $start_marker = '<!-- theme list start -->';
+	my $end_marker = '<!-- theme list end -->';
+	my ($fh, $filename) = tempfile(basename($0).'.XXXXXXXX', DIR => dirname($xml));
+	open(my $in, '<', $xml);
+	my $state = 'waiting-for-start-marker';
+	while (<$in>) {
+		if ( $state eq 'waiting-for-start-marker' ) {
+			print $fh $_;
+			$state = 'skipping-styles' if /^\s*\Q$start_marker\E/;
+			next;
+		}
+		if ( $state eq 'skipping-styles' ) {
+			next unless /^\s*\Q$end_marker\E/;
+			outputThemes($fh);
+			print $fh $_;
+			$state = 'copying-the-rest';
+			next;
+		}
+		if ( $state eq 'copying-the-rest') {
+			print $fh $_;
+			next;
+		}
+
+		die "Unexpected state '$state'";
 	}
-	else {
-		printf "<style name=\"%s\">\n",
-			$baseTheme;
-		printf "  <item name=\"windowActionBar\">false</item>\n";
-		printf "  <item name=\"windowNoTitle\">true</item>\n";
-		printf "  <item name=\"textColor\">#d0000000</item>\n";
-	}
-	printf "  <item name=\"colorPrimary\">#%s</item>\n",
-       		hslHex($hue/360.0, 0.60, 0.60);
-	printf "  <item name=\"colorPrimaryTransparent\">#00%s</item>\n",
-       		hslHex($hue/360.0, 0.60, 0.60);
-	printf "  <item name=\"colorAccent\">#%s</item>\n",
-       		hslHex($hue/360.0, 0.85, 0.50);
-	printf "  <item name=\"drawer_background\">#ffffffff</item>\n";
-	printf "  <item name=\"table_row_dark_bg\">#%s</item>\n",
-       		hslHex($hue/360.0, 0.85, 0.95);
-	printf "  <item name=\"table_row_light_bg\">#%s</item>\n",
-       		hslHex($hue/360.0, 0.85, 0.98);
-	printf "</style>\n";
+
+	close($fh);
+	close($in);
+
+	rename($filename, $xml);
+}
+else {
+	outputThemes(\*STDOUT);
 }
