@@ -41,6 +41,8 @@ import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Observable;
 import java.util.Observer;
 
@@ -83,7 +85,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         }
     }
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         mActivity = (MainActivity) context;
     }
@@ -194,7 +196,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
     }
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
         inflater.inflate(R.menu.transaction_list, menu);
 
         menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
