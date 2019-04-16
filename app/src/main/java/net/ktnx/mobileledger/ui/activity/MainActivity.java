@@ -274,7 +274,8 @@ public class MainActivity extends ProfileThemedActivity {
                     profileListHeadArrow.setVisibility(View.VISIBLE);
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadMore.setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
+                    profileListHeadMore
+                            .setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
                 }
             };
             mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
@@ -357,7 +358,8 @@ public class MainActivity extends ProfileThemedActivity {
         MainActivity.this.runOnUiThread(() -> {
 
             boolean haveProfile = profile != null;
-            findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
+            findViewById(R.id.no_profiles_layout)
+                    .setVisibility(haveProfile ? View.GONE : View.VISIBLE);
             findViewById(R.id.pager_layout)
                     .setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
