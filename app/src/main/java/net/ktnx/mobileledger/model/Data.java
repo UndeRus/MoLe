@@ -83,7 +83,9 @@ public final class Data {
         if (profileUUID == null) return -1;
 
         SQLiteDatabase db = MLDB.getDatabase();
-        try(Cursor c = db.rawQuery("SELECT theme from profiles where uuid=?", new String[]{profileUUID})) {
+        try (Cursor c = db
+                .rawQuery("SELECT theme from profiles where uuid=?", new String[]{profileUUID}))
+        {
             if (c.moveToNext()) return c.getInt(0);
         }
 
