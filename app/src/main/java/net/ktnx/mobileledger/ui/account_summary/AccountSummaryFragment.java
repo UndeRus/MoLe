@@ -158,8 +158,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             }
         });
         swiper = mActivity.findViewById(R.id.account_swiper);
-        Colors.themeWatch.addObserver((o, arg) -> swiper.setColorSchemeColors(Colors.primary));
-        swiper.setColorSchemeColors(Colors.primary);
+        Colors.themeWatch.observe(this, this::themeChanged);
         swiper.setOnRefreshListener(() -> {
             Log.d("ui", "refreshing accounts via swipe");
             mActivity.scheduleTransactionListRetrieval();

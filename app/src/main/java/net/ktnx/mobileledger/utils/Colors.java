@@ -28,6 +28,7 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorLong;
+import androidx.lifecycle.MutableLiveData;
 
 import static java.lang.Math.abs;
 
@@ -44,7 +45,7 @@ public class Colors {
     @ColorInt
     public static int primary, defaultTextColor;
     public static int profileThemeId = -1;
-    public static ObservableValue<Integer> themeWatch = new ObservableValue<>(0);
+    public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
     public static void refreshColors(Resources.Theme theme) {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
@@ -59,7 +60,7 @@ public class Colors {
         accent = tv.data;
 
         // trigger theme observers
-        themeWatch.notifyObservers();
+        themeWatch.postValue(themeWatch.getValue()+1);
     }
     public static @ColorLong
     long hsvaColor(float hue, float saturation, float value, float alpha) {

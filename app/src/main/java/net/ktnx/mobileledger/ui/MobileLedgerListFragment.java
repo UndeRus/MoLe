@@ -17,16 +17,20 @@
 
 package net.ktnx.mobileledger.ui;
 
-import androidx.fragment.app.Fragment;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.RecyclerView;
-
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;
+import net.ktnx.mobileledger.utils.Colors;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class MobileLedgerListFragment extends Fragment {
     protected MainActivity mActivity;
     public SwipeRefreshLayout swiper;
     protected RecyclerView root;
     public TransactionListAdapter modelAdapter;
+    protected void themeChanged(Integer counter) {
+        swiper.setColorSchemeColors(Colors.primary);
+    }
 }
