@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
@@ -34,14 +35,15 @@ import net.ktnx.mobileledger.utils.DimensionUtils;
 import androidx.annotation.Nullable;
 
 public class HueRing extends View {
-    private final int markerWidthDegrees = 10;
-    private Paint ringPaint, initialPaint, currentPaint;
+    private static final int hueStepDegrees = 15;
+    private Paint ringPaint, initialPaint, currentPaint, markerPaint;
     private int centerX, centerY;
     private int diameter;
     private int padding;
     private int initialHueDegrees;
     private int color, hueDegrees;
-    private float radius;
+    private float outerR;
+    private float innerR;
     private float bandWidth;
     private float ringR;
     private float innerDiameter;
@@ -49,6 +51,7 @@ public class HueRing extends View {
     private RectF centerRect;
     private RectF ringRect;
     private int markerOverflow;
+    private int markerStrokeWidth;
     public HueRing(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init(Colors.DEFAULT_HUE_DEG);
@@ -71,13 +74,13 @@ public class HueRing extends View {
         init(initialHueDegrees);
     }
     private void init(int initialHueDegrees) {
-        final int[] steps = {0xFF000000 | Colors.getPrimaryColorForHue(0),      // red
-                             0xFF000000 | Colors.getPrimaryColorForHue(60),     // yellow
-                             0xFF000000 | Colors.getPrimaryColorForHue(120),    // green
-                             0xFF000000 | Colors.getPrimaryColorForHue(180),    // cyan
-                             0xFF000000 | Colors.getPrimaryColorForHue(240),    // blue
-                             0xFF000000 | Colors.getPrimaryColorForHue(300),    // magenta
-                             0xFF000000 | Colors.getPrimaryColorForHue(360),    // red, again
+        final int[] steps = {Colors.getPrimaryColorForHue(0),      // red
+                             Colors.getPrimaryColorForHue(60),     // yellow
+                             Colors.getPrimaryColorForHue(120),    // green
+                             Colors.getPrimaryColorForHue(180),    // cyan
+                             Colors.getPrimaryColorForHue(240),    // blue
+                             Colors.getPrimaryColorForHue(300),    // magenta
+                             Colors.getPrimaryColorForHue(360),    // red, again
         };
         Shader rainbow = new SweepGradient(0, 0, steps, null);
 
@@ -94,7 +97,14 @@ public class HueRing extends View {
         setInitialHue(initialHueDegrees);
         setHue(initialHueDegrees);
 
-        padding = DimensionUtils.dp2px(getContext(), 4);
+        markerStrokeWidth = DimensionUtils.dp2px(getContext(), 4);
+
+        padding = markerStrokeWidth * 2 + 2;
+
+        markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        markerPaint.setStyle(Paint.Style.STROKE);
+        markerPaint.setColor(0xa0000000);
+        markerPaint.setStrokeWidth(markerStrokeWidth);
     }
     public int getColor() {
         return color;
@@ -107,9 +117,9 @@ public class HueRing extends View {
 
         if (hueDegrees != Colors.DEFAULT_HUE_DEG) {
             // round to 15 degrees
-            int rem = hueDegrees % 15;
-            if (rem < 8) hueDegrees -= rem;
-            else hueDegrees += 15 - rem;
+            int rem = hueDegrees % hueStepDegrees;
+            if (rem < (hueStepDegrees / 2)) hueDegrees -= rem;
+            else hueDegrees += hueStepDegrees - rem;
         }
 
         this.hueDegrees = hueDegrees;
@@ -127,16 +137,37 @@ public class HueRing extends View {
         float center = getWidth() / 2f;
         ringPaint.setStrokeWidth((int) bandWidth);
 
+        canvas.save();
         canvas.translate(center, center);
         canvas.drawOval(ringRect, ringPaint);
 
         canvas.drawArc(centerRect, 180, 180, true, initialPaint);
         canvas.drawArc(centerRect, 0, 180, true, currentPaint);
 
-        drawMarker(canvas);
+        canvas.restore();
+        drawMarker(canvas, center);
     }
-    private void drawMarker(Canvas canvas) {
-        // TODO
+    private void drawMarker(Canvas canvas, float center) {
+        float leftRadians = (float) Math.toRadians(-hueStepDegrees / 2f);
+        float rightRadians = (float) Math.toRadians(hueStepDegrees / 2f);
+        float sl = (float) Math.sin(leftRadians);
+        float sr = (float) Math.sin(rightRadians);
+        float cl = (float) Math.cos(leftRadians);
+        float cr = (float) Math.cos(rightRadians);
+        float innerEdge = innerR - 1.5f * markerStrokeWidth;
+        float outerEdge = outerR + 1.5f + markerStrokeWidth;
+        Path p = new Path();
+//        p.arcTo(-innerEdge, -innerEdge, innerEdge, innerEdge, -hueStepDegrees / 2f,
+//                hueStepDegrees, true);
+//        p.lineTo(outerEdge * cr, outerEdge * sr);
+        p.arcTo(-outerEdge, -outerEdge, outerEdge, outerEdge, hueStepDegrees / 2f,
+                -hueStepDegrees, false);
+//        p.close();
+        canvas.save();
+        canvas.translate(center, center);
+        canvas.rotate(hueDegrees, 0, 0);
+        canvas.drawPath(p, markerPaint);
+        canvas.restore();
     }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -158,12 +189,13 @@ public class HueRing extends View {
 //        padding = DimensionUtils.dp2px(getContext(),
 //                getContext().getResources().getDimension(R.dimen.activity_horizontal_margin)) / 2;
         diameter -= 2 * padding;
-        radius = diameter / 2f;
-        centerX = padding + (int) radius;
+        outerR = diameter / 2f;
+        centerX = padding + (int) outerR;
         centerY = centerX;
 
         bandWidth = diameter / 3.5f;
-        ringR = radius - bandWidth / 2f;
+        ringR = outerR - bandWidth / 2f;
+        innerR = outerR - bandWidth;
 
         ringRect = new RectF(-ringR, -ringR, ringR, ringR);
 
