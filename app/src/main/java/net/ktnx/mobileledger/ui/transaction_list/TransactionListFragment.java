@@ -156,6 +156,9 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         });
     }
     private void onAccountNameFilterChanged(String accName) {
+        final String fieldText = accNameFilter.getText().toString();
+        if ((accName == null) && (fieldText.equals(""))) return;
+
         if (accNameFilter != null) {
             accNameFilter.setText(accName, false);
         }
