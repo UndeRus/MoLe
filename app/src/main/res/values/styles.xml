@@ -30,6 +30,7 @@
 
     <!-- base hue: 261.2245° -->
     <!-- target primary color: #935FF2 -->
+    <!-- theme list start -->
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -233,6 +234,7 @@
         <item name="table_row_dark_bg">#fde7ed</item>
         <item name="table_row_light_bg">#fef6f8</item>
     </style>
+    <!-- theme list end -->
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
