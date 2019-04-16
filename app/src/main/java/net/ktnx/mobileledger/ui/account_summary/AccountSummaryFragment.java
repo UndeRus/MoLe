@@ -49,7 +49,7 @@ import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_O
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
-    MenuItem mShowOnlyStarred;
+    private MenuItem mShowOnlyStarred;
     public AccountSummaryAdapter modelAdapter;
     private Menu optMenu;
     private FloatingActionButton fab;
