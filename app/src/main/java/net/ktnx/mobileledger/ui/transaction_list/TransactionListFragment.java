@@ -43,7 +43,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Observable;
 import java.util.Observer;
 
 import androidx.annotation.NonNull;
@@ -72,16 +71,12 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         setHasOptionsMenu(true);
         if (backgroundTaskCountObserver == null) {
             Log.d("rtl", "creating background task count observer");
-            Data.backgroundTaskCount.addObserver(backgroundTaskCountObserver = new Observer() {
-                @Override
-                public void update(Observable o, Object arg) {
-                    mActivity.runOnUiThread(() -> {
+            Data.backgroundTaskCount.addObserver(
+                    backgroundTaskCountObserver = (o, arg) -> mActivity.runOnUiThread(() -> {
                         int cnt = Data.backgroundTaskCount.get();
                         Log.d("trl", String.format("background task count changed to %d", cnt));
                         swiper.setRefreshing(cnt > 0);
-                    });
-                }
-            });
+                    }));
         }
     }
     @Override
@@ -162,15 +157,12 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
         TransactionListViewModel.updating.addObserver(
                 (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
-        TransactionListViewModel.updateError.addObserver(new Observer() {
-            @Override
-            public void update(Observable o, Object arg) {
-                String err = TransactionListViewModel.updateError.get();
-                if (err == null) return;
+        TransactionListViewModel.updateError.addObserver((o, arg) -> {
+            String err = TransactionListViewModel.updateError.get();
+            if (err == null) return;
 
-                Toast.makeText(mActivity, err, Toast.LENGTH_SHORT).show();
-                TransactionListViewModel.updateError.set(null);
-            }
+            Toast.makeText(mActivity, err, Toast.LENGTH_SHORT).show();
+            TransactionListViewModel.updateError.set(null);
         });
         Data.transactions.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
