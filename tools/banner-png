@@ -8,3 +8,10 @@ DST="metadata/en-US/images/featureGraphic.png"
 
 convert "$SRC" "$DST"
 optipng "$DST"
+
+LANG="bg-BG"
+SRC="art/app-banner-$LANG.svg"
+DST="metadata/$LANG/images/featureGraphic.png"
+
+convert "$SRC" "$DST"
+optipng "$DST"
