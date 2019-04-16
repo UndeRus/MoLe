@@ -102,7 +102,6 @@ public class MainActivity extends ProfileThemedActivity {
     private boolean mBackMeansToAccountList = false;
     private Observer profileObserver;
     private Observer profilesObserver;
-    private Observer lastUpdateDateObserver;
     private Toolbar mToolbar;
     private DrawerLayout.SimpleDrawerListener drawerListener;
     private ActionBarDrawerToggle barDrawerToggle;
@@ -132,8 +131,6 @@ public class MainActivity extends ProfileThemedActivity {
         profileObserver = null;
         Data.profiles.deleteObserver(profilesObserver);
         profilesObserver = null;
-        Data.lastUpdateDate.deleteObserver(lastUpdateDateObserver);
-        lastUpdateDateObserver = null;
         RecyclerView root = findViewById(R.id.nav_profile_list);
         if (root != null) root.setAdapter(null);
         if (drawer != null) drawer.removeDrawerListener(drawerListener);
@@ -247,15 +244,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
         else mAccountFilter = null;
 
-        if (lastUpdateDateObserver == null) {
-            lastUpdateDateObserver = (o, arg) -> {
-                Log.d("main", "lastUpdateDate changed");
-                runOnUiThread(this::updateLastUpdateDisplay);
-            };
-            Data.lastUpdateDate.addObserver(lastUpdateDateObserver);
-        }
-
-        updateLastUpdateDisplay();
+        Data.lastUpdateDate.observe(this, this::updateLastUpdateDisplay);
 
         findViewById(R.id.btn_no_profiles_add)
                 .setOnClickListener(v -> startEditProfileActivity(null));
@@ -319,11 +308,8 @@ public class MainActivity extends ProfileThemedActivity {
         onProfileChanged(null);
 
         updateLastUpdateTextFromDB();
-
-        scheduleDataRetrievalIfStale();
     }
-    private void scheduleDataRetrievalIfStale() {
-        Date lastUpdate = Data.lastUpdateDate.get();
+    private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
         if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
             if (lastUpdate == null) Log.d("db::", "WEB data never fetched. scheduling a fetch");
@@ -429,24 +415,23 @@ public class MainActivity extends ProfileThemedActivity {
             }
 
             updateLastUpdateTextFromDB();
-
-            scheduleDataRetrievalIfStale();
         });
     }
-    private void updateLastUpdateDisplay() {
+    private void updateLastUpdateDisplay(Date newValue) {
         LinearLayout l = findViewById(R.id.transactions_last_update_layout);
         TextView v = findViewById(R.id.transactions_last_update);
-        Date date = Data.lastUpdateDate.get();
-        if (date == null) {
+        if (newValue == null) {
             l.setVisibility(View.INVISIBLE);
             Log.d("main", "no last update date :(");
         }
         else {
-            final String text = DateFormat.getDateTimeInstance().format(date);
+            final String text = DateFormat.getDateTimeInstance().format(newValue);
             v.setText(text);
             l.setVisibility(View.VISIBLE);
             Log.d("main", String.format("Date formatted: %s", text));
         }
+
+        scheduleDataRetrievalIfStale(newValue);
     }
     @Override
     public void finish() {
@@ -598,18 +583,15 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void updateLastUpdateTextFromDB() {
-        {
-            final MobileLedgerProfile profile = Data.profile.get();
-            long last_update =
-                    (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
+        final MobileLedgerProfile profile = Data.profile.get();
+        long last_update = (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
 
-            Log.d("transactions", String.format("Last update = %d", last_update));
-            if (last_update == 0) {
-                Data.lastUpdateDate.set(null);
-            }
-            else {
-                Data.lastUpdateDate.set(new Date(last_update));
-            }
+        Log.d("transactions", String.format("Last update = %d", last_update));
+        if (last_update == 0) {
+            Data.lastUpdateDate.postValue(null);
+        }
+        else {
+            Data.lastUpdateDate.postValue(new Date(last_update));
         }
     }
     public void scheduleTransactionListRetrieval() {

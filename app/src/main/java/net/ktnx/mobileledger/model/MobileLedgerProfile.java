@@ -388,7 +388,7 @@ public final class MobileLedgerProfile {
         Log.d("db", "Updating transaction value stamp");
         Date now = new Date();
         setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
-        Data.lastUpdateDate.set(now);
+        Data.lastUpdateDate.postValue(now);
     }
     public List<LedgerAccount> loadChildAccountsOf(LedgerAccount acc) {
         List<LedgerAccount> result = new ArrayList<>();

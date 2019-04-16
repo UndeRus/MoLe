@@ -29,11 +29,13 @@ import net.ktnx.mobileledger.utils.ObservableValue;
 import java.util.ArrayList;
 import java.util.Date;
 
+import androidx.lifecycle.MutableLiveData;
+
 public final class Data {
     public static ObservableList<TransactionListItem> transactions = new ObservableList<>(new ArrayList<>());
     public static ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
     public static ObservableAtomicInteger backgroundTaskCount = new ObservableAtomicInteger(0);
-    public static ObservableValue<Date> lastUpdateDate = new ObservableValue<>();
+    public static MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
     public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
     public static ObservableList<MobileLedgerProfile> profiles =
             new ObservableList<>(new ArrayList<>());
