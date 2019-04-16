@@ -697,31 +697,6 @@ public class MainActivity extends ProfileThemedActivity {
                 .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
         profileListHeadMore.setVisibility(View.GONE);
     }
-    public void onProfileRowClicked(View v) {
-        Data.setCurrentProfile((MobileLedgerProfile) v.getTag());
-    }
-    public void enableProfileModifications() {
-        profileModificationEnabled = true;
-        ViewGroup profileList = findViewById(R.id.nav_profile_list);
-        for (int i = 0; i < profileList.getChildCount(); i++) {
-            View aRow = profileList.getChildAt(i);
-            aRow.findViewById(R.id.profile_list_edit_button).setVisibility(View.VISIBLE);
-            aRow.findViewById(R.id.profile_list_rearrange_handle).setVisibility(View.VISIBLE);
-        }
-        // FIXME enable rearranging
-
-    }
-    public void disableProfileModifications() {
-        profileModificationEnabled = false;
-        ViewGroup profileList = findViewById(R.id.nav_profile_list);
-        for (int i = 0; i < profileList.getChildCount(); i++) {
-            View aRow = profileList.getChildAt(i);
-            aRow.findViewById(R.id.profile_list_edit_button).setVisibility(View.GONE);
-            aRow.findViewById(R.id.profile_list_rearrange_handle).setVisibility(View.INVISIBLE);
-        }
-        // FIXME disable rearranging
-
-    }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;
         if (view.getId() == R.id.account_expander) row = (ViewGroup) view.getParent().getParent();
