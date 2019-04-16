@@ -195,7 +195,7 @@ sub hslStyleForHue {
                         $baseTheme;
                 $result .= "  <item name=\"windowActionBar\">false</item>\n";
                 $result .= "  <item name=\"windowNoTitle\">true</item>\n";
-                $result .= "  <item name=\"textColor\">#d0000000</item>\n";
+                $result .= "  <item name=\"textColor\">#8a000000</item>\n";
         }
         my $S = 0.845;
         $result .= sprintf "  <item name=\"colorPrimary\">#%s</item>\n",
