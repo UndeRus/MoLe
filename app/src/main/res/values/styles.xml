@@ -29,6 +29,7 @@
     </style>
 
     <!-- base hue: 261.2245° -->
+    <!-- target primary color: #935FF2 -->
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
