@@ -37,6 +37,7 @@ import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
+import org.jetbrains.annotations.NotNull;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,7 +61,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         Data.backgroundTasksRunning.observe(this, this::onBackgroundTaskRunningChanged);
     }
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         Log.d("flow", "AccountSummaryFragment.onAttach()");
         mActivity = (MainActivity) context;
@@ -170,7 +171,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         stopSelection();
     }
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.account_summary, menu);
         optMenu = menu;
