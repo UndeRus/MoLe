@@ -73,7 +73,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
                 TransactionLoader loader = new TransactionLoader();
                 loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                        new TransactionLoaderParams(tr, holder, position, Data.accountFilter.get(),
+                        new TransactionLoaderParams(tr, holder, position, Data.accountFilter.getValue(),
                                 item.isOdd()));
 
                 // WORKAROUND what seems to be a bug in CardHolder somewhere

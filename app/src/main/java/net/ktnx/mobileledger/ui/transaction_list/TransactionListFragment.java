@@ -56,9 +56,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     private View vAccountFilter;
     private AutoCompleteTextView accNameFilter;
     private Observer backgroundTaskCountObserver;
-    private Observer accountFilterObserver;
-    private static void update(Observable o, Object arg) {
-    }
     @Override
     public void onDestroy() {
         if (backgroundTaskCountObserver != null) {
@@ -66,8 +63,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             Data.backgroundTaskCount.deleteObserver(backgroundTaskCountObserver);
         }
         super.onDestroy();
-    }
-    public void setShowOnlyAccountName(String mShowOnlyAccountName) {
     }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -158,14 +153,11 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
 //                Log.d("tmp", "direct onItemClick");
             MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
-            Data.accountFilter.set(mc.getString(1));
+            Data.accountFilter.setValue(mc.getString(1));
             Globals.hideSoftKeyboard(mActivity);
         });
 
-        if (accountFilterObserver == null) {
-            accountFilterObserver = (o, arg) -> onAccountNameFilterChanged();
-            Data.accountFilter.addObserver(accountFilterObserver);
-        }
+        Data.accountFilter.observe(this, this::onAccountNameFilterChanged);
 
         TransactionListViewModel.updating.addObserver(
                 (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
@@ -183,20 +175,13 @@ public class TransactionListFragment extends MobileLedgerListFragment {
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
 
         mActivity.findViewById(R.id.clearAccountNameFilter).setOnClickListener(v -> {
-            String current = Data.accountFilter.get();
-            Data.accountFilter.set(null);
+            Data.accountFilter.setValue(null);
             vAccountFilter.setVisibility(View.GONE);
             menuTransactionListFilter.setVisible(true);
             Globals.hideSoftKeyboard(mActivity);
         });
-
-        onAccountNameFilterChanged(false);
     }
-    private void onAccountNameFilterChanged() {
-        onAccountNameFilterChanged(true);
-    }
-    private void onAccountNameFilterChanged(boolean reloadTransactions) {
-        String accName = Data.accountFilter.get();
+    private void onAccountNameFilterChanged(String accName) {
         if (accNameFilter != null) {
             accNameFilter.setText(accName, false);
         }
@@ -206,7 +191,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         }
         if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(!filterActive);
 
-        if (reloadTransactions) TransactionListViewModel.scheduleTransactionListReload();
+        TransactionListViewModel.scheduleTransactionListReload();
 
     }
     @Override
@@ -216,7 +201,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
         if ((menuTransactionListFilter == null)) throw new AssertionError();
 
-        if (Data.accountFilter.get() != null) {
+        if (Data.accountFilter.getValue() != null) {
             menuTransactionListFilter.setVisible(false);
         }
 

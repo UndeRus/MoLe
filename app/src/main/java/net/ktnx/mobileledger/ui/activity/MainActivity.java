@@ -114,15 +114,15 @@ public class MainActivity extends ProfileThemedActivity {
         Log.d("flow", "MainActivity.onStart()");
         mViewPager.setCurrentItem(mCurrentPage, false);
         if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
-        else Data.accountFilter.set(null);
+        else Data.accountFilter.setValue(null);
 
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
-        if (Data.accountFilter.get() != null)
-            outState.putString(STATE_ACC_FILTER, Data.accountFilter.get());
+        if (mAccountFilter != null)
+            outState.putString(STATE_ACC_FILTER, mAccountFilter);
     }
     @Override
     protected void onDestroy() {
@@ -520,7 +520,7 @@ public class MainActivity extends ProfileThemedActivity {
     }
     private void showAccountSummaryFragment() {
         mViewPager.setCurrentItem(0, true);
-        Data.accountFilter.set(null);
+        Data.accountFilter.setValue(null);
 //        FragmentTransaction ft = fragmentManager.beginTransaction();
 //        accountSummaryFragment = new AccountSummaryFragment();
 //        ft.replace(R.id.root_frame, accountSummaryFragment);
@@ -536,8 +536,7 @@ public class MainActivity extends ProfileThemedActivity {
 //        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
     private void showTransactionsFragment(String accName) {
-        Data.accountFilter.set(accName);
-        Data.accountFilter.notifyObservers();
+        Data.accountFilter.setValue(accName);
         mViewPager.setCurrentItem(1, true);
     }
     private void showTransactionsFragment(LedgerAccount account) {
@@ -572,7 +571,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
         else {
             if (mBackMeansToAccountList && (mViewPager.getCurrentItem() == 1)) {
-                Data.accountFilter.set(null);
+                Data.accountFilter.setValue(null);
                 showAccountSummaryFragment();
                 mBackMeansToAccountList = false;
             }
