@@ -264,8 +264,6 @@ public class MainActivity extends ProfileThemedActivity {
         if (editingProfilesObserver == null) {
             editingProfilesObserver = (o, arg) -> {
                 if (mProfileListAdapter.isEditingProfiles()) {
-                    profileListHeadArrow.clearAnimation();
-                    profileListHeadArrow.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
                     profileListHeadMore
                             .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
@@ -274,8 +272,6 @@ public class MainActivity extends ProfileThemedActivity {
                             .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
                 }
                 else {
-                    profileListHeadArrow.setRotation(180f);
-                    profileListHeadArrow.setVisibility(View.VISIBLE);
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadCancel
                             .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
