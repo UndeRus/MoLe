@@ -271,15 +271,25 @@ public class MainActivity extends ProfileThemedActivity {
                     profileListHeadArrow.clearAnimation();
                     profileListHeadArrow.setVisibility(View.GONE);
                     profileListHeadMore.setVisibility(View.GONE);
+                    profileListHeadMore
+                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
                     profileListHeadCancel.setVisibility(View.VISIBLE);
+                    profileListHeadCancel
+                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
                 }
                 else {
                     profileListHeadArrow.setRotation(180f);
                     profileListHeadArrow.setVisibility(View.VISIBLE);
                     profileListHeadCancel.setVisibility(View.GONE);
+                    profileListHeadCancel
+                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
                     profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadMore
-                            .setVisibility(profileListExpanded ? View.VISIBLE : View.GONE);
+                    if (profileListExpanded) {
+                        profileListHeadMore.setVisibility(View.VISIBLE);
+                        profileListHeadMore
+                                .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
+                    }
+                    else profileListHeadMore.setVisibility(View.GONE);
                 }
             };
             mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
@@ -699,7 +709,18 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadArrow.setRotation(0f);
         profileListHeadArrow
                 .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
-        profileListHeadMore.setVisibility(View.GONE);
+        final Animation moreAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+        moreAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                profileListHeadMore.setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+        profileListHeadMore.startAnimation(moreAnimation);
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;

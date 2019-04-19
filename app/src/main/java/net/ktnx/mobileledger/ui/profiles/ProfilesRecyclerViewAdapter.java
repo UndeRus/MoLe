@@ -23,6 +23,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -68,7 +70,8 @@ public class ProfilesRecyclerViewAdapter
                                   @NonNull RecyclerView.ViewHolder target) {
                 Data.profiles.blockNotifications();
                 try {
-                    Collections.swap(Data.profiles, viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                    Collections.swap(Data.profiles, viewHolder.getAdapterPosition(),
+                            target.getAdapterPosition());
                     MobileLedgerProfile.storeProfilesOrder();
                     notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
                 }
@@ -193,12 +196,26 @@ public class ProfilesRecyclerViewAdapter
         holder.itemView
                 .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles.get()) {
+            boolean wasHidden = holder.mEditButton.getVisibility() == View.GONE;
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
+            if (wasHidden) {
+                Animation a = AnimationUtils
+                        .loadAnimation(holder.mRearrangeHandle.getContext(), R.anim.fade_in);
+                holder.mRearrangeHandle.startAnimation(a);
+                holder.mEditButton.startAnimation(a);
+            }
         }
         else {
+            boolean wasShown = holder.mEditButton.getVisibility() == View.VISIBLE;
             holder.mRearrangeHandle.setVisibility(View.INVISIBLE);
             holder.mEditButton.setVisibility(View.GONE);
+            if (wasShown) {
+                Animation a = AnimationUtils
+                        .loadAnimation(holder.mRearrangeHandle.getContext(), R.anim.fade_out);
+                holder.mRearrangeHandle.startAnimation(a);
+                holder.mEditButton.startAnimation(a);
+            }
         }
     }
     @Override
