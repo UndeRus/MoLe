@@ -18,13 +18,8 @@
 package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -44,14 +39,15 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
-    private MenuItem mShowOnlyStarred;
     public AccountSummaryAdapter modelAdapter;
+/*
+    private MenuItem mShowOnlyStarred;
     private Menu optMenu;
+*/
     private FloatingActionButton fab;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,11 +143,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.accounts.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
     }
-    private void update_account_table() {
-        if (this.getContext() == null) return;
-
-        AccountSummaryViewModel.scheduleAccountListReload();
-    }
+/*
     void stopSelection() {
         modelAdapter.stopSelection();
         if (optMenu != null) {
@@ -218,4 +210,5 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             return true;
         });
     }
+*/
 }
