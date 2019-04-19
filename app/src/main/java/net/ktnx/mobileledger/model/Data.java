@@ -60,7 +60,7 @@ public final class Data {
         profile.set(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
-        try (LockHolder lh = profiles.lockForReading()) {
+        try (LockHolder ignored = profiles.lockForReading()) {
             for (int i = 0; i < profiles.size(); i++) {
                 MobileLedgerProfile p = profiles.get(i);
                 if (p.equals(profile)) return i;
@@ -70,7 +70,7 @@ public final class Data {
         }
     }
     public static int getProfileIndex(String profileUUID) {
-        try (LockHolder lh = profiles.lockForReading()) {
+        try (LockHolder ignored = profiles.lockForReading()) {
             for (int i = 0; i < profiles.size(); i++) {
                 MobileLedgerProfile p = profiles.get(i);
                 if (p.getUuid().equals(profileUUID)) return i;
@@ -98,7 +98,7 @@ public final class Data {
             profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
         }
         else {
-            try (LockHolder lh = profiles.lockForReading()) {
+            try (LockHolder ignored = profiles.lockForReading()) {
                 int i = getProfileIndex(profileUUID);
                 if (i == -1) i = 0;
                 profile = profiles.get(i);
