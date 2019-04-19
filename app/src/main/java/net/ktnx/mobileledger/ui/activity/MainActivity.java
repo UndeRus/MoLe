@@ -542,7 +542,7 @@ public class MainActivity extends ProfileThemedActivity {
         mViewPager.setCurrentItem(1, true);
     }
     private void showTransactionsFragment(LedgerAccount account) {
-        showTransactionsFragment((account == null) ? (String) null : account.getName());
+        showTransactionsFragment((account == null) ? null : account.getName());
     }
     public void showAccountTransactions(LedgerAccount account) {
         mBackMeansToAccountList = true;
