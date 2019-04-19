@@ -121,7 +121,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         });
 
         Colors.themeWatch.observe(this, this::themeChanged);
-        swiper.setColorSchemeColors(Colors.primary);
 
         vAccountFilter = mActivity.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = mActivity.findViewById(R.id.transaction_filter_account_name);
