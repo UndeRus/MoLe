@@ -335,7 +335,7 @@ public class MainActivity extends ProfileThemedActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
-        try (LockHolder lh = Data.profiles.lockForReading()) {
+        try (LockHolder ignored = Data.profiles.lockForReading()) {
             for (int i = 0; i < Data.profiles.size(); i++) {
                 MobileLedgerProfile p = Data.profiles.get(i);
                 if (!p.isPostingPermitted()) continue;
@@ -734,7 +734,7 @@ public class MainActivity extends ProfileThemedActivity {
 
                     // removing all child accounts from the view
                     int start = -1, count = 0;
-                    try (LockHolder lh = Data.accounts.lockForWriting()) {
+                    try (LockHolder ignored = Data.accounts.lockForWriting()) {
                         for (int i = 0; i < Data.accounts.size(); i++) {
                             if (acc.isParentOf(Data.accounts.get(i))) {
 //                                debug("accounts", String.format("Found a child '%s' at position %d",
@@ -772,7 +772,7 @@ public class MainActivity extends ProfileThemedActivity {
                     animator.rotationBy(-180);
                     List<LedgerAccount> children =
                             Data.profile.get().loadVisibleChildAccountsOf(acc);
-                    try (LockHolder lh = Data.accounts.lockForWriting()) {
+                    try (LockHolder ignored = Data.accounts.lockForWriting()) {
                         int parentPos = Data.accounts.indexOf(acc);
                         if (parentPos != -1) {
                             // may have disappeared in a concurrent refresh operation
