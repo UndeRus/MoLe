@@ -158,7 +158,8 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadArrow = findViewById(R.id.nav_profiles_arrow);
         profileListHeadMore = findViewById(R.id.nav_profiles_start_edit);
         profileListHeadCancel = findViewById(R.id.nav_profiles_cancel_edit);
-        profileListHeadMoreAndCancel = findViewById(R.id.nav_profile_list_head_buttons);
+        LinearLayout profileListHeadMoreAndCancel =
+                findViewById(R.id.nav_profile_list_head_buttons);
         drawer = findViewById(R.id.drawer_layout);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
         progressBar = findViewById(R.id.transaction_list_progress_bar);
