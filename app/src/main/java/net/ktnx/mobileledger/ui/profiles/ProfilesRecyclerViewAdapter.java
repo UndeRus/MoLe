@@ -127,6 +127,7 @@ public class ProfilesRecyclerViewAdapter
         context.startActivity(intent);
     }
     private void onProfileRowClicked(View v) {
+        if (editingProfiles.get()) return;
         MobileLedgerProfile profile = (MobileLedgerProfile) v.getTag();
         if (profile == null)
             throw new IllegalStateException("Profile row without associated profile");
