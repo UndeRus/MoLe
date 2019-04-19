@@ -685,41 +685,51 @@ public class MainActivity extends ProfileThemedActivity {
                        Data.profiles.size()));
     }
     private void collapseProfileList() {
+        boolean wasExpanded = profileListExpanded;
         profileListExpanded = false;
 
-        final Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        if (wasExpanded) {
+            final Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-            }
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                profileListContainer.setVisibility(View.GONE);
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    profileListContainer.setVisibility(View.GONE);
+                }
+                @Override
+                public void onAnimationRepeat(Animation animation) {
 
-            }
-        });
-        mProfileListAdapter.stopEditingProfiles();
+                }
+            });
+            mProfileListAdapter.stopEditingProfiles();
 
-        profileListContainer.startAnimation(animation);
-        profileListHeadArrow.setRotation(0f);
-        profileListHeadArrow
-                .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
-        final Animation moreAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out);
-        moreAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {}
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                profileListHeadMore.setVisibility(View.GONE);
-            }
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
-        profileListHeadMore.startAnimation(moreAnimation);
+            profileListContainer.startAnimation(animation);
+            profileListHeadArrow.setRotation(0f);
+            profileListHeadArrow
+                    .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
+            final Animation moreAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+            moreAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    profileListHeadMore.setVisibility(View.GONE);
+                }
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+            profileListHeadMore.startAnimation(moreAnimation);
+        }
+        else {
+            profileListContainer.setVisibility(View.GONE);
+            profileListHeadArrow.setRotation(0f);
+            profileListHeadMore.setVisibility(View.GONE);
+        }
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;
