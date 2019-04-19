@@ -88,9 +88,7 @@ public class MainActivity extends ProfileThemedActivity {
     DrawerLayout drawer;
     private LinearLayout profileListContainer;
     private View profileListHeadArrow, profileListHeadMore, profileListHeadCancel;
-    private LinearLayout profileListHeadMoreAndCancel;
     private FragmentManager fragmentManager;
-    private TextView tvLastUpdate;
     private RetrieveTransactionsTask retrieveTransactionsTask;
     private View bTransactionListCancelDownload;
     private ProgressBar progressBar;
@@ -98,7 +96,6 @@ public class MainActivity extends ProfileThemedActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private FloatingActionButton fab;
-    private boolean profileModificationEnabled = false;
     private boolean profileListExpanded = false;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
@@ -163,7 +160,6 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadCancel = findViewById(R.id.nav_profiles_cancel_edit);
         profileListHeadMoreAndCancel = findViewById(R.id.nav_profile_list_head_buttons);
         drawer = findViewById(R.id.drawer_layout);
-        tvLastUpdate = findViewById(R.id.transactions_last_update);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
         progressBar = findViewById(R.id.transaction_list_progress_bar);
         progressLayout = findViewById(R.id.transaction_progress_layout);
@@ -535,19 +531,11 @@ public class MainActivity extends ProfileThemedActivity {
     private void showAccountSummaryFragment() {
         mViewPager.setCurrentItem(0, true);
         Data.accountFilter.setValue(null);
-//        FragmentTransaction ft = fragmentManager.beginTransaction();
-//        accountSummaryFragment = new AccountSummaryFragment();
-//        ft.replace(R.id.root_frame, accountSummaryFragment);
-//        ft.commit();
-//        currentFragment = accountSummaryFragment;
     }
     public void onLatestTransactionsClicked(View view) {
         drawer.closeDrawers();
 
         showTransactionsFragment((String) null);
-    }
-    private void resetFragmentBackStack() {
-//        fragmentManager.popBackStack(0, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
     private void showTransactionsFragment(String accName) {
         Data.accountFilter.setValue(accName);
@@ -555,23 +543,6 @@ public class MainActivity extends ProfileThemedActivity {
     }
     private void showTransactionsFragment(LedgerAccount account) {
         showTransactionsFragment((account == null) ? (String) null : account.getName());
-//        FragmentTransaction ft = fragmentManager.beginTransaction();
-//        if (transactionListFragment == null) {
-//            debug("flow", "MainActivity creating TransactionListFragment");
-//            transactionListFragment = new TransactionListFragment();
-//        }
-//        Bundle bundle = new Bundle();
-//        if (account != null) {
-//            bundle.putString(TransactionListFragment.BUNDLE_KEY_FILTER_ACCOUNT_NAME,
-//                    account.getName());
-//        }
-//        transactionListFragment.setArguments(bundle);
-//        ft.replace(R.id.root_frame, transactionListFragment);
-//        if (account != null)
-//            ft.addToBackStack(getResources().getString(R.string.title_activity_transaction_list));
-//        ft.commit();
-//
-//        currentFragment = transactionListFragment;
     }
     public void showAccountTransactions(LedgerAccount account) {
         mBackMeansToAccountList = true;
