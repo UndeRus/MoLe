@@ -125,8 +125,7 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
-        if (mAccountFilter != null)
-            outState.putString(STATE_ACC_FILTER, mAccountFilter);
+        if (mAccountFilter != null) outState.putString(STATE_ACC_FILTER, mAccountFilter);
     }
     @Override
     protected void onDestroy() {
