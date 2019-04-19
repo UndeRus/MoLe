@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Observer;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -125,6 +126,13 @@ public class ProfilesRecyclerViewAdapter
 
         context.startActivity(intent);
     }
+    private void onProfileRowClicked(View v) {
+        MobileLedgerProfile profile = (MobileLedgerProfile) v.getTag();
+        if (profile == null)
+            throw new IllegalStateException("Profile row without associated profile");
+        debug("profiles", "Setting profile to " + profile.getName());
+        Data.setCurrentProfile(profile);
+    }
     @NonNull
     @Override
     public ProfileListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -132,13 +140,14 @@ public class ProfilesRecyclerViewAdapter
                 .inflate(R.layout.profile_list_content, parent, false);
         ProfileListViewHolder holder = new ProfileListViewHolder(view);
 
+        holder.mRow.setOnClickListener(this::onProfileRowClicked);
         holder.mTitle.setOnClickListener(v -> {
             View row = (View) v.getParent();
-            MobileLedgerProfile profile = (MobileLedgerProfile) row.getTag();
-            if (profile == null)
-                throw new IllegalStateException("Profile row without associated profile");
-            debug("profiles", "Setting profile to " + profile.getName());
-            Data.setCurrentProfile(profile);
+            onProfileRowClicked(row);
+        });
+        holder.mColorTag.setOnClickListener(v -> {
+            View row = (View) v.getParent().getParent();
+            onProfileRowClicked(row);
         });
         holder.mTitle.setOnLongClickListener(v -> {
             flipEditingProfiles();
@@ -203,6 +212,7 @@ public class ProfilesRecyclerViewAdapter
         final TextView mTitle, mColorTag;
         final LinearLayout tagAndHandleLayout;
         final ImageView mRearrangeHandle;
+        final ConstraintLayout mRow;
 
         ProfileListViewHolder(View view) {
             super(view);
@@ -211,6 +221,7 @@ public class ProfilesRecyclerViewAdapter
             mColorTag = view.findViewById(R.id.colorTag);
             mRearrangeHandle = view.findViewById(R.id.profile_list_rearrange_handle);
             tagAndHandleLayout = view.findViewById(R.id.handle_and_tag);
+            mRow = (ConstraintLayout) view;
         }
     }
 }
