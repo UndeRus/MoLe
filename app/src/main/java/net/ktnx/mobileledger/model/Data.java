@@ -69,6 +69,7 @@ public final class Data {
             return -1;
         }
     }
+    @SuppressWarnings("WeakerAccess")
     public static int getProfileIndex(String profileUUID) {
         try (LockHolder ignored = profiles.lockForReading()) {
             for (int i = 0; i < profiles.size(); i++) {
