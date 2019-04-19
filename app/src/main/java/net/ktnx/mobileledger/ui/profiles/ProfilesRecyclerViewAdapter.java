@@ -157,11 +157,6 @@ public class ProfilesRecyclerViewAdapter
             flipEditingProfiles();
             return true;
         });
-        Data.profile.addObserver((o, arg) -> {
-            MobileLedgerProfile myProfile = (MobileLedgerProfile) holder.itemView.getTag();
-            final MobileLedgerProfile currentProfile = Data.profile.get();
-            final boolean sameProfile = currentProfile.equals(myProfile);
-        });
 
         View.OnTouchListener dragStarter = (v, event) -> {
             if (rearrangeHelper != null && editingProfiles.get()) {
