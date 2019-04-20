@@ -631,6 +631,9 @@ public class MainActivity extends ProfileThemedActivity {
         MobileLedgerProfile profile = Data.profile.get();
         if ((profile != null) && profile.isPostingPermitted()) fab.show();
     }
+    public void fabHide() {
+        fab.hide();
+    }
     public void navProfilesHeadClicked(View view) {
         if (profileListExpanded) {
             collapseProfileList();

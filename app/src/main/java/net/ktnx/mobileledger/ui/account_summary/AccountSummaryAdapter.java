@@ -108,7 +108,7 @@ public class AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return Data.accounts.size() + 1;
+        return Data.accounts.size();
     }
     public void startSelection() {
         try (LockHolder lh = Data.accounts.lockForWriting()) {

@@ -45,7 +45,6 @@ import org.jetbrains.annotations.NotNull;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -102,13 +101,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         FloatingActionButton fab = mActivity.findViewById(R.id.btn_add_transaction);
 
         mActivity.fabShouldShow();
-        root.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (dy < 0) mActivity.fabShouldShow();
-                if (dy > 0) fab.hide();
-            }
-        });
+
+        manageFabOnScroll();
 
         LinearLayoutManager llm = new LinearLayoutManager(mActivity);
 

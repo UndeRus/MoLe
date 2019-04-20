@@ -124,15 +124,9 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 //                }));
 
         mActivity.fabShouldShow();
-        root.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                if (fab != null) {
-                    if (dy < 0) mActivity.fabShouldShow();
-                    if (dy > 0) fab.hide();
-                }
-            }
-        });
+
+        manageFabOnScroll();
+
         swiper = mActivity.findViewById(R.id.account_swiper);
         Colors.themeWatch.observe(this, this::themeChanged);
         swiper.setOnRefreshListener(() -> {

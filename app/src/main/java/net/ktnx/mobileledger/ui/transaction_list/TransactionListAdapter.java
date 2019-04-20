@@ -126,7 +126,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
     @Override
     public int getItemCount() {
-        return Data.transactions.size() + 1;
+        return Data.transactions.size();
     }
     enum LoaderStep {HEAD, ACCOUNTS, DONE}
     private static class TransactionLoader
