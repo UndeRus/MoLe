@@ -44,10 +44,10 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class AccountSummaryFragment extends MobileLedgerListFragment {
 
     public AccountSummaryAdapter modelAdapter;
-/*
-    private MenuItem mShowOnlyStarred;
-    private Menu optMenu;
-*/
+    /*
+        private MenuItem mShowOnlyStarred;
+        private Menu optMenu;
+    */
     private FloatingActionButton fab;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,7 +83,8 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
         root.setAdapter(modelAdapter);
-        DividerItemDecoration did = new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
+        DividerItemDecoration did =
+                new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
         root.addItemDecoration(did);
 
         fab = mActivity.findViewById(R.id.btn_add_transaction);
