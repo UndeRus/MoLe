@@ -89,41 +89,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         fab = mActivity.findViewById(R.id.btn_add_transaction);
 
-//        root.addOnItemTouchListener(new RecyclerItemListener(mActivity, root,
-//                new RecyclerItemListener.RecyclerTouchListener() {
-//                    @Override
-//                    public void onClickItem(View v, int position) {
-//                        debug("value", String.format("item %d clicked", position));
-//                        if (modelAdapter.isSelectionActive()) {
-//                            modelAdapter.selectItem(position);
-//                        }
-//                        else {
-//                            List<LedgerAccount> accounts = Data.accounts.get();
-//                            if (accounts != null) {
-//                                LedgerAccount account = accounts.get(position);
-//
-//                                mActivity.showAccountTransactions(account);
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onLongClickItem(View v, int position) {
-//                        debug("value", String.format("item %d long-clicked", position));
-//                        modelAdapter.startSelection();
-//                        if (optMenu != null) {
-//                            optMenu.findItem(R.id.menu_acc_summary_cancel_selection)
-//                                    .setVisible(true);
-//                            optMenu.findItem(R.id.menu_acc_summary_confirm_selection)
-//                                    .setVisible(true);
-//                            optMenu.findItem(R.id.menu_acc_summary_only_starred).setVisible(false);
-//                        }
-//                        {
-//                            if (fab != null) fab.hide();
-//                        }
-//                    }
-//                }));
-
         mActivity.fabShouldShow();
 
         manageFabOnScroll();
