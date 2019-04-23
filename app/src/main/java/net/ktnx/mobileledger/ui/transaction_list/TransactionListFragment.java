@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -102,7 +103,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
         LinearLayoutManager llm = new LinearLayoutManager(mActivity);
 
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
 
         swiper.setOnRefreshListener(() -> {
