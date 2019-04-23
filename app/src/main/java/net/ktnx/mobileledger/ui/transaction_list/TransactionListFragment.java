@@ -30,8 +30,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
@@ -97,8 +95,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             throw new RuntimeException("Can't get hold on the transaction value view");
         modelAdapter = new TransactionListAdapter();
         root.setAdapter(modelAdapter);
-
-        FloatingActionButton fab = mActivity.findViewById(R.id.btn_add_transaction);
 
         mActivity.fabShouldShow();
 
