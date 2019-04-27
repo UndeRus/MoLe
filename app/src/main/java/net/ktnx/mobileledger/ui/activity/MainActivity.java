@@ -56,6 +56,7 @@ import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.LockHolder;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +66,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Observer;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -321,9 +323,9 @@ public class MainActivity extends ProfileThemedActivity {
         long now = new Date().getTime();
         if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
             if (lastUpdate == null) debug("db::", "WEB data never fetched. scheduling a fetch");
-            else debug("db",
-                    String.format("WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
-                            lastUpdate.getTime() / 1000f, now / 1000f));
+            else debug("db", String.format(Locale.ENGLISH,
+                    "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
+                    lastUpdate.getTime() / 1000f, now / 1000f));
 
             scheduleTransactionListRetrieval();
         }
@@ -558,7 +560,7 @@ public class MainActivity extends ProfileThemedActivity {
                 mBackMeansToAccountList = false;
             }
             else {
-                debug("fragments", String.format("manager stack: %d",
+                debug("fragments", String.format(Locale.ENGLISH, "manager stack: %d",
                         fragmentManager.getBackStackEntryCount()));
 
                 super.onBackPressed();
@@ -569,7 +571,7 @@ public class MainActivity extends ProfileThemedActivity {
         final MobileLedgerProfile profile = Data.profile.get();
         long last_update = (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
 
-        debug("transactions", String.format("Last update = %d", last_update));
+        debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", last_update));
         if (last_update == 0) {
             Data.lastUpdateDate.postValue(null);
         }
@@ -806,7 +808,7 @@ public class MainActivity extends ProfileThemedActivity {
         @NotNull
         @Override
         public Fragment getItem(int position) {
-            debug("main", String.format("Switching to fragment %d", position));
+            debug("main", String.format(Locale.ENGLISH, "Switching to fragment %d", position));
             switch (position) {
                 case 0:
 //                    debug("flow", "Creating account summary fragment");

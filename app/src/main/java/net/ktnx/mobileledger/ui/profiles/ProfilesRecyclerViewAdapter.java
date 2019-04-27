@@ -37,6 +37,7 @@ import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Observer;
 
 import androidx.annotation.NonNull;
@@ -173,7 +174,7 @@ public class ProfilesRecyclerViewAdapter
     public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
         final MobileLedgerProfile profile = Data.profiles.get(position);
         final MobileLedgerProfile currentProfile = Data.profile.get();
-        debug("profiles", String.format("pos %d: %s, current: %s", position, profile.getUuid(),
+        debug("profiles", String.format(Locale.ENGLISH,"pos %d: %s, current: %s", position, profile.getUuid(),
                 (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
         holder.itemView.setTag(profile);
 

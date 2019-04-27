@@ -50,6 +50,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -267,7 +268,8 @@ public class RetrieveTransactionsTask
                                 if (m.find()) {
                                     transactionId = Integer.valueOf(m.group(1));
                                     state = ParserState.EXPECTING_TRANSACTION_DESCRIPTION;
-                                    L(String.format("found transaction %d → expecting description",
+                                    L(String.format(Locale.ENGLISH,
+                                            "found transaction %d → expecting description",
                                             transactionId));
                                     progress.setProgress(++processedTransactionCount);
                                     if (maxTransactionId < transactionId)
@@ -304,9 +306,9 @@ public class RetrieveTransactionsTask
                                         return String.format("Error parsing date '%s'", date);
                                     }
                                     state = ParserState.EXPECTING_TRANSACTION_DETAILS;
-                                    L(String.format("transaction %d created for %s (%s) →" +
-                                                    " expecting details", transactionId, date,
-                                            m.group(2)));
+                                    L(String.format(Locale.ENGLISH,
+                                            "transaction %d created for %s (%s) →" +
+                                            " expecting details", transactionId, date, m.group(2)));
                                 }
                                 break;
 
@@ -357,8 +359,8 @@ public class RetrieveTransactionsTask
                                         transaction.addAccount(
                                                 new LedgerTransactionAccount(acc_name,
                                                         Float.valueOf(amount), currency));
-                                        L(String.format("%d: %s = %s", transaction.getId(),
-                                                acc_name, amount));
+                                        L(String.format(Locale.ENGLISH, "%d: %s = %s",
+                                                transaction.getId(), acc_name, amount));
                                     }
                                     else throw new IllegalStateException(String.format(
                                             "Can't parse transaction %d " + "details: %s",
@@ -528,14 +530,14 @@ public class RetrieveTransactionsTask
                     if (transactionOrder == DetectedTransactionOrder.UNKNOWN) {
                         if (orderAccumulator > 30) {
                             transactionOrder = DetectedTransactionOrder.FILE;
-                            debug("rtt", String.format(
+                            debug("rtt", String.format(Locale.ENGLISH,
                                     "Detected native file order after %d transactions (factor %d)",
                                     processedTransactionCount, orderAccumulator));
                             progress.setTotal(Data.transactions.size());
                         }
                         else if (orderAccumulator < -30) {
                             transactionOrder = DetectedTransactionOrder.REVERSE_CHRONOLOGICAL;
-                            debug("rtt", String.format(
+                            debug("rtt", String.format(Locale.ENGLISH,
                                     "Detected reverse chronological order after %d transactions (factor %d)",
                                     processedTransactionCount, orderAccumulator));
                         }

@@ -26,6 +26,8 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.utils.Colors;
 
+import java.util.Locale;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 
@@ -49,8 +51,8 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             if (profile == null) throw new AssertionError(
                     String.format("Can't get profile " + "(index:%d) from the global list", index));
 
-            debug("profiles", String.format("Editing profile %s (%s); hue=%d", profile.getName(),
-                    profile.getUuid(), profile.getThemeId()));
+                debug("profiles", String.format(Locale.ENGLISH, "Editing profile %s (%s); hue=%d",
+                        profile.getName(), profile.getUuid(), profile.getThemeId()));
         }
 
         super.onCreate(savedInstanceState);

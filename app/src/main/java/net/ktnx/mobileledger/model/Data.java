@@ -27,6 +27,7 @@ import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.lifecycle.MutableLiveData;
@@ -47,12 +48,16 @@ public final class Data {
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
-        debug("data", String.format("background task count is %d after incrementing", cnt));
+        debug("data",
+                String.format(Locale.ENGLISH, "background task count is %d after incrementing",
+                        cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void backgroundTaskFinished() {
         int cnt = backgroundTaskCount.decrementAndGet();
-        debug("data", String.format("background task count is %d after decrementing", cnt));
+        debug("data",
+                String.format(Locale.ENGLISH, "background task count is %d after decrementing",
+                        cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
