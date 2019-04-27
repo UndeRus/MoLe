@@ -331,7 +331,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     private void createShortcuts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         try (LockHolder ignored = Data.profiles.lockForReading()) {
