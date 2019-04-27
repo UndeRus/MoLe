@@ -225,7 +225,7 @@ public final class MobileLedgerProfile {
                                  item.getCurrency()
                     });
         }
-        debug("profile", String.format("Transaction %d stored", tr.getId()));
+//        debug("profile", String.format("Transaction %d stored", tr.getId()));
     }
     public String getOption(String name, String default_value) {
         SQLiteDatabase db = MLDB.getDatabase();

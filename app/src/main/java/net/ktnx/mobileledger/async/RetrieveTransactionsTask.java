@@ -21,7 +21,6 @@ import android.annotation.SuppressLint;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.OperationCanceledException;
-import android.util.Log;
 
 import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.AccountListParser;
@@ -154,7 +153,7 @@ public class RetrieveTransactionsTask
                         m = reComment.matcher(line);
                         if (m.find()) {
                             // TODO: comments are ignored for now
-                            Log.v("transaction-parser", "Ignoring comment");
+//                            Log.v("transaction-parser", "Ignoring comment");
                             continue;
                         }
                         //L(String.format("State is %d", updating));
