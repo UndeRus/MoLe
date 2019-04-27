@@ -214,7 +214,7 @@ public final class MLDB {
     }
 }
 
-class MobileLedgerDatabase extends SQLiteOpenHelper implements AutoCloseable {
+class MobileLedgerDatabase extends SQLiteOpenHelper {
     private static final String DB_NAME = "MoLe.db";
     private static final int LATEST_REVISION = 22;
     private static final String CREATE_DB_SQL = "create_db";
