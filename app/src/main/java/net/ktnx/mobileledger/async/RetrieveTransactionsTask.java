@@ -69,7 +69,6 @@ public class RetrieveTransactionsTask
             Pattern.compile("^\\s+(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
     private WeakReference<MainActivity> contextRef;
-    private int error;
     // %3A is '='
     private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     private Pattern reAccountValue = Pattern.compile(
