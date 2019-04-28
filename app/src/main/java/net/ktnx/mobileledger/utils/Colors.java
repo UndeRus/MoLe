@@ -25,6 +25,8 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
+import java.util.Locale;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorLong;
 import androidx.lifecycle.MutableLiveData;
@@ -153,7 +155,8 @@ public class Colors {
         float l = yellowLightness + (blueLightness - yellowLightness) *
                                     (float) Math.cos(Math.toRadians(Math.abs(180 - y) / 2f));
         int result = hslColor(hueDegrees/360f, 0.845f, l);
-        debug("colors", String.format("getPrimaryColorForHue(%d) = %x", hueDegrees, result));
+        debug("colors", String.format(Locale.ENGLISH, "getPrimaryColorForHue(%d) = %x", hueDegrees,
+                result));
         return result;
     }
     public static void setupTheme(Activity activity) {
@@ -241,8 +244,8 @@ public class Colors {
                 break;
             default:
                 activity.setTheme(R.style.AppTheme_NoActionBar);
-                debug("profiles",
-                        String.format("Theme hue %d not supported, using the default", themeId));
+                debug("profiles", String.format(Locale.ENGLISH,
+                        "Theme hue %d not supported, using the default", themeId));
         }
 
         refreshColors(activity.getTheme());
