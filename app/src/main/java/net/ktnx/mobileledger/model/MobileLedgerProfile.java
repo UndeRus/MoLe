@@ -52,6 +52,18 @@ public final class MobileLedgerProfile {
     public MobileLedgerProfile(String uuid) {
         this.uuid = uuid;
     }
+    public MobileLedgerProfile(MobileLedgerProfile origin) {
+        uuid = origin.uuid;
+        name = origin.name;
+        permitPosting = origin.permitPosting;
+        preferredAccountsFilter = origin.preferredAccountsFilter;
+        url = origin.url;
+        authEnabled = origin.authEnabled;
+        authUserName = origin.authUserName;
+        authPassword = origin.authPassword;
+        themeId = origin.themeId;
+        orderNo = origin.orderNo;
+    }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
     public static MobileLedgerProfile loadAllFromDB(String currentProfileUUID) {
