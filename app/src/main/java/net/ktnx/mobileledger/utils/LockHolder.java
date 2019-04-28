@@ -31,8 +31,8 @@ public class LockHolder implements AutoCloseable {
     }
     @Override
     public void close() {
-        if (wLock != null) wLock.unlock();
-        if (rLock != null) rLock.unlock();
+        if (wLock != null) { wLock.unlock(); wLock = null; }
+        if (rLock != null) { rLock.unlock(); rLock = null; }
     }
     public void downgrade() {
         if (rLock == null) throw new IllegalStateException("no locks are held");
