@@ -37,7 +37,7 @@
         <item name="textColor">#8a000000</item>
         <item name="colorPrimary">#935ff2</item>
         <item name="colorPrimaryTransparent">#00935ff2</item>
-        <item name="colorAccent">#5f14e8</item>
+        <item name="colorAccent">#5f14e9</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#efe7fd</item>
         <item name="table_row_light_bg">#f9f6fe</item>
@@ -46,7 +46,7 @@
     <style name="AppTheme.NoActionBar.0" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#ec1717</item>
         <item name="colorPrimaryTransparent">#00ec1717</item>
-        <item name="colorAccent">#990d0d</item>
+        <item name="colorAccent">#b00f0f</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7e7</item>
         <item name="table_row_light_bg">#fef6f6</item>
@@ -55,7 +55,7 @@
     <style name="AppTheme.NoActionBar.15" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#dd4513</item>
         <item name="colorPrimaryTransparent">#00dd4513</item>
-        <item name="colorAccent">#862a0b</item>
+        <item name="colorAccent">#a3330e</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdede7</item>
         <item name="table_row_light_bg">#fef8f6</item>
@@ -64,7 +64,7 @@
     <style name="AppTheme.NoActionBar.30" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#cb6e11</item>
         <item name="colorPrimaryTransparent">#00cb6e11</item>
-        <item name="colorAccent">#713d0a</item>
+        <item name="colorAccent">#94500c</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf2e7</item>
         <item name="table_row_light_bg">#fefaf6</item>
@@ -73,7 +73,7 @@
     <style name="AppTheme.NoActionBar.45" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#b88e0f</item>
         <item name="colorPrimaryTransparent">#00b88e0f</item>
-        <item name="colorAccent">#5c4708</item>
+        <item name="colorAccent">#85670b</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf8e7</item>
         <item name="table_row_light_bg">#fefcf6</item>
@@ -82,7 +82,7 @@
     <style name="AppTheme.NoActionBar.60" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#a5a50e</item>
         <item name="colorPrimaryTransparent">#00a5a50e</item>
-        <item name="colorAccent">#474706</item>
+        <item name="colorAccent">#76760a</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdfde7</item>
         <item name="table_row_light_bg">#fefef6</item>
@@ -91,7 +91,7 @@
     <style name="AppTheme.NoActionBar.75" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#8eb80f</item>
         <item name="colorPrimaryTransparent">#008eb80f</item>
-        <item name="colorAccent">#475c08</item>
+        <item name="colorAccent">#67850b</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f8fde7</item>
         <item name="table_row_light_bg">#fcfef6</item>
@@ -100,7 +100,7 @@
     <style name="AppTheme.NoActionBar.90" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#6ecb11</item>
         <item name="colorPrimaryTransparent">#006ecb11</item>
-        <item name="colorAccent">#3d710a</item>
+        <item name="colorAccent">#50940c</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f2fde7</item>
         <item name="table_row_light_bg">#fafef6</item>
@@ -109,7 +109,7 @@
     <style name="AppTheme.NoActionBar.105" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#45dd13</item>
         <item name="colorPrimaryTransparent">#0045dd13</item>
-        <item name="colorAccent">#2a860b</item>
+        <item name="colorAccent">#33a30e</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#edfde7</item>
         <item name="table_row_light_bg">#f8fef6</item>
@@ -118,7 +118,7 @@
     <style name="AppTheme.NoActionBar.120" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#17ec17</item>
         <item name="colorPrimaryTransparent">#0017ec17</item>
-        <item name="colorAccent">#0d990d</item>
+        <item name="colorAccent">#0fb00f</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fde7</item>
         <item name="table_row_light_bg">#f6fef6</item>
@@ -127,7 +127,7 @@
     <style name="AppTheme.NoActionBar.135" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#27ed59</item>
         <item name="colorPrimaryTransparent">#0027ed59</item>
-        <item name="colorAccent">#0eab35</item>
+        <item name="colorAccent">#10bd3b</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fded</item>
         <item name="table_row_light_bg">#f6fef8</item>
@@ -136,7 +136,7 @@
     <style name="AppTheme.NoActionBar.150" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#36ee92</item>
         <item name="colorPrimaryTransparent">#0036ee92</item>
-        <item name="colorAccent">#10bb65</item>
+        <item name="colorAccent">#11c96d</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf2</item>
         <item name="table_row_light_bg">#f6fefa</item>
@@ -145,7 +145,7 @@
     <style name="AppTheme.NoActionBar.165" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#43efc4</item>
         <item name="colorPrimaryTransparent">#0043efc4</item>
-        <item name="colorAccent">#11c99b</item>
+        <item name="colorAccent">#12d3a3</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf8</item>
         <item name="table_row_light_bg">#f6fefc</item>
@@ -154,7 +154,7 @@
     <style name="AppTheme.NoActionBar.180" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#4ef0f0</item>
         <item name="colorPrimaryTransparent">#004ef0f0</item>
-        <item name="colorAccent">#12d5d5</item>
+        <item name="colorAccent">#12dbdb</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdfd</item>
         <item name="table_row_light_bg">#f6fefe</item>
@@ -163,7 +163,7 @@
     <style name="AppTheme.NoActionBar.195" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#56caf1</item>
         <item name="colorPrimaryTransparent">#0056caf1</item>
-        <item name="colorAccent">#13acdf</item>
+        <item name="colorAccent">#13aee2</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f8fd</item>
         <item name="table_row_light_bg">#f6fcfe</item>
@@ -172,7 +172,7 @@
     <style name="AppTheme.NoActionBar.210" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#5ca7f1</item>
         <item name="colorPrimaryTransparent">#005ca7f1</item>
-        <item name="colorAccent">#137ce6</item>
+        <item name="colorAccent">#137de7</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f2fd</item>
         <item name="table_row_light_bg">#f6fafe</item>
@@ -208,7 +208,7 @@
     <style name="AppTheme.NoActionBar.270" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#a75cf1</item>
         <item name="colorPrimaryTransparent">#00a75cf1</item>
-        <item name="colorAccent">#7c13e6</item>
+        <item name="colorAccent">#7d13e7</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f2e7fd</item>
         <item name="table_row_light_bg">#faf6fe</item>
@@ -217,7 +217,7 @@
     <style name="AppTheme.NoActionBar.285" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#ca56f1</item>
         <item name="colorPrimaryTransparent">#00ca56f1</item>
-        <item name="colorAccent">#ac13df</item>
+        <item name="colorAccent">#ae13e2</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f8e7fd</item>
         <item name="table_row_light_bg">#fcf6fe</item>
@@ -226,7 +226,7 @@
     <style name="AppTheme.NoActionBar.300" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#f04ef0</item>
         <item name="colorPrimaryTransparent">#00f04ef0</item>
-        <item name="colorAccent">#d512d5</item>
+        <item name="colorAccent">#db12db</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7fd</item>
         <item name="table_row_light_bg">#fef6fe</item>
@@ -235,7 +235,7 @@
     <style name="AppTheme.NoActionBar.315" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#ef43c4</item>
         <item name="colorPrimaryTransparent">#00ef43c4</item>
-        <item name="colorAccent">#c9119b</item>
+        <item name="colorAccent">#d312a3</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f8</item>
         <item name="table_row_light_bg">#fef6fc</item>
@@ -244,7 +244,7 @@
     <style name="AppTheme.NoActionBar.330" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#ee3692</item>
         <item name="colorPrimaryTransparent">#00ee3692</item>
-        <item name="colorAccent">#bb1065</item>
+        <item name="colorAccent">#c9116d</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f2</item>
         <item name="table_row_light_bg">#fef6fa</item>
@@ -253,7 +253,7 @@
     <style name="AppTheme.NoActionBar.345" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">#ed2759</item>
         <item name="colorPrimaryTransparent">#00ed2759</item>
-        <item name="colorAccent">#ab0e35</item>
+        <item name="colorAccent">#bd103b</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7ed</item>
         <item name="table_row_light_bg">#fef6f8</item>

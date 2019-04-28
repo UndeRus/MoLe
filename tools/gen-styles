@@ -176,11 +176,16 @@ sub hslStyleForHue {
 	my $blueL = 0.665;
 	my $yellowL = 0.350;
 
+	my $blueL2 = 0.350;
+	my $yellowL2 = 0.500;
+
+	# $y == 0 for yellow
 	my $y = $hue - 60;
 	$y += 360 if $y < 0;
+	# $q == 0 for yellow, 1 for blue
 	my $q = cos(deg2rad(abs($y-180)/2.0));
 	my $l1 = $yellowL + ($blueL - $yellowL) * $q;
-	my $l2 = 0.150 + 0.350 * $q;
+	my $l2 = 0.250 + 0.250 * $q;
 	my $l3 = 0.950;
 	my $l4 = 0.980;
 
