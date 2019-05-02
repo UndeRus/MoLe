@@ -39,8 +39,8 @@ public class TransactionListViewModel extends ViewModel {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, filter);
     }
     public static TransactionListItem getTransactionListItem(int position) {
+        if (Data.transactions == null) return null;
         try(LockHolder lh = Data.transactions.lockForReading()) {
-            if (Data.transactions == null) return null;
             if (position >= Data.transactions.size() + 1) return null;
             if (position == Data.transactions.size()) return new TransactionListItem();
             return Data.transactions.get(position);
