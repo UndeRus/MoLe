@@ -45,11 +45,15 @@ import net.ktnx.mobileledger.ui.HueRingDialog;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -91,7 +95,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     public ProfileDetailFragment() {
     }
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
         debug("profiles", "[fragment] Creating profile details options menu");
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.profile_details, menu);
@@ -100,36 +104,49 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle(mProfile.getName());
             builder.setMessage(R.string.remove_profile_dialog_message);
-            builder.setPositiveButton(R.string.Remove, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    debug("profiles",
-                            String.format("[fragment] removing profile %s", mProfile.getUuid()));
-                    mProfile.removeFromDB();
-                    Data.profiles.remove(mProfile);
-                    if (Data.profile.get().equals(mProfile)) {
-                        debug("profiles", "[fragment] setting current profile to 0");
-                        Data.setCurrentProfile(Data.profiles.get(0));
-                    }
-                    getActivity().finish();
+            builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
+                debug("profiles",
+                        String.format("[fragment] removing profile %s", mProfile.getUuid()));
+                mProfile.removeFromDB();
+                ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
+                assert oldList != null;
+                ArrayList<MobileLedgerProfile> newList =
+                        (ArrayList<MobileLedgerProfile>) oldList.clone();
+                newList.remove(mProfile);
+                Data.profiles.setValue(newList);
+                if (mProfile.equals(Data.profile.getValue())) {
+                    debug("profiles", "[fragment] setting current profile to 0");
+                    Data.setCurrentProfile(newList.get(0));
+                    final FragmentActivity activity = getActivity();
+                    if (activity != null) activity.finish();
                 }
             });
             builder.show();
             return false;
         });
-        menuDeleteProfile.setVisible((mProfile != null) && (Data.profiles.size() > 1));
+        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+        menuDeleteProfile
+                .setVisible((mProfile != null) && (profiles != null) && (profiles.size() > 1));
 
         if (BuildConfig.DEBUG) {
             final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
-            menuWipeProfileData.setOnMenuItemClickListener(this::onWipeDataMenuClicked);
+            menuWipeProfileData.setOnMenuItemClickListener(ignored -> onWipeDataMenuClicked());
             menuWipeProfileData.setVisible(mProfile != null);
         }
     }
-    private boolean onWipeDataMenuClicked(MenuItem item) {
+    private boolean onWipeDataMenuClicked() {
         // this is a development option, so no confirmation
         mProfile.wipeAllData();
-        Data.profile.forceNotifyObservers();
+        if (mProfile.equals(Data.profile.getValue())) triggerProfileChange();
         return true;
+    }
+    private void triggerProfileChange() {
+        int index = Data.getProfileIndex(mProfile);
+        MobileLedgerProfile newProfile = new MobileLedgerProfile(mProfile);
+        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+        assert profiles != null;
+        profiles.set(index, newProfile);
+        if (mProfile.equals(Data.profile.getValue())) Data.profile.setValue(newProfile);
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -137,7 +154,9 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
 
         if ((getArguments() != null) && getArguments().containsKey(ARG_ITEM_ID)) {
             int index = getArguments().getInt(ARG_ITEM_ID, -1);
-            if (index != -1) mProfile = Data.profiles.get(index);
+            ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+            if ((profiles != null) && (index != -1) && (index < profiles.size()))
+                mProfile = profiles.get(index);
 
             Activity activity = this.getActivity();
             if (activity == null) throw new AssertionError();
@@ -155,38 +174,38 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         if (context == null) return;
 
         FloatingActionButton fab = context.findViewById(R.id.fab);
-        fab.setOnClickListener(v -> {
-            if (!checkValidity()) return;
-
-            if (mProfile != null) {
-                updateProfileFromUI();
-//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
-                mProfile.storeInDB();
-                debug("profiles", "profile stored in DB");
-                Data.profiles.triggerItemChangedNotification(mProfile);
-
-
-                if (mProfile.getUuid().equals(Data.profile.get().getUuid())) {
-                    // dummy update to notify the observers of the possibly new name/URL
-                    Data.profile.forceNotifyObservers();
-                }
-            }
-            else {
-                mProfile = new MobileLedgerProfile();
-                updateProfileFromUI();
-                mProfile.storeInDB();
-                Data.profiles.add(mProfile);
-                MobileLedgerProfile.storeProfilesOrder();
-
-                // first profile ever?
-                if (Data.profiles.size() == 1) Data.profile.set(mProfile);
-            }
-
-            Activity activity = getActivity();
-            if (activity != null) activity.finish();
-        });
+        fab.setOnClickListener(v -> onSaveFabClicked());
 
         profileName.requestFocus();
+    }
+    private void onSaveFabClicked() {
+        if (!checkValidity()) return;
+
+        if (mProfile != null) {
+            updateProfileFromUI();
+//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
+            mProfile.storeInDB();
+            debug("profiles", "profile stored in DB");
+            triggerProfileChange();
+        }
+        else {
+            mProfile = new MobileLedgerProfile();
+            updateProfileFromUI();
+            mProfile.storeInDB();
+            final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+            assert profiles != null;
+            ArrayList<MobileLedgerProfile> newList =
+                    (ArrayList<MobileLedgerProfile>) profiles.clone();
+            newList.add(mProfile);
+            Data.profiles.setValue(newList);
+            MobileLedgerProfile.storeProfilesOrder();
+
+            // first profile ever?
+            if (newList.size() == 1) Data.profile.setValue(mProfile);
+        }
+
+        Activity activity = getActivity();
+        if (activity != null) activity.finish();
     }
     private void updateProfileFromUI() {
         mProfile.setName(profileName.getText());

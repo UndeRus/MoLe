@@ -43,6 +43,6 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         setupProfileColors();
     }
     protected void initProfile() {
-        mProfile = Data.profile.get();
+        mProfile = Data.profile.getValue();
     }
 }

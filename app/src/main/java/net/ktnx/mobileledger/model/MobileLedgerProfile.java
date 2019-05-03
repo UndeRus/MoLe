@@ -22,7 +22,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.utils.Globals;
-import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
@@ -68,7 +67,7 @@ public final class MobileLedgerProfile {
     // returns the profile with the given UUID
     public static MobileLedgerProfile loadAllFromDB(String currentProfileUUID) {
         MobileLedgerProfile result = null;
-        List<MobileLedgerProfile> list = new ArrayList<>();
+        ArrayList<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = MLDB.getDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
@@ -90,7 +89,7 @@ public final class MobileLedgerProfile {
                 if (item.getUuid().equals(currentProfileUUID)) result = item;
             }
         }
-        Data.profiles.setList(list);
+        Data.profiles.setValue(list);
         return result;
     }
     public static void storeProfilesOrder() {
@@ -98,14 +97,11 @@ public final class MobileLedgerProfile {
         db.beginTransaction();
         try {
             int orderNo = 0;
-            try (LockHolder lh = Data.profiles.lockForReading()) {
-                for (int i = 0; i < Data.profiles.size(); i++) {
-                    MobileLedgerProfile p = Data.profiles.get(i);
-                    db.execSQL("update profiles set order_no=? where uuid=?",
-                            new Object[]{orderNo, p.getUuid()});
-                    p.orderNo = orderNo;
-                    orderNo++;
-                }
+            for (MobileLedgerProfile p : Data.profiles.getValue()) {
+                db.execSQL("update profiles set order_no=? where uuid=?",
+                        new Object[]{orderNo, p.getUuid()});
+                p.orderNo = orderNo;
+                orderNo++;
             }
             db.setTransactionSuccessful();
         }

@@ -36,6 +36,7 @@ import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Observer;
@@ -69,16 +70,12 @@ public class ProfilesRecyclerViewAdapter
             public boolean onMove(@NonNull RecyclerView recyclerView,
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
-                Data.profiles.blockNotifications();
-                try {
-                    Collections.swap(Data.profiles, viewHolder.getAdapterPosition(),
-                            target.getAdapterPosition());
-                    MobileLedgerProfile.storeProfilesOrder();
-                    notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                }
-                finally {
-                    Data.profiles.unblockNotifications();
-                }
+                final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+                assert profiles != null;
+                Collections.swap(profiles, viewHolder.getAdapterPosition(),
+                        target.getAdapterPosition());
+                MobileLedgerProfile.storeProfilesOrder();
+                notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
                 return true;
             }
             @Override
@@ -122,7 +119,7 @@ public class ProfilesRecyclerViewAdapter
         else startEditingProfiles();
     }
     private void editProfile(View view, MobileLedgerProfile profile) {
-        int index = Data.profiles.indexOf(profile);
+        int index = Data.getProfileIndex(profile);
         Context context = view.getContext();
         Intent intent = new Intent(context, ProfileDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION);
@@ -172,8 +169,10 @@ public class ProfilesRecyclerViewAdapter
     }
     @Override
     public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
-        final MobileLedgerProfile profile = Data.profiles.get(position);
-        final MobileLedgerProfile currentProfile = Data.profile.get();
+        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+        assert profiles != null;
+        final MobileLedgerProfile profile = profiles.get(position);
+        final MobileLedgerProfile currentProfile = Data.profile.getValue();
         debug("profiles", String.format(Locale.ENGLISH,"pos %d: %s, current: %s", position, profile.getUuid(),
                 (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
         holder.itemView.setTag(profile);
@@ -216,7 +215,8 @@ public class ProfilesRecyclerViewAdapter
     }
     @Override
     public int getItemCount() {
-        return Data.profiles.size();
+        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+        return profiles != null ? profiles.size() : 0;
     }
     public boolean isEditingProfiles() {
         return editingProfiles.get();

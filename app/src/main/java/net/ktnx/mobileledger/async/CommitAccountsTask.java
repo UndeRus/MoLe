@@ -34,7 +34,7 @@ public class CommitAccountsTask
     protected ArrayList<LedgerAccount> doInBackground(CommitAccountsTaskParams... params) {
         Data.backgroundTaskStarted();
         ArrayList<LedgerAccount> newList = new ArrayList<>();
-        String profile = Data.profile.get().getUuid();
+        String profile = Data.profile.getValue().getUuid();
         try {
 
             SQLiteDatabase db = MLDB.getDatabase();

@@ -126,7 +126,8 @@ public final class MLDB {
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
                                                  final boolean profileSpecific) {
-        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null, null, Data.profile.get());
+        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null, null,
+                Data.profile.getValue());
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hookAutocompletionAdapter(final Context context,

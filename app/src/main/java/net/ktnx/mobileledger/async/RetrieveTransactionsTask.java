@@ -73,8 +73,11 @@ public class RetrieveTransactionsTask
     private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     private Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
-    public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef) {
+    private MobileLedgerProfile profile;
+    public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef,
+                                    MobileLedgerProfile profile) {
         this.contextRef = contextRef;
+        this.profile = profile;
     }
     private static void L(String msg) {
         //debug("transaction-parser", msg);
@@ -107,7 +110,7 @@ public class RetrieveTransactionsTask
         if (context == null) return;
         context.onRetrieveDone(null);
     }
-    private String retrieveTransactionListLegacy(MobileLedgerProfile profile)
+    private String retrieveTransactionListLegacy()
             throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
@@ -393,7 +396,7 @@ public class RetrieveTransactionsTask
                 new String[]{profile.getUuid()});
         db.execSQL("update accounts set keep=0 where profile=?;", new String[]{profile.getUuid()});
     }
-    private boolean retrieveAccountList(MobileLedgerProfile profile)
+    private boolean retrieveAccountList()
             throws IOException, HTTPException {
         Progress progress = new Progress();
 
@@ -481,7 +484,7 @@ public class RetrieveTransactionsTask
 
         return true;
     }
-    private boolean retrieveTransactionList(MobileLedgerProfile profile)
+    private boolean retrieveTransactionList()
             throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
@@ -589,11 +592,10 @@ public class RetrieveTransactionsTask
     @SuppressLint("DefaultLocale")
     @Override
     protected String doInBackground(Void... params) {
-        MobileLedgerProfile profile = Data.profile.get();
         Data.backgroundTaskStarted();
         try {
-            if (!retrieveAccountList(profile) || !retrieveTransactionList(profile))
-                return retrieveTransactionListLegacy(profile);
+            if (!retrieveAccountList() || !retrieveTransactionList())
+                return retrieveTransactionListLegacy();
             return null;
         }
         catch (MalformedURLException e) {

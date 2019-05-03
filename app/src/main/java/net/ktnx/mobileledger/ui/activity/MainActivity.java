@@ -103,13 +103,12 @@ public class MainActivity extends ProfileThemedActivity {
     private int mCurrentPage;
     private String mAccountFilter;
     private boolean mBackMeansToAccountList = false;
-    private Observer profileObserver;
-    private Observer profilesObserver;
     private Toolbar mToolbar;
     private DrawerLayout.SimpleDrawerListener drawerListener;
     private ActionBarDrawerToggle barDrawerToggle;
     private ViewPager.SimpleOnPageChangeListener pageChangeListener;
     private Observer editingProfilesObserver;
+    private MobileLedgerProfile profile;
     @Override
     protected void onStart() {
         super.onStart();
@@ -129,10 +128,6 @@ public class MainActivity extends ProfileThemedActivity {
     @Override
     protected void onDestroy() {
         mSectionsPagerAdapter = null;
-        Data.profile.deleteObserver(profileObserver);
-        profileObserver = null;
-        Data.profiles.deleteObserver(profilesObserver);
-        profilesObserver = null;
         RecyclerView root = findViewById(R.id.nav_profile_list);
         if (root != null) root.setAdapter(null);
         if (drawer != null) drawer.removeDrawerListener(drawerListener);
@@ -177,15 +172,9 @@ public class MainActivity extends ProfileThemedActivity {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        if (profileObserver == null) {
-            profileObserver = (o, arg) -> onProfileChanged(arg);
-            Data.profile.addObserver(profileObserver);
-        }
+        Data.profile.observe(this, this::onProfileChanged);
 
-        if (profilesObserver == null) {
-            profilesObserver = (o, arg) -> onProfileListChanged(arg);
-            Data.profiles.addObserver(profilesObserver);
-        }
+        Data.profiles.observe(this, this::onProfileListChanged);
 
         if (barDrawerToggle == null) {
             barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar,
@@ -313,11 +302,7 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.nav_profile_list_head_layout)
                 .setOnClickListener(this::navProfilesHeadClicked);
         findViewById(R.id.nav_profiles_label).setOnClickListener(this::navProfilesHeadClicked);
-        boolean initialStart = Data.profile.get() == null;
         setupProfile();
-        if (!initialStart) onProfileChanged(null);
-
-        updateLastUpdateTextFromDB();
     }
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
@@ -330,103 +315,97 @@ public class MainActivity extends ProfileThemedActivity {
             scheduleTransactionListRetrieval();
         }
     }
-    private void createShortcuts() {
+    private void createShortcuts(List<MobileLedgerProfile> list) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
-        try (LockHolder ignored = Data.profiles.lockForReading()) {
-            for (int i = 0; i < Data.profiles.size(); i++) {
-                MobileLedgerProfile p = Data.profiles.get(i);
-                if (!p.isPostingPermitted()) continue;
+        int i = 0;
+        for (MobileLedgerProfile p : list) {
+            if (!p.isPostingPermitted()) continue;
 
-                ShortcutInfo si = new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid())
-                        .setShortLabel(p.getName())
-                        .setIcon(Icon.createWithResource(this, R.drawable.svg_thick_plus_white))
-                        .setIntent(new Intent(Intent.ACTION_VIEW, null, this,
-                                NewTransactionActivity.class).putExtra("profile_uuid", p.getUuid()))
-                        .setRank(i).build();
-                shortcuts.add(si);
-            }
+            ShortcutInfo si = new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid())
+                    .setShortLabel(p.getName())
+                    .setIcon(Icon.createWithResource(this, R.drawable.svg_thick_plus_white))
+                    .setIntent(
+                            new Intent(Intent.ACTION_VIEW, null, this, NewTransactionActivity.class)
+                                    .putExtra("profile_uuid", p.getUuid())).setRank(i).build();
+            shortcuts.add(si);
+            i++;
         }
         ShortcutManager sm = getSystemService(ShortcutManager.class);
         sm.setDynamicShortcuts(shortcuts);
     }
-    private void onProfileListChanged(Object arg) {
+    private void onProfileListChanged(List<MobileLedgerProfile> newList) {
+        if (newList.isEmpty()) {
+            findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
+            findViewById(R.id.pager_layout).setVisibility(View.GONE);
+            findViewById(R.id.loading_layout).setVisibility(View.GONE);
+            return;
+        }
+
+        findViewById(R.id.pager_layout).setVisibility(View.VISIBLE);
+        findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
+        findViewById(R.id.loading_layout).setVisibility(View.GONE);
+
         findViewById(R.id.nav_profile_list).setMinimumHeight(
-                (int) (getResources().getDimension(R.dimen.thumb_row_height) *
-                       Data.profiles.size()));
+                (int) (getResources().getDimension(R.dimen.thumb_row_height) * newList.size()));
 
         debug("profiles", "profile list changed");
-        if (arg == null) mProfileListAdapter.notifyDataSetChanged();
-        else mProfileListAdapter.notifyItemChanged((int) arg);
+        mProfileListAdapter.notifyDataSetChanged();
 
-        createShortcuts();
+        createShortcuts(newList);
     }
-    private void onProfileChanged(Object arg) {
-        MobileLedgerProfile profile = Data.profile.get();
-        MainActivity.this.runOnUiThread(() -> {
+    /** called when the current profile has changed */
+    private void onProfileChanged(MobileLedgerProfile profile) {
+        boolean haveProfile = profile != null;
+        findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
+        findViewById(R.id.pager_layout).setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
-            boolean haveProfile = profile != null;
-            findViewById(R.id.no_profiles_layout)
-                    .setVisibility(haveProfile ? View.GONE : View.VISIBLE);
-            findViewById(R.id.pager_layout)
-                    .setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
+        if (haveProfile) setTitle(profile.getName());
+        else setTitle(R.string.app_name);
 
-            if (profile == null) MainActivity.this.setTitle(R.string.app_name);
-            else MainActivity.this.setTitle(profile.getName());
-            MainActivity.this.updateLastUpdateTextFromDB();
-            int old_index = -1;
-            int new_index = -1;
-            if (arg != null) {
-                MobileLedgerProfile old = (MobileLedgerProfile) arg;
-                old_index = Data.getProfileIndex(old);
-                new_index = Data.getProfileIndex(profile);
-            }
+        this.profile = profile;
 
-            if ((old_index != -1) && (new_index != -1)) {
-                mProfileListAdapter.notifyItemChanged(old_index);
-                mProfileListAdapter.notifyItemChanged(new_index);
-            }
-            else mProfileListAdapter.notifyDataSetChanged();
+        mProfileListAdapter.notifyDataSetChanged();
 
-            MainActivity.this.collapseProfileList();
+        int newProfileTheme = haveProfile ? profile.getThemeId() : -1;
+        if (newProfileTheme != Colors.profileThemeId) {
+            debug("profiles",
+                    String.format(Locale.ENGLISH, "profile theme %d → %d", Colors.profileThemeId,
+                            newProfileTheme));
+            MainActivity.this.profileThemeChanged();
+            Colors.profileThemeId = newProfileTheme;
+            // profileThemeChanged would restart the activity, so no need to reload the
+            // data sets below
+            return;
+        }
+        collapseProfileList();
 
-            int newProfileTheme = (profile == null) ? -1 : profile.getThemeId();
-            if (newProfileTheme != Colors.profileThemeId) {
-                debug("profiles", String.format("profile theme %d → %d", Colors.profileThemeId,
-                        newProfileTheme));
-                MainActivity.this.profileThemeChanged();
-                Colors.profileThemeId = newProfileTheme;
-                // profileThemeChanged would restart the activity, so no need to reload the
-                // data sets below
-                return;
-            }
-            drawer.closeDrawers();
+        drawer.closeDrawers();
 
-            Data.transactions.clear();
-            debug("transactions", "requesting list reload");
-            TransactionListViewModel.scheduleTransactionListReload();
+        Data.transactions.clear();
+        debug("transactions", "requesting list reload");
+        TransactionListViewModel.scheduleTransactionListReload();
 
-            Data.accounts.clear();
-            AccountSummaryViewModel.scheduleAccountListReload();
+        Data.accounts.clear();
+        AccountSummaryViewModel.scheduleAccountListReload();
 
-            if (profile == null) {
+        if (haveProfile) {
+            if (profile.isPostingPermitted()) {
                 mToolbar.setSubtitle(null);
-                fab.hide();
+                fab.show();
             }
             else {
-                if (profile.isPostingPermitted()) {
-                    mToolbar.setSubtitle(null);
-                    fab.show();
-                }
-                else {
-                    mToolbar.setSubtitle(R.string.profile_subitlte_read_only);
-                    fab.hide();
-                }
+                mToolbar.setSubtitle(R.string.profile_subitlte_read_only);
+                fab.hide();
             }
+        }
+        else {
+            mToolbar.setSubtitle(null);
+            fab.hide();
+        }
 
-            updateLastUpdateTextFromDB();
-        });
+        updateLastUpdateTextFromDB();
     }
     private void updateLastUpdateDisplay(Date newValue) {
         LinearLayout l = findViewById(R.id.transactions_last_update_layout);
@@ -444,20 +423,6 @@ public class MainActivity extends ProfileThemedActivity {
 
         scheduleDataRetrievalIfStale(newValue);
     }
-    @Override
-    public void finish() {
-        if (profilesObserver != null) {
-            Data.profiles.deleteObserver(profilesObserver);
-            profilesObserver = null;
-        }
-
-        if (profileObserver != null) {
-            Data.profile.deleteObserver(profileObserver);
-            profileObserver = null;
-        }
-
-        super.finish();
-    }
     private void profileThemeChanged() {
         setupProfileColors();
 
@@ -465,6 +430,11 @@ public class MainActivity extends ProfileThemedActivity {
         onSaveInstanceState(bundle);
         // restart activity to reflect theme change
         finish();
+
+        // un-hook all observed LiveData
+        Data.profile.removeObservers(this);
+        Data.profiles.removeObservers(this);
+        Data.lastUpdateDate.removeObservers(this);
         Intent intent = new Intent(this, this.getClass());
         intent.putExtra(BUNDLE_SAVED_STATE, bundle);
         startActivity(intent);
@@ -481,24 +451,10 @@ public class MainActivity extends ProfileThemedActivity {
     }
     private void setupProfile() {
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-        MobileLedgerProfile profile;
+        MobileLedgerProfile startupProfile;
 
-        profile = Data.getProfile(profileUUID);
-
-        if (Data.profiles.isEmpty()) {
-            findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
-            findViewById(R.id.pager_layout).setVisibility(View.GONE);
-            return;
-        }
-
-        findViewById(R.id.pager_layout).setVisibility(View.VISIBLE);
-        findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
-
-        if (profile == null) profile = Data.profiles.get(0);
-
-        if (profile == null) throw new AssertionError("profile must have a value");
-
-        Data.setCurrentProfile(profile);
+        startupProfile = Data.getProfile(profileUUID);
+        Data.setCurrentProfile(startupProfile);
     }
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
@@ -568,7 +524,6 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void updateLastUpdateTextFromDB() {
-        final MobileLedgerProfile profile = Data.profile.get();
         long last_update = (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
 
         debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", last_update));
@@ -630,7 +585,6 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void fabShouldShow() {
-        MobileLedgerProfile profile = Data.profile.get();
         if ((profile != null) && profile.isPostingPermitted()) fab.show();
     }
     public void fabHide() {
@@ -653,9 +607,10 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadArrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180));
         profileListHeadMore.setVisibility(View.VISIBLE);
         profileListHeadMore.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
+        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
         findViewById(R.id.nav_profile_list).setMinimumHeight(
                 (int) (getResources().getDimension(R.dimen.thumb_row_height) *
-                       Data.profiles.size()));
+                       (profiles != null ? profiles.size() : 0)));
     }
     private void collapseProfileList() {
         boolean wasExpanded = profileListExpanded;
@@ -726,7 +681,7 @@ public class MainActivity extends ProfileThemedActivity {
 
                 acc.toggleExpanded();
                 DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
-                        new Object[]{acc.isExpanded(), acc.getName(), Data.profile.get().getUuid()
+                        new Object[]{acc.isExpanded(), acc.getName(), profile.getUuid()
                         });
 
                 if (wasExpanded) {
@@ -772,8 +727,7 @@ public class MainActivity extends ProfileThemedActivity {
                     debug("accounts", String.format("Expanding account '%s'", acc.getName()));
                     arrow.setRotation(180);
                     animator.rotationBy(-180);
-                    List<LedgerAccount> children =
-                            Data.profile.get().loadVisibleChildAccountsOf(acc);
+                    List<LedgerAccount> children = profile.loadVisibleChildAccountsOf(acc);
                     try (LockHolder ignored = Data.accounts.lockForWriting()) {
                         int parentPos = Data.accounts.indexOf(acc);
                         if (parentPos != -1) {
@@ -791,7 +745,7 @@ public class MainActivity extends ProfileThemedActivity {
                     DbOpQueue
                             .add("update accounts set amounts_expanded=? where name=? and profile=?",
                                     new Object[]{acc.amountsExpanded(), acc.getName(),
-                                                 Data.profile.get().getUuid()
+                                                 profile.getUuid()
                                     });
                     Data.accounts.triggerItemChangedNotification(acc);
                 }

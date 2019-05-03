@@ -160,7 +160,7 @@ public class Colors {
         return result;
     }
     public static void setupTheme(Activity activity) {
-        MobileLedgerProfile profile = Data.profile.get();
+        MobileLedgerProfile profile = Data.profile.getValue();
         setupTheme(activity, profile);
     }
     public static void setupTheme(Activity activity, MobileLedgerProfile profile) {

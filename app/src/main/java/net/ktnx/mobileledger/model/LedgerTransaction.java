@@ -32,8 +32,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 
-import static net.ktnx.mobileledger.utils.Logger.debug;
-
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
     public final Comparator<LedgerTransactionAccount> comparator =
@@ -68,7 +66,7 @@ public class LedgerTransaction {
         dataLoaded = false;
     }
     public LedgerTransaction(Integer id, Date date, String description) {
-        this(id, date, description, Data.profile.get());
+        this(id, date, description, Data.profile.getValue());
     }
     public LedgerTransaction(Date date, String description) {
         this(null, date, description);

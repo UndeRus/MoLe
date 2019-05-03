@@ -21,6 +21,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.utils.LockHolder;
+import net.ktnx.mobileledger.utils.Locker;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableList;
 import net.ktnx.mobileledger.utils.ObservableValue;
@@ -38,14 +40,15 @@ public final class Data {
     public static ObservableList<TransactionListItem> transactions =
             new ObservableList<>(new ArrayList<>());
     public static ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
-    private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     public static MutableLiveData<Boolean> backgroundTasksRunning = new MutableLiveData<>(false);
     public static MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
-    public static ObservableValue<MobileLedgerProfile> profile = new ObservableValue<>();
-    public static ObservableList<MobileLedgerProfile> profiles =
-            new ObservableList<>(new ArrayList<>());
+    public static MutableLiveData<MobileLedgerProfile> profile = new MutableLiveData<>();
+    public static MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
+            new MutableLiveData<>(new ArrayList<>());
     public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
+    private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
+    private static Locker profilesLocker = new Locker();
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
         debug("data",
@@ -62,12 +65,14 @@ public final class Data {
     }
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
-        profile.set(newProfile);
+        profile.postValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
-        try (LockHolder ignored = profiles.lockForReading()) {
-            for (int i = 0; i < profiles.size(); i++) {
-                MobileLedgerProfile p = profiles.get(i);
+        try (LockHolder ignored = profilesLocker.lockForReading()) {
+            List<MobileLedgerProfile> prList = profiles.getValue();
+            assert prList != null;
+            for (int i = 0; i < prList.size(); i++) {
+                MobileLedgerProfile p = prList.get(i);
                 if (p.equals(profile)) return i;
             }
 
@@ -76,9 +81,11 @@ public final class Data {
     }
     @SuppressWarnings("WeakerAccess")
     public static int getProfileIndex(String profileUUID) {
-        try (LockHolder ignored = profiles.lockForReading()) {
-            for (int i = 0; i < profiles.size(); i++) {
-                MobileLedgerProfile p = profiles.get(i);
+        try (LockHolder ignored = profilesLocker.lockForReading()) {
+            List<MobileLedgerProfile> prList = profiles.getValue();
+            assert prList != null;
+            for (int i = 0; i < prList.size(); i++) {
+                MobileLedgerProfile p = prList.get(i);
                 if (p.getUuid().equals(profileUUID)) return i;
             }
 
@@ -100,14 +107,19 @@ public final class Data {
     }
     public static MobileLedgerProfile getProfile(String profileUUID) {
         MobileLedgerProfile profile;
-        if (profiles.isEmpty()) {
-            profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
-        }
-        else {
-            try (LockHolder ignored = profiles.lockForReading()) {
+        try (LockHolder readLock = profilesLocker.lockForReading()) {
+            List<MobileLedgerProfile> prList = profiles.getValue();
+            assert prList != null;
+            if (prList.isEmpty()) {
+                readLock.close();
+                try (LockHolder ignored = profilesLocker.lockForWriting()) {
+                    profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
+                }
+            }
+            else {
                 int i = getProfileIndex(profileUUID);
                 if (i == -1) i = 0;
-                profile = profiles.get(i);
+                profile = prList.get(i);
             }
         }
         return profile;
