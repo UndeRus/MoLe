@@ -552,7 +552,9 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void updateLastUpdateTextFromDB() {
-        long last_update = (profile != null) ? profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L) : 0;
+        if (profile == null) return;
+
+        long last_update = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
 
         debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", last_update));
         if (last_update == 0) {
