@@ -342,6 +342,14 @@ public class MainActivity extends ProfileThemedActivity {
         sm.setDynamicShortcuts(shortcuts);
     }
     private void onProfileListChanged(List<MobileLedgerProfile> newList) {
+        if (newList == null) {
+            // profiles not yet loaded from DB
+            findViewById(R.id.loading_layout).setVisibility(View.VISIBLE);
+            findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
+            findViewById(R.id.pager_layout).setVisibility(View.GONE);
+            return;
+        }
+
         if (newList.isEmpty()) {
             findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
             findViewById(R.id.pager_layout).setVisibility(View.GONE);

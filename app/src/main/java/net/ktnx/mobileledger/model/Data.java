@@ -50,7 +50,7 @@ public final class Data {
     public static MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
     public static MutableLiveData<MobileLedgerProfile> profile = new MutableLiveData<>();
     public static MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
-            new MutableLiveData<>(new ArrayList<>());
+            new MutableLiveData<>(null);
     public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
@@ -117,8 +117,7 @@ public final class Data {
         MobileLedgerProfile profile;
         try (LockHolder readLock = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
-            assert prList != null;
-            if (prList.isEmpty()) {
+            if ((prList == null) || prList.isEmpty()) {
                 readLock.close();
                 try (LockHolder ignored = profilesLocker.lockForWriting()) {
                     profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
