@@ -251,12 +251,15 @@ public class RetrieveTransactionsTask
                                 profile.storeAccountValue(db, lastAccount.getName(), currency, val);
                                 lastAccount.addAmount(val, currency);
                                 for (LedgerAccount syn : syntheticAccounts.values()) {
+                                    L(String.format(Locale.ENGLISH, "propagating %s %1.2f to %s",
+                                            currency, val, syn.getName()));
                                     syn.addAmount(val, currency);
                                     profile.storeAccountValue(db, syn.getName(), currency, val);
                                 }
                             }
 
                             if (match_found) {
+                                syntheticAccounts.clear();
                                 state = ParserState.EXPECTING_ACCOUNT;
                                 L("→ expecting account");
                             }
