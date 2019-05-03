@@ -24,7 +24,7 @@
     <string name="pref_description_use_http_auth_off">Без използване на удостоверяване при свързване със сървъра</string>
     <string name="pref_title_backend_url">Адрес на сървъра</string>
     <string name="nav_reports_title">Справки</string>
-    <string name="nav_latest_transactions_title">Последни движения</string>
+    <string name="nav_transactions_title">Движения</string>
     <string name="action_settings">Настройки</string>
     <string name="pref_title_backend_auth_user">Потребител</string>
     <string name="pref_title_backend_auth_password">Парола</string>
