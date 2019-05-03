@@ -71,7 +71,7 @@ public final class Data {
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
-        MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
+        MLDB.setOption(MLDB.OPT_PROFILE_UUID, (newProfile == null) ? null : newProfile.getUuid());
         stopTransactionsRetrieval();
         profile.postValue(newProfile);
     }
