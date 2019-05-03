@@ -17,15 +17,16 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.ktnx.mobileledger.R;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 class TransactionRowHolder extends RecyclerView.ViewHolder {
     TextView tvDescription;
