@@ -361,7 +361,9 @@ public class MainActivity extends ProfileThemedActivity {
 
         createShortcuts(newList);
     }
-    /** called when the current profile has changed */
+    /**
+     * called when the current profile has changed
+     */
     private void onProfileChanged(MobileLedgerProfile profile) {
         boolean haveProfile = profile != null;
         findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
@@ -464,7 +466,7 @@ public class MainActivity extends ProfileThemedActivity {
         startActivity(intent, args);
     }
     private void setupProfile() {
-        MLDB.getOption(MLDB.OPT_PROFILE_UUID, null, new GetOptCallback(){
+        MLDB.getOption(MLDB.OPT_PROFILE_UUID, null, new GetOptCallback() {
             @Override
             protected void onResult(String profileUUID) {
                 MobileLedgerProfile startupProfile;
