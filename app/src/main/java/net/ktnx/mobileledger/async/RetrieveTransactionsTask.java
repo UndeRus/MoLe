@@ -54,6 +54,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
+
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 
@@ -75,7 +77,7 @@ public class RetrieveTransactionsTask
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     private MobileLedgerProfile profile;
     public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef,
-                                    MobileLedgerProfile profile) {
+                                    @NonNull MobileLedgerProfile profile) {
         this.contextRef = contextRef;
         this.profile = profile;
     }

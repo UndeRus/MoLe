@@ -136,6 +136,9 @@ public final class Data {
             Logger.debug("db", "Ignoring request for transaction retrieval - already active");
             return;
         }
+        MobileLedgerProfile pr = profile.getValue();
+        if (pr == null) throw new IllegalStateException("No current profile");
+
         retrieveTransactionsTask =
                 new RetrieveTransactionsTask(new WeakReference<>(activity), profile.getValue());
         Logger.debug("db", "Created a background transaction retrieval task");
