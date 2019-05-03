@@ -21,10 +21,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 
@@ -44,7 +44,7 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
             if (onlyStarred) sql += " AND a.hidden = 0";
             sql += " ORDER BY a.name";
 
-            SQLiteDatabase db = MLDB.getDatabase();
+            SQLiteDatabase db = App.getDatabase();
             try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
                 while (cursor.moveToNext()) {
                     final String accName = cursor.getString(0);

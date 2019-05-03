@@ -21,21 +21,23 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.utils.Globals;
-import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
-public class MobileLedgerApplication extends Application {
-
+public class App extends Application {
+    public static App instance;
+    private MobileLedgerDatabase dbHelper;
     @Override
     public void onCreate() {
+        instance = this;
         super.onCreate();
         updateMonthNames();
-        MLDB.init(this);
         SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
         Data.optShowOnlyStarred.set(p.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
         SharedPreferences.OnSharedPreferenceChangeListener handler =
@@ -49,12 +51,30 @@ public class MobileLedgerApplication extends Application {
     }
     @Override
     public void onTerminate() {
-        MLDB.done();
+        if (dbHelper != null) dbHelper.close();
         super.onTerminate();
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateMonthNames();
+    }
+    public static SQLiteDatabase getDatabase() {
+        if (instance == null) throw new RuntimeException("Application not created yet");
+
+        return instance.getDB();
+    }
+    public SQLiteDatabase getDB() {
+        if (dbHelper == null) initDb();
+
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("pragma case_sensitive_like=ON;");
+
+        return db;
+    }
+    private synchronized void initDb() {
+        if (dbHelper != null) return;
+
+        dbHelper = new MobileLedgerDatabase(this);
     }
 }

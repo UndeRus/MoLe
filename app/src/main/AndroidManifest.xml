@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".MobileLedgerApplication"
+        android:name=".App"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_descriptor"
         android:icon="@drawable/app_icon"

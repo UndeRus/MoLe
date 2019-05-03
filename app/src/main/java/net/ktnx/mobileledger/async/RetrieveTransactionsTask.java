@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.AccountListParser;
 import net.ktnx.mobileledger.json.ParsedBalance;
@@ -34,7 +35,6 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -129,7 +129,8 @@ public class RetrieveTransactionsTask
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
-        try (SQLiteDatabase db = MLDB.getDatabase()) {
+        // FIXME: why the resource block here? that would close the global DB connection
+        try (SQLiteDatabase db = App.getDatabase()) {
             try (InputStream resp = http.getInputStream()) {
                 if (http.getResponseCode() != 200)
                     throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
@@ -412,7 +413,7 @@ public class RetrieveTransactionsTask
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
         publishProgress(progress);
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         ArrayList<LedgerAccount> accountList = new ArrayList<>();
         boolean listFilledOK = false;
         try (InputStream resp = http.getInputStream()) {
@@ -501,7 +502,7 @@ public class RetrieveTransactionsTask
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         try (InputStream resp = http.getInputStream()) {
             if (http.getResponseCode() != 200)
                 throw new IOException(String.format("HTTP error %d", http.getResponseCode()));

@@ -20,10 +20,10 @@ package net.ktnx.mobileledger.async;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.utils.LockHolder;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 
@@ -37,7 +37,7 @@ public class CommitAccountsTask
         String profile = Data.profile.getValue().getUuid();
         try {
 
-            SQLiteDatabase db = MLDB.getDatabase();
+            SQLiteDatabase db = App.getDatabase();
             db.beginTransaction();
             try {
                 try (LockHolder lh = params[0].accountList.lockForWriting()) {

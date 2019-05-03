@@ -43,6 +43,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
@@ -531,7 +532,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         debug("descr", sql);
         debug("descr", params.toString());
 
-        try (Cursor c = MLDB.getDatabase().rawQuery(sql, params.toArray(new String[]{}))) {
+        try (Cursor c = App.getDatabase().rawQuery(sql, params.toArray(new String[]{}))) {
             if (!c.moveToNext()) return;
 
             String profileUUID = c.getString(0);

@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.LockHolder;
@@ -103,7 +104,7 @@ public final class Data {
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
         if (profileUUID == null) return -1;
 
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         try (Cursor c = db
                 .rawQuery("SELECT theme from profiles where uuid=?", new String[]{profileUUID}))
         {

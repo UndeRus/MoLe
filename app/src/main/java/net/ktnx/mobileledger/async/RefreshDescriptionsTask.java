@@ -21,8 +21,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
         Map<String, Boolean> unique = new HashMap<>();
 
         debug("descriptions", "Starting refresh");
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
 
         Data.backgroundTaskStarted();
         try {

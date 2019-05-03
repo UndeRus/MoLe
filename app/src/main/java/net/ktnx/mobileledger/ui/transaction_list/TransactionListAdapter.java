@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -38,7 +39,6 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -128,7 +128,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             LedgerTransaction tr = p[0].transaction;
             boolean odd = p[0].odd;
 
-            SQLiteDatabase db = MLDB.getDatabase();
+            SQLiteDatabase db = App.getDatabase();
             tr.loadData(db);
 
             publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, odd));

@@ -21,12 +21,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Globals;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             }
 
             debug("UTT", sql);
-            SQLiteDatabase db = MLDB.getDatabase();
+            SQLiteDatabase db = App.getDatabase();
             String lastDateString = Globals.formatLedgerDate(new Date());
             Date lastDate = Globals.parseLedgerDate(lastDateString);
             boolean odd = true;

@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.model;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
@@ -70,7 +71,7 @@ public final class MobileLedgerProfile {
     public static MobileLedgerProfile loadAllFromDB(String currentProfileUUID) {
         MobileLedgerProfile result = null;
         ArrayList<MobileLedgerProfile> list = new ArrayList<>();
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
                                          "preferred_accounts_filter FROM " +
@@ -95,7 +96,7 @@ public final class MobileLedgerProfile {
         return result;
     }
     public static void storeProfilesOrder() {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         db.beginTransaction();
         try {
             int orderNo = 0;
@@ -172,7 +173,7 @@ public final class MobileLedgerProfile {
         this.authPassword = authPassword;
     }
     public void storeInDB() {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         db.beginTransaction();
         try {
 //            debug("profiles", String.format("Storing profile in DB: uuid=%s, name=%s, " +
@@ -238,7 +239,7 @@ public final class MobileLedgerProfile {
 //        debug("profile", String.format("Transaction %d stored", tr.getId()));
     }
     public String getOption(String name, String default_value) {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
                 new String[]{uuid, name}))
         {
@@ -289,7 +290,7 @@ public final class MobileLedgerProfile {
         setOption(name, String.valueOf(value));
     }
     public void removeFromDB() {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         debug("db", String.format("removing profile %s from DB", uuid));
         db.beginTransaction();
         try {
@@ -307,12 +308,12 @@ public final class MobileLedgerProfile {
     }
     @NonNull
     public LedgerAccount loadAccount(String name) {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         return loadAccount(db, name);
     }
     @Nullable
     public LedgerAccount tryLoadAccount(String acct_name) {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         return tryLoadAccount(db, acct_name);
     }
     @NonNull
@@ -352,7 +353,7 @@ public final class MobileLedgerProfile {
     }
     public LedgerTransaction loadTransaction(int transactionId) {
         LedgerTransaction tr = new LedgerTransaction(transactionId, this.uuid);
-        tr.loadData(MLDB.getDatabase());
+        tr.loadData(App.getDatabase());
 
         return tr;
     }
@@ -403,7 +404,7 @@ public final class MobileLedgerProfile {
     }
     public List<LedgerAccount> loadChildAccountsOf(LedgerAccount acc) {
         List<LedgerAccount> result = new ArrayList<>();
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         try (Cursor c = db.rawQuery(
                 "SELECT a.name FROM accounts a WHERE a.profile = ? and a.name like ?||':%'",
                 new String[]{uuid, acc.getName()}))
@@ -421,7 +422,7 @@ public final class MobileLedgerProfile {
         ArrayList<LedgerAccount> visibleList = new ArrayList<>();
         visibleList.add(acc);
 
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         try (Cursor c = db.rawQuery(
                 "SELECT a.name FROM accounts a WHERE a.profile = ? and a.name like ?||':%'",
                 new String[]{uuid, acc.getName()}))
@@ -438,7 +439,7 @@ public final class MobileLedgerProfile {
         return result;
     }
     public void wipeAllData() {
-        SQLiteDatabase db = MLDB.getDatabase();
+        SQLiteDatabase db = App.getDatabase();
         db.beginTransaction();
         try {
             String[] pUuid = new String[]{uuid};
