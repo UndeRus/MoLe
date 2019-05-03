@@ -391,8 +391,7 @@ public class RetrieveTransactionsTask
                 new String[]{profile.getUuid()});
         db.execSQL("update accounts set keep=0 where profile=?;", new String[]{profile.getUuid()});
     }
-    private boolean retrieveAccountList()
-            throws IOException, HTTPException {
+    private boolean retrieveAccountList() throws IOException, HTTPException {
         Progress progress = new Progress();
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
@@ -479,8 +478,7 @@ public class RetrieveTransactionsTask
 
         return true;
     }
-    private boolean retrieveTransactionList()
-            throws IOException, ParseException, HTTPException {
+    private boolean retrieveTransactionList() throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         int maxTransactionId = Progress.INDETERMINATE;
 
