@@ -41,8 +41,7 @@ public class TransactionListViewModel extends ViewModel {
     public static TransactionListItem getTransactionListItem(int position) {
         if (Data.transactions == null) return null;
         try(LockHolder lh = Data.transactions.lockForReading()) {
-            if (position >= Data.transactions.size() + 1) return null;
-            if (position == Data.transactions.size()) return new TransactionListItem();
+            if (position >= Data.transactions.size()) return null;
             return Data.transactions.get(position);
         }
     }

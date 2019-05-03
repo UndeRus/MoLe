@@ -205,10 +205,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <view
-        android:id="@+id/transaction_list_trailer"
-        class="androidx.constraintlayout.widget.Placeholder"
-        id="@+id/view"
-        android:layout_width="match_parent"
-        android:layout_height="80dp" />
 </androidx.appcompat.widget.ContentFrameLayout>

@@ -65,7 +65,6 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             case TRANSACTION:
                 holder.vTransaction.setVisibility(View.VISIBLE);
                 holder.vDelimiter.setVisibility(View.GONE);
-                holder.vTrailer.setVisibility(View.GONE);
                 LedgerTransaction tr = item.getTransaction();
 
                 //        debug("transactions", String.format("Filling position %d with %d accounts", position,
@@ -86,7 +85,6 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             case DELIMITER:
                 Date date = item.getDate();
                 holder.vTransaction.setVisibility(View.GONE);
-                holder.vTrailer.setVisibility(View.GONE);
                 holder.vDelimiter.setVisibility(View.VISIBLE);
                 holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
                 if (item.isMonthShown()) {
@@ -105,12 +103,6 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     holder.vDelimiterLine.setVisibility(View.VISIBLE);
                     holder.vDelimiterThick.setVisibility(View.GONE);
                 }
-                break;
-            case TRAILER:
-                holder.vTransaction.setVisibility(View.GONE);
-                holder.vTrailer.setVisibility(View.VISIBLE);
-                holder.vDelimiter.setVisibility(View.GONE);
-
                 break;
         }
     }
