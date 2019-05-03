@@ -19,7 +19,10 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 
+import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
@@ -27,8 +30,10 @@ import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableList;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,6 +54,7 @@ public final class Data {
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static Locker profilesLocker = new Locker();
+    private static RetrieveTransactionsTask retrieveTransactionsTask;
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
         debug("data",
@@ -123,5 +129,22 @@ public final class Data {
             }
         }
         return profile;
+    }
+    public synchronized static void scheduleTransactionListRetrieval(MainActivity activity) {
+        if (retrieveTransactionsTask != null) {
+            Logger.debug("db", "Ignoring request for transaction retrieval - already active");
+            return;
+        }
+        retrieveTransactionsTask =
+                new RetrieveTransactionsTask(new WeakReference<>(activity), profile.getValue());
+        Logger.debug("db", "Created a background transaction retrieval task");
+
+        retrieveTransactionsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+    public static synchronized void stopTransactionsRetrieval() {
+        if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
+    }
+    public static void transactionRetrievalDone() {
+        retrieveTransactionsTask = null;
     }
 }

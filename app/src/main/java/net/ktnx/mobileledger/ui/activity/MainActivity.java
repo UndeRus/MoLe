@@ -56,12 +56,10 @@ import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.LockHolder;
-import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.ref.WeakReference;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,7 +89,6 @@ public class MainActivity extends ProfileThemedActivity {
     private LinearLayout profileListContainer;
     private View profileListHeadArrow, profileListHeadMore, profileListHeadCancel;
     private FragmentManager fragmentManager;
-    private RetrieveTransactionsTask retrieveTransactionsTask;
     private View bTransactionListCancelDownload;
     private ProgressBar progressBar;
     private LinearLayout progressLayout;
@@ -312,7 +309,7 @@ public class MainActivity extends ProfileThemedActivity {
                     "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
                     lastUpdate.getTime() / 1000f, now / 1000f));
 
-            scheduleTransactionListRetrieval();
+            Data.scheduleTransactionListRetrieval(this);
         }
     }
     private void createShortcuts(List<MobileLedgerProfile> list) {
@@ -534,19 +531,13 @@ public class MainActivity extends ProfileThemedActivity {
             Data.lastUpdateDate.postValue(new Date(last_update));
         }
     }
-    public void scheduleTransactionListRetrieval() {
-        if (Data.profile.get() == null) return;
-
-        retrieveTransactionsTask = new RetrieveTransactionsTask(new WeakReference<>(this));
-
-        retrieveTransactionsTask.execute();
-    }
     public void onStopTransactionRefreshClick(View view) {
         debug("interactive", "Cancelling transactions refresh");
-        if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
+        Data.stopTransactionsRetrieval();
         bTransactionListCancelDownload.setEnabled(false);
     }
     public void onRetrieveDone(String error) {
+        Data.transactionRetrievalDone();
         progressLayout.setVisibility(View.GONE);
 
         if (error == null) {
