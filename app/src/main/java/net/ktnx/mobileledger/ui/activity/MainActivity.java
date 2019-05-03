@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
@@ -85,6 +86,7 @@ public class MainActivity extends ProfileThemedActivity {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
+    private static final String PREF_THEME_ID = "themeId";
     public AccountSummaryFragment mAccountSummaryFragment;
     DrawerLayout drawer;
     private LinearLayout profileListContainer;
@@ -141,9 +143,12 @@ public class MainActivity extends ProfileThemedActivity {
     }
     @Override
     protected void setupProfileColors() {
-        int profileColor = Data.retrieveCurrentThemeIdFromDb();
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        int profileColor = prefs.getInt(PREF_THEME_ID, -2);
+        if (profileColor == -2) profileColor = Data.retrieveCurrentThemeIdFromDb();
         Colors.setupTheme(this, profileColor);
         Colors.profileThemeId = profileColor;
+        storeThemeIdInPrefs(profileColor);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -427,6 +432,9 @@ public class MainActivity extends ProfileThemedActivity {
     private void profileThemeChanged() {
         Bundle bundle = new Bundle();
         onSaveInstanceState(bundle);
+
+        storeThemeIdInPrefs(profile.getThemeId());
+
         // restart activity to reflect theme change
         finish();
 
@@ -437,6 +445,13 @@ public class MainActivity extends ProfileThemedActivity {
         Intent intent = new Intent(this, this.getClass());
         intent.putExtra(BUNDLE_SAVED_STATE, bundle);
         startActivity(intent);
+    }
+    private void storeThemeIdInPrefs(int themeId) {
+        // store the new theme id in the preferences
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor e = prefs.edit();
+        e.putInt(PREF_THEME_ID, themeId);
+        e.apply();
     }
     public void startEditProfileActivity(MobileLedgerProfile profile) {
         Intent intent = new Intent(this, ProfileDetailActivity.class);
