@@ -71,6 +71,7 @@ public final class Data {
     }
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
+        stopTransactionsRetrieval();
         profile.postValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
