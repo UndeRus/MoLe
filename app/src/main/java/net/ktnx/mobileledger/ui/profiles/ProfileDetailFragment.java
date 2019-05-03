@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -244,9 +243,9 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             if (isChecked) userName.requestFocus();
         });
 
-        postingPermitted.setOnCheckedChangeListener(((buttonView, isChecked) -> {
-            preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-        }));
+        postingPermitted.setOnCheckedChangeListener(
+                ((buttonView, isChecked) -> preferredAccountsFilterLayout
+                        .setVisibility(isChecked ? View.VISIBLE : View.GONE)));
 
         hookClearErrorOnFocusListener(profileName, profileNameLayout);
         hookClearErrorOnFocusListener(url, urlLayout);
@@ -284,8 +283,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         huePickerView.setTag(profileThemeId);
         huePickerView.setOnClickListener(v -> {
             HueRingDialog d = new HueRingDialog(
-                    Objects.requireNonNull(ProfileDetailFragment.this.getContext()),
-                    profileThemeId, (Integer) v.getTag());
+                    Objects.requireNonNull(ProfileDetailFragment.this.getContext()), profileThemeId,
+                    (Integer) v.getTag());
             d.show();
             d.setColorSelectedListener(this);
         });

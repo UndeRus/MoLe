@@ -62,7 +62,7 @@ public class Colors {
         accent = tv.data;
 
         // trigger theme observers
-        themeWatch.postValue(themeWatch.getValue()+1);
+        themeWatch.postValue(themeWatch.getValue() + 1);
     }
     public static @ColorLong
     long hsvaColor(float hue, float saturation, float value, float alpha) {
@@ -154,7 +154,7 @@ public class Colors {
         if (y < 0) y += 360;
         float l = yellowLightness + (blueLightness - yellowLightness) *
                                     (float) Math.cos(Math.toRadians(Math.abs(180 - y) / 2f));
-        int result = hslColor(hueDegrees/360f, 0.845f, l);
+        int result = hslColor(hueDegrees / 360f, 0.845f, l);
         debug("colors", String.format(Locale.ENGLISH, "getPrimaryColorForHue(%d) = %x", hueDegrees,
                 result));
         return result;

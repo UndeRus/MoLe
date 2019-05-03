@@ -252,7 +252,8 @@ public class RetrieveTransactionsTask
                                     lastAccount.addAmount(val, currency);
                                     for (LedgerAccount syn : syntheticAccounts.values()) {
                                         syn.addAmount(val, currency);
-                                        profile.storeAccountValue(db, syn.getName(), currency, val);
+                                        profile.storeAccountValue(db, syn.getName(), currency,
+                                                val);
                                     }
                                 }
 
