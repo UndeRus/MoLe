@@ -139,12 +139,15 @@ public class MainActivity extends ProfileThemedActivity {
         super.onDestroy();
     }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        debug("flow", "MainActivity.onCreate()");
+    protected void setupProfileColors() {
         int profileColor = Data.retrieveCurrentThemeIdFromDb();
         Colors.setupTheme(this, profileColor);
         Colors.profileThemeId = profileColor;
+    }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        debug("flow", "MainActivity.onCreate()");
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.btn_add_transaction);
@@ -421,8 +424,6 @@ public class MainActivity extends ProfileThemedActivity {
         scheduleDataRetrievalIfStale(newValue);
     }
     private void profileThemeChanged() {
-        setupProfileColors();
-
         Bundle bundle = new Bundle();
         onSaveInstanceState(bundle);
         // restart activity to reflect theme change
