@@ -34,6 +34,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
 
+import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -114,8 +115,7 @@ public final class MLDB {
     }
     static public void setOption(String name, String value) {
         debug("option", String.format("%s := %s", name, value));
-        SQLiteDatabase db = MLDB.getDatabase();
-        db.execSQL("insert or replace into options(profile, name, value) values(?, ?, ?);",
+        DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{NO_PROFILE, name, value});
     }
     static public void setLongOption(String name, long value) {
