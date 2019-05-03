@@ -42,7 +42,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
-
     public AccountSummaryAdapter modelAdapter;
     /*
         private MenuItem mShowOnlyStarred;
