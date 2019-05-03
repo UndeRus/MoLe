@@ -55,6 +55,7 @@ import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.GetOptCallback;
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -448,11 +449,15 @@ public class MainActivity extends ProfileThemedActivity {
         startActivity(intent, args);
     }
     private void setupProfile() {
-        String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-        MobileLedgerProfile startupProfile;
+        MLDB.getOption(MLDB.OPT_PROFILE_UUID, null, new GetOptCallback(){
+            @Override
+            protected void onResult(String profileUUID) {
+                MobileLedgerProfile startupProfile;
 
-        startupProfile = Data.getProfile(profileUUID);
-        Data.setCurrentProfile(startupProfile);
+                startupProfile = Data.getProfile(profileUUID);
+                Data.setCurrentProfile(startupProfile);
+            }
+        });
     }
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
