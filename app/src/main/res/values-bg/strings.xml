@@ -109,5 +109,6 @@
     <string name="pref_preferred_autocompletion_account_filter_hint" >Филтър при избор на предишна трансакция</string>
     <string name="remove_profile_dialog_message">Потвърдете окончателното премахване на профила</string>
     <string name="Remove">Премахване</string>
+    <string name="text_loading">Зареждане…</string>
 
 </resources>
