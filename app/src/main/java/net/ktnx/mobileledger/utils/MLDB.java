@@ -26,6 +26,7 @@ import android.database.MatrixCursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.FontsContract;
 import android.util.Log;
@@ -93,6 +94,38 @@ public final class MLDB {
             debug("db", "returning default long value of " + name, e);
             return default_value;
         }
+    }
+    static public void getOption(String name, String defaultValue, GetOptCallback cb) {
+        AsyncTask<Void, Void, String> t = new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                SQLiteDatabase db = getDatabase();
+                try (Cursor cursor = db
+                        .rawQuery("select value from options where profile = ? and name=?",
+                                new String[]{NO_PROFILE, name}))
+                {
+                    if (cursor.moveToFirst()) {
+                        String result = cursor.getString(0);
+
+                        if (result == null) result = defaultValue;
+
+                        debug("async-db", "option " + name + "=" + result);
+                        return result;
+                    }
+                    else return defaultValue;
+                }
+                catch (Exception e) {
+                    debug("db", "returning default value for " + name, e);
+                    return defaultValue;
+                }
+            }
+            @Override
+            protected void onPostExecute(String result) {
+                cb.onResult(result);
+            }
+        };
+
+        t.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
     }
     static public String getOption(String name, String default_value) {
         debug("db", "about to fetch option " + name);
