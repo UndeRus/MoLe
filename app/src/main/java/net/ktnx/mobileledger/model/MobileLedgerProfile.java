@@ -22,11 +22,13 @@ import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
@@ -446,6 +448,7 @@ public final class MobileLedgerProfile {
             db.execSQL("delete from transactions where profile=?", pUuid);
             db.execSQL("delete from transaction_accounts where profile=?", pUuid);
             db.setTransactionSuccessful();
+            Logger.debug("wipe", String.format(Locale.ENGLISH, "Profile %s wiped out", pUuid[0]));
         }
         finally {
             db.endTransaction();
