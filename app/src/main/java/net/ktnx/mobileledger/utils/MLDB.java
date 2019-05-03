@@ -72,6 +72,7 @@ public final class MLDB {
         db.execSQL("pragma case_sensitive_like=ON;");
         return db;
     }
+    @SuppressWarnings("unused")
     static public int getIntOption(String name, int default_value) {
         String s = getOption(name, String.valueOf(default_value));
         try {
@@ -82,6 +83,7 @@ public final class MLDB {
             return default_value;
         }
     }
+    @SuppressWarnings("unused")
     static public long getLongOption(String name, long default_value) {
         String s = getOption(name, String.valueOf(default_value));
         try {
@@ -118,6 +120,7 @@ public final class MLDB {
         DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
                 new String[]{NO_PROFILE, name, value});
     }
+    @SuppressWarnings("unused")
     static public void setLongOption(String name, long value) {
         setOption(name, String.valueOf(value));
     }
@@ -178,7 +181,8 @@ public final class MLDB {
                 while (matches.moveToNext()) {
                     String match = matches.getString(0);
                     int order = matches.getInt(1);
-                    debug("autocompletion", String.format("match: %s |%d", match, order));
+                    debug("autocompletion",
+                            String.format(Locale.ENGLISH, "match: %s |%d", match, order));
                     c.newRow().add(i++).add(match);
                 }
             }
@@ -222,7 +226,7 @@ class MobileLedgerDatabase extends SQLiteOpenHelper {
 
     private final Application mContext;
 
-    public MobileLedgerDatabase(Application context) {
+    MobileLedgerDatabase(Application context) {
         super(context, DB_NAME, null, LATEST_REVISION);
         debug("db", "creating helper instance");
         mContext = context;
