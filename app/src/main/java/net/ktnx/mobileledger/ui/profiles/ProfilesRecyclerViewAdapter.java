@@ -34,15 +34,14 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
-import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Observer;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,7 +53,7 @@ public class ProfilesRecyclerViewAdapter
         MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
         editProfile(view, profile);
     };
-    private ObservableValue<Boolean> editingProfiles = new ObservableValue<>(false);
+    public MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     public ProfilesRecyclerViewAdapter() {
@@ -84,12 +83,6 @@ public class ProfilesRecyclerViewAdapter
         };
         rearrangeHelper = new ItemTouchHelper(cb);
     }
-    public void addEditingProfilesObserver(Observer o) {
-        editingProfiles.addObserver(o);
-    }
-    public void deleteEditingProfilesObserver(Observer o) {
-        editingProfiles.deleteObserver(o);
-    }
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         rearrangeHelper.attachToRecyclerView(null);
@@ -100,22 +93,22 @@ public class ProfilesRecyclerViewAdapter
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
-        if (editingProfiles.get()) rearrangeHelper.attachToRecyclerView(recyclerView);
+        if (editingProfiles.getValue()) rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void startEditingProfiles() {
-        if (editingProfiles.get()) return;
-        this.editingProfiles.set(true);
+        if (editingProfiles.getValue()) return;
+        this.editingProfiles.setValue(true);
         notifyDataSetChanged();
         rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void stopEditingProfiles() {
-        if (!editingProfiles.get()) return;
-        this.editingProfiles.set(false);
+        if (!editingProfiles.getValue()) return;
+        this.editingProfiles.setValue(false);
         notifyDataSetChanged();
         rearrangeHelper.attachToRecyclerView(null);
     }
     public void flipEditingProfiles() {
-        if (editingProfiles.get()) stopEditingProfiles();
+        if (editingProfiles.getValue()) stopEditingProfiles();
         else startEditingProfiles();
     }
     private void editProfile(View view, MobileLedgerProfile profile) {
@@ -128,7 +121,7 @@ public class ProfilesRecyclerViewAdapter
         context.startActivity(intent);
     }
     private void onProfileRowClicked(View v) {
-        if (editingProfiles.get()) return;
+        if (editingProfiles.getValue()) return;
         MobileLedgerProfile profile = (MobileLedgerProfile) v.getTag();
         if (profile == null)
             throw new IllegalStateException("Profile row without associated profile");
@@ -157,7 +150,7 @@ public class ProfilesRecyclerViewAdapter
         });
 
         View.OnTouchListener dragStarter = (v, event) -> {
-            if (rearrangeHelper != null && editingProfiles.get()) {
+            if (rearrangeHelper != null && editingProfiles.getValue()) {
                 rearrangeHelper.startDrag(holder);
                 return true;
             }
@@ -190,7 +183,7 @@ public class ProfilesRecyclerViewAdapter
         final boolean sameProfile = (currentProfile != null) && currentProfile.equals(profile);
         holder.itemView
                 .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
-        if (editingProfiles.get()) {
+        if (editingProfiles.getValue()) {
             boolean wasHidden = holder.mEditButton.getVisibility() == View.GONE;
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
@@ -217,9 +210,6 @@ public class ProfilesRecyclerViewAdapter
     public int getItemCount() {
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
         return profiles != null ? profiles.size() : 0;
-    }
-    public boolean isEditingProfiles() {
-        return editingProfiles.get();
     }
     class ProfileListViewHolder extends RecyclerView.ViewHolder {
         final TextView mEditButton;

@@ -66,7 +66,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Observer;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
@@ -104,7 +103,6 @@ public class MainActivity extends ProfileThemedActivity {
     private DrawerLayout.SimpleDrawerListener drawerListener;
     private ActionBarDrawerToggle barDrawerToggle;
     private ViewPager.SimpleOnPageChangeListener pageChangeListener;
-    private Observer editingProfilesObserver;
     private MobileLedgerProfile profile;
     @Override
     protected void onStart() {
@@ -133,9 +131,6 @@ public class MainActivity extends ProfileThemedActivity {
         barDrawerToggle = null;
         if (mViewPager != null) mViewPager.removeOnPageChangeListener(pageChangeListener);
         pageChangeListener = null;
-        if (mProfileListAdapter != null)
-            mProfileListAdapter.deleteEditingProfilesObserver(editingProfilesObserver);
-        editingProfilesObserver = null;
         super.onDestroy();
     }
     @Override
@@ -254,33 +249,37 @@ public class MainActivity extends ProfileThemedActivity {
         if (mProfileListAdapter == null) mProfileListAdapter = new ProfilesRecyclerViewAdapter();
         root.setAdapter(mProfileListAdapter);
 
-        if (editingProfilesObserver == null) {
-            editingProfilesObserver = (o, arg) -> {
-                if (mProfileListAdapter.isEditingProfiles()) {
-                    profileListHeadMore.setVisibility(View.GONE);
-                    profileListHeadMore
-                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
-                    profileListHeadCancel.setVisibility(View.VISIBLE);
-                    profileListHeadCancel
-                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
-                    profileListHeadAddProfile.setVisibility(View.VISIBLE);
-                    profileListHeadAddProfile
-                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
-                }
-                else {
-                    profileListHeadCancel.setVisibility(View.GONE);
-                    profileListHeadCancel
-                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
-                    profileListHeadMore.setVisibility(View.VISIBLE);
-                    profileListHeadMore
-                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
-                    profileListHeadAddProfile.setVisibility(View.GONE);
-                    profileListHeadAddProfile
-                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
-                }
-            };
-            mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
-        }
+        mProfileListAdapter.editingProfiles
+                .observe(this, newValue -> {
+                    if (newValue) {
+                        profileListHeadMore.setVisibility(View.GONE);
+                        profileListHeadCancel.setVisibility(View.VISIBLE);
+                        profileListHeadAddProfile.setVisibility(View.VISIBLE);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            profileListHeadMore.startAnimation(AnimationUtils
+                                    .loadAnimation(MainActivity.this, R.anim.fade_out));
+                            profileListHeadCancel.startAnimation(AnimationUtils
+                                    .loadAnimation(MainActivity.this, R.anim.fade_in));
+                            profileListHeadAddProfile.startAnimation(AnimationUtils
+                                    .loadAnimation(MainActivity.this, R.anim.fade_in));
+                        }
+                    }
+                    else {
+                        profileListHeadCancel.setVisibility(View.GONE);
+                        profileListHeadMore.setVisibility(View.VISIBLE);
+                        profileListHeadAddProfile.setVisibility(View.GONE);
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            profileListHeadCancel.startAnimation(AnimationUtils
+                                    .loadAnimation(MainActivity.this, R.anim.fade_out));
+                            profileListHeadMore.startAnimation(AnimationUtils
+                                    .loadAnimation(MainActivity.this, R.anim.fade_in));
+                            profileListHeadAddProfile.startAnimation(AnimationUtils
+                                    .loadAnimation(MainActivity.this, R.anim.fade_out));
+                        }
+                    }
+
+                    mProfileListAdapter.notifyDataSetChanged();
+                });
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
