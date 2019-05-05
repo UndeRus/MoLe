@@ -117,7 +117,6 @@
                         android:id="@+id/new_transaction_amt_1"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_gravity="bottom"
                         android:layout_weight="1"
                         android:width="0dp"
                         android:hint="@string/new_transaction_amount_hint"
