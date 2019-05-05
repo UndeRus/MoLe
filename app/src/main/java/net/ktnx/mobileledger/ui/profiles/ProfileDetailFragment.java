@@ -146,6 +146,10 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
         if (profiles == null) throw new AssertionError();
         profiles.set(index, newProfile);
+
+        ProfilesRecyclerViewAdapter prva = ProfilesRecyclerViewAdapter.getInstance();
+        if (prva != null) prva.notifyItemChanged(index);
+
         if (mProfile.equals(Data.profile.getValue())) Data.profile.setValue(newProfile);
     }
     @Override
