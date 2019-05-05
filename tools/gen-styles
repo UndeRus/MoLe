@@ -140,8 +140,10 @@ warn sprintf( 's%1.3f, l%1.3f -> %s',
 
 my $baseTheme = "AppTheme.NoActionBar";
 
+use constant STEP_DEGREES => 15;
+
 # # hsb
-# for( my $hue = 0; $hue < 360; $hue += 15 ) {
+# for( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
 # 	printf "<style name=\"%s.%d\" parent=\"%s\">\n",
 # 		$baseTheme, $hue, $baseTheme;
 # 	printf "  <item name=\"colorPrimary\">#%s</item>\n",
@@ -165,7 +167,7 @@ sub outputThemes {
 	my $out = shift;
 	my $baseIndent = shift;
 	$out->print(hslStyleForHue($baseColorHue, undef, $baseIndent));
-	for( my $hue = 0; $hue < 360; $hue += 15 ) {
+	for( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
 		$out->print("\n");
 		$out->print(hslStyleForHue($hue, $baseTheme, $baseIndent));
 	}
