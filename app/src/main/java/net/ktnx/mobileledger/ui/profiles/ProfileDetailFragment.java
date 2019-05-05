@@ -116,9 +116,10 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                 if (mProfile.equals(Data.profile.getValue())) {
                     debug("profiles", "[fragment] setting current profile to 0");
                     Data.setCurrentProfile(newList.get(0));
-                    final FragmentActivity activity = getActivity();
-                    if (activity != null) activity.finish();
                 }
+
+                final FragmentActivity activity = getActivity();
+                if (activity != null) activity.finish();
             });
             builder.show();
             return false;
