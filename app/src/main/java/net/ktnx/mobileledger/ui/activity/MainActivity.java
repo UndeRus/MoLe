@@ -32,7 +32,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -89,8 +88,7 @@ public class MainActivity extends ProfileThemedActivity {
     private static final String PREF_THEME_ID = "themeId";
     public AccountSummaryFragment mAccountSummaryFragment;
     DrawerLayout drawer;
-    private LinearLayout profileListContainer;
-    private View profileListHeadArrow, profileListHeadMore, profileListHeadCancel;
+    private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
     private FragmentManager fragmentManager;
     private View bTransactionListCancelDownload;
     private ProgressBar progressBar;
@@ -157,12 +155,11 @@ public class MainActivity extends ProfileThemedActivity {
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.btn_add_transaction);
-        profileListContainer = findViewById(R.id.nav_profile_list_container);
-        profileListHeadArrow = findViewById(R.id.nav_profiles_arrow);
         profileListHeadMore = findViewById(R.id.nav_profiles_start_edit);
         profileListHeadCancel = findViewById(R.id.nav_profiles_cancel_edit);
         LinearLayout profileListHeadMoreAndCancel =
                 findViewById(R.id.nav_profile_list_head_buttons);
+        profileListHeadAddProfile = findViewById(R.id.nav_new_profile_button);
         drawer = findViewById(R.id.drawer_layout);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
         progressBar = findViewById(R.id.transaction_list_progress_bar);
@@ -267,18 +264,20 @@ public class MainActivity extends ProfileThemedActivity {
                     profileListHeadCancel.setVisibility(View.VISIBLE);
                     profileListHeadCancel
                             .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
+                    profileListHeadAddProfile.setVisibility(View.VISIBLE);
+                    profileListHeadAddProfile
+                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
                 }
                 else {
                     profileListHeadCancel.setVisibility(View.GONE);
                     profileListHeadCancel
                             .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
-                    profileListHeadMore.setVisibility(View.GONE);
-                    if (profileListExpanded) {
-                        profileListHeadMore.setVisibility(View.VISIBLE);
-                        profileListHeadMore
-                                .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
-                    }
-                    else profileListHeadMore.setVisibility(View.GONE);
+                    profileListHeadMore.setVisibility(View.VISIBLE);
+                    profileListHeadMore
+                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
+                    profileListHeadAddProfile.setVisibility(View.GONE);
+                    profileListHeadAddProfile
+                            .startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_out));
                 }
             };
             mProfileListAdapter.addEditingProfilesObserver(editingProfilesObserver);
@@ -294,20 +293,6 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadMoreAndCancel
                 .setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
 
-        if (drawerListener == null) {
-            drawerListener = new DrawerLayout.SimpleDrawerListener() {
-                @Override
-                public void onDrawerClosed(View drawerView) {
-                    super.onDrawerClosed(drawerView);
-                    collapseProfileList();
-                }
-            };
-            drawer.addDrawerListener(drawerListener);
-        }
-
-        findViewById(R.id.nav_profile_list_head_layout)
-                .setOnClickListener(this::navProfilesHeadClicked);
-        findViewById(R.id.nav_profiles_label).setOnClickListener(this::navProfilesHeadClicked);
         setupProfile();
     }
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
@@ -395,7 +380,6 @@ public class MainActivity extends ProfileThemedActivity {
             // data sets below
             return;
         }
-        collapseProfileList();
 
         drawer.closeDrawers();
 
@@ -613,75 +597,6 @@ public class MainActivity extends ProfileThemedActivity {
     }
     public void fabHide() {
         fab.hide();
-    }
-    public void navProfilesHeadClicked(View view) {
-        if (profileListExpanded) {
-            collapseProfileList();
-        }
-        else {
-            expandProfileList();
-        }
-    }
-    private void expandProfileList() {
-        profileListExpanded = true;
-
-
-        profileListContainer.setVisibility(View.VISIBLE);
-        profileListContainer.startAnimation(AnimationUtils.loadAnimation(this, R.anim.slide_down));
-        profileListHeadArrow.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180));
-        profileListHeadMore.setVisibility(View.VISIBLE);
-        profileListHeadMore.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in));
-        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        findViewById(R.id.nav_profile_list).setMinimumHeight(
-                (int) (getResources().getDimension(R.dimen.thumb_row_height) *
-                       (profiles != null ? profiles.size() : 0)));
-    }
-    private void collapseProfileList() {
-        boolean wasExpanded = profileListExpanded;
-        profileListExpanded = false;
-
-        if (wasExpanded) {
-            final Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    profileListContainer.setVisibility(View.GONE);
-                }
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            mProfileListAdapter.stopEditingProfiles();
-
-            profileListContainer.startAnimation(animation);
-            profileListHeadArrow.setRotation(0f);
-            profileListHeadArrow
-                    .startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_180_back));
-            final Animation moreAnimation = AnimationUtils.loadAnimation(this, R.anim.fade_out);
-            moreAnimation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    profileListHeadMore.setVisibility(View.GONE);
-                }
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            profileListHeadMore.startAnimation(moreAnimation);
-        }
-        else {
-            profileListContainer.setVisibility(View.GONE);
-            profileListHeadArrow.setRotation(0f);
-            profileListHeadMore.setVisibility(View.GONE);
-        }
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;

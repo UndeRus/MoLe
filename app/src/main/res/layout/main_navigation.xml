@@ -149,8 +149,7 @@
                         android:layout_height="wrap_content"
                         android:animateLayoutChanges="true"
                         android:nestedScrollingEnabled="false"
-                        android:orientation="vertical"
-                        android:visibility="gone">
+                        android:orientation="vertical">
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/nav_profile_list"
@@ -163,7 +162,6 @@
 
                         </androidx.recyclerview.widget.RecyclerView>
 
-                        <include layout="@layout/nav_profile_list_new_profile_row" />
                     </LinearLayout>
 
                 </LinearLayout>

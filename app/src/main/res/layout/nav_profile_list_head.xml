@@ -23,14 +23,18 @@
     android:layout_height="@dimen/thumb_row_height">
 
     <ImageView
-        android:id="@+id/nav_profiles_arrow"
+        android:id="@+id/nav_new_profile_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_expand_more_black_24dp"
-        android:gravity="start|center_vertical"
+        android:layout_gravity="center"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/nav_profile_list_head_buttons"
         app:layout_constraintStart_toEndOf="@id/nav_profiles_label"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_add_circle_white_24dp" />
 
     <LinearLayout
         android:id="@+id/nav_profile_list_head_buttons"
@@ -50,6 +54,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/ic_clear_black_24dp"
             android:gravity="end|center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +67,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/ic_settings_black_24dp"
             android:gravity="end|center_vertical"
-            android:visibility="gone"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -73,7 +80,6 @@
         style="@style/nav_button"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:drawableStart="@drawable/ic_view_list_black_24dp"
         android:gravity="start|center_vertical"
         android:text="@string/profiles"
         app:layout_constraintBottom_toBottomOf="parent"
