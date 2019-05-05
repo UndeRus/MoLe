@@ -86,6 +86,7 @@
                             android:id="@+id/transaction_filter_account_name"
                             android:layout_width="0dp"
                             android:textColor="?textColor"
+                            android:hint="@string/new_transaction_account_hint"
                             android:layout_height="wrap_content"
                             android:layout_weight="1" />
 
