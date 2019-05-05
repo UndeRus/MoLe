@@ -35,11 +35,13 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -54,10 +56,12 @@ public class ProfilesRecyclerViewAdapter
         editProfile(view, profile);
     };
     public MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
+    private static WeakReference<ProfilesRecyclerViewAdapter> instanceRef;
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     private boolean animationsEnabled = true;
     public ProfilesRecyclerViewAdapter() {
+        instanceRef = new WeakReference<>(this);
         debug("flow", "ProfilesRecyclerViewAdapter.new()");
 
         ItemTouchHelper.Callback cb = new ItemTouchHelper.Callback() {
@@ -83,6 +87,9 @@ public class ProfilesRecyclerViewAdapter
             }
         };
         rearrangeHelper = new ItemTouchHelper(cb);
+    }
+    public static @Nullable ProfilesRecyclerViewAdapter getInstance() {
+        return instanceRef.get();
     }
     public void setAnimationsEnabled(boolean animationsEnabled) {
         this.animationsEnabled = animationsEnabled;
