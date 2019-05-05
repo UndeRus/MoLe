@@ -168,8 +168,8 @@ public class ProfilesRecyclerViewAdapter
         assert profiles != null;
         final MobileLedgerProfile profile = profiles.get(position);
         final MobileLedgerProfile currentProfile = Data.profile.getValue();
-        debug("profiles", String.format(Locale.ENGLISH,"pos %d: %s, current: %s", position, profile.getUuid(),
-                (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
+        debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
+                profile.getUuid(), (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
         holder.itemView.setTag(profile);
 
         int hue = profile.getThemeId();
