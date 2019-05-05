@@ -35,7 +35,7 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
         Data.backgroundTaskStarted();
         try {
             MobileLedgerProfile profile = Data.profile.getValue();
-            assert profile != null;
+            if (profile == null) throw new AssertionError();
             String profileUUID = profile.getUuid();
             boolean onlyStarred = Data.optShowOnlyStarred.get();
             ArrayList<LedgerAccount> newList = new ArrayList<>();

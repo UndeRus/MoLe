@@ -108,7 +108,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                         String.format("[fragment] removing profile %s", mProfile.getUuid()));
                 mProfile.removeFromDB();
                 ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
-                assert oldList != null;
+                if (oldList == null) throw new AssertionError();
                 ArrayList<MobileLedgerProfile> newList =
                         (ArrayList<MobileLedgerProfile>) oldList.clone();
                 newList.remove(mProfile);
@@ -144,7 +144,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         int index = Data.getProfileIndex(mProfile);
         MobileLedgerProfile newProfile = new MobileLedgerProfile(mProfile);
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        assert profiles != null;
+        if (profiles == null) throw new AssertionError();
         profiles.set(index, newProfile);
         if (mProfile.equals(Data.profile.getValue())) Data.profile.setValue(newProfile);
     }
@@ -193,7 +193,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             updateProfileFromUI();
             mProfile.storeInDB();
             final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-            assert profiles != null;
+            if (profiles == null) throw new AssertionError();
             ArrayList<MobileLedgerProfile> newList =
                     (ArrayList<MobileLedgerProfile>) profiles.clone();
             newList.add(mProfile);

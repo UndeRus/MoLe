@@ -78,7 +78,7 @@ public final class Data {
     public static int getProfileIndex(MobileLedgerProfile profile) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
-            assert prList != null;
+            if (prList == null) throw new AssertionError();
             for (int i = 0; i < prList.size(); i++) {
                 MobileLedgerProfile p = prList.get(i);
                 if (p.equals(profile)) return i;
@@ -91,7 +91,7 @@ public final class Data {
     public static int getProfileIndex(String profileUUID) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
-            assert prList != null;
+            if (prList == null) throw new AssertionError();
             for (int i = 0; i < prList.size(); i++) {
                 MobileLedgerProfile p = prList.get(i);
                 if (p.getUuid().equals(profileUUID)) return i;

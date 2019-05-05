@@ -71,7 +71,7 @@ public class ProfilesRecyclerViewAdapter
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
                 final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-                assert profiles != null;
+                if (profiles == null) throw new AssertionError();
                 Collections.swap(profiles, viewHolder.getAdapterPosition(),
                         target.getAdapterPosition());
                 MobileLedgerProfile.storeProfilesOrder();
@@ -165,7 +165,7 @@ public class ProfilesRecyclerViewAdapter
     @Override
     public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        assert profiles != null;
+        if (profiles == null) throw new AssertionError();
         final MobileLedgerProfile profile = profiles.get(position);
         final MobileLedgerProfile currentProfile = Data.profile.getValue();
         debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
