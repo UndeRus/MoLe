@@ -249,37 +249,36 @@ public class MainActivity extends ProfileThemedActivity {
         if (mProfileListAdapter == null) mProfileListAdapter = new ProfilesRecyclerViewAdapter();
         root.setAdapter(mProfileListAdapter);
 
-        mProfileListAdapter.editingProfiles
-                .observe(this, newValue -> {
-                    if (newValue) {
-                        profileListHeadMore.setVisibility(View.GONE);
-                        profileListHeadCancel.setVisibility(View.VISIBLE);
-                        profileListHeadAddProfile.setVisibility(View.VISIBLE);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            profileListHeadMore.startAnimation(AnimationUtils
-                                    .loadAnimation(MainActivity.this, R.anim.fade_out));
-                            profileListHeadCancel.startAnimation(AnimationUtils
-                                    .loadAnimation(MainActivity.this, R.anim.fade_in));
-                            profileListHeadAddProfile.startAnimation(AnimationUtils
-                                    .loadAnimation(MainActivity.this, R.anim.fade_in));
-                        }
-                    }
-                    else {
-                        profileListHeadCancel.setVisibility(View.GONE);
-                        profileListHeadMore.setVisibility(View.VISIBLE);
-                        profileListHeadAddProfile.setVisibility(View.GONE);
-                        if (drawer.isDrawerOpen(GravityCompat.START)) {
-                            profileListHeadCancel.startAnimation(AnimationUtils
-                                    .loadAnimation(MainActivity.this, R.anim.fade_out));
-                            profileListHeadMore.startAnimation(AnimationUtils
-                                    .loadAnimation(MainActivity.this, R.anim.fade_in));
-                            profileListHeadAddProfile.startAnimation(AnimationUtils
-                                    .loadAnimation(MainActivity.this, R.anim.fade_out));
-                        }
-                    }
+        mProfileListAdapter.editingProfiles.observe(this, newValue -> {
+            if (newValue) {
+                profileListHeadMore.setVisibility(View.GONE);
+                profileListHeadCancel.setVisibility(View.VISIBLE);
+                profileListHeadAddProfile.setVisibility(View.VISIBLE);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    profileListHeadMore.startAnimation(
+                            AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_out));
+                    profileListHeadCancel.startAnimation(
+                            AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in));
+                    profileListHeadAddProfile.startAnimation(
+                            AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in));
+                }
+            }
+            else {
+                profileListHeadCancel.setVisibility(View.GONE);
+                profileListHeadMore.setVisibility(View.VISIBLE);
+                profileListHeadAddProfile.setVisibility(View.GONE);
+                if (drawer.isDrawerOpen(GravityCompat.START)) {
+                    profileListHeadCancel.startAnimation(
+                            AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_out));
+                    profileListHeadMore.startAnimation(
+                            AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in));
+                    profileListHeadAddProfile.startAnimation(
+                            AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_out));
+                }
+            }
 
-                    mProfileListAdapter.notifyDataSetChanged();
-                });
+            mProfileListAdapter.notifyDataSetChanged();
+        });
 
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
