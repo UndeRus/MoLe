@@ -108,7 +108,9 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onStart() {
         super.onStart();
 
-        debug("flow", "MainActivity.onStart()");
+        debug("flow", String.format(Locale.ENGLISH,
+                "MainActivity.onStart(), currentPage is %d, accountFilter is %s", mCurrentPage,
+                (mAccountFilter == null) ? "<NULL>" : mAccountFilter));
         mViewPager.setCurrentItem(mCurrentPage, false);
         if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
         else Data.accountFilter.setValue(null);
