@@ -26,6 +26,7 @@ import android.preference.PreferenceManager;
 
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
@@ -35,6 +36,7 @@ public class App extends Application {
     private MobileLedgerDatabase dbHelper;
     @Override
     public void onCreate() {
+        Logger.debug("flow", "App onCreate()");
         instance = this;
         super.onCreate();
         updateMonthNames();
@@ -51,6 +53,7 @@ public class App extends Application {
     }
     @Override
     public void onTerminate() {
+        Logger.debug("flow", "App onTerminate()");
         if (dbHelper != null) dbHelper.close();
         super.onTerminate();
     }
