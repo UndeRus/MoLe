@@ -136,10 +136,8 @@ public final class MLDB {
     @TargetApi(Build.VERSION_CODES.N)
     public static void hookAutocompletionAdapter(final Context context,
                                                  final AutoCompleteTextView view,
-                                                 final String table, final String field,
-                                                 final boolean profileSpecific) {
-        hookAutocompletionAdapter(context, view, table, field, profileSpecific, null, null,
-                Data.profile.getValue());
+                                                 final String table, final String field) {
+        hookAutocompletionAdapter(context, view, table, field, true, null, null, null);
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hookAutocompletionAdapter(final Context context,
@@ -166,13 +164,15 @@ public final class MLDB {
             String sql;
             String[] params;
             if (profileSpecific) {
+                MobileLedgerProfile p = (profile == null) ? Data.profile.getValue() : profile;
+                if (p == null) throw new AssertionError();
                 sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
                                     "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
                                     "WHEN %s_upper LIKE '%% '||?||'%%' then 3 else 9 end " +
                                     "FROM %s " +
                                     "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
                                     "ORDER BY 2, 1;", field, field, field, field, table, field);
-                params = new String[]{str, str, str, profile.getUuid(), str};
+                params = new String[]{str, str, str, p.getUuid(), str};
             }
             else {
                 sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
