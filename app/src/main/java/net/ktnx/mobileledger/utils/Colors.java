@@ -24,6 +24,7 @@ import android.util.TypedValue;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.HueRing;
 
 import java.util.Locale;
 
@@ -164,88 +165,25 @@ public class Colors {
         setupTheme(activity, profile);
     }
     public static void setupTheme(Activity activity, MobileLedgerProfile profile) {
-        final int themeId = (profile == null) ? -1 : profile.getThemeId();
-        setupTheme(activity, themeId);
+        final int themeHue = (profile == null) ? -1 : profile.getThemeId();
+        setupTheme(activity, themeHue);
     }
-    public static void setupTheme(Activity activity, int themeId) {
-        switch (themeId) {
-            case 0:
-            case 360:
-                activity.setTheme(R.style.AppTheme_NoActionBar_0);
-                break;
-            case 15:
-                activity.setTheme(R.style.AppTheme_NoActionBar_15);
-                break;
-            case 30:
-                activity.setTheme(R.style.AppTheme_NoActionBar_30);
-                break;
-            case 45:
-                activity.setTheme(R.style.AppTheme_NoActionBar_45);
-                break;
-            case 60:
-                activity.setTheme(R.style.AppTheme_NoActionBar_60);
-                break;
-            case 75:
-                activity.setTheme(R.style.AppTheme_NoActionBar_75);
-                break;
-            case 90:
-                activity.setTheme(R.style.AppTheme_NoActionBar_90);
-                break;
-            case 105:
-                activity.setTheme(R.style.AppTheme_NoActionBar_105);
-                break;
-            case 120:
-                activity.setTheme(R.style.AppTheme_NoActionBar_120);
-                break;
-            case 135:
-                activity.setTheme(R.style.AppTheme_NoActionBar_135);
-                break;
-            case 150:
-                activity.setTheme(R.style.AppTheme_NoActionBar_150);
-                break;
-            case 165:
-                activity.setTheme(R.style.AppTheme_NoActionBar_165);
-                break;
-            case 180:
-                activity.setTheme(R.style.AppTheme_NoActionBar_180);
-                break;
-            case 195:
-                activity.setTheme(R.style.AppTheme_NoActionBar_195);
-                break;
-            case 210:
-                activity.setTheme(R.style.AppTheme_NoActionBar_210);
-                break;
-            case 225:
-                activity.setTheme(R.style.AppTheme_NoActionBar_225);
-                break;
-            case 240:
-                activity.setTheme(R.style.AppTheme_NoActionBar_240);
-                break;
-            case 255:
-                activity.setTheme(R.style.AppTheme_NoActionBar_255);
-                break;
-            case 270:
-                activity.setTheme(R.style.AppTheme_NoActionBar_270);
-                break;
-            case 285:
-                activity.setTheme(R.style.AppTheme_NoActionBar_285);
-                break;
-            case 300:
-                activity.setTheme(R.style.AppTheme_NoActionBar_300);
-                break;
-            case 315:
-                activity.setTheme(R.style.AppTheme_NoActionBar_315);
-                break;
-            case 330:
-                activity.setTheme(R.style.AppTheme_NoActionBar_330);
-                break;
-            case 345:
-                activity.setTheme(R.style.AppTheme_NoActionBar_345);
-                break;
-            default:
-                activity.setTheme(R.style.AppTheme_NoActionBar);
-                debug("profiles", String.format(Locale.ENGLISH,
-                        "Theme hue %d not supported, using the default", themeId));
+    public static void setupTheme(Activity activity, int themeHue) {
+        int themeId = -1;
+        // Relies that theme resource IDs are sequential numbers
+        if (themeHue == 360) themeHue = 0;
+        if ((themeHue >= 0) && (themeHue < 360) && ((themeHue % HueRing.hueStepDegrees) == 0)) {
+            themeId = R.style.AppTheme_NoActionBar_000 + (themeHue / HueRing.hueStepDegrees);
+        }
+
+        if (themeId < 0) {
+            activity.setTheme(R.style.AppTheme_NoActionBar);
+            debug("profiles",
+                    String.format(Locale.ENGLISH, "Theme hue %d not supported, using the default",
+                            themeHue));
+        }
+        else {
+            activity.setTheme(themeId);
         }
 
         refreshColors(activity.getTheme());

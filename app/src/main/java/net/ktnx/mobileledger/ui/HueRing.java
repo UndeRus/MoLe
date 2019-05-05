@@ -36,7 +36,7 @@ import androidx.annotation.Nullable;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class HueRing extends View {
-    private static final int hueStepDegrees = 15;
+    public static final int hueStepDegrees = 5;
     private Paint ringPaint, initialPaint, currentPaint, markerPaint;
     private int centerX, centerY;
     private int diameter;

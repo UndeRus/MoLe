@@ -140,11 +140,11 @@ warn sprintf( 's%1.3f, l%1.3f -> %s',
 
 my $baseTheme = "AppTheme.NoActionBar";
 
-use constant STEP_DEGREES => 15;
+use constant STEP_DEGREES => 5;
 
 # # hsb
 # for( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
-# 	printf "<style name=\"%s.%d\" parent=\"%s\">\n",
+# 	printf "<style name=\"%s.%03d\" parent=\"%s\">\n",
 # 		$baseTheme, $hue, $baseTheme;
 # 	printf "  <item name=\"colorPrimary\">#%s</item>\n",
 #        		hsvHex($hue/360.0, 0.61, 0.95);
@@ -198,7 +198,7 @@ sub hslStyleForHue {
 	my $indent = "$baseIndent    ";
 
 	if ($base) {
-		$result .= sprintf "$baseIndent<style name=\"%s.%d\" parent=\"%s\">\n",
+		$result .= sprintf "$baseIndent<style name=\"%s.%03d\" parent=\"%s\">\n",
                         $baseTheme, $hue, $baseTheme;
         }
         else {
