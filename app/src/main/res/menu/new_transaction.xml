@@ -18,13 +18,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_submit_transaction"
-        android:icon="@drawable/ic_save_white_24dp"
-        android:onClick="saveTransactionFromMenu"
-        android:title="@string/action_submit_transaction_title"
-        android:visible="false"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/action_reset_new_transaction_activity"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:onClick="resetTransactionFromMenu"

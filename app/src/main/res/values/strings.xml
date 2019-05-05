@@ -82,7 +82,6 @@
     <string name="progress_connecting">Connecting…</string>
     <string name="progress_N_accounts_loaded">%d accounts loaded</string>
     <string name="new_transaction_description_hint">Description</string>
-    <string name="action_submit_transaction_title">Save</string>
     <string name="account_summary_title">Accounts</string>
     <string name="menu_acc_summary_refresh_title">Refresh</string>
     <string name="menu_acc_view_transactions">View transactions</string>
