@@ -206,6 +206,7 @@ public class MainActivity extends ProfileThemedActivity {
             pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
                 @Override
                 public void onPageSelected(int position) {
+                    mCurrentPage = position;
                     switch (position) {
                         case 0:
                             markDrawerItemCurrent(R.id.nav_account_summary);
