@@ -56,6 +56,7 @@ public class ProfilesRecyclerViewAdapter
     public MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
+    private boolean animationsEnabled = true;
     public ProfilesRecyclerViewAdapter() {
         debug("flow", "ProfilesRecyclerViewAdapter.new()");
 
@@ -83,6 +84,9 @@ public class ProfilesRecyclerViewAdapter
         };
         rearrangeHelper = new ItemTouchHelper(cb);
     }
+    public void setAnimationsEnabled(boolean animationsEnabled) {
+        this.animationsEnabled = animationsEnabled;
+    }
     @Override
     public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
         rearrangeHelper.attachToRecyclerView(null);
@@ -98,13 +102,11 @@ public class ProfilesRecyclerViewAdapter
     public void startEditingProfiles() {
         if (editingProfiles.getValue()) return;
         this.editingProfiles.setValue(true);
-        notifyDataSetChanged();
         rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void stopEditingProfiles() {
         if (!editingProfiles.getValue()) return;
         this.editingProfiles.setValue(false);
-        notifyDataSetChanged();
         rearrangeHelper.attachToRecyclerView(null);
     }
     public void flipEditingProfiles() {
@@ -187,7 +189,7 @@ public class ProfilesRecyclerViewAdapter
             boolean wasHidden = holder.mEditButton.getVisibility() == View.GONE;
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
-            if (wasHidden) {
+            if (wasHidden && animationsEnabled) {
                 Animation a = AnimationUtils
                         .loadAnimation(holder.mRearrangeHandle.getContext(), R.anim.fade_in);
                 holder.mRearrangeHandle.startAnimation(a);
@@ -198,7 +200,7 @@ public class ProfilesRecyclerViewAdapter
             boolean wasShown = holder.mEditButton.getVisibility() == View.VISIBLE;
             holder.mRearrangeHandle.setVisibility(View.INVISIBLE);
             holder.mEditButton.setVisibility(View.GONE);
-            if (wasShown) {
+            if (wasShown && animationsEnabled) {
                 Animation a = AnimationUtils
                         .loadAnimation(holder.mRearrangeHandle.getContext(), R.anim.fade_out);
                 holder.mRearrangeHandle.startAnimation(a);

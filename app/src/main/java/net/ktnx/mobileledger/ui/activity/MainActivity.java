@@ -290,7 +290,22 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
         profileListHeadMoreAndCancel
                 .setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
-
+        if (drawerListener == null) {
+            drawerListener = new DrawerLayout.SimpleDrawerListener() {
+                @Override
+                public void onDrawerClosed(View drawerView) {
+                    super.onDrawerClosed(drawerView);
+                    mProfileListAdapter.setAnimationsEnabled(false);
+                    mProfileListAdapter.editingProfiles.setValue(false);
+                }
+                @Override
+                public void onDrawerOpened(View drawerView) {
+                    super.onDrawerOpened(drawerView);
+                    mProfileListAdapter.setAnimationsEnabled(true);
+                }
+            };
+            drawer.addDrawerListener(drawerListener);
+        }
         setupProfile();
     }
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
