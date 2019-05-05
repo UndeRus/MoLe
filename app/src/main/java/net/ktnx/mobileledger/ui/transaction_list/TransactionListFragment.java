@@ -168,7 +168,9 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
         if ((menuTransactionListFilter == null)) throw new AssertionError();
 
-        if (Data.accountFilter.getValue() != null) {
+        if ((Data.accountFilter.getValue() != null) ||
+            (vAccountFilter.getVisibility() == View.VISIBLE))
+        {
             menuTransactionListFilter.setVisible(false);
         }
 
