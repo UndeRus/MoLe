@@ -275,10 +275,9 @@ public class NewTransactionActivity extends ProfileThemedActivity
         });
     }
 
-    public boolean simulateCrash(MenuItem item) {
+    public void simulateCrash(MenuItem item) {
         debug("crash", "Will crash intentionally");
         new AsyncCrasher().execute();
-        return true;
     }
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
