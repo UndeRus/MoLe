@@ -163,15 +163,18 @@ my $baseTheme = "AppTheme.NoActionBar";
 # HSL
 sub outputThemes {
 	my $out = shift;
-	$out->print(hslStyleForHue($baseColorHue));
+	my $baseIndent = shift;
+	$out->print(hslStyleForHue($baseColorHue, undef, $baseIndent));
 	for( my $hue = 0; $hue < 360; $hue += 15 ) {
-		$out->print(hslStyleForHue($hue, $baseTheme));
+		$out->print("\n");
+		$out->print(hslStyleForHue($hue, $baseTheme, $baseIndent));
 	}
 }
 
 sub hslStyleForHue {
 	my $hue = shift;
 	my $base = shift;
+	my $baseIndent = shift // '';
 
 	my $blueL = 0.665;
 	my $yellowL = 0.350;
@@ -190,31 +193,32 @@ sub hslStyleForHue {
 	my $l4 = 0.980;
 
 	my $result = "";
+	my $indent = "$baseIndent    ";
 
 	if ($base) {
-		$result .= sprintf "<style name=\"%s.%d\" parent=\"%s\">\n",
+		$result .= sprintf "$baseIndent<style name=\"%s.%d\" parent=\"%s\">\n",
                         $baseTheme, $hue, $baseTheme;
         }
         else {
-                $result .= sprintf "<style name=\"%s\">\n",
+                $result .= sprintf "$baseIndent<style name=\"%s\">\n",
                         $baseTheme;
-                $result .= "  <item name=\"windowActionBar\">false</item>\n";
-                $result .= "  <item name=\"windowNoTitle\">true</item>\n";
-                $result .= "  <item name=\"textColor\">#8a000000</item>\n";
+                $result .= "$indent<item name=\"windowActionBar\">false</item>\n";
+                $result .= "$indent<item name=\"windowNoTitle\">true</item>\n";
+                $result .= "$indent<item name=\"textColor\">#8a000000</item>\n";
         }
         my $S = 0.845;
-        $result .= sprintf "  <item name=\"colorPrimary\">#%s</item>\n",
+        $result .= sprintf "$indent<item name=\"colorPrimary\">#%s</item>\n",
                 hslHex($hue, $S, $l1);
-        $result .= sprintf "  <item name=\"colorPrimaryTransparent\">#00%s</item>\n",
+        $result .= sprintf "$indent<item name=\"colorPrimaryTransparent\">#00%s</item>\n",
                 hslHex($hue, $S, $l1);
-        $result .= sprintf "  <item name=\"colorAccent\">#%s</item>\n",
+        $result .= sprintf "$indent<item name=\"colorAccent\">#%s</item>\n",
                 hslHex($hue, $S, $l2);
-        $result .= "  <item name=\"drawer_background\">#ffffffff</item>\n";
-        $result .= sprintf "  <item name=\"table_row_dark_bg\">#%s</item>\n",
+        $result .= "$indent<item name=\"drawer_background\">#ffffffff</item>\n";
+        $result .= sprintf "$indent<item name=\"table_row_dark_bg\">#%s</item>\n",
                 hslHex($hue, $S, $l3);
-        $result .= sprintf "  <item name=\"table_row_light_bg\">#%s</item>\n",
+        $result .= sprintf "$indent<item name=\"table_row_light_bg\">#%s</item>\n",
                 hslHex($hue, $S, $l4);
-        $result .= "</style>\n";
+        $result .= "$baseIndent</style>\n";
 
         return $result;
 }
@@ -226,16 +230,18 @@ if ($xml) {
 	my $end_marker = '<!-- theme list end -->';
 	my ($fh, $filename) = tempfile(basename($0).'.XXXXXXXX', DIR => dirname($xml));
 	open(my $in, '<', $xml);
+	my $base_indent = '';
 	my $state = 'waiting-for-start-marker';
 	while (<$in>) {
 		if ( $state eq 'waiting-for-start-marker' ) {
 			print $fh $_;
-			$state = 'skipping-styles' if /^\s*\Q$start_marker\E/;
+			$state = 'skipping-styles', $base_indent = $1
+                                if /^(\s*)\Q$start_marker\E/;
 			next;
 		}
 		if ( $state eq 'skipping-styles' ) {
 			next unless /^\s*\Q$end_marker\E/;
-			outputThemes($fh);
+			outputThemes($fh, $base_indent);
 			print $fh $_;
 			$state = 'copying-the-rest';
 			next;
