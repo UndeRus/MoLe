@@ -96,7 +96,6 @@ public class MainActivity extends ProfileThemedActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private FloatingActionButton fab;
-    private boolean profileListExpanded = false;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
     private String mAccountFilter;
