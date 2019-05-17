@@ -1,5 +1,26 @@
 # Changes
 
+## [0.10.0] - 2019-05-18
+
+* NEW:
+    - profile list is a prime-time element in the side drawer, always visible
+* IMPROVEMENTS
+    - better app icon
+    - adjust feature graphic to better fit the f-droid client's interface
+    - more translations
+    - more readable theme colors
+    - better, smoother color selector
+    - internal improvements
+    - omit debug log messages in production build
+    - avoid multiple acc/trn list updating when switching profiles
+    - remove unused Options side drawer element
+    - better "swipe up to show button" implementation, without a dummy padding row under the list
+    - better async DB operations
+* FIXES
+    - account name filter shown only on transaction list
+    - profile-dependent colors in the header items - account name filter, cancel refresh button
+    - fix "synthetic" accounts created when backend skips unused accounts
+
 ## [0.9.5] - 2019-04-13
 
  * IMPROVEMENTS
