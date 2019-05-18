@@ -88,7 +88,6 @@ public class MainActivity extends ProfileThemedActivity {
     public AccountSummaryFragment mAccountSummaryFragment;
     DrawerLayout drawer;
     private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
-    private FragmentManager fragmentManager;
     private View bTransactionListCancelDownload;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -161,8 +160,7 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadAddProfile = findViewById(R.id.nav_new_profile_button);
         drawer = findViewById(R.id.drawer_layout);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
-        fragmentManager = getSupportFragmentManager();
-        mSectionsPagerAdapter = new SectionsPagerAdapter(fragmentManager);
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager = findViewById(R.id.root_frame);
 
         Bundle extra = getIntent().getBundleExtra(BUNDLE_SAVED_STATE);
@@ -540,7 +538,7 @@ public class MainActivity extends ProfileThemedActivity {
             }
             else {
                 debug("fragments", String.format(Locale.ENGLISH, "manager stack: %d",
-                        fragmentManager.getBackStackEntryCount()));
+                        getSupportFragmentManager().getBackStackEntryCount()));
 
                 super.onBackPressed();
             }
