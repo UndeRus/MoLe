@@ -145,6 +145,11 @@ public class MainActivity extends ProfileThemedActivity {
         storeThemeIdInPrefs(profileColor);
     }
     @Override
+    protected void onResume() {
+        super.onResume();
+        fabShouldShow();
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         debug("flow", "MainActivity.onCreate()");
