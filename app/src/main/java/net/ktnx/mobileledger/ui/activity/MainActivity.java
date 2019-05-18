@@ -90,8 +90,6 @@ public class MainActivity extends ProfileThemedActivity {
     private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
     private FragmentManager fragmentManager;
     private View bTransactionListCancelDownload;
-    private ProgressBar progressBar;
-    private LinearLayout progressLayout;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private FloatingActionButton fab;
@@ -163,8 +161,6 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadAddProfile = findViewById(R.id.nav_new_profile_button);
         drawer = findViewById(R.id.drawer_layout);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
-        progressBar = findViewById(R.id.transaction_list_progress_bar);
-        progressLayout = findViewById(R.id.transaction_progress_layout);
         fragmentManager = getSupportFragmentManager();
         mSectionsPagerAdapter = new SectionsPagerAdapter(fragmentManager);
         mViewPager = findViewById(R.id.root_frame);
@@ -197,11 +193,6 @@ public class MainActivity extends ProfileThemedActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
-
-        if (progressBar == null)
-            throw new RuntimeException("Can't get hold on the transaction value progress bar");
-        if (progressLayout == null) throw new RuntimeException(
-                "Can't get hold on the transaction value progress bar layout");
 
         markDrawerItemCurrent(R.id.nav_account_summary);
 
@@ -575,7 +566,7 @@ public class MainActivity extends ProfileThemedActivity {
     }
     public void onRetrieveDone(String error) {
         Data.transactionRetrievalDone();
-        progressLayout.setVisibility(View.GONE);
+        findViewById(R.id.transaction_progress_layout).setVisibility(View.GONE);
 
         if (error == null) {
             updateLastUpdateTextFromDB();
@@ -586,15 +577,17 @@ public class MainActivity extends ProfileThemedActivity {
         else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
     }
     public void onRetrieveStart() {
+        ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
         bTransactionListCancelDownload.setEnabled(true);
         progressBar.setIndeterminateTintList(ColorStateList.valueOf(Colors.primary));
         progressBar.setProgressTintList(ColorStateList.valueOf(Colors.primary));
         progressBar.setIndeterminate(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
         else progressBar.setProgress(0);
-        progressLayout.setVisibility(View.VISIBLE);
+        findViewById(R.id.transaction_progress_layout).setVisibility(View.VISIBLE);
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
+        ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
         if ((progress.getTotal() == RetrieveTransactionsTask.Progress.INDETERMINATE) ||
             (progress.getTotal() == 0))
         {
