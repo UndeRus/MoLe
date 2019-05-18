@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.util.TypedValue;
 
@@ -30,6 +31,7 @@ import java.util.Locale;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.ColorLong;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import static java.lang.Math.abs;
@@ -39,6 +41,7 @@ public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
     private static final float blueLightness = 0.665f;
     private static final float yellowLightness = 0.350f;
+    private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
     public static @ColorInt
     int accent;
     @ColorInt
@@ -189,4 +192,22 @@ public class Colors {
         refreshColors(activity.getTheme());
     }
 
+    public static @NonNull
+    ColorStateList getColorStateList() {
+        return getColorStateList(profileThemeId);
+    }
+    public static @NonNull
+    ColorStateList getColorStateList(int hue) {
+        return new ColorStateList(EMPTY_STATES, getColors(hue));
+    }
+    public static int[] getColors() {
+        return getColors(profileThemeId);
+    }
+    public static int[] getColors(int hue) {
+        int[] colors = new int[]{0, 0, 0, 0, 0, 0};
+        for (int i = 0; i < 6; i++, hue = (hue + 60) % 360) {
+            colors[i] = getPrimaryColorForHue(hue);
+        }
+        return colors;
+    }
 }

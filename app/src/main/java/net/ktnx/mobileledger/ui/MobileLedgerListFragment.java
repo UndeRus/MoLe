@@ -35,7 +35,7 @@ public class MobileLedgerListFragment extends Fragment {
     protected MainActivity mActivity;
     protected RecyclerView root;
     protected void themeChanged(Integer counter) {
-        swiper.setColorSchemeColors(Colors.primary);
+        swiper.setColorSchemeColors(Colors.getColors());
     }
     public void onBackgroundTaskRunningChanged(Boolean isRunning) {
         if (mActivity == null) return;

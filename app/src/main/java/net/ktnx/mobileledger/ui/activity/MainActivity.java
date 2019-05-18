@@ -577,8 +577,9 @@ public class MainActivity extends ProfileThemedActivity {
     public void onRetrieveStart() {
         ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
         bTransactionListCancelDownload.setEnabled(true);
-        progressBar.setIndeterminateTintList(ColorStateList.valueOf(Colors.primary));
-        progressBar.setProgressTintList(ColorStateList.valueOf(Colors.primary));
+        ColorStateList csl = Colors.getColorStateList();
+        progressBar.setIndeterminateTintList(csl);
+        progressBar.setProgressTintList(csl);
         progressBar.setIndeterminate(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
         else progressBar.setProgress(0);
