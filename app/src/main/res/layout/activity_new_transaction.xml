@@ -60,7 +60,7 @@
             android:padding="@dimen/fab_margin"
             android:tint="@android:color/white"
             android:visibility="gone"
-            app:backgroundTint="?colorPrimary"
+            app:backgroundTint="?colorAccent"
             app:layout_constraintBottom_toBottomOf="@id/save_transaction_progress"
             app:layout_constraintEnd_toEndOf="@id/save_transaction_progress"
             app:layout_constraintStart_toStartOf="@id/save_transaction_progress"
