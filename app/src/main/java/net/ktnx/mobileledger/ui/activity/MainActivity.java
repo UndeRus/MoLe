@@ -94,7 +94,6 @@ public class MainActivity extends ProfileThemedActivity {
     private FloatingActionButton fab;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
-    private String mAccountFilter;
     private boolean mBackMeansToAccountList = false;
     private Toolbar mToolbar;
     private DrawerLayout.SimpleDrawerListener drawerListener;
@@ -105,19 +104,14 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onStart() {
         super.onStart();
 
-        debug("flow", String.format(Locale.ENGLISH,
-                "MainActivity.onStart(), currentPage is %d, accountFilter is %s", mCurrentPage,
-                (mAccountFilter == null) ? "<NULL>" : mAccountFilter));
         mViewPager.setCurrentItem(mCurrentPage, false);
-        if (mAccountFilter != null) showTransactionsFragment(mAccountFilter);
-        else Data.accountFilter.setValue(null);
-
     }
     @Override
     protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
-        if (mAccountFilter != null) outState.putString(STATE_ACC_FILTER, mAccountFilter);
+        if (Data.accountFilter.getValue() != null)
+            outState.putString(STATE_ACC_FILTER, Data.accountFilter.getValue());
     }
     @Override
     protected void onDestroy() {
@@ -225,9 +219,8 @@ public class MainActivity extends ProfileThemedActivity {
             if (currentPage != -1) {
                 mCurrentPage = currentPage;
             }
-            mAccountFilter = savedInstanceState.getString(STATE_ACC_FILTER, null);
+            Data.accountFilter.setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
         }
-        else mAccountFilter = null;
 
         Data.lastUpdateDate.observe(this, this::updateLastUpdateDisplay);
 
