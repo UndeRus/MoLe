@@ -17,17 +17,18 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import net.ktnx.mobileledger.ui.CrashReportDialogFragment;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -42,6 +43,16 @@ public abstract class CrashReportingActivity extends AppCompatActivity {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
 
+                try {
+                    PackageInfo pi = getApplicationContext().getPackageManager()
+                            .getPackageInfo(getPackageName(), 0);
+                    pw.format("MoLe version: %s\n", pi.versionName);
+                }
+                catch (Exception oh) {
+                    pw.print("Error getting package version:\n");
+                    oh.printStackTrace(pw);
+                    pw.print("\n");
+                }
                 pw.format("OS version: %s; API level %d\n\n", Build.VERSION.RELEASE,
                         Build.VERSION.SDK_INT);
                 e.printStackTrace(pw);
