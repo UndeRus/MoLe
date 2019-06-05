@@ -1,0 +1,8 @@
+* IMPROVEMENTS:
+    - multi-color progress indicators
+* FIXES:
+    - avoid a crash when parsing amounts like '1,234.56'
+    - show new transaction button when re-entering the app
+    - use a color that is different for the new transaction submission progress
+    - keep account name filter upon app re-entry
+    - add MoLe version to the crash report
