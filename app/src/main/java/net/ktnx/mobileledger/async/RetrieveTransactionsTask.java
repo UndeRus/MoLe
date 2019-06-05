@@ -22,6 +22,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 
+import androidx.annotation.NonNull;
+
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.AccountListParser;
@@ -54,8 +56,6 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import androidx.annotation.NonNull;
-
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 
@@ -70,6 +70,8 @@ public class RetrieveTransactionsTask
     private static final Pattern reTransactionDetails =
             Pattern.compile("^\\s+(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
+    private static final Pattern reDecimalPoint = Pattern.compile("\\.\\d\\d?$");
+    private static final Pattern reDecimalComma = Pattern.compile(",\\d\\d?$");
     private WeakReference<MainActivity> contextRef;
     // %3A is '='
     private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
@@ -245,7 +247,20 @@ public class RetrieveTransactionsTask
                                 String value = m.group(1);
                                 String currency = m.group(2);
                                 if (currency == null) currency = "";
-                                value = value.replace(',', '.');
+
+                                {
+                                    Matcher tmpM = reDecimalComma.matcher(value);
+                                    if (tmpM.find()) {
+                                        value = value.replace(".", "");
+                                        value = value.replace(',', '.');
+                                    }
+
+                                    tmpM = reDecimalPoint.matcher(value);
+                                    if (tmpM.find()) {
+                                        value = value.replace(",", "");
+                                        value = value.replace(" ", "");
+                                    }
+                                }
                                 L("curr=" + currency + ", value=" + value);
                                 final float val = Float.parseFloat(value);
                                 profile.storeAccountValue(db, lastAccount.getName(), currency, val);
