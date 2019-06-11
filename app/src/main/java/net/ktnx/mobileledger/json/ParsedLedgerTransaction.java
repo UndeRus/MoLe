@@ -38,7 +38,7 @@ public class ParsedLedgerTransaction {
     private String tprecedingcomment;
     private int tindex;
     private List<ParsedPosting> tpostings;
-    private List<String> ttags = new ArrayList<>();
+    private List<List<String>> ttags = new ArrayList<>();
     private ParsedSourcePos tsourcepos = new ParsedSourcePos();
     public ParsedLedgerTransaction() {
     }
@@ -54,10 +54,10 @@ public class ParsedLedgerTransaction {
     public void setTstatus(String tstatus) {
         this.tstatus = tstatus;
     }
-    public List<String> getTtags() {
+    public List<List<String>> getTtags() {
         return ttags;
     }
-    public void setTtags(List<String> ttags) {
+    public void setTtags(List<List<String>> ttags) {
         this.ttags = ttags;
     }
     public ParsedSourcePos getTsourcepos() {
