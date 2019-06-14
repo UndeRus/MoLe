@@ -33,7 +33,7 @@ public class ParsedPosting {
     private String pdate = null;
     private String ptype = "RegularPosting";
     private String pcomment = "";
-    private ArrayList<String> ptags = new ArrayList<>();
+    private List<List<String>> ptags = new ArrayList<>();
     private String poriginal = null;
     public ParsedPosting() {
     }
@@ -55,10 +55,10 @@ public class ParsedPosting {
     public void setPcomment(String pcomment) {
         this.pcomment = pcomment;
     }
-    public ArrayList<String> getPtags() {
+    public List<List<String>> getPtags() {
         return ptags;
     }
-    public void setPtags(ArrayList<String> ptags) {
+    public void setPtags(List<List<String>> ptags) {
         this.ptags = ptags;
     }
     public String getPoriginal() {
