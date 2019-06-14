@@ -1,0 +1,3 @@
+* FIXES:
+    - two fixes in the JSON parser by Mattéo Delabre
+      (for version 1.14+ hledger-web backends)

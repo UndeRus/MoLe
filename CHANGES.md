@@ -1,5 +1,11 @@
 # Changes
 
+## [0.10.2] - 2019-06-14
+
+* FIXES:
+    - two fixes in the JSON parser by Mattéo Delabre
+      (for version 1.14+ hledger-web backends)
+
 ## [0.10.1] - 2019-06-05
 
 * IMPROVEMENTS:
