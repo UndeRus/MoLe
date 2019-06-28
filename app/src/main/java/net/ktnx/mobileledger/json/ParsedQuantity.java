@@ -25,6 +25,18 @@ public class ParsedQuantity {
     private int decimalPlaces;
     public ParsedQuantity() {
     }
+    public ParsedQuantity(String input) {
+        int pointPos = input.indexOf('.');
+        if (pointPos >= 0) {
+            String integral = input.replace(".", "");
+            decimalMantissa = Long.valueOf(integral);
+            decimalPlaces = input.length() - pointPos - 1;
+        }
+        else {
+            decimalMantissa = Long.valueOf(input);
+            decimalPlaces = 0;
+        }
+    }
     public long getDecimalMantissa() {
         return decimalMantissa;
     }
