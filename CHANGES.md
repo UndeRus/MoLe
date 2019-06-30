@@ -1,5 +1,10 @@
 # Changes
 
+## [0.10.3] - 2019-06-30
+
+* FIXES:
+    - JSON API parser: add String constructor for ParsedQuantity
+
 ## [0.10.2] - 2019-06-14
 
 * FIXES:

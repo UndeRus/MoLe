@@ -1,0 +1,2 @@
+* FIXES:
+    - JSON API parser: add String constructor for ParsedQuantity
