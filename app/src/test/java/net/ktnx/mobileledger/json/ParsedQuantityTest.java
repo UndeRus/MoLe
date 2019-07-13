@@ -26,10 +26,10 @@ public class ParsedQuantityTest {
     public void fromString() {
         ParsedQuantity pq = new ParsedQuantity("-22");
         assertEquals(0, pq.getDecimalPlaces());
-        assertEquals( -22, pq.getDecimalMantissa());
+        assertEquals(-22, pq.getDecimalMantissa());
 
         pq = new ParsedQuantity("-123.45");
-        assertEquals( 2, pq.getDecimalPlaces());
-        assertEquals( -12345, pq.getDecimalMantissa());
+        assertEquals(2, pq.getDecimalPlaces());
+        assertEquals(-12345, pq.getDecimalMantissa());
     }
 }

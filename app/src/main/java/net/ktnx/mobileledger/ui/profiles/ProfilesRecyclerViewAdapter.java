@@ -29,6 +29,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -40,23 +47,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.MutableLiveData;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.RecyclerView;
-
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class ProfilesRecyclerViewAdapter
         extends RecyclerView.Adapter<ProfilesRecyclerViewAdapter.ProfileListViewHolder> {
+    private static WeakReference<ProfilesRecyclerViewAdapter> instanceRef;
     private final View.OnClickListener mOnClickListener = view -> {
         MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
         editProfile(view, profile);
     };
     public MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
-    private static WeakReference<ProfilesRecyclerViewAdapter> instanceRef;
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     private boolean animationsEnabled = true;
@@ -88,7 +88,8 @@ public class ProfilesRecyclerViewAdapter
         };
         rearrangeHelper = new ItemTouchHelper(cb);
     }
-    public static @Nullable ProfilesRecyclerViewAdapter getInstance() {
+    public static @Nullable
+    ProfilesRecyclerViewAdapter getInstance() {
         return instanceRef.get();
     }
     public void setAnimationsEnabled(boolean animationsEnabled) {
