@@ -34,6 +34,11 @@ import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_O
 public class App extends Application {
     public static App instance;
     private MobileLedgerDatabase dbHelper;
+    public static SQLiteDatabase getDatabase() {
+        if (instance == null) throw new RuntimeException("Application not created yet");
+
+        return instance.getDB();
+    }
     @Override
     public void onCreate() {
         Logger.debug("flow", "App onCreate()");
@@ -61,11 +66,6 @@ public class App extends Application {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateMonthNames();
-    }
-    public static SQLiteDatabase getDatabase() {
-        if (instance == null) throw new RuntimeException("Application not created yet");
-
-        return instance.getDB();
     }
     public SQLiteDatabase getDB() {
         if (dbHelper == null) initDb();
