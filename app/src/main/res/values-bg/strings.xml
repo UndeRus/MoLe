@@ -109,5 +109,6 @@
     <string name="remove_profile_dialog_message">Потвърдете окончателното премахване на профила</string>
     <string name="Remove">Премахване</string>
     <string name="text_loading">Зареждане…</string>
+    <string name="err_invalid_url">Грешен или непълен адрес</string>
 
 </resources>

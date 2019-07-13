@@ -46,6 +46,8 @@ import net.ktnx.mobileledger.utils.Colors;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -321,10 +323,19 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             profileNameLayout.setError(getResources().getText(R.string.err_profile_name_empty));
         }
 
-        val = String.valueOf(url.getText());
-        if (val.trim().isEmpty()) {
+        val = String.valueOf(url.getText()).trim();
+        if (val.isEmpty()) {
             valid = false;
             urlLayout.setError(getResources().getText(R.string.err_profile_url_empty));
+        }
+        try {
+            URL url = new URL(val);
+            String host = url.getHost();
+            if (host == null || host.isEmpty()) throw new MalformedURLException("Missing host");
+        }
+        catch (MalformedURLException e) {
+            valid = false;
+            urlLayout.setError(getResources().getText(R.string.err_invalid_url));
         }
         if (useAuthentication.isChecked()) {
             val = String.valueOf(userName.getText());
