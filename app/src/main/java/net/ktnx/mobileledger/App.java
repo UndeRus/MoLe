@@ -23,11 +23,18 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
+
+import java.net.Authenticator;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URL;
 
 import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
@@ -51,6 +58,30 @@ public class App extends Application {
                 (preference, value) -> Data.optShowOnlyStarred
                         .set(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
         p.registerOnSharedPreferenceChangeListener(handler);
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                MobileLedgerProfile p = Data.profile.getValue();
+                if ((p != null) && p.isAuthEnabled()) {
+                    try {
+                        final URL url = new URL(p.getUrl());
+                        final String requestingHost = getRequestingHost();
+                        final String expectedHost = url.getHost();
+                        if (requestingHost.equalsIgnoreCase(expectedHost))
+                            return new PasswordAuthentication(p.getAuthUserName(),
+                                    p.getAuthPassword().toCharArray());
+                        else Log.w("http-auth",
+                                String.format("Requesting host [%s] differs from expected [%s]",
+                                        requestingHost, expectedHost));
+                    }
+                    catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return super.getPasswordAuthentication();
+            }
+        });
     }
     private void updateMonthNames() {
         Resources rm = getResources();

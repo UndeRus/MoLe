@@ -17,14 +17,11 @@
 
 package net.ktnx.mobileledger.utils;
 
-import android.util.Base64;
-
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -38,15 +35,7 @@ public final class NetworkUtil {
         url += path;
         debug("network", "Connecting to " + url);
         HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
-        if (use_auth) {
-            final String auth_user = profile.getAuthUserName();
-            final String auth_password = profile.getAuthPassword();
-            final byte[] bytes = (String.format("%s:%s", auth_user, auth_password))
-                    .getBytes(StandardCharsets.UTF_8);
-            final String value = Base64.encodeToString(bytes, Base64.DEFAULT);
-            http.setRequestProperty("Authorization", "Basic " + value);
-        }
-        http.setAllowUserInteraction(false);
+        http.setAllowUserInteraction(true);
         http.setRequestProperty("Accept-Charset", "UTF-8");
         http.setInstanceFollowRedirects(false);
         http.setUseCaches(false);
