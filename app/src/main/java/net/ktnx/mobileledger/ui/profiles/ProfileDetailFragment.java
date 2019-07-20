@@ -88,6 +88,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private TextView preferredAccountsFilter;
     private TextInputLayout preferredAccountsFilterLayout;
     private View huePickerView;
+    private View insecureWarningText;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -243,11 +244,28 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         preferredAccountsFilter = rootView.findViewById(R.id.preferred_accounts_filter_filter);
         preferredAccountsFilterLayout =
                 rootView.findViewById(R.id.preferred_accounts_accounts_filter_layout);
+        insecureWarningText = rootView.findViewById(R.id.insecure_scheme_text);
+
+        url.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                checkInsecureSchemeWithAuth();
+            }
+        });
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             debug("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (isChecked) userName.requestFocus();
+            checkInsecureSchemeWithAuth();
         });
 
         postingPermitted.setOnCheckedChangeListener(
@@ -296,6 +314,17 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             d.setColorSelectedListener(this);
         });
         return rootView;
+    }
+    private void checkInsecureSchemeWithAuth() {
+        boolean showWarning = false;
+
+        if (useAuthentication.isChecked()) {
+            String urlText = url.getText().toString();
+            if (urlText.startsWith("http") && !urlText.startsWith("https")) showWarning = true;
+        }
+
+        if (showWarning) insecureWarningText.setVisibility(View.VISIBLE);
+        else insecureWarningText.setVisibility(View.GONE);
     }
     private void hookClearErrorOnFocusListener(TextView view, TextInputLayout layout) {
         view.setOnFocusChangeListener((v, hasFocus) -> {

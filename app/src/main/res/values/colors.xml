@@ -24,4 +24,5 @@
     <color name="table_row_dark_bg">#286c33d4</color>
     <color name="table_row_light_bg">#28ddcbff</color>
     <color name="header_border">#804a148c</color>
+    <color name="error_background">#FFE1E2</color>
 </resources>
