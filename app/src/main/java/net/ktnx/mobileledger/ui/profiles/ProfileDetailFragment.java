@@ -257,6 +257,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             }
             @Override
             public void afterTextChanged(Editable s) {
+                checkValidity();
                 checkInsecureSchemeWithAuth();
             }
         });
@@ -361,6 +362,11 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             URL url = new URL(val);
             String host = url.getHost();
             if (host == null || host.isEmpty()) throw new MalformedURLException("Missing host");
+            String protocol = url.getProtocol().toUpperCase();
+            if (!protocol.equals("HTTP") && !protocol.equals("HTTPS")) {
+                valid = false;
+                urlLayout.setError(getResources().getText(R.string.err_invalid_url));
+            }
         }
         catch (MalformedURLException e) {
             valid = false;
