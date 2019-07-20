@@ -110,5 +110,6 @@
     <string name="Remove">Премахване</string>
     <string name="text_loading">Зареждане…</string>
     <string name="err_invalid_url">Грешен или непълен адрес</string>
+    <string name="btn_color_picker_button">Бутон за избор на цвят</string>
 
 </resources>

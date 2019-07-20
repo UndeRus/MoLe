@@ -154,6 +154,7 @@
                 android:layout_height="@dimen/thumb_row_height"
                 android:layout_weight="1"
                 android:background="?colorPrimary"
+                android:contentDescription="@string/btn_color_picker_button"
                 android:src="@drawable/ic_palette_black_24dp"
                 android:tint="?drawer_background" />
 
