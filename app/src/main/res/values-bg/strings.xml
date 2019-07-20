@@ -90,7 +90,7 @@
     <string name="crash_send_question">Желаете ли да изпратите доклад за грешката на автора? Това ще помогне за диагностициране и отстраняване на проблема.</string>
     <string name="crash_app_condensed_label">Срив</string>
     <string name="btn_not_now">Не сега</string>
-    <string name="btn_send_crash_report">Изпращане...</string>
+    <string name="btn_send_crash_report">Изпращане…</string>
     <string name="crash_app_label">Тестов срив</string>
     <string name="crash_dialog_title">MoLe се срина</string>
     <string name="crash_report_contents_label">Съдържание на доклада:</string>

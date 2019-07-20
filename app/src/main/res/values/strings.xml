@@ -133,7 +133,7 @@
     <string name="profile_subitlte_read_only">(Read only)</string>
     <string name="crash_report_contents_label">Crash report contents:</string>
     <string name="crash_dialog_title">MoLe chashed</string>
-    <string name="btn_send_crash_report">Send...</string>
+    <string name="btn_send_crash_report">Send…</string>
     <string name="btn_not_now">Not now</string>
     <string name="crash_app_label">Crash app</string>
     <string name="crash_app_condensed_label">Crash</string>
