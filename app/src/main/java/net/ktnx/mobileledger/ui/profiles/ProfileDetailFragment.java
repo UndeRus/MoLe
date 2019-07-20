@@ -49,6 +49,7 @@ import net.ktnx.mobileledger.ui.HueRingDialog;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.MalformedURLException;
@@ -69,6 +70,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
+    @NonNls
+    private static final String HTTPS_URL_START = "https://";
 
     /**
      * The dummy content this fragment is presenting.
@@ -274,7 +277,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         }
         else {
             profileName.setText("");
-            url.setText("https://");
+            url.setText(HTTPS_URL_START);
             postingPermitted.setChecked(true);
             useAuthentication.setChecked(false);
             authParams.setVisibility(View.GONE);
