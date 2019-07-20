@@ -87,7 +87,7 @@
     <string name="err_profile_password_empty">Паролата е задължителна</string>
     <string name="posting_permitted">Позволяване на добавянето на нови трансакции</string>
     <string name="send_crash_via">Изпращане на доклада чрез:</string>
-    <string name="crash_send_question">Желаете ли да изпратите доклад за грешката на автора? Това ще помогне за диагностициране и отстраняване на проблема.</string>
+    <string name="crash_send_question">Желаете ли да изпратите доклад за грешката на автора? Това ще помогне за диагностициране и отстраняване на проблема. Докладът се изпраща по email, като имате възможност за преглед преди изпращане.</string>
     <string name="crash_app_condensed_label">Срив</string>
     <string name="btn_not_now">Не сега</string>
     <string name="btn_send_crash_report">Изпращане…</string>
