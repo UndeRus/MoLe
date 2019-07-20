@@ -246,22 +246,6 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                 rootView.findViewById(R.id.preferred_accounts_accounts_filter_layout);
         insecureWarningText = rootView.findViewById(R.id.insecure_scheme_text);
 
-        url.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                checkValidity();
-                checkInsecureSchemeWithAuth();
-            }
-        });
-
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             debug("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
@@ -302,6 +286,23 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             profileThemeId = -1;
         }
 
+        checkInsecureSchemeWithAuth();
+
+        url.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                checkInsecureSchemeWithAuth();
+            }
+        });
+
         final int hue = (profileThemeId == -1) ? Colors.DEFAULT_HUE_DEG : profileThemeId;
         final int profileColor = Colors.getPrimaryColorForHue(hue);
 
@@ -315,6 +316,31 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             d.setColorSelectedListener(this);
         });
         return rootView;
+    }
+    private boolean checkUrlValidity() {
+        boolean valid = true;
+
+        String val = String.valueOf(url.getText()).trim();
+        if (val.isEmpty()) {
+            valid = false;
+            urlLayout.setError(getResources().getText(R.string.err_profile_url_empty));
+        }
+        try {
+            URL url = new URL(val);
+            String host = url.getHost();
+            if (host == null || host.isEmpty()) throw new MalformedURLException("Missing host");
+            String protocol = url.getProtocol().toUpperCase();
+            if (!protocol.equals("HTTP") && !protocol.equals("HTTPS")) {
+                valid = false;
+                urlLayout.setError(getResources().getText(R.string.err_invalid_url));
+            }
+        }
+        catch (MalformedURLException e) {
+            valid = false;
+            urlLayout.setError(getResources().getText(R.string.err_invalid_url));
+        }
+
+        return valid;
     }
     private void checkInsecureSchemeWithAuth() {
         boolean showWarning = false;
@@ -353,25 +379,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             profileNameLayout.setError(getResources().getText(R.string.err_profile_name_empty));
         }
 
-        val = String.valueOf(url.getText()).trim();
-        if (val.isEmpty()) {
-            valid = false;
-            urlLayout.setError(getResources().getText(R.string.err_profile_url_empty));
-        }
-        try {
-            URL url = new URL(val);
-            String host = url.getHost();
-            if (host == null || host.isEmpty()) throw new MalformedURLException("Missing host");
-            String protocol = url.getProtocol().toUpperCase();
-            if (!protocol.equals("HTTP") && !protocol.equals("HTTPS")) {
-                valid = false;
-                urlLayout.setError(getResources().getText(R.string.err_invalid_url));
-            }
-        }
-        catch (MalformedURLException e) {
-            valid = false;
-            urlLayout.setError(getResources().getText(R.string.err_invalid_url));
-        }
+        if (!checkUrlValidity()) valid = false;
+
         if (useAuthentication.isChecked()) {
             val = String.valueOf(userName.getText());
             if (val.trim().isEmpty()) {
