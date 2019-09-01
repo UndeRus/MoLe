@@ -17,6 +17,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/profile_detail"
     style="?android:attr/textAppearanceLarge"
     android:layout_width="match_parent"
@@ -121,7 +122,8 @@
                 android:id="@+id/password_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
@@ -129,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/pref_title_backend_auth_password"
-                    android:inputType="textPassword" />
+                    android:inputType="textWebPassword" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
