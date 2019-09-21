@@ -111,16 +111,9 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         table = findViewById(R.id.new_transaction_accounts_table);
-        for (int i = 0; i < table.getChildCount(); i++) {
-            TableRow row = (TableRow) table.getChildAt(i);
-            AutoCompleteTextView tvAccountName = (AutoCompleteTextView) row.getChildAt(0);
-            TextView tvAmount = (TextView) row.getChildAt(1);
-            hookSwipeListener(row);
-            MLDB.hookAutocompletionAdapter(this, tvAccountName, MLDB.ACCOUNTS_TABLE, "name", true,
-                    tvAmount, null, mProfile);
-            hookTextChangeListener(tvAccountName);
-            hookTextChangeListener(tvAmount);
-//            debug("swipe", "hooked to row "+i);
+
+        while (table.getChildCount() < 2) {
+            doAddAccountRow(false);
         }
     }
     @Override
@@ -343,8 +336,15 @@ public class NewTransactionActivity extends ProfileThemedActivity
         amt.setSelectAllOnFocus(true);
 
         // forward navigation support
-        final TableRow last_row = (TableRow) table.getChildAt(table.getChildCount() - 1);
-        final TextView last_amt = (TextView) last_row.getChildAt(1);
+        TextView last_amt;
+        int rows = table.getChildCount();
+        if (rows > 0) {
+            final TableRow last_row = (TableRow) table.getChildAt(rows - 1);
+            last_amt = (TextView) last_row.getChildAt(1);
+        }
+        else {
+            last_amt = tvDescription;
+        }
         last_amt.setNextFocusForwardId(acc.getId());
         last_amt.setNextFocusRightId(acc.getId());
         last_amt.setImeOptions(EditorInfo.IME_ACTION_NEXT);
@@ -543,7 +543,6 @@ public class NewTransactionActivity extends ProfileThemedActivity
                     "transaction %d with description %s", profileUUID, transactionId, description));
 
             tr = profile.loadTransaction(transactionId);
-            table = findViewById(R.id.new_transaction_accounts_table);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
             TableRow firstNegative = null;
             int negativeCount = 0;
