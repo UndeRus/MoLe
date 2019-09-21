@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -54,6 +53,7 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.OnSwipeTouchListener;
 import net.ktnx.mobileledger.utils.Globals;
@@ -105,7 +105,6 @@ public class NewTransactionActivity extends ProfileThemedActivity
         MLDB.hookAutocompletionAdapter(this, tvDescription, MLDB.DESCRIPTION_HISTORY_TABLE,
                 "description", false, findViewById(R.id.new_transaction_acc_1), this, mProfile);
         hookTextChangeListener(tvDescription);
-        hookClearClickListener(tvDescription);
 
         progress = findViewById(R.id.save_transaction_progress);
         fab = findViewById(R.id.fab);
@@ -119,75 +118,6 @@ public class NewTransactionActivity extends ProfileThemedActivity
         }
 
         check_transaction_submittable();
-    }
-    private void hookClearClickListener(AutoCompleteTextView v) {
-        final TextWatcher w = new TextWatcher() {
-            private boolean hasText;
-            private boolean hadText;
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                hadText = s.length() > 0;
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                hasText = s.length() > 0;
-
-                if (hadText && !hasText) {
-                    v.setCompoundDrawablesRelative(null, null, null, null);
-                }
-                if (!hadText && hasText) {
-                    v.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0,
-                            R.drawable.ic_clear_black_24dp, 0);
-                }
-            }
-        };
-        View.OnFocusChangeListener prevFocusListener = v.getOnFocusChangeListener();
-        v.setOnFocusChangeListener((v12, hasFocus) -> {
-            if (hasFocus) {
-                if (((TextView) v12).getText().length() > 0) {
-                    ((TextView) v12).setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0,
-                            R.drawable.ic_clear_black_24dp, 0);
-                }
-                ((TextView) v12).addTextChangedListener(w);
-            }
-            else {
-                ((TextView) v12).removeTextChangedListener(w);
-                ((TextView) v12).setCompoundDrawables(null, null, null, null);
-            }
-
-            if (prevFocusListener != null) prevFocusListener.onFocusChange(v12, hasFocus);
-        });
-
-        v.setOnTouchListener((v1, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_UP)
-                if (((TextView) v1).getText().length() > 0) {
-                    boolean clearClicked = false;
-                    final float x = event.getX();
-                    final int vw = v1.getWidth();
-                    // start, top, end, bottom (end == 2)
-                    Drawable dwb = ((TextView) v1).getCompoundDrawablesRelative()[2];
-                    if (dwb != null) {
-                        final int dw = dwb.getBounds().width();
-                        if (v1.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR) {
-                            if ((x > vw - dw)) clearClicked = true;
-                        }
-                        else {
-                            if (x < vw - dw) clearClicked = true;
-                        }
-                        if (clearClicked) {
-                            ((TextView) v1).setText("");
-                            v1.requestFocus();
-                            return true;
-                        }
-                    }
-                }
-            v.performClick();
-            return false;
-        });
     }
     @Override
     protected void initProfile() {
@@ -387,7 +317,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
     }
     private TableRow doAddAccountRow(boolean focus) {
-        final AutoCompleteTextView acc = new AutoCompleteTextView(this);
+        final AutoCompleteTextView acc = new AutoCompleteTextViewWithClear(this);
         acc.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
                 TableRow.LayoutParams.WRAP_CONTENT, 9f));
         acc.setHint(R.string.new_transaction_account_hint);
@@ -438,7 +368,6 @@ public class NewTransactionActivity extends ProfileThemedActivity
         MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt, null,
                 mProfile);
         hookTextChangeListener(acc);
-        hookClearClickListener(acc);
         hookTextChangeListener(amt);
 
         return row;
