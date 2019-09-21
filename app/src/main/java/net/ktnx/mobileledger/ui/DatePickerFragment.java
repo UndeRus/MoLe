@@ -17,12 +17,15 @@
 
 package net.ktnx.mobileledger.ui;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDialogFragment;
+import android.view.WindowManager;
 import android.widget.CalendarView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDialogFragment;
 
 import net.ktnx.mobileledger.R;
 
@@ -96,9 +99,13 @@ public class DatePickerFragment extends AppCompatDialogFragment
         }
         else date.setText(String.format(Locale.US, "%d/%d/%d", year, month + 1, day));
 
-        TextView description = Objects.requireNonNull(getActivity())
-                .findViewById(R.id.new_transaction_description);
-        description.requestFocus();
+        Activity activity = getActivity();
+        if (activity == null) return;
+
+        TextView description = activity.findViewById(R.id.new_transaction_description);
+        boolean tookFocus = description.requestFocus();
+        if (tookFocus) activity.getWindow()
+                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
     @Override
     public void onSelectedDayChange(@NonNull CalendarView view, int year, int month,
