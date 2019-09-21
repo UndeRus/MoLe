@@ -25,7 +25,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.FontsContract;
-import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
@@ -137,13 +136,13 @@ public final class MLDB {
     public static void hookAutocompletionAdapter(final Context context,
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field) {
-        hookAutocompletionAdapter(context, view, table, field, true, null, null, null);
+        hookAutocompletionAdapter(context, view, table, field, true, null, null);
     }
     @TargetApi(Build.VERSION_CODES.N)
     public static void hookAutocompletionAdapter(final Context context,
                                                  final AutoCompleteTextView view,
                                                  final String table, final String field,
-                                                 final boolean profileSpecific, final View nextView,
+                                                 final boolean profileSpecific,
                                                  final DescriptionSelectedCallback callback,
                                                  final MobileLedgerProfile profile) {
         String[] from = {field};
@@ -204,14 +203,9 @@ public final class MLDB {
 
         view.setAdapter(adapter);
 
-        if (nextView != null) {
-            view.setOnItemClickListener((parent, itemView, position, id) -> {
-                nextView.requestFocus(View.FOCUS_FORWARD);
-                if (callback != null) {
-                    callback.descriptionSelected(String.valueOf(view.getText()));
-                }
-            });
-        }
+        if (callback != null) view.setOnItemClickListener((parent, itemView, position, id) -> {
+            callback.descriptionSelected(String.valueOf(view.getText()));
+        });
     }
 }
 

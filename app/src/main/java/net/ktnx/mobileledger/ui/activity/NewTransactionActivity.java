@@ -103,7 +103,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         });
         tvDescription = findViewById(R.id.new_transaction_description);
         MLDB.hookAutocompletionAdapter(this, tvDescription, MLDB.DESCRIPTION_HISTORY_TABLE,
-                "description", false, findViewById(R.id.new_transaction_acc_1), this, mProfile);
+                "description", false, this, mProfile);
         hookTextChangeListener(tvDescription);
 
         progress = findViewById(R.id.save_transaction_progress);
@@ -365,8 +365,8 @@ public class NewTransactionActivity extends ProfileThemedActivity
         if (focus) acc.requestFocus();
 
         hookSwipeListener(row);
-        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true, amt, null,
-                mProfile);
+        MLDB.hookAutocompletionAdapter(this, acc, MLDB.ACCOUNTS_TABLE, "name", true,
+                description -> amt.requestFocus(), mProfile);
         hookTextChangeListener(acc);
         hookTextChangeListener(amt);
 
