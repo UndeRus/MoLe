@@ -63,8 +63,10 @@ public final class AutoCompleteTextViewWithClear extends AppCompatAutoCompleteTe
     protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
         final boolean hasText = text.length() > 0;
 
-        if (hadText && !hasText) hideClearDrawable();
-        if (!hadText && hasText) showClearDrawable();
+        if (hasFocus()) {
+            if (hadText && !hasText) hideClearDrawable();
+            if (!hadText && hasText) showClearDrawable();
+        }
 
         hadText = hasText;
 
