@@ -23,11 +23,14 @@ import android.os.Bundle;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.GetOptCallback;
+import net.ktnx.mobileledger.utils.MLDB;
 
 import androidx.annotation.Nullable;
 
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
+    static final int waitSlice = 200;
     protected MobileLedgerProfile mProfile;
     protected void setupProfileColors() {
         Colors.setupTheme(this, mProfile);
@@ -40,9 +43,24 @@ public class ProfileThemedActivity extends CrashReportingActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         initProfile();
         super.onCreate(savedInstanceState);
-        setupProfileColors();
+        Data.profile.observe(this, mobileLedgerProfile -> {
+            mProfile = mobileLedgerProfile;
+            setupProfileColors();
+        });
     }
     protected void initProfile() {
         mProfile = Data.profile.getValue();
+        if (mProfile == null) {
+            MLDB.getOption(MLDB.OPT_PROFILE_UUID, null, new GetOptCallback() {
+                @Override
+                protected void onResult(String profileUUID) {
+                    MobileLedgerProfile startupProfile;
+
+
+                    startupProfile = Data.getProfile(profileUUID);
+                    Data.setCurrentProfile(startupProfile);
+                }
+            });
+        }
     }
 }
