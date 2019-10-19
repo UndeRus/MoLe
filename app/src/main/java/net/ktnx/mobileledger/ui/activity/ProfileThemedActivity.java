@@ -20,13 +20,13 @@ package net.ktnx.mobileledger.ui.activity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
+
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.GetOptCallback;
 import net.ktnx.mobileledger.utils.MLDB;
-
-import androidx.annotation.Nullable;
 
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
