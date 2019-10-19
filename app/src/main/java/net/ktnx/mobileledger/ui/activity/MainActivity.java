@@ -309,7 +309,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     private void createShortcuts(List<MobileLedgerProfile> list) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) return;
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         int i = 0;
