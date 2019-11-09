@@ -22,17 +22,17 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.util.TypedValue;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorLong;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.HueRing;
 
 import java.util.Locale;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorLong;
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 
 import static java.lang.Math.abs;
 import static net.ktnx.mobileledger.utils.Logger.debug;
