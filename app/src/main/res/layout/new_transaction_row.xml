@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright © 2019 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="false"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ntr_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/new_transaction_date"
+            android:layout_width="94dp"
+            android:layout_height="0dp"
+            android:accessibilityTraversalBefore="@+id/new_transaction_description"
+            android:ems="10"
+            android:foregroundGravity="bottom"
+            android:gravity="bottom"
+            android:hint="@string/new_transaction_date_hint"
+            android:imeOptions="actionNext"
+            android:cursorVisible="false"
+            android:textCursorDrawable="@android:color/transparent"
+            android:inputType="date"
+            android:nextFocusDown="@+id/new_transaction_acc_1"
+            android:nextFocusForward="@+id/new_transaction_description"
+            android:textAlignment="center"
+            android:enabled="true"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_weight="8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
+            android:id="@+id/new_transaction_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:accessibilityTraversalAfter="@+id/new_transaction_date"
+            android:ems="10"
+            android:hint="@string/new_transaction_description_hint"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:nextFocusLeft="@+id/new_transaction_date"
+            android:nextFocusUp="@+id/new_transaction_date"
+            android:singleLine="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="30"
+            app:layout_constraintStart_toEndOf="@+id/new_transaction_date"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/ntr_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
+            android:id="@+id/account_row_acc_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:hint="@string/new_transaction_account_hint"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:width="0dp" />
+
+        <EditText
+            android:id="@+id/account_row_acc_amounts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_weight="0"
+            android:width="0dp"
+            android:foregroundGravity="bottom"
+            android:gravity="bottom|end"
+            android:hint="0.00"
+            android:inputType="numberSigned|numberDecimal"
+            android:minWidth="60sp"
+            android:textAlignment="viewEnd"
+            android:selectAllOnFocus="true"
+            tools:ignore="HardcodedText"
+            android:imeOptions="actionNext"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/ntr_padding"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:minHeight="80dp">
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -17,10 +17,8 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.view.WindowManager;
 import android.widget.CalendarView;
 import android.widget.TextView;
 
@@ -31,7 +29,6 @@ import net.ktnx.mobileledger.R;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +38,7 @@ public class DatePickerFragment extends AppCompatDialogFragment
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
+    private DatePickedListener onDatePickedListener;
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -87,30 +85,17 @@ public class DatePickerFragment extends AppCompatDialogFragment
 
         return dpd;
     }
-    private void updateDateInput(int year, int month, int day) {
-        TextView date =
-                Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
-
-        final Calendar c = GregorianCalendar.getInstance();
-        if (c.get(GregorianCalendar.YEAR) == year) {
-            if (c.get(GregorianCalendar.MONTH) == month)
-                date.setText(String.format(Locale.US, "%d", day));
-            else date.setText(String.format(Locale.US, "%d/%d", month + 1, day));
-        }
-        else date.setText(String.format(Locale.US, "%d/%d/%d", year, month + 1, day));
-
-        Activity activity = getActivity();
-        if (activity == null) return;
-
-        TextView description = activity.findViewById(R.id.new_transaction_description);
-        boolean tookFocus = description.requestFocus();
-        if (tookFocus) activity.getWindow()
-                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-    }
     @Override
     public void onSelectedDayChange(@NonNull CalendarView view, int year, int month,
                                     int dayOfMonth) {
-        updateDateInput(year, month, dayOfMonth);
+        if (onDatePickedListener != null)
+            onDatePickedListener.onDatePicked(year, month, dayOfMonth);
         this.dismiss();
+    }
+    public void setOnDatePickedListener(DatePickedListener listener) {
+        onDatePickedListener = listener;
+    }
+    public interface DatePickedListener {
+        void onDatePicked(int year, int month, int day);
     }
 }
