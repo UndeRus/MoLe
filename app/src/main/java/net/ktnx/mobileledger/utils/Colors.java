@@ -52,6 +52,44 @@ public class Colors {
     public static int primary, defaultTextColor;
     public static int profileThemeId = -1;
     public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
+    private static int[] themeIDs =
+            {R.style.AppTheme_NoActionBar_000, R.style.AppTheme_NoActionBar_005,
+             R.style.AppTheme_NoActionBar_010, R.style.AppTheme_NoActionBar_015,
+             R.style.AppTheme_NoActionBar_020, R.style.AppTheme_NoActionBar_025,
+             R.style.AppTheme_NoActionBar_030, R.style.AppTheme_NoActionBar_035,
+             R.style.AppTheme_NoActionBar_040, R.style.AppTheme_NoActionBar_045,
+             R.style.AppTheme_NoActionBar_050, R.style.AppTheme_NoActionBar_055,
+             R.style.AppTheme_NoActionBar_060, R.style.AppTheme_NoActionBar_065,
+             R.style.AppTheme_NoActionBar_070, R.style.AppTheme_NoActionBar_075,
+             R.style.AppTheme_NoActionBar_080, R.style.AppTheme_NoActionBar_085,
+             R.style.AppTheme_NoActionBar_090, R.style.AppTheme_NoActionBar_095,
+             R.style.AppTheme_NoActionBar_100, R.style.AppTheme_NoActionBar_105,
+             R.style.AppTheme_NoActionBar_110, R.style.AppTheme_NoActionBar_115,
+             R.style.AppTheme_NoActionBar_120, R.style.AppTheme_NoActionBar_125,
+             R.style.AppTheme_NoActionBar_130, R.style.AppTheme_NoActionBar_135,
+             R.style.AppTheme_NoActionBar_140, R.style.AppTheme_NoActionBar_145,
+             R.style.AppTheme_NoActionBar_150, R.style.AppTheme_NoActionBar_155,
+             R.style.AppTheme_NoActionBar_160, R.style.AppTheme_NoActionBar_165,
+             R.style.AppTheme_NoActionBar_170, R.style.AppTheme_NoActionBar_175,
+             R.style.AppTheme_NoActionBar_180, R.style.AppTheme_NoActionBar_185,
+             R.style.AppTheme_NoActionBar_190, R.style.AppTheme_NoActionBar_195,
+             R.style.AppTheme_NoActionBar_200, R.style.AppTheme_NoActionBar_205,
+             R.style.AppTheme_NoActionBar_210, R.style.AppTheme_NoActionBar_215,
+             R.style.AppTheme_NoActionBar_220, R.style.AppTheme_NoActionBar_225,
+             R.style.AppTheme_NoActionBar_230, R.style.AppTheme_NoActionBar_235,
+             R.style.AppTheme_NoActionBar_240, R.style.AppTheme_NoActionBar_245,
+             R.style.AppTheme_NoActionBar_250, R.style.AppTheme_NoActionBar_255,
+             R.style.AppTheme_NoActionBar_260, R.style.AppTheme_NoActionBar_265,
+             R.style.AppTheme_NoActionBar_270, R.style.AppTheme_NoActionBar_275,
+             R.style.AppTheme_NoActionBar_280, R.style.AppTheme_NoActionBar_285,
+             R.style.AppTheme_NoActionBar_290, R.style.AppTheme_NoActionBar_295,
+             R.style.AppTheme_NoActionBar_300, R.style.AppTheme_NoActionBar_305,
+             R.style.AppTheme_NoActionBar_310, R.style.AppTheme_NoActionBar_315,
+             R.style.AppTheme_NoActionBar_320, R.style.AppTheme_NoActionBar_325,
+             R.style.AppTheme_NoActionBar_330, R.style.AppTheme_NoActionBar_335,
+             R.style.AppTheme_NoActionBar_340, R.style.AppTheme_NoActionBar_345,
+             R.style.AppTheme_NoActionBar_350, R.style.AppTheme_NoActionBar_355,
+             };
     public static void refreshColors(Resources.Theme theme) {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
@@ -176,7 +214,7 @@ public class Colors {
         // Relies that theme resource IDs are sequential numbers
         if (themeHue == 360) themeHue = 0;
         if ((themeHue >= 0) && (themeHue < 360) && ((themeHue % HueRing.hueStepDegrees) == 0)) {
-            themeId = R.style.AppTheme_NoActionBar_000 + (themeHue / HueRing.hueStepDegrees);
+            themeId = themeIDs[themeHue / HueRing.hueStepDegrees];
         }
 
         if (themeId < 0) {
