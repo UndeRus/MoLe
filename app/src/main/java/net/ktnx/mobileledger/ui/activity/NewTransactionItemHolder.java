@@ -171,7 +171,26 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         accountCountObserver = count -> {
-            if (getAdapterPosition() == count) tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            final int adapterPosition = getAdapterPosition();
+            final int layoutPosition = getLayoutPosition();
+            Logger.debug("holder",
+                    String.format(Locale.US, "count=%d; pos=%d, layoutPos=%d [%s]", count,
+                            adapterPosition, layoutPosition, item.getType()
+                                                                 .toString()
+                                                                 .concat(item.getType() ==
+                                                                         NewTransactionModel.ItemType.transactionRow
+                                                                         ? String.format(Locale.US,
+                                                                         "'%s'=%s",
+                                                                         item.getAccount()
+                                                                             .getAccountName(),
+                                                                         item.getAccount()
+                                                                             .isAmountSet()
+                                                                         ? String.format(Locale.US,
+                                                                                 "%.2f",
+                                                                                 item.getAccount()
+                                                                                     .getAmount())
+                                                                         : "unset") : "")));
+            if (adapterPosition == count) tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
             else tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         };
     }
