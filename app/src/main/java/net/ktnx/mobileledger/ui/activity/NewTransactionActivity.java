@@ -141,6 +141,7 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         if (profileUUID != null) {
             mProfile = Data.getProfile(profileUUID);
             if (mProfile == null) finish();
+            Data.setCurrentProfile(mProfile);
         }
         else super.initProfile();
     }

@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
@@ -83,6 +84,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             if (hasFocus) pickTransactionDate();
         });
         tvDate.setOnClickListener(v -> pickTransactionDate());
+
+        mProfile = Data.profile.getValue();
+        if (mProfile == null) throw new AssertionError();
 
         MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
