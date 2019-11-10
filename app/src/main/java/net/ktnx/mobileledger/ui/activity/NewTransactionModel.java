@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -173,7 +174,7 @@ public class NewTransactionModel extends ViewModel {
 
             if (single_empty_amount) {
                 empty_amount.setAmountHint(String.format(Locale.US, "%1.2f",
-                        (Math.abs(running_total) > 0.005) ? -running_total : 0f));
+                        Misc.isZero(running_total) ? 0f : -running_total));
             }
 
             debug("submittable", String.format(Locale.US,
