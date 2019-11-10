@@ -78,8 +78,11 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     @Override
     public void onBindViewHolder(@NonNull NewTransactionItemHolder holder, int position) {
         Logger.debug("bind", String.format(Locale.US, "Binding item at position %d", position));
-        holder.setData(model.getItem(position));
-        Logger.debug("bind", String.format(Locale.US, "Bound item at position %d", position));
+        NewTransactionModel.Item item = model.getItem(position);
+        holder.setData(item);
+        Logger.debug("bind", String.format(Locale.US, "Bound %s item at position %d", item.getType()
+                                                                                          .toString(),
+                position));
     }
     @Override
     public int getItemCount() {
