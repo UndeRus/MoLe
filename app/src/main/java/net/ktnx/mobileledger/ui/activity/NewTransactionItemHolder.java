@@ -121,15 +121,33 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         dateObserver = date -> {
             if (syncingData) return;
-            tvDate.setText(item.getFormattedDate());
+            syncingData = true;
+            try {
+                tvDate.setText(item.getFormattedDate());
+            }
+            finally {
+                syncingData = false;
+            }
         };
         descriptionObserver = description -> {
             if (syncingData) return;
-            tvDescription.setText(description);
+            syncingData = true;
+            try {
+                tvDescription.setText(description);
+            }
+            finally {
+                syncingData = false;
+            }
         };
         hintObserver = hint -> {
             if (syncingData) return;
-            tvAmount.setHint(hint);
+            syncingData = true;
+            try {
+                tvAmount.setHint(hint);
+            }
+            finally {
+                syncingData = false;
+            }
         };
         focusedAccountObserver = index -> {
             if ((index != null) && index.equals(getAdapterPosition())) {
