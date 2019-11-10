@@ -113,8 +113,10 @@ public class NewTransactionModel extends ViewModel {
         if (index == 0) {
             return header;
         }
-        else if (index <= items.size()) return items.get(index - 1);
-        else return trailer;
+
+        if (index <= items.size()) return items.get(index - 1);
+
+        return trailer;
     }
     // rules:
     // 1) at least two account names
