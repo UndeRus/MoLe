@@ -64,6 +64,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 String.format(Locale.US, "invoking notifyItemInserted(%d)", newAccountCount));
         // the header is at position 0
         notifyItemInserted(newAccountCount);
+        model.sendCountNotifications(); // needed after holders' positions have changed
         return newAccountCount;
     }
     @NonNull
@@ -176,9 +177,5 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         notifyItemRangeChanged(1, 2);    // the two empty rows
         if (presentItemCount > 2)
             notifyItemRangeRemoved(3, presentItemCount - 2); // all the rest are gone
-    }
-    public void removeItem(int pos) {
-        model.removeItem(pos - 1, this);
-        notifyItemRemoved(pos);
     }
 }

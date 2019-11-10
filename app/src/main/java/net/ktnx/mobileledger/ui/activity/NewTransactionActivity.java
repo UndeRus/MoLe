@@ -91,9 +91,14 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
             public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                         @NonNull RecyclerView.ViewHolder viewHolder) {
                 int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
-                if (viewModel.getAccountCount() > 2) flags |=
-                        makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
+                // the top item is always there (date and description)
+                if (viewHolder.getAdapterPosition() > 0) {
+                    if (viewModel.getAccountCount() > 2) {
+                        flags |= makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
                                 ItemTouchHelper.START | ItemTouchHelper.END);
+                    }
+                }
+
                 return flags;
             }
             @Override
@@ -109,9 +114,10 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
                             Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 else {
                     int pos = viewHolder.getAdapterPosition();
-                    listAdapter.removeItem(pos);
-                    // FIXME hook next/prev links somehow
-                    throw new RuntimeException("TODO");
+                    viewModel.removeItem(pos - 1);
+                    listAdapter.notifyItemRemoved(pos);
+                    viewModel.sendCountNotifications(); // needed after items re-arrangement
+                    viewModel.checkTransactionSubmittable(listAdapter);
                 }
             }
         }).attachToRecyclerView(list);

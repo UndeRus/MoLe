@@ -207,10 +207,12 @@ public class NewTransactionModel extends ViewModel {
             isSubmittable.setValue(false);
         }
     }
-    public void removeItem(int pos, NewTransactionItemsAdapter adapter) {
+    public void removeItem(int pos) {
         items.remove(pos);
         accountCount.setValue(getAccountCount());
-        checkTransactionSubmittable(adapter);
+    }
+    public void sendCountNotifications() {
+        accountCount.setValue(getAccountCount());
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
