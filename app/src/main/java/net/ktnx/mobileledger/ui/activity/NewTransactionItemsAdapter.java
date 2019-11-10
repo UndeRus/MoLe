@@ -83,10 +83,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     }
     @Override
     public int getItemCount() {
-        final int itemCount = model.getAccountCount() + 2;
-        Logger.debug("new-transaction",
-                String.format(Locale.US, "getItemCount() returning %d", itemCount));
-        return itemCount;
+        return model.getAccountCount() + 2;
     }
     boolean accountListIsEmpty() {
         for (int i = 0; i < model.getAccountCount(); i++) {
