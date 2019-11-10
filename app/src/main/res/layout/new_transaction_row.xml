@@ -63,6 +63,7 @@
             android:inputType="text"
             android:nextFocusLeft="@+id/new_transaction_date"
             android:nextFocusUp="@+id/new_transaction_date"
+            android:selectAllOnFocus="true"
             android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="30"
@@ -86,6 +87,7 @@
             android:inputType="text"
             android:imeOptions="actionNext"
             android:singleLine="true"
+            android:selectAllOnFocus="true"
             android:width="0dp" />
 
         <EditText

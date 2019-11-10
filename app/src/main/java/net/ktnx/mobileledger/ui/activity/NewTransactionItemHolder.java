@@ -158,7 +158,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     case transactionRow:
                         tvAccount.requestFocus();
                         tvAccount.dismissDropDown();
-                        tvAccount.selectAll();
                         break;
                 }
             }
