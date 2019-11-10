@@ -78,9 +78,11 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(v -> saveTransaction());
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar())
+               .setDisplayHomeAsUpEnabled(true);
         list = findViewById(R.id.new_transaction_accounts);
-        viewModel = ViewModelProviders.of(this).get(NewTransactionModel.class);
+        viewModel = ViewModelProviders.of(this)
+                                      .get(NewTransactionModel.class);
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(this));
@@ -111,7 +113,9 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 if (viewModel.getAccountCount() == 2)
                     Snackbar.make(list, R.string.msg_at_least_two_accounts_are_required,
-                            Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                            Snackbar.LENGTH_LONG)
+                            .setAction("Action", null)
+                            .show();
                 else {
                     int pos = viewHolder.getAdapterPosition();
                     viewModel.removeItem(pos - 1);
@@ -122,22 +126,23 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
             }
         }).attachToRecyclerView(list);
 
-        viewModel.isSubmittable().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean isSubmittable) {
-                if (isSubmittable) {
-                    if (fab != null) {
-                        fab.show();
-                        fab.setEnabled(true);
-                    }
-                }
-                else {
-                    if (fab != null) {
-                        fab.hide();
-                    }
-                }
-            }
-        });
+        viewModel.isSubmittable()
+                 .observe(this, new Observer<Boolean>() {
+                     @Override
+                     public void onChanged(Boolean isSubmittable) {
+                         if (isSubmittable) {
+                             if (fab != null) {
+                                 fab.show();
+                                 fab.setEnabled(true);
+                             }
+                         }
+                         else {
+                             if (fab != null) {
+                                 fab.hide();
+                             }
+                         }
+                     }
+                 });
         viewModel.checkTransactionSubmittable(listAdapter);
     }
     @Override
@@ -180,14 +185,15 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
 
             Date date = viewModel.getDate();
             LedgerTransaction tr =
-                    new LedgerTransaction(null, date, viewModel.getDescription(),
-                            mProfile);
+                    new LedgerTransaction(null, date, viewModel.getDescription(), mProfile);
 
             LedgerTransactionAccount emptyAmountAccount = null;
             float emptyAmountAccountBalance = 0;
             for (int i = 0; i < viewModel.getAccountCount(); i++) {
                 LedgerTransactionAccount acc = viewModel.getAccount(i);
-                if (acc.getAccountName().trim().isEmpty()) continue;
+                if (acc.getAccountName()
+                       .trim()
+                       .isEmpty()) continue;
 
                 if (acc.isAmountSet()) {
                     emptyAmountAccountBalance += acc.getAmount();
@@ -220,7 +226,8 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         getMenuInflater().inflate(R.menu.new_transaction, menu);
 
         if (BuildConfig.DEBUG) {
-            menu.findItem(R.id.action_simulate_crash).setVisible(true);
+            menu.findItem(R.id.action_simulate_crash)
+                .setVisible(true);
         }
 
         return true;
@@ -240,7 +247,8 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         debug("visuals", "hiding progress");
 
         if (error == null) resetForm();
-        else Snackbar.make(list, error, BaseTransientBottomBar.LENGTH_LONG).show();
+        else Snackbar.make(list, error, BaseTransientBottomBar.LENGTH_LONG)
+                     .show();
 
         listAdapter.toggleAllEditing(true);
         viewModel.checkTransactionSubmittable(listAdapter);
