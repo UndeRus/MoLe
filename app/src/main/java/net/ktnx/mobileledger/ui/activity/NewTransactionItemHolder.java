@@ -63,6 +63,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<String> hintObserver;
     private Observer<Integer> focusedAccountObserver;
     private Observer<Integer> accountCountObserver;
+    private Observer<Boolean> editableObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
@@ -148,6 +149,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 syncingData = false;
             }
         };
+        editableObserver = this::setEditable;
         focusedAccountObserver = index -> {
             if ((index != null) && index.equals(getAdapterPosition())) {
                 switch (item.getType()) {
@@ -193,6 +195,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             if (adapterPosition == count) tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
             else tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         };
+    }
+    private void setEditable(Boolean editable) {
+        tvDate.setEnabled(editable);
+        tvDescription.setEnabled(editable);
+        tvAccount.setEnabled(editable);
+        tvAmount.setEnabled(editable);
     }
     private void beginUpdates() {
         if (inUpdate) throw new RuntimeException("Already in update mode");
@@ -263,6 +271,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 this.item.stopObservingDate(dateObserver);
                 this.item.stopObservingDescription(descriptionObserver);
                 this.item.stopObservingAmountHint(hintObserver);
+                this.item.stopObservingEditableFlag(editableObserver);
                 this.item.getModel()
                          .stopObservingFocusedItem(focusedAccountObserver);
                 this.item.getModel()
@@ -278,6 +287,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     lHead.setVisibility(View.VISIBLE);
                     lAccount.setVisibility(View.GONE);
                     lPadding.setVisibility(View.GONE);
+                    setEditable(true);
                     break;
                 case transactionRow:
                     LedgerTransactionAccount acc = item.getAccount();
@@ -288,11 +298,13 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     lHead.setVisibility(View.GONE);
                     lAccount.setVisibility(View.VISIBLE);
                     lPadding.setVisibility(View.GONE);
+                    setEditable(true);
                     break;
                 case bottomFiller:
                     lHead.setVisibility(View.GONE);
                     lAccount.setVisibility(View.GONE);
                     lPadding.setVisibility(View.VISIBLE);
+                    setEditable(false);
                     break;
             }
 
@@ -303,6 +315,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 item.observeDate(activity, dateObserver);
                 item.observeDescription(activity, descriptionObserver);
                 item.observeAmountHint(activity, hintObserver);
+                item.observeEditableFlag(activity, editableObserver);
                 item.getModel()
                     .observeFocusedItem(activity, focusedAccountObserver);
                 item.getModel()

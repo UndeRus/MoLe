@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.activity;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
@@ -223,32 +224,35 @@ public class NewTransactionModel extends ViewModel {
         private LedgerTransactionAccount account;
         private MutableLiveData<String> amountHint = new MutableLiveData<>();
         private NewTransactionModel model;
-        private boolean editable = true;
+        private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
         public Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
+            editable.setValue(false);
         }
         public Item(NewTransactionModel model, Date date, String description) {
             this.model = model;
             this.type = ItemType.generalData;
             this.date.setValue(date);
             this.description.setValue(description);
+            this.editable.setValue(true);
         }
         public Item(NewTransactionModel model, LedgerTransactionAccount account) {
             this.model = model;
             this.type = ItemType.transactionRow;
             this.account = account;
+            this.editable.setValue(true);
         }
         public NewTransactionModel getModel() {
             return model;
         }
         public boolean isEditable() {
             ensureType(ItemType.transactionRow);
-            return editable;
+            return this.editable.getValue();
         }
         public void setEditable(boolean editable) {
             ensureType(ItemType.transactionRow);
-            this.editable = editable;
+            this.editable.setValue(editable);
         }
         public String getAmountHint() {
             ensureType(ItemType.transactionRow);
@@ -375,6 +379,13 @@ public class NewTransactionModel extends ViewModel {
             }
 
             return String.valueOf(myDay);
+        }
+        public void observeEditableFlag(NewTransactionActivity activity,
+                                        Observer<Boolean> observer) {
+            editable.observe(activity, observer);
+        }
+        public void stopObservingEditableFlag(Observer<Boolean> observer) {
+            editable.removeObserver(observer);
         }
     }
 }
