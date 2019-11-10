@@ -17,8 +17,24 @@
 
 package net.ktnx.mobileledger.utils;
 
+import android.app.Activity;
+import android.view.WindowManager;
+
+import androidx.fragment.app.Fragment;
+
 public class Misc {
     public static boolean isZero(float f) {
         return (f < 0.005) && (f > -0.005);
+    }
+    public static void showSoftKeyboard(Activity activity) {
+        // make the keyboard appear
+        activity.getWindow()
+                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+    public static void showSoftKeyboard(Fragment fragment) {
+        // make the keyboard appear
+        fragment.getActivity()
+                .getWindow()
+                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 }

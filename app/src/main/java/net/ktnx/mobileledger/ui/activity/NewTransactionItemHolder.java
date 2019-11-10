@@ -17,12 +17,10 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
-import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -41,6 +39,7 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -153,11 +152,20 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             if ((index != null) && index.equals(getAdapterPosition())) {
                 switch (item.getType()) {
                     case generalData:
-                        tvDate.requestFocus();
+                        // bad idea - double pop-up, and not really necessary.
+                        // the user can tap the input to get the calendar
+                        //if (!tvDate.hasFocus()) tvDate.requestFocus();
+                        boolean focused = tvDescription.requestFocus();
+                        tvDescription.dismissDropDown();
+                        if (focused) Misc.showSoftKeyboard(
+                                (NewTransactionActivity) tvDescription.getContext());
                         break;
                     case transactionRow:
-                        tvAccount.requestFocus();
+                        focused = tvAccount.requestFocus();
                         tvAccount.dismissDropDown();
+                        if (focused)
+                            Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+
                         break;
                 }
             }
@@ -291,14 +299,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         final Calendar c = GregorianCalendar.getInstance();
         c.set(year, month, day);
         item.setDate(c.getTime());
-        boolean tookFocus = tvDescription.requestFocus();
-        if (tookFocus) {
-            // make the keyboard appear
-            InputMethodManager imm = (InputMethodManager) tvDate.getContext()
-                                                                .getSystemService(
-                                                                        Context.INPUT_METHOD_SERVICE);
-            imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-        }
+        boolean focused = tvDescription.requestFocus();
+        if (focused) Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+
     }
     @Override
     public void descriptionSelected(String description) {
