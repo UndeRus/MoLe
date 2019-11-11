@@ -32,9 +32,6 @@ public class Misc {
                 .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
     public static void showSoftKeyboard(Fragment fragment) {
-        // make the keyboard appear
-        fragment.getActivity()
-                .getWindow()
-                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        showSoftKeyboard(fragment.getActivity());
     }
 }
