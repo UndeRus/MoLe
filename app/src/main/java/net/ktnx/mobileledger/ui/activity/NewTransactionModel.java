@@ -279,7 +279,7 @@ public class NewTransactionModel extends ViewModel {
         public void ensureType(ItemType wantedType) {
             if (type != wantedType) {
                 throw new RuntimeException(
-                        String.format("Actual type (%d) differs from wanted (%s)", type,
+                        String.format("Actual type (%s) differs from wanted (%s)", type,
                                 wantedType));
             }
         }
