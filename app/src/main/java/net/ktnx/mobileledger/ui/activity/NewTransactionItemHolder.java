@@ -239,8 +239,20 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     String amount = String.valueOf(tvAmount.getText());
                     amount = amount.trim();
 
-                    if (!amount.isEmpty()) item.getAccount()
-                                               .setAmount(Float.parseFloat(amount));
+                    if (!amount.isEmpty()) {
+                        try {
+                            item.getAccount()
+                                .setAmount(Float.parseFloat(amount));
+                        }
+                        catch (NumberFormatException e) {
+                            Logger.debug("new-trans", String.format(
+                                    "assuming amount is not set due to number format exception. " +
+                                    "input was '%s'",
+                                    amount));
+                            item.getAccount()
+                                .resetAmount();
+                        }
+                    }
                     else item.getAccount()
                              .resetAmount();
 
