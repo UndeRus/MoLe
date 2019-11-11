@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.view.WindowManager;
 
 import androidx.fragment.app.Fragment;
@@ -28,8 +29,11 @@ public class Misc {
     }
     public static void showSoftKeyboard(Activity activity) {
         // make the keyboard appear
-        activity.getWindow()
-                .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        Configuration cf = activity.getResources()
+                                   .getConfiguration();
+        if (cf.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES)
+            activity.getWindow()
+                    .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
     public static void showSoftKeyboard(Fragment fragment) {
         showSoftKeyboard(fragment.getActivity());
