@@ -31,7 +31,8 @@ public class Misc {
         // make the keyboard appear
         Configuration cf = activity.getResources()
                                    .getConfiguration();
-        if (cf.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES)
+        if (cf.keyboard == Configuration.KEYBOARD_NOKEYS ||
+            cf.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES)
             activity.getWindow()
                     .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
