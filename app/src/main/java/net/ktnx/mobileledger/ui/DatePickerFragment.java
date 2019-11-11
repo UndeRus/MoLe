@@ -88,9 +88,9 @@ public class DatePickerFragment extends AppCompatDialogFragment
     @Override
     public void onSelectedDayChange(@NonNull CalendarView view, int year, int month,
                                     int dayOfMonth) {
+        this.dismiss();
         if (onDatePickedListener != null)
             onDatePickedListener.onDatePicked(year, month, dayOfMonth);
-        this.dismiss();
     }
     public void setOnDatePickedListener(DatePickedListener listener) {
         onDatePickedListener = listener;
