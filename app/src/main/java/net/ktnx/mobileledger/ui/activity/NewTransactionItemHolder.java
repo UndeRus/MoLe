@@ -81,12 +81,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAmount.setNextFocusForwardId(View.NO_ID); // magic!
 
         tvDate.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) pickTransactionDate();
+            if (hasFocus)
+                pickTransactionDate();
         });
         tvDate.setOnClickListener(v -> pickTransactionDate());
 
         mProfile = Data.profile.getValue();
-        if (mProfile == null) throw new AssertionError();
+        if (mProfile == null)
+            throw new AssertionError();
 
         MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
@@ -105,7 +107,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             @Override
             public void afterTextChanged(Editable s) {
 //                debug("input", "text changed");
-                if (inUpdate) return;
+                if (inUpdate)
+                    return;
 
                 Logger.debug("textWatcher", "calling syncData()");
                 syncData();
@@ -120,7 +123,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAmount.addTextChangedListener(tw);
 
         dateObserver = date -> {
-            if (syncingData) return;
+            if (syncingData)
+                return;
             syncingData = true;
             try {
                 tvDate.setText(item.getFormattedDate());
@@ -130,7 +134,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         descriptionObserver = description -> {
-            if (syncingData) return;
+            if (syncingData)
+                return;
             syncingData = true;
             try {
                 tvDescription.setText(description);
@@ -140,7 +145,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         hintObserver = hint -> {
-            if (syncingData) return;
+            if (syncingData)
+                return;
             syncingData = true;
             try {
                 tvAmount.setHint(hint);
@@ -159,8 +165,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         //if (!tvDate.hasFocus()) tvDate.requestFocus();
                         boolean focused = tvDescription.requestFocus();
                         tvDescription.dismissDropDown();
-                        if (focused) Misc.showSoftKeyboard(
-                                (NewTransactionActivity) tvDescription.getContext());
+                        if (focused)
+                            Misc.showSoftKeyboard(
+                                    (NewTransactionActivity) tvDescription.getContext());
                         break;
                     case transactionRow:
                         focused = tvAccount.requestFocus();
@@ -192,8 +199,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                                                                  item.getAccount()
                                                                                      .getAmount())
                                                                          : "unset") : "")));
-            if (adapterPosition == count) tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
-            else tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+            if (adapterPosition == count)
+                tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            else
+                tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         };
     }
     private void setEditable(Boolean editable) {
@@ -203,11 +212,13 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAmount.setEnabled(editable);
     }
     private void beginUpdates() {
-        if (inUpdate) throw new RuntimeException("Already in update mode");
+        if (inUpdate)
+            throw new RuntimeException("Already in update mode");
         inUpdate = true;
     }
     private void endUpdates() {
-        if (!inUpdate) throw new RuntimeException("Not in update mode");
+        if (!inUpdate)
+            throw new RuntimeException("Not in update mode");
         inUpdate = false;
     }
     /**
@@ -216,7 +227,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
      * Stores the data from the UI elements into the model item
      */
     private void syncData() {
-        if (item == null) return;
+        if (item == null)
+            return;
 
         if (syncingData) {
             Logger.debug("new-trans", "skipping syncData() loop");
@@ -253,8 +265,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                 .resetAmount();
                         }
                     }
-                    else item.getAccount()
-                             .resetAmount();
+                    else
+                        item.getAccount()
+                            .resetAmount();
 
                     break;
                 case bottomFiller:
@@ -344,7 +357,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         c.set(year, month, day);
         item.setDate(c.getTime());
         boolean focused = tvDescription.requestFocus();
-        if (focused) Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+        if (focused)
+            Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
 
     }
     @Override
