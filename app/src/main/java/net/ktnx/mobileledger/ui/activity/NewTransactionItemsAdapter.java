@@ -144,7 +144,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             for (int i = 0; i < accounts.size(); i++) {
                 LedgerTransactionAccount acc = accounts.get(i);
                 NewTransactionModel.Item item;
-                if (model.getAccountCount() < i) {
+                if (model.getAccountCount() < i + 1) {
                     model.addAccount(acc);
                     notifyItemInserted(i + 1);
                 }
