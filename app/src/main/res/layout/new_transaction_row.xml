@@ -101,7 +101,7 @@
             android:gravity="bottom|end"
             android:hint="0.00"
             android:inputType="numberSigned|numberDecimal"
-            android:minWidth="60sp"
+            android:minWidth="70sp"
             android:textAlignment="viewEnd"
             android:selectAllOnFocus="true"
             tools:ignore="HardcodedText"
