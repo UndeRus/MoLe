@@ -300,7 +300,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     String amount = String.valueOf(tvAmount.getText());
                     amount = amount.trim();
 
-                    if (!amount.isEmpty()) {
+                    if (amount.isEmpty()) {
+                        item.getAccount()
+                            .resetAmount();
+                    }
+                    else {
                         try {
                             amount = amount.replace(decimalSeparator, decimalDot);
                             item.getAccount()
@@ -315,9 +319,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                 .resetAmount();
                         }
                     }
-                    else
-                        item.getAccount()
-                            .resetAmount();
 
                     break;
                 case bottomFiller:
