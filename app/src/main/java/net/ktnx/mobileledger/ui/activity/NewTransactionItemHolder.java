@@ -18,8 +18,10 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
@@ -42,6 +44,7 @@ import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
+import java.text.DecimalFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -49,6 +52,8 @@ import java.util.Locale;
 
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
         implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
+    private final String decimalSeparator;
+    private final String decimalDot;
     private NewTransactionModel.Item item;
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
@@ -96,6 +101,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
                 "name", true, this, mProfile);
 
+        // FIXME: react on configuration (locale) changes
+        decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance()
+                                                              .getMonetaryDecimalSeparator());
+        decimalDot = ".";
+
         final TextWatcher tw = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -119,9 +129,44 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 Logger.debug("textWatcher", "done");
             }
         };
+        final TextWatcher amountWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    // only one decimal separator is allowed
+                    // plus and minus are allowed only at the beginning
+                    String val = s.toString();
+                    if (val.isEmpty())
+                        tvAmount.setKeyListener(DigitsKeyListener.getInstance(
+                                "0123456789+-" + decimalSeparator + decimalDot));
+                    else if (val.contains(decimalSeparator) || val.contains(decimalDot))
+                        tvAmount.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
+                    else
+                        tvAmount.setKeyListener(DigitsKeyListener.getInstance(
+                                "0123456789" + decimalSeparator + decimalDot));
+
+                    syncData();
+                    adapter.model.checkTransactionSubmittable(adapter);
+                }
+            }
+        };
         tvDescription.addTextChangedListener(tw);
         tvAccount.addTextChangedListener(tw);
-        tvAmount.addTextChangedListener(tw);
+        tvAmount.addTextChangedListener(amountWatcher);
+
+        // FIXME: react on locale changes
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            tvAmount.setKeyListener(DigitsKeyListener.getInstance(Locale.getDefault(), true, true));
+        else
+            tvAmount.setKeyListener(
+                    DigitsKeyListener.getInstance("0123456789+-" + decimalSeparator + decimalDot));
 
         dateObserver = date -> {
             if (syncingData)
@@ -257,6 +302,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     if (!amount.isEmpty()) {
                         try {
+                            amount = amount.replace(decimalSeparator, decimalDot);
                             item.getAccount()
                                 .setAmount(Float.parseFloat(amount));
                         }
