@@ -98,10 +98,12 @@ public class NewTransactionModel extends ViewModel {
     boolean accountsInInitialState() {
         for (Item item : items) {
             LedgerTransactionAccount acc = item.getAccount();
-            if (acc.isAmountSet()) return false;
+            if (acc.isAmountSet())
+                return false;
             if (!acc.getAccountName()
                     .trim()
-                    .isEmpty()) return false;
+                    .isEmpty())
+                return false;
         }
 
         return true;
@@ -115,7 +117,8 @@ public class NewTransactionModel extends ViewModel {
             return header;
         }
 
-        if (index <= items.size()) return items.get(index - 1);
+        if (index <= items.size())
+            return items.get(index - 1);
 
         return trailer;
     }
@@ -384,9 +387,11 @@ public class NewTransactionModel extends ViewModel {
          * @return nicely formatted, shortest available date representation
          */
         public String getFormattedDate() {
-            if (date == null) return null;
+            if (date == null)
+                return null;
             Date time = date.getValue();
-            if (time == null) return null;
+            if (time == null)
+                return null;
 
             Calendar c = GregorianCalendar.getInstance();
             c.setTime(time);
