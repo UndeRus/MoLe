@@ -43,6 +43,7 @@ public class NewTransactionModel extends ViewModel {
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
+    private static final String ZERO_AMOUNT_HINT = "0.00";
     private final Item header = new Item(this, null, "");
     private final Item trailer = new Item(this);
     private final ArrayList<Item> items = new ArrayList<>();
@@ -145,27 +146,31 @@ public class NewTransactionModel extends ViewModel {
                 LedgerTransactionAccount acc = item.getAccount();
                 String acc_name = acc.getAccountName()
                                      .trim();
-                if (!acc_name.isEmpty()) {
+                if (acc_name.isEmpty()) {
+                    empty_rows++;
+                }
+                else {
                     accounts++;
 
                     if (acc.isAmountSet()) {
                         accounts_with_values++;
                     }
                 }
-                else empty_rows++;
 
-                if (!acc.isAmountSet()) {
+                if (acc.isAmountSet()) {
+                    amounts++;
+                    if (!acc_name.isEmpty())
+                        amounts_with_accounts++;
+                    running_total += acc.getAmount();
+                }
+                else {
                     if (empty_amount == null) {
                         empty_amount = item;
                         single_empty_amount = true;
                         single_empty_amount_has_account = !acc_name.isEmpty();
                     }
-                    else if (!acc_name.isEmpty()) single_empty_amount = false;
-                }
-                else {
-                    amounts++;
-                    if (!acc_name.isEmpty()) amounts_with_accounts++;
-                    running_total += acc.getAmount();
+                    else if (!acc_name.isEmpty())
+                        single_empty_amount = false;
                 }
             }
 
@@ -175,9 +180,28 @@ public class NewTransactionModel extends ViewModel {
                 adapter.addRow();
             }
 
-            if (single_empty_amount) {
-                empty_amount.setAmountHint(String.format(Locale.US, "%1.2f",
-                        Misc.isZero(running_total) ? 0f : -running_total));
+            for (NewTransactionModel.Item item : items) {
+
+                final LedgerTransactionAccount acc = item.getAccount();
+                if (acc.isAmountSet())
+                    continue;
+
+                if (single_empty_amount) {
+                    if (item.equals(empty_amount)) {
+                        empty_amount.setAmountHint(String.format(Locale.US, "%1.2f",
+                                Misc.isZero(running_total) ? 0f : -running_total));
+                        continue;
+                    }
+                }
+                else {
+                    // no single empty account and this account's amount is not set
+                    // => hint should be '0.00'
+                    String hint = item.getAmountHint();
+                    if ((hint == null) || !hint.equals(ZERO_AMOUNT_HINT)) {
+                        item.setAmountHint(ZERO_AMOUNT_HINT);
+                    }
+                }
+
             }
 
             debug("submittable", String.format(Locale.US,
