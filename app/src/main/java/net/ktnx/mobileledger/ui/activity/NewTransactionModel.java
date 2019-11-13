@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -43,7 +45,6 @@ public class NewTransactionModel extends ViewModel {
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
-    private static final String ZERO_AMOUNT_HINT = "0.00";
     private final Item header = new Item(this, null, "");
     private final Item trailer = new Item(this);
     private final ArrayList<Item> items = new ArrayList<>();
@@ -129,6 +130,7 @@ public class NewTransactionModel extends ViewModel {
     // 3a) there must be exactly one empty amount
     // 4) empty accounts with empty amounts are ignored
     // 5) a row with an empty account name or empty amount is guaranteed to exist
+    @SuppressLint("DefaultLocale")
     public void checkTransactionSubmittable(NewTransactionItemsAdapter adapter) {
         int accounts = 0;
         int accounts_with_values = 0;
@@ -191,18 +193,17 @@ public class NewTransactionModel extends ViewModel {
 
                 if (single_empty_amount) {
                     if (item.equals(empty_amount)) {
-                        empty_amount.setAmountHint(String.format(Locale.US, "%1.2f",
-                                Misc.isZero(running_total) ? 0f : -running_total));
+                        empty_amount.setAmountHint(Misc.isZero(running_total) ? null
+                                                                              : String.format(
+                                                                                      "%1.2f",
+                                                                                      -running_total));
                         continue;
                     }
                 }
                 else {
                     // no single empty account and this account's amount is not set
                     // => hint should be '0.00'
-                    String hint = item.getAmountHint();
-                    if ((hint == null) || !hint.equals(ZERO_AMOUNT_HINT)) {
-                        item.setAmountHint(ZERO_AMOUNT_HINT);
-                    }
+                    item.setAmountHint(null);
                 }
 
             }

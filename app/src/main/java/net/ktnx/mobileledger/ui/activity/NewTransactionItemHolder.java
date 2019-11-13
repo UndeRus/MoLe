@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -149,6 +150,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 return;
             syncingData = true;
             try {
+                if (hint == null)
+                    hint = tvAmount.getResources()
+                                   .getString(R.string.zero_amount);
                 tvAmount.setHint(hint);
             }
             finally {
@@ -289,6 +293,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
      *
      * @param item updates the UI elements with the data from the model item
      */
+    @SuppressLint("DefaultLocale")
     public void setData(NewTransactionModel.Item item) {
         beginUpdates();
         try {
@@ -318,8 +323,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     LedgerTransactionAccount acc = item.getAccount();
                     tvAccount.setText(acc.getAccountName());
                     tvAmount.setText(
-                            acc.isAmountSet() ? String.format(Locale.US, "%1.2f", acc.getAmount())
-                                              : "");
+                            acc.isAmountSet() ? String.format("%1.2f", acc.getAmount()) : "");
                     lHead.setVisibility(View.GONE);
                     lAccount.setVisibility(View.VISIBLE);
                     lPadding.setVisibility(View.GONE);

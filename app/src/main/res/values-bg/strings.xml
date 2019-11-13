@@ -112,5 +112,6 @@
     <string name="err_invalid_url">Грешен или непълен адрес</string>
     <string name="btn_color_picker_button">Бутон за избор на цвят</string>
     <string name="insecure_scheme_with_auth">ВНИМАНИЕ: Използване на удостоверяване с несигурна схема на достъп</string>
+    <string name="zero_amount">0,00</string>
 
 </resources>

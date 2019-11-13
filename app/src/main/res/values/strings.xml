@@ -154,4 +154,5 @@
     <string name="err_invalid_url">Invalid URL</string>
     <string name="btn_color_picker_button">Color picker button</string>
     <string name="insecure_scheme_with_auth">WARNING: Insecure http used with authentication</string>
+    <string name="zero_amount">0.00</string>
 </resources>

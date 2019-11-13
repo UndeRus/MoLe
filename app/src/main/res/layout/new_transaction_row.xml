@@ -99,12 +99,11 @@
             android:width="0dp"
             android:foregroundGravity="bottom"
             android:gravity="bottom|end"
-            android:hint="0.00"
-            android:inputType="numberSigned|numberDecimal"
+            android:hint="@string/zero_amount"
+            android:inputType="numberSigned|numberDecimal|number"
             android:minWidth="70sp"
             android:textAlignment="viewEnd"
             android:selectAllOnFocus="true"
-            tools:ignore="HardcodedText"
             android:imeOptions="actionNext"/>
 
     </LinearLayout>
