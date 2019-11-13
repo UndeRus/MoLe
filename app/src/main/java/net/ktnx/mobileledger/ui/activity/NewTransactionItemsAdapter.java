@@ -91,15 +91,18 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         for (int i = 0; i < model.getAccountCount(); i++) {
             LedgerTransactionAccount acc = model.getAccount(i);
             if (!acc.getAccountName()
-                    .isEmpty()) return false;
-            if (acc.isAmountSet()) return false;
+                    .isEmpty())
+                return false;
+            if (acc.isAmountSet())
+                return false;
         }
 
         return true;
     }
     public void descriptionSelected(String description) {
         debug("descr selected", description);
-        if (!accountListIsEmpty()) return;
+        if (!accountListIsEmpty())
+            return;
 
         String accFilter = mProfile.getPreferredAccountsFilter();
 
@@ -126,15 +129,18 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         try (Cursor c = App.getDatabase()
                            .rawQuery(sql, params.toArray(new String[]{})))
         {
-            if (!c.moveToNext()) return;
+            if (!c.moveToNext())
+                return;
 
             String profileUUID = c.getString(0);
             int transactionId = c.getInt(1);
             LedgerTransaction tr;
             MobileLedgerProfile profile = Data.getProfile(profileUUID);
-            if (profile == null) throw new RuntimeException(String.format(
-                    "Unable to find profile %s, which is supposed to contain " +
-                    "transaction %d with description %s", profileUUID, transactionId, description));
+            if (profile == null)
+                throw new RuntimeException(String.format(
+                        "Unable to find profile %s, which is supposed to contain " +
+                        "transaction %d with description %s", profileUUID, transactionId,
+                        description));
 
             tr = profile.loadTransaction(transactionId);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
