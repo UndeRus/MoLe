@@ -21,7 +21,6 @@ import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TableRow;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -139,7 +138,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
 
             tr = profile.loadTransaction(transactionId);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
-            TableRow firstNegative = null;
+            NewTransactionModel.Item firstNegative = null;
+            boolean singleNegative = false;
             int negativeCount = 0;
             for (int i = 0; i < accounts.size(); i++) {
                 LedgerTransactionAccount acc = accounts.get(i);
@@ -152,11 +152,27 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
 
                 item.getAccount()
                     .setAccountName(acc.getAccountName());
-                if (acc.isAmountSet()) item.getAccount()
-                                           .setAmount(acc.getAmount());
-                else item.getAccount()
-                         .resetAmount();
+                if (acc.isAmountSet()) {
+                    item.getAccount()
+                        .setAmount(acc.getAmount());
+                    if (acc.getAmount() < 0) {
+                        if (firstNegative == null) {
+                            firstNegative = item;
+                            singleNegative = true;
+                        }
+                        else
+                            singleNegative = false;
+                    }
+                }
+                else
+                    item.getAccount()
+                        .resetAmount();
                 notifyItemChanged(i + 1);
+            }
+
+            if (singleNegative) {
+                firstNegative.getAccount()
+                             .resetAmount();
             }
         }
         model.checkTransactionSubmittable(this);
