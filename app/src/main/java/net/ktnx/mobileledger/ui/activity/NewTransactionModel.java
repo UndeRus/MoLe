@@ -290,6 +290,17 @@ public class NewTransactionModel extends ViewModel {
         }
         public void setAmountHint(String amountHint) {
             ensureType(ItemType.transactionRow);
+
+            // avoid unnecessary triggers
+            if (amountHint == null) {
+                if (this.amountHint.getValue() == null)
+                    return;
+            }
+            else {
+                if (amountHint.equals(this.amountHint.getValue()))
+                    return;
+            }
+
             this.amountHint.setValue(amountHint);
         }
         public void observeAmountHint(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
