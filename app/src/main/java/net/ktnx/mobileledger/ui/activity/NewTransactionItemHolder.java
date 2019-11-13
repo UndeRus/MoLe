@@ -313,8 +313,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         catch (NumberFormatException e) {
                             Logger.debug("new-trans", String.format(
                                     "assuming amount is not set due to number format exception. " +
-                                    "input was '%s'",
-                                    amount));
+                                    "input was '%s'", amount));
                             item.getAccount()
                                 .resetAmount();
                         }
