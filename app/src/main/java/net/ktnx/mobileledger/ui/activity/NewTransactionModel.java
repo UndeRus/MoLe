@@ -277,7 +277,7 @@ public class NewTransactionModel extends ViewModel {
             return model;
         }
         public void setEditable(boolean editable) {
-            ensureType(ItemType.transactionRow);
+            ensureType(ItemType.generalData, ItemType.transactionRow);
             this.editable.setValue(editable);
         }
         private void ensureType(ItemType type1, ItemType type2) {
