@@ -196,9 +196,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             syncingData = true;
             try {
                 if (hint == null)
-                    hint = tvAmount.getResources()
-                                   .getString(R.string.zero_amount);
-                tvAmount.setHint(hint);
+                    tvAmount.setHint(R.string.zero_amount);
+                else
+                    tvAmount.setHint(hint);
             }
             finally {
                 syncingData = false;
