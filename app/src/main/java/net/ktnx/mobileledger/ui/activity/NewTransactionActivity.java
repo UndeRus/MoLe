@@ -151,10 +151,12 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
 
         if (profileUUID != null) {
             mProfile = Data.getProfile(profileUUID);
-            if (mProfile == null) finish();
+            if (mProfile == null)
+                finish();
             Data.setCurrentProfile(mProfile);
         }
-        else super.initProfile();
+        else
+            super.initProfile();
     }
     @Override
     public void finish() {
@@ -176,7 +178,8 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         // FIXME if (tvDescription.getText().toString().isEmpty()) tvDescription.requestFocus();
     }
     public void saveTransaction() {
-        if (fab != null) fab.setEnabled(false);
+        if (fab != null)
+            fab.setEnabled(false);
         listAdapter.toggleAllEditing(false);
         progress.setVisibility(View.VISIBLE);
         try {
@@ -193,7 +196,8 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
                 LedgerTransactionAccount acc = viewModel.getAccount(i);
                 if (acc.getAccountName()
                        .trim()
-                       .isEmpty()) continue;
+                       .isEmpty())
+                    continue;
 
                 if (acc.isAmountSet()) {
                     emptyAmountAccountBalance += acc.getAmount();
@@ -214,7 +218,8 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
 
             progress.setVisibility(View.GONE);
             listAdapter.toggleAllEditing(true);
-            if (fab != null) fab.setEnabled(true);
+            if (fab != null)
+                fab.setEnabled(true);
         }
     }
     public void simulateCrash(MenuItem item) {
@@ -248,10 +253,12 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
 
         if (error == null)
             listAdapter.reset();
-        else Snackbar.make(list, error, BaseTransientBottomBar.LENGTH_LONG)
-                     .show();
+        else
+            Snackbar.make(list, error, BaseTransientBottomBar.LENGTH_LONG)
+                    .show();
 
         listAdapter.toggleAllEditing(true);
+
         viewModel.checkTransactionSubmittable(listAdapter);
     }
 

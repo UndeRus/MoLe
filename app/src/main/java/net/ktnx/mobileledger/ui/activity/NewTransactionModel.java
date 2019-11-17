@@ -247,6 +247,8 @@ public class NewTransactionModel extends ViewModel {
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
+    //==========================================================================================
+
     class Item extends Object {
         private ItemType type;
         private MutableLiveData<Date> date = new MutableLiveData<>();
