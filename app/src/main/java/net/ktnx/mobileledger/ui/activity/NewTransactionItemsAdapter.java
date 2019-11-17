@@ -185,11 +185,12 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         model.setFocusedItem(1);
     }
     public void toggleAllEditing(boolean editable) {
-        for (int i = 0; i < model.getAccountCount(); i++) {
-            model.getItem(i + 1)
+        // item 0 is the header
+        for (int i = 0; i <= model.getAccountCount(); i++) {
+            model.getItem(i)
                  .setEditable(editable);
-            notifyItemChanged(i + 1);
-            // TODO perhaps do only one notification about the whole range [1…count]?
+            notifyItemChanged(i);
+            // TODO perhaps do only one notification about the whole range (notifyDatasetChanged)?
         }
     }
     public void reset() {
