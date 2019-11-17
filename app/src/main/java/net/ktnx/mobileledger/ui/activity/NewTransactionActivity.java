@@ -27,7 +27,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -127,19 +126,16 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         }).attachToRecyclerView(list);
 
         viewModel.isSubmittable()
-                 .observe(this, new Observer<Boolean>() {
-                     @Override
-                     public void onChanged(Boolean isSubmittable) {
-                         if (isSubmittable) {
-                             if (fab != null) {
-                                 fab.show();
-                                 fab.setEnabled(true);
-                             }
+                 .observe(this, isSubmittable -> {
+                     if (isSubmittable) {
+                         if (fab != null) {
+                             fab.show();
+                             fab.setEnabled(true);
                          }
-                         else {
-                             if (fab != null) {
-                                 fab.hide();
-                             }
+                     }
+                     else {
+                         if (fab != null) {
+                             fab.hide();
                          }
                      }
                  });
