@@ -368,8 +368,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 case transactionRow:
                     LedgerTransactionAccount acc = item.getAccount();
                     tvAccount.setText(acc.getAccountName());
-                    tvAmount.setText(
-                            acc.isAmountSet() ? String.format("%1.2f", acc.getAmount()) : "");
+                    if (acc.isAmountSet()) {
+                        tvAmount.setText(String.format("%1.2f", acc.getAmount()));
+                    }
+                    else {
+                        tvAmount.setText("");
+//                        tvAmount.setHint(R.string.zero_amount);
+                    }
+                    tvAmount.setHint(item.getAmountHint());
                     lHead.setVisibility(View.GONE);
                     lAccount.setVisibility(View.VISIBLE);
                     lPadding.setVisibility(View.GONE);
