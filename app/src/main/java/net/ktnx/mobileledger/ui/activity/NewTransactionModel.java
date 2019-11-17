@@ -252,7 +252,7 @@ public class NewTransactionModel extends ViewModel {
         private MutableLiveData<Date> date = new MutableLiveData<>();
         private MutableLiveData<String> description = new MutableLiveData<>();
         private LedgerTransactionAccount account;
-        private MutableLiveData<String> amountHint = new MutableLiveData<>();
+        private MutableLiveData<String> amountHint = new MutableLiveData<>(null);
         private NewTransactionModel model;
         private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
         public Item(NewTransactionModel model) {
