@@ -239,14 +239,15 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
                 getResources().getDisplayMetrics()));
     }
     public void resetTransactionFromMenu(MenuItem item) {
-        resetForm();
+        listAdapter.reset();
     }
     @Override
     public void done(String error) {
         progress.setVisibility(View.INVISIBLE);
         debug("visuals", "hiding progress");
 
-        if (error == null) resetForm();
+        if (error == null)
+            listAdapter.reset();
         else Snackbar.make(list, error, BaseTransientBottomBar.LENGTH_LONG)
                      .show();
 
@@ -254,9 +255,6 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         viewModel.checkTransactionSubmittable(listAdapter);
     }
 
-    private void resetForm() {
-        listAdapter.reset();
-    }
     private class AsyncCrasher extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
