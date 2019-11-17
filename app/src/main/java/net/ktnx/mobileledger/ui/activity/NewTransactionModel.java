@@ -280,6 +280,13 @@ public class NewTransactionModel extends ViewModel {
             ensureType(ItemType.transactionRow);
             this.editable.setValue(editable);
         }
+        private void ensureType(ItemType type1, ItemType type2) {
+            if ((type != type1) && (type != type2)) {
+                throw new RuntimeException(
+                        String.format("Actual type (%s) differs from wanted (%s or %s)", type,
+                                type1, type2));
+            }
+        }
         public String getAmountHint() {
             ensureType(ItemType.transactionRow);
             return amountHint.getValue();
