@@ -25,7 +25,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,12 +36,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
-import static net.ktnx.mobileledger.utils.Misc.isZero;
 
 public class NewTransactionModel extends ViewModel {
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
@@ -123,28 +125,35 @@ public class NewTransactionModel extends ViewModel {
 
         return trailer;
     }
-    // rules:
-    // 1) at least two account names
-    // 2) each amount must have account name
-    // 3) amounts must balance to 0, or
-    // 3a) there must be exactly one empty amount
-    // 4) empty accounts with empty amounts are ignored
-    // 5) a row with an empty account name or empty amount is guaranteed to exist
+    /*
+     A transaction is submittable if:
+     0) has description
+     1) has at least two account names
+     2) each amount has account name
+     3) amounts must balance to 0, or
+     3a) there must be exactly one empty amount (with account)
+     4) empty accounts with empty amounts are ignored
+     5) a row with an empty account name or empty amount is guaranteed to exist
+    */
     @SuppressLint("DefaultLocale")
     public void checkTransactionSubmittable(NewTransactionItemsAdapter adapter) {
         int accounts = 0;
-        int accounts_with_values = 0;
         int amounts = 0;
-        int amounts_with_accounts = 0;
         int empty_rows = 0;
-        Item empty_amount = null;
-        boolean single_empty_amount = false;
-        boolean single_empty_amount_has_account = false;
-        float running_total = 0f;
+        float balance = 0f;
         final String descriptionText = getDescription();
-        final boolean have_description = ((descriptionText != null) && !descriptionText.isEmpty());
+        boolean submittable = true;
+        List<Item> itemsWithEmptyAmount = new ArrayList<>();
+        List<Item> itemsWithAccountAndEmptyAmount = new ArrayList<>();
 
         try {
+            if ((descriptionText == null) || descriptionText.trim()
+                                                            .isEmpty())
+            {
+                Logger.debug("submittable", "Transaction not submittable: missing description");
+                submittable = false;
+            }
+
             for (int i = 0; i < this.items.size(); i++) {
                 Item item = this.items.get(i);
 
@@ -153,80 +162,96 @@ public class NewTransactionModel extends ViewModel {
                                      .trim();
                 if (acc_name.isEmpty()) {
                     empty_rows++;
+
+                    if (acc.isAmountSet()) {
+                        // 2) each amount has account name
+                        Logger.debug("submittable", String.format(
+                                "Transaction not submittable: row %d has no account name, but has" +
+                                " amount %1.2f", i + 1, acc.getAmount()));
+                        submittable = false;
+                    }
                 }
                 else {
                     accounts++;
-
-                    if (acc.isAmountSet()) {
-                        accounts_with_values++;
-                    }
                 }
 
                 if (acc.isAmountSet()) {
                     amounts++;
-                    if (!acc_name.isEmpty())
-                        amounts_with_accounts++;
-                    running_total += acc.getAmount();
+                    balance += acc.getAmount();
                 }
                 else {
-                    if (empty_amount == null) {
-                        empty_amount = item;
-                        single_empty_amount = true;
-                        single_empty_amount_has_account = !acc_name.isEmpty();
+                    itemsWithEmptyAmount.add(item);
+
+                    if (!acc_name.isEmpty()) {
+                        itemsWithAccountAndEmptyAmount.add(item);
                     }
-                    else if (!acc_name.isEmpty())
-                        single_empty_amount = false;
                 }
             }
 
+            // 1) has at least two account names
+            if (accounts < 2) {
+                Logger.debug("submittable",
+                        String.format("Transaction not submittable: only %d account names",
+                                accounts));
+                submittable = false;
+            }
+
+            // 3) amount must balance to 0, or
+            // 3a) there must be exactly one empty amount (with account)
+            if (Misc.isZero(balance)) {
+                for (Item item : items) {
+                    item.setAmountHint(null);
+                }
+            }
+            else {
+                int balanceReceiversCount = itemsWithAccountAndEmptyAmount.size();
+                if (balanceReceiversCount != 1) {
+                    Logger.debug("submittable", (balanceReceiversCount == 0) ?
+                                                "Transaction not submittable: non-zero balance " +
+                                                "with no empty amounts with accounts" :
+                                                "Transaction not submittable: non-zero balance " +
+                                                "with multiple empty amounts with accounts");
+                    submittable = false;
+                }
+
+                // suggest off-balance amount to a row and remove hints on other rows
+                Item receiver = null;
+                if (!itemsWithAccountAndEmptyAmount.isEmpty())
+                    receiver = itemsWithAccountAndEmptyAmount.get(0);
+                else if (!itemsWithEmptyAmount.isEmpty())
+                    receiver = itemsWithEmptyAmount.get(0);
+
+                for (Item item : items) {
+                    if (item.equals(receiver)) {
+                        Logger.debug("submittable",
+                                String.format("Setting amount hint to %1.2f", -balance));
+                        item.setAmountHint(String.format("%1.2f", -balance));
+                    }
+                    else
+                        item.setAmountHint(null);
+                }
+            }
+
+            // 5) a row with an empty account name or empty amount is guaranteed to exist
             if ((empty_rows == 0) &&
                 ((this.items.size() == accounts) || (this.items.size() == amounts)))
             {
                 adapter.addRow();
             }
 
-            for (NewTransactionModel.Item item : items) {
 
-                final LedgerTransactionAccount acc = item.getAccount();
-                if (acc.isAmountSet())
-                    continue;
+            debug("submittable", submittable ? "YES" : "NO");
+            isSubmittable.setValue(submittable);
 
-                if (single_empty_amount) {
-                    if (item.equals(empty_amount)) {
-                        empty_amount.setAmountHint(Misc.isZero(running_total) ? null
-                                                                              : String.format(
-                                                                                      "%1.2f",
-                                                                                      -running_total));
-                        continue;
-                    }
+            if (BuildConfig.DEBUG) {
+                debug("submittable", "== Dump of all items");
+                for (int i = 0; i < items.size(); i++) {
+                    Item item = items.get(i);
+                    LedgerTransactionAccount acc = item.getAccount();
+                    debug("submittable", String.format("Item %2d: [%4.2f] %s", i,
+                            acc.isAmountSet() ? acc.getAmount() : 0, acc.getAccountName()));
                 }
-                else {
-                    // no single empty account and this account's amount is not set
-                    // => hint should be '0.00'
-                    item.setAmountHint(null);
-                }
-
             }
-
-            debug("submittable", String.format(Locale.US,
-                    "%s, accounts=%d, accounts_with_values=%s, " +
-                    "amounts_with_accounts=%d, amounts=%d, running_total=%1.2f, " +
-                    "single_empty_with_acc=%s", have_description ? "description" : "NO description",
-                    accounts, accounts_with_values, amounts_with_accounts, amounts, running_total,
-                    (single_empty_amount && single_empty_amount_has_account) ? "true" : "false"));
-
-            if (have_description && (accounts >= 2) && (accounts_with_values >= (accounts - 1)) &&
-                (amounts_with_accounts == amounts) &&
-                (single_empty_amount && single_empty_amount_has_account || isZero(running_total)))
-            {
-                debug("submittable", "YES");
-                isSubmittable.setValue(true);
-            }
-            else {
-                debug("submittable", "NO");
-                isSubmittable.setValue(false);
-            }
-
         }
         catch (NumberFormatException e) {
             debug("submittable", "NO (because of NumberFormatException)");
