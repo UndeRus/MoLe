@@ -35,6 +35,13 @@ public class ParsedPosting {
     private String pcomment = "";
     private List<List<String>> ptags = new ArrayList<>();
     private String poriginal = null;
+    private int ptransaction_;
+    public int getPtransaction_() {
+        return ptransaction_;
+    }
+    public void setPtransaction_(int ptransaction_) {
+        this.ptransaction_ = ptransaction_;
+    }
     public ParsedPosting() {
     }
     public String getPdate() {

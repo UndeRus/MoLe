@@ -101,9 +101,16 @@ public class ParsedLedgerTransaction {
     }
     public void setTindex(int tindex) {
         this.tindex = tindex;
+        for(ParsedPosting p : tpostings) {
+            p.setPtransaction_(tindex);
+        }
     }
     public List<ParsedPosting> getTpostings() {
         return tpostings;
+    }
+    public void addPosting(ParsedPosting posting) {
+        posting.setPtransaction_(tindex);
+        tpostings.add(posting);
     }
     public void setTpostings(List<ParsedPosting> tpostings) {
         this.tpostings = tpostings;
