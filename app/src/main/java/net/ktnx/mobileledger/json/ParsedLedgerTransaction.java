@@ -30,12 +30,12 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedLedgerTransaction {
     private String tdate;
-    private String tdate2;
+    private String tdate2 = null;
     private String tdescription;
     private String tcomment;
     private String tcode = "";
     private String tstatus = "Unmarked";
-    private String tprecedingcomment;
+    private String tprecedingcomment = "";
     private int tindex;
     private List<ParsedPosting> tpostings;
     private List<List<String>> ttags = new ArrayList<>();

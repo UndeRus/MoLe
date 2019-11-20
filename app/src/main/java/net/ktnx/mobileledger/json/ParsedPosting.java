@@ -31,6 +31,13 @@ public class ParsedPosting {
     private String paccount;
     private List<ParsedAmount> pamount;
     private String pdate = null;
+    public String getPdate2() {
+        return pdate2;
+    }
+    public void setPdate2(String pdate2) {
+        this.pdate2 = pdate2;
+    }
+    private String pdate2 = null;
     private String ptype = "RegularPosting";
     private String pcomment = "";
     private List<List<String>> ptags = new ArrayList<>();
