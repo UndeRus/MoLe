@@ -29,7 +29,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
-    static final int waitSlice = 200;
     protected MobileLedgerProfile mProfile;
     protected void setupProfileColors() {
         Colors.setupTheme(this, mProfile);
