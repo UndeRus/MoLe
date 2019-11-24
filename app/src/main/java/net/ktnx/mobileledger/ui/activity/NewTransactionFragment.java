@@ -166,9 +166,19 @@ public class NewTransactionFragment extends Fragment {
                 // TODO display error
             }
             else {
-                viewModel.reset();
             }
         }
+
+        if (savedInstanceState != null) {
+            boolean keep = savedInstanceState.getBoolean("keep", true);
+            if (!keep)
+                viewModel.reset();
+        }
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("keep", true);
     }
     private void onFabPressed() {
         fab.setEnabled(false);
