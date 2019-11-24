@@ -23,7 +23,7 @@
     android:animateLayoutChanges="false"
     android:orientation="vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/ntr_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -31,34 +31,36 @@
         <EditText
             android:id="@+id/new_transaction_date"
             android:layout_width="94dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:accessibilityTraversalBefore="@+id/new_transaction_description"
             android:drawableStart="@drawable/ic_event_gray_24dp"
             android:ems="10"
-            android:foregroundGravity="bottom"
-            android:gravity="bottom"
+            android:enabled="true"
+            android:focusable="false"
+            android:gravity="bottom|center"
             android:hint="@string/new_transaction_date_hint"
-            android:imeOptions="actionNext"
-            android:cursorVisible="false"
-            android:textCursorDrawable="@android:color/transparent"
-            android:inputType="date"
+            android:inputType="none"
             android:nextFocusDown="@+id/new_transaction_acc_1"
             android:nextFocusForward="@+id/new_transaction_description"
-            android:textAlignment="center"
-            android:enabled="true"
+            android:textAlignment="gravity"
+            android:textCursorDrawable="@android:color/transparent"
             app:layout_constrainedHeight="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_weight="8"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="TextFields" />
 
         <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
             android:id="@+id/new_transaction_description"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginStart="8dp"
             android:accessibilityTraversalAfter="@+id/new_transaction_date"
             android:ems="10"
+            android:foregroundGravity="bottom"
+            android:gravity="bottom"
             android:hint="@string/new_transaction_description_hint"
             android:imeOptions="actionNext"
             android:inputType="text"
@@ -66,11 +68,12 @@
             android:nextFocusUp="@+id/new_transaction_date"
             android:selectAllOnFocus="true"
             android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="30"
             app:layout_constraintStart_toEndOf="@+id/new_transaction_date"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <LinearLayout
         android:id="@+id/ntr_account"
