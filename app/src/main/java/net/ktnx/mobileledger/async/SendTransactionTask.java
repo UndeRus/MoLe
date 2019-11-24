@@ -76,7 +76,8 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         http.setDoInput(true);
         http.addRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
 
-        debug("network", "request header: " + http.getRequestProperties().toString());
+        debug("network", "request header: " + http.getRequestProperties()
+                                                  .toString());
 
         try (OutputStream req = http.getOutputStream()) {
             debug("network", "Request body: " + body);
@@ -119,20 +120,23 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
 
         UrlEncodedFormData params = new UrlEncodedFormData();
         params.addPair("_formid", "identify-add");
-        if (token != null) params.addPair("_token", token);
+        if (token != null)
+            params.addPair("_token", token);
         params.addPair("date", Globals.formatLedgerDate(ltr.getDate()));
         params.addPair("description", ltr.getDescription());
         for (LedgerTransactionAccount acc : ltr.getAccounts()) {
             params.addPair("account", acc.getAccountName());
             if (acc.isAmountSet())
                 params.addPair("amount", String.format(Locale.US, "%1.2f", acc.getAmount()));
-            else params.addPair("amount", "");
+            else
+                params.addPair("amount", "");
         }
 
         String body = params.toString();
         http.addRequestProperty("Content-Length", String.valueOf(body.length()));
 
-        debug("network", "request header: " + http.getRequestProperties().toString());
+        debug("network", "request header: " + http.getRequestProperties()
+                                                  .toString());
 
         try (OutputStream req = http.getOutputStream()) {
             debug("network", "Request body: " + body);
@@ -202,10 +206,10 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             if (!sendOK()) {
                 int tried = 0;
                 while (!legacySendOK()) {
-                        tried++;
-                        if (tried >= 2)
-                            throw new IOException(String.format("aborting after %d tries", tried));
-                        sleep(100);
+                    tried++;
+                    if (tried >= 2)
+                        throw new IOException(String.format("aborting after %d tries", tried));
+                    sleep(100);
                 }
             }
         }
