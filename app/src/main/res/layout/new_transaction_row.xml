@@ -33,6 +33,7 @@
             android:layout_width="94dp"
             android:layout_height="0dp"
             android:accessibilityTraversalBefore="@+id/new_transaction_description"
+            android:drawableStart="@drawable/ic_event_gray_24dp"
             android:ems="10"
             android:foregroundGravity="bottom"
             android:gravity="bottom"
