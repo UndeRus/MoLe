@@ -473,7 +473,7 @@ public class MainActivity extends ProfileThemedActivity {
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_right, R.anim.dummy);
+        overridePendingTransition(R.anim.slide_in_up, R.anim.dummy);
     }
     public void navSettingsClicked(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
