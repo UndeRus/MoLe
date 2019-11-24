@@ -45,18 +45,7 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/new_transaction_accounts"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar_layout">
-
-        </androidx.recyclerview.widget.RecyclerView>
+        <include layout="@layout/new_transaction_accounts" />
 
         <ProgressBar
             android:id="@+id/save_transaction_progress"
