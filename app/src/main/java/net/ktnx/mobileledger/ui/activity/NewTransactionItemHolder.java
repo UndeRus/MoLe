@@ -86,10 +86,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAccount.setNextFocusForwardId(View.NO_ID);
         tvAmount.setNextFocusForwardId(View.NO_ID); // magic!
 
-        tvDate.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus)
-                pickTransactionDate();
-        });
         tvDate.setOnClickListener(v -> pickTransactionDate());
 
         mProfile = Data.profile.getValue();
