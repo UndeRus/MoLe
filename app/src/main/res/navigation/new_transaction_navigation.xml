@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright © 2019 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/new_transaction_navigation"
+    app:startDestination="@id/newTransactionFragment">
+
+    <fragment
+        android:id="@+id/newTransactionFragment"
+        android:name="net.ktnx.mobileledger.ui.activity.NewTransactionFragment"
+        android:label="NewTransactionFragment" >
+        <action
+            android:id="@+id/action_newTransactionFragment_to_newTransactionSavingFragment"
+            app:destination="@id/newTransactionSavingFragment"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/slide_out_up" />
+        <argument
+            android:name="error"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
+    </fragment>
+    <fragment
+        android:id="@+id/newTransactionSavingFragment"
+        android:name="net.ktnx.mobileledger.ui.NewTransactionSavingFragment"
+        android:label="fragment_new_transaction_saving" >
+        <action
+            android:id="@+id/action_newTransactionSavingFragment_Success"
+            app:destination="@id/newTransactionFragment"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/slide_out_up"
+            app:popExitAnim="@anim/slide_out_down"
+            />
+        <action
+            android:id="@+id/action_newTransactionSavingFragment_Failure"
+            app:destination="@id/newTransactionFragment"
+            app:enterAnim="@anim/slide_in_down"
+            app:exitAnim="@anim/slide_out_down"
+            app:popExitAnim="@anim/slide_out_up"
+            />
+    </fragment>
+</navigation>

@@ -22,19 +22,10 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
@@ -42,9 +33,7 @@ import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 
-import java.util.Date;
 import java.util.Objects;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -56,13 +45,9 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
  *         (the last problem with the POST was the missing content-length header)
  *  */
 
-public class NewTransactionActivity extends ProfileThemedActivity implements TaskCallback {
-    private static SendTransactionTask saver;
-    private ProgressBar progress;
-    private FloatingActionButton fab;
-    private NewTransactionItemsAdapter listAdapter;
-    private NewTransactionModel viewModel;
-    private RecyclerView list;
+public class NewTransactionActivity extends ProfileThemedActivity implements TaskCallback,
+        NewTransactionFragment.OnNewTransactionFragmentInteractionListener {
+    private NavController navController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,73 +58,10 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         Data.profile.observe(this,
                 mobileLedgerProfile -> toolbar.setSubtitle(mobileLedgerProfile.getName()));
 
-        progress = findViewById(R.id.save_transaction_progress);
-        fab = findViewById(R.id.fab);
-        fab.setOnClickListener(v -> saveTransaction());
+        navController = Navigation.findNavController(this, R.id.new_transaction_nav);
 
         Objects.requireNonNull(getSupportActionBar())
                .setDisplayHomeAsUpEnabled(true);
-        list = findViewById(R.id.new_transaction_accounts);
-        viewModel = ViewModelProviders.of(this)
-                                      .get(NewTransactionModel.class);
-        listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
-        list.setAdapter(listAdapter);
-        list.setLayoutManager(new LinearLayoutManager(this));
-        Data.profile.observe(this, profile -> listAdapter.setProfile(profile));
-        listAdapter.notifyDataSetChanged();
-        new ItemTouchHelper(new ItemTouchHelper.Callback() {
-            @Override
-            public int getMovementFlags(@NonNull RecyclerView recyclerView,
-                                        @NonNull RecyclerView.ViewHolder viewHolder) {
-                int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
-                // the top item is always there (date and description)
-                if (viewHolder.getAdapterPosition() > 0) {
-                    if (viewModel.getAccountCount() > 2) {
-                        flags |= makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
-                                ItemTouchHelper.START | ItemTouchHelper.END);
-                    }
-                }
-
-                return flags;
-            }
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                  @NonNull RecyclerView.ViewHolder viewHolder,
-                                  @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                if (viewModel.getAccountCount() == 2)
-                    Snackbar.make(list, R.string.msg_at_least_two_accounts_are_required,
-                            Snackbar.LENGTH_LONG)
-                            .setAction("Action", null)
-                            .show();
-                else {
-                    int pos = viewHolder.getAdapterPosition();
-                    viewModel.removeItem(pos - 1);
-                    listAdapter.notifyItemRemoved(pos);
-                    viewModel.sendCountNotifications(); // needed after items re-arrangement
-                    viewModel.checkTransactionSubmittable(listAdapter);
-                }
-            }
-        }).attachToRecyclerView(list);
-
-        viewModel.isSubmittable()
-                 .observe(this, isSubmittable -> {
-                     if (isSubmittable) {
-                         if (fab != null) {
-                             fab.show();
-                             fab.setEnabled(true);
-                         }
-                     }
-                     else {
-                         if (fab != null) {
-                             fab.hide();
-                         }
-                     }
-                 });
-        viewModel.checkTransactionSubmittable(listAdapter);
     }
     @Override
     protected void initProfile() {
@@ -157,7 +79,7 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.dummy, R.anim.slide_out_right);
+        overridePendingTransition(R.anim.dummy, R.anim.slide_out_down);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -173,49 +95,19 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         super.onStart();
         // FIXME if (tvDescription.getText().toString().isEmpty()) tvDescription.requestFocus();
     }
-    public void saveTransaction() {
-        if (fab != null)
-            fab.setEnabled(false);
-        listAdapter.toggleAllEditing(false);
-        progress.setVisibility(View.VISIBLE);
+    public void onTransactionSave(LedgerTransaction tr) {
+        navController.navigate(R.id.action_newTransactionFragment_to_newTransactionSavingFragment);
         try {
 
-            saver = new SendTransactionTask(this, mProfile);
-
-            Date date = viewModel.getDate();
-            LedgerTransaction tr =
-                    new LedgerTransaction(null, date, viewModel.getDescription(), mProfile);
-
-            LedgerTransactionAccount emptyAmountAccount = null;
-            float emptyAmountAccountBalance = 0;
-            for (int i = 0; i < viewModel.getAccountCount(); i++) {
-                LedgerTransactionAccount acc = viewModel.getAccount(i);
-                if (acc.getAccountName()
-                       .trim()
-                       .isEmpty())
-                    continue;
-
-                if (acc.isAmountSet()) {
-                    emptyAmountAccountBalance += acc.getAmount();
-                }
-                else {
-                    emptyAmountAccount = acc;
-                }
-
-                tr.addAccount(acc);
-            }
-
-            if (emptyAmountAccount != null)
-                emptyAmountAccount.setAmount(-emptyAmountAccountBalance);
+            SendTransactionTask saver = new SendTransactionTask(this, mProfile);
             saver.execute(tr);
         }
         catch (Exception e) {
             debug("new-transaction", "Unknown error", e);
 
-            progress.setVisibility(View.GONE);
-            listAdapter.toggleAllEditing(true);
-            if (fab != null)
-                fab.setEnabled(true);
+            Bundle b = new Bundle();
+            b.putString("error", "unknown error");
+            navController.navigate(R.id.newTransactionFragment, b);
         }
     }
     public void simulateCrash(MenuItem item) {
@@ -239,23 +131,15 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics()));
     }
-    public void resetTransactionFromMenu(MenuItem item) {
-        listAdapter.reset();
-    }
     @Override
     public void done(String error) {
-        progress.setVisibility(View.INVISIBLE);
-        debug("visuals", "hiding progress");
-
-        if (error == null)
-            listAdapter.reset();
+        Bundle b = new Bundle();
+        if (error != null) {
+            b.putString("error", error);
+            navController.navigate(R.id.action_newTransactionSavingFragment_Failure);
+        }
         else
-            Snackbar.make(list, error, BaseTransientBottomBar.LENGTH_LONG)
-                    .show();
-
-        listAdapter.toggleAllEditing(true);
-
-        viewModel.checkTransactionSubmittable(listAdapter);
+            navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
     }
 
     private class AsyncCrasher extends AsyncTask<Void, Void, Void> {

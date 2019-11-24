@@ -18,12 +18,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_reset_new_transaction_activity"
-        android:icon="@drawable/ic_refresh_white_24dp"
-        android:onClick="resetTransactionFromMenu"
-        android:title="@string/action_reset_new_transaction_activity_title"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_simulate_crash"
         android:title="@string/crash_app_label"
         android:titleCondensed="@string/crash_app_condensed_label"

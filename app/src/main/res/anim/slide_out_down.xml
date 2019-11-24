@@ -15,18 +15,9 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/new_transaction_accounts"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:paddingStart="@dimen/activity_horizontal_margin"
-    android:paddingEnd="@dimen/activity_horizontal_margin"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
-    tools:showIn="@layout/activity_new_transaction">
-
-</androidx.recyclerview.widget.RecyclerView>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@android:integer/config_shortAnimTime">
+    <translate
+        android:fromYDelta="0%"
+        android:toYDelta="100%" />
+</set>
