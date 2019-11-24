@@ -444,11 +444,11 @@ public class NewTransactionModel extends ViewModel {
             final int myDay = c.get(Calendar.DAY_OF_MONTH);
 
             if (today.get(Calendar.YEAR) != myYear) {
-                return String.format(Locale.US, "%d/%02d/%02d", myYear, myMonth, myDay);
+                return String.format(Locale.US, "%d/%02d/%02d", myYear, myMonth + 1, myDay);
             }
 
             if (today.get(Calendar.MONTH) != myMonth) {
-                return String.format(Locale.US, "%d/%02d", myMonth, myDay);
+                return String.format(Locale.US, "%d/%02d", myMonth + 1, myDay);
             }
 
             return String.valueOf(myDay);
