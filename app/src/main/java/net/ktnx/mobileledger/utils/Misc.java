@@ -42,4 +42,18 @@ public class Misc {
         if (activity != null)
             showSoftKeyboard(activity);
     }
+    public static void hideSoftKeyboard(Fragment fragment) {
+        final FragmentActivity activity = fragment.getActivity();
+        if (activity != null)
+            hideSoftKeyboard(activity);
+    }
+    public static void hideSoftKeyboard(Activity activity) {
+        Configuration cf = activity.getResources()
+                                   .getConfiguration();
+        if (cf.keyboard == Configuration.KEYBOARD_NOKEYS ||
+            cf.keyboardHidden == Configuration.KEYBOARDHIDDEN_NO)
+            activity.getWindow()
+                    .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+    }
 }
