@@ -277,6 +277,12 @@ public class NewTransactionModel extends ViewModel {
     public void updateFocusedItem(int position) {
         focusedItem.setValue(position);
     }
+    public void noteFocusIsOnAccount(int position) {
+        getItem(position).setFocusIsOnAmount(false);
+    }
+    public void noteFocusIsOnAmount(int position) {
+        getItem(position).setFocusIsOnAmount(true);
+    }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
     //==========================================================================================
@@ -289,6 +295,10 @@ public class NewTransactionModel extends ViewModel {
         private MutableLiveData<String> amountHint = new MutableLiveData<>(null);
         private NewTransactionModel model;
         private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
+        public boolean focusIsOnAmount() {
+            return focusIsOnAmount;
+        }
+        private boolean focusIsOnAmount = false;
         public Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
@@ -466,6 +476,9 @@ public class NewTransactionModel extends ViewModel {
         }
         public void stopObservingEditableFlag(Observer<Boolean> observer) {
             editable.removeObserver(observer);
+        }
+        public void setFocusIsOnAmount(boolean flag) {
+            focusIsOnAmount = flag;
         }
     }
 }

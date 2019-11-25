@@ -38,6 +38,7 @@ import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -96,7 +97,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 boolean wasSyncing = syncingData;
                 syncingData = true;
                 try {
-                    adapter.updateFocusedItem(getAdapterPosition());
+                    final int pos = getAdapterPosition();
+                    adapter.updateFocusedItem(pos);
+                    if (v instanceof AutoCompleteTextViewWithClear) {
+                        adapter.noteFocusIsOnAccount(pos);
+                    }
+                    else {
+                        adapter.noteFocusIsOnAmount(pos);
+                    }
                 }
                 finally {
                     syncingData = wasSyncing;
@@ -233,10 +241,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     case transactionRow:
                         // do nothing if a row element already has the focus
                         if (!itemView.hasFocus()) {
-                            focused = tvAccount.requestFocus();
-                            tvAccount.dismissDropDown();
-                            if (focused)
-                                Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+                            if (item.focusIsOnAmount()) {
+                                tvAmount.requestFocus();
+                            }
+                            else {
+                                focused = tvAccount.requestFocus();
+                                tvAccount.dismissDropDown();
+                                if (focused)
+                                    Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+                            }
                         }
 
                         break;
