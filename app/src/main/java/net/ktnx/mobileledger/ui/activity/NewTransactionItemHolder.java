@@ -30,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,7 +58,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private AutoCompleteTextView tvDescription;
     private AutoCompleteTextView tvAccount;
     private TextView tvAmount;
-    private LinearLayoutCompat lHead;
+    private LinearLayout lHead;
     private LinearLayout lAccount;
     private FrameLayout lPadding;
     private MobileLedgerProfile mProfile;

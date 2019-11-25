@@ -23,7 +23,7 @@
     android:animateLayoutChanges="false"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
         android:id="@+id/ntr_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -73,7 +73,7 @@
             app:layout_constraintHorizontal_weight="30"
             app:layout_constraintStart_toEndOf="@+id/new_transaction_date"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ntr_account"
