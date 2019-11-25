@@ -22,6 +22,7 @@ import android.content.res.Configuration;
 import android.view.WindowManager;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 public class Misc {
     public static boolean isZero(float f) {
@@ -37,6 +38,8 @@ public class Misc {
                     .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
     public static void showSoftKeyboard(Fragment fragment) {
-        showSoftKeyboard(fragment.getActivity());
+        final FragmentActivity activity = fragment.getActivity();
+        if (activity != null)
+            showSoftKeyboard(activity);
     }
 }
