@@ -173,12 +173,18 @@ public class NewTransactionFragment extends Fragment {
             boolean keep = savedInstanceState.getBoolean("keep", true);
             if (!keep)
                 viewModel.reset();
+            else {
+                final int focused = savedInstanceState.getInt("focused", 0);
+                viewModel.setFocusedItem(focused);
+            }
         }
     }
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("keep", true);
+        final int focusedItem = viewModel.getFocusedItem();
+        outState.putInt("focused", focusedItem);
     }
     private void onFabPressed() {
         fab.setEnabled(false);

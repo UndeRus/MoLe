@@ -201,4 +201,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         if (presentItemCount > 2)
             notifyItemRangeRemoved(3, presentItemCount - 2); // all the rest are gone
     }
+    public void updateFocusedItem(int position) {
+        model.updateFocusedItem(position);
+    }
 }

@@ -92,6 +92,23 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         if (mProfile == null)
             throw new AssertionError();
 
+        View.OnFocusChangeListener focusMonitor = (v, hasFocus) -> {
+            if (hasFocus) {
+                boolean wasSyncing = syncingData;
+                syncingData = true;
+                try {
+                    adapter.updateFocusedItem(getAdapterPosition());
+                }
+                finally {
+                    syncingData = wasSyncing;
+                }
+            }
+        };
+
+        tvDescription.setOnFocusChangeListener(focusMonitor);
+        tvAccount.setOnFocusChangeListener(focusMonitor);
+        tvAmount.setOnFocusChangeListener(focusMonitor);
+
         MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
         MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
@@ -215,10 +232,13 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                     (NewTransactionActivity) tvDescription.getContext());
                         break;
                     case transactionRow:
-                        focused = tvAccount.requestFocus();
-                        tvAccount.dismissDropDown();
-                        if (focused)
-                            Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+                        // do nothing if a row element already has the focus
+                        if (!itemView.hasFocus()) {
+                            focused = tvAccount.requestFocus();
+                            tvAccount.dismissDropDown();
+                            if (focused)
+                                Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+                        }
 
                         break;
                 }

@@ -51,7 +51,7 @@ public class NewTransactionModel extends ViewModel {
     private final Item trailer = new Item(this);
     private final ArrayList<Item> items = new ArrayList<>();
     private final MutableLiveData<Boolean> isSubmittable = new MutableLiveData<>(false);
-    private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(null);
+    private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
     public int getAccountCount() {
         return items.size();
@@ -90,6 +90,7 @@ public class NewTransactionModel extends ViewModel {
             @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
         this.accountCount.removeObserver(observer);
     }
+    public int getFocusedItem() { return focusedItem.getValue(); }
     public void setFocusedItem(int position) {
         focusedItem.setValue(position);
     }
@@ -269,6 +270,12 @@ public class NewTransactionModel extends ViewModel {
     }
     public void sendCountNotifications() {
         accountCount.setValue(getAccountCount());
+    }
+    public void sendFocusedNotification() {
+        focusedItem.setValue(focusedItem.getValue());
+    }
+    public void updateFocusedItem(int position) {
+        focusedItem.setValue(position);
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
