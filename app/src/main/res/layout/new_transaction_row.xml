@@ -87,12 +87,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="9"
+            android:width="0dp"
             android:hint="@string/new_transaction_account_hint"
-            android:selectAllOnFocus="false"
-            android:inputType="text"
             android:imeOptions="actionNext"
-            android:singleLine="true"
-            android:width="0dp" />
+            android:inputType="text"
+            android:selectAllOnFocus="false" />
 
         <EditText
             android:id="@+id/account_row_acc_amounts"
@@ -104,11 +103,11 @@
             android:foregroundGravity="bottom"
             android:gravity="bottom|end"
             android:hint="@string/zero_amount"
+            android:imeOptions="actionNext"
             android:inputType="numberSigned|numberDecimal|number"
             android:minWidth="70sp"
-            android:textAlignment="viewEnd"
             android:selectAllOnFocus="true"
-            android:imeOptions="actionNext"/>
+            android:textAlignment="viewEnd" />
 
     </LinearLayout>
 
