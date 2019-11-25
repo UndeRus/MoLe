@@ -66,7 +66,7 @@
             android:inputType="text"
             android:nextFocusLeft="@+id/new_transaction_date"
             android:nextFocusUp="@+id/new_transaction_date"
-            android:selectAllOnFocus="true"
+            android:selectAllOnFocus="false"
             android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -88,10 +88,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="9"
             android:hint="@string/new_transaction_account_hint"
+            android:selectAllOnFocus="false"
             android:inputType="text"
             android:imeOptions="actionNext"
             android:singleLine="true"
-            android:selectAllOnFocus="true"
             android:width="0dp" />
 
         <EditText
