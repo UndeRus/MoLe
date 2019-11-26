@@ -43,6 +43,7 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -188,6 +189,7 @@ public class NewTransactionFragment extends Fragment {
     }
     private void onFabPressed() {
         fab.setEnabled(false);
+        Misc.hideSoftKeyboard(this);
         if (mListener != null) {
             Date date = viewModel.getDate();
             LedgerTransaction tr =

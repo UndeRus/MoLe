@@ -60,6 +60,19 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         mProfile = profile;
     }
     private boolean sendOK() throws IOException {
+//        if (BuildConfig.DEBUG) {
+//        TODO: simulate random problems
+//
+//            try {
+//                Thread.sleep(1500);
+//            }
+//            catch (InterruptedException ex) {
+//                Logger.debug("network", ex.toString());
+//            }
+//
+//            return true;
+//        }
+
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("PUT");
         http.setRequestProperty("Content-Type", "application/json");
