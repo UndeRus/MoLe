@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.renderscript.RSInvalidStateException;
@@ -30,6 +29,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +43,7 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
@@ -160,24 +161,30 @@ public class NewTransactionFragment extends Fragment {
         fab = activity.findViewById(R.id.fab);
         fab.setOnClickListener(v -> onFabPressed());
 
+        boolean keep = false;
+
         Bundle args = getArguments();
         if (args != null) {
             String error = args.getString("error");
             if (error != null) {
                 // TODO display error
-            }
-            else {
+                Logger.debug("new-trans-f", String.format("Got error: %s", error));
+                Snackbar.make(list, error, Snackbar.LENGTH_LONG)
+                        .show();
+                keep = true;
             }
         }
 
+        int focused = 0;
         if (savedInstanceState != null) {
-            boolean keep = savedInstanceState.getBoolean("keep", true);
-            if (!keep)
-                viewModel.reset();
-            else {
-                final int focused = savedInstanceState.getInt("focused", 0);
-                viewModel.setFocusedItem(focused);
-            }
+            keep |= savedInstanceState.getBoolean("keep", true);
+            focused = savedInstanceState.getInt("focused", 0);
+        }
+
+        if (!keep)
+            viewModel.reset();
+        else {
+            viewModel.setFocusedItem(focused);
         }
     }
     @Override
