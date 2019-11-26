@@ -378,6 +378,13 @@ public class NewTransactionModel extends ViewModel {
             this.date.setValue(date);
         }
         public void setDate(String text) {
+            if ((text == null) || text.trim()
+                                      .isEmpty())
+            {
+                setDate((Date) null);
+                return;
+            }
+
             int year, month, day;
             final Calendar c = GregorianCalendar.getInstance();
             Matcher m = reYMD.matcher(text);
