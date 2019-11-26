@@ -86,13 +86,13 @@ public class NewTransactionFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Activity activity = getActivity();
+        FragmentActivity activity = getActivity();
         if (activity == null)
             throw new RSInvalidStateException(
                     "getActivity() returned null within onActivityCreated()");
 
         list = activity.findViewById(R.id.new_transaction_accounts);
-        viewModel = ViewModelProviders.of(this)
+        viewModel = ViewModelProviders.of(activity)
                                       .get(NewTransactionModel.class);
         mProfile = Data.profile.getValue();
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
