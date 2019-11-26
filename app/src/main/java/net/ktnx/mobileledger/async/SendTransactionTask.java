@@ -61,10 +61,10 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     }
     private boolean sendOK() throws IOException {
 //        if (BuildConfig.DEBUG) {
-//        TODO: simulate random problems
-//
 //            try {
 //                Thread.sleep(1500);
+//                if (Math.random() > 0.3)
+//                    throw new RuntimeException("Simulated test exception");
 //            }
 //            catch (InterruptedException ex) {
 //                Logger.debug("network", ex.toString());
