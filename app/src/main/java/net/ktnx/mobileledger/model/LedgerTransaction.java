@@ -31,6 +31,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -201,7 +202,11 @@ public class LedgerTransaction {
         }
 
         result.setTpostings(postings);
-        result.setTdate(Globals.formatIsoDate(date));
+        Date transactionDate = date;
+        if (transactionDate == null) {
+            transactionDate = new GregorianCalendar().getTime();
+        }
+        result.setTdate(Globals.formatIsoDate(transactionDate));
         result.setTdate2(null);
         result.setTindex(1);
         result.setTdescription(description);
