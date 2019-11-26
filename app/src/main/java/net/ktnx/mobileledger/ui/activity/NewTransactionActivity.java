@@ -136,7 +136,7 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         Bundle b = new Bundle();
         if (error != null) {
             b.putString("error", error);
-            navController.navigate(R.id.action_newTransactionSavingFragment_Failure);
+            navController.navigate(R.id.action_newTransactionSavingFragment_Failure, b);
         }
         else
             navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
