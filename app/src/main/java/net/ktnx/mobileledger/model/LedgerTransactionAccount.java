@@ -17,14 +17,14 @@
 
 package net.ktnx.mobileledger.model;
 
+import androidx.annotation.NonNull;
+
 import net.ktnx.mobileledger.json.ParsedAmount;
 import net.ktnx.mobileledger.json.ParsedPosting;
 import net.ktnx.mobileledger.json.ParsedQuantity;
 import net.ktnx.mobileledger.json.ParsedStyle;
 
 import java.util.ArrayList;
-
-import androidx.annotation.NonNull;
 
 public class LedgerTransactionAccount {
     private String accountName;
