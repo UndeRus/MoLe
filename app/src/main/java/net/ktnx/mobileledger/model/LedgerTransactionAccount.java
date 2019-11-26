@@ -50,16 +50,16 @@ public class LedgerTransactionAccount {
     public String getAccountName() {
         return accountName;
     }
-    public String getShortAccountName() {
-        return shortAccountName;
-    }
     public void setAccountName(String accountName) {
         this.accountName = accountName;
         shortAccountName = accountName.replaceAll("(?<=^|:)(.)[^:]+(?=:)", "$1");
     }
-
+    public String getShortAccountName() {
+        return shortAccountName;
+    }
     public float getAmount() {
-        if (!amountSet) throw new IllegalStateException("Account amount is not set");
+        if (!amountSet)
+            throw new IllegalStateException("Account amount is not set");
 
         return amount;
     }
@@ -81,7 +81,8 @@ public class LedgerTransactionAccount {
     }
     @NonNull
     public String toString() {
-        if (!amountSet) return "";
+        if (!amountSet)
+            return "";
 
         StringBuilder sb = new StringBuilder();
         if (currency != null) {
