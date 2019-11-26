@@ -295,9 +295,6 @@ public class NewTransactionModel extends ViewModel {
         private MutableLiveData<String> amountHint = new MutableLiveData<>(null);
         private NewTransactionModel model;
         private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
-        public boolean focusIsOnAmount() {
-            return focusIsOnAmount;
-        }
         private boolean focusIsOnAmount = false;
         public Item(NewTransactionModel model) {
             this.model = model;
@@ -316,6 +313,9 @@ public class NewTransactionModel extends ViewModel {
             this.type = ItemType.transactionRow;
             this.account = account;
             this.editable.setValue(true);
+        }
+        public boolean focusIsOnAmount() {
+            return focusIsOnAmount;
         }
         public NewTransactionModel getModel() {
             return model;
