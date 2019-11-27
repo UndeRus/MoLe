@@ -39,6 +39,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -144,7 +146,13 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         params.addPair("_formid", "identify-add");
         if (token != null)
             params.addPair("_token", token);
-        params.addPair("date", Globals.formatLedgerDate(ltr.getDate()));
+
+        Date transactionDate = ltr.getDate();
+        if (transactionDate == null) {
+            transactionDate = new GregorianCalendar().getTime();
+        }
+
+        params.addPair("date", Globals.formatLedgerDate(transactionDate));
         params.addPair("description", ltr.getDescription());
         for (LedgerTransactionAccount acc : ltr.getAccounts()) {
             params.addPair("account", acc.getAccountName());
