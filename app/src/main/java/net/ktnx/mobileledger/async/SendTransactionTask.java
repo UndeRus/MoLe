@@ -28,6 +28,7 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
 
@@ -54,24 +55,32 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     private String session;
     private LedgerTransaction ltr;
     private MobileLedgerProfile mProfile;
+    private boolean simulate = false;
 
+    public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile,
+                               boolean simulate) {
+        taskCallback = callback;
+        mProfile = profile;
+        this.simulate = simulate;
+    }
     public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile) {
         taskCallback = callback;
         mProfile = profile;
+        simulate = false;
     }
     private boolean sendOK() throws IOException {
-//        if (BuildConfig.DEBUG) {
-//            try {
-//                Thread.sleep(1500);
-//                if (Math.random() > 0.3)
-//                    throw new RuntimeException("Simulated test exception");
-//            }
-//            catch (InterruptedException ex) {
-//                Logger.debug("network", ex.toString());
-//            }
-//
-//            return true;
-//        }
+        if (simulate) {
+            try {
+                Thread.sleep(1500);
+                if (Math.random() > 0.3)
+                    throw new RuntimeException("Simulated test exception");
+            }
+            catch (InterruptedException ex) {
+                Logger.debug("network", ex.toString());
+            }
+
+            return true;
+        }
 
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("PUT");

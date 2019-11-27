@@ -114,5 +114,7 @@
     <string name="insecure_scheme_with_auth">ВНИМАНИЕ: Използване на удостоверяване с несигурна схема на достъп</string>
     <string name="zero_amount">0,00</string>
     <string name="new_transaction_saving">Запазване…</string>
+    <string name="simulate_save_label">Симулиране на заявките за съхраняване</string>
+    <string name="simulate_save_condensed_label">Симул. съхр.</string>
 
 </resources>

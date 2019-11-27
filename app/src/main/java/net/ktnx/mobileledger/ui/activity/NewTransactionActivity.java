@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -48,6 +49,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class NewTransactionActivity extends ProfileThemedActivity implements TaskCallback,
         NewTransactionFragment.OnNewTransactionFragmentInteractionListener {
     private NavController navController;
+    private NewTransactionModel model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +64,9 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
 
         Objects.requireNonNull(getSupportActionBar())
                .setDisplayHomeAsUpEnabled(true);
+
+        model = ViewModelProviders.of(this)
+                                  .get(NewTransactionModel.class);
     }
     @Override
     protected void initProfile() {
@@ -99,7 +104,8 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         navController.navigate(R.id.action_newTransactionFragment_to_newTransactionSavingFragment);
         try {
 
-            SendTransactionTask saver = new SendTransactionTask(this, mProfile);
+            SendTransactionTask saver =
+                    new SendTransactionTask(this, mProfile, model.getSimulateSave());
             saver.execute(tr);
         }
         catch (Exception e) {
@@ -121,7 +127,12 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         if (BuildConfig.DEBUG) {
             menu.findItem(R.id.action_simulate_crash)
                 .setVisible(true);
+            menu.findItem(R.id.action_simulate_save)
+                .setVisible(true);
         }
+
+        model.observeSimulateSave(this, state -> menu.findItem(R.id.action_simulate_save)
+                                                     .setChecked(state));
 
         return true;
     }
@@ -140,6 +151,9 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         }
         else
             navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
+    }
+    public void toggleSimulateSave(MenuItem item) {
+        model.toggleSimulateSave();
     }
 
     private class AsyncCrasher extends AsyncTask<Void, Void, Void> {

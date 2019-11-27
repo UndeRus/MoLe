@@ -53,6 +53,21 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<Boolean> isSubmittable = new MutableLiveData<>(false);
     private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
+    private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
+    public boolean getSimulateSave() {
+        return simulateSave.getValue();
+    }
+    public void setSimulateSave(boolean simulateSave) {
+        this.simulateSave.setValue(simulateSave);
+    }
+    public void toggleSimulateSave() {
+        simulateSave.setValue(!simulateSave.getValue());
+    }
+    public void observeSimulateSave(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                                    @NonNull
+                                            androidx.lifecycle.Observer<? super Boolean> observer) {
+        this.simulateSave.observe(owner, observer);
+    }
     public int getAccountCount() {
         return items.size();
     }
