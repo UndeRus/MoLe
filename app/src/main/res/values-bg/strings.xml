@@ -116,5 +116,6 @@
     <string name="new_transaction_saving">Запазване…</string>
     <string name="simulate_save_label">Симулиране на заявките за съхраняване</string>
     <string name="simulate_save_condensed_label">Симул. съхр.</string>
+    <string name="simulation_label">СИМУЛАЦИЯ</string>
 
 </resources>

@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
@@ -131,8 +132,11 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
                 .setVisible(true);
         }
 
-        model.observeSimulateSave(this, state -> menu.findItem(R.id.action_simulate_save)
-                                                     .setChecked(state));
+        model.observeSimulateSave(this, state -> {
+            menu.findItem(R.id.action_simulate_save)
+                .setChecked(state);
+            findViewById(R.id.simulationLabel).setVisibility(state ? View.VISIBLE : View.GONE);
+        });
 
         return true;
     }

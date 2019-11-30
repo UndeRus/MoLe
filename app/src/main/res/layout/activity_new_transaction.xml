@@ -24,7 +24,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/toolbar_layout"
@@ -54,6 +55,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar_layout"
             app:navGraph="@navigation/new_transaction_navigation" />
+
+        <TextView
+            android:id="@+id/simulationLabel"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:clickable="false"
+            android:gravity="center"
+            android:rotation="-45"
+            android:text="@string/simulation_label"
+            android:textAlignment="center"
+            android:textColor="@color/table_row_dark_bg"
+            android:textIsSelectable="false"
+            android:textSize="54sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -158,4 +158,5 @@
     <string name="new_transaction_saving">Saving…</string>
     <string name="simulate_save_label">Simulate save requests</string>
     <string name="simulate_save_condensed_label">Simul. save</string>
+    <string name="simulation_label">SIMULATION</string>
 </resources>
