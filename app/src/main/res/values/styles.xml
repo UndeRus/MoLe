@@ -28,6 +28,7 @@
         <item name="textColor">@android:color/tab_indicator_text</item>
     </style>
 
+    <style name="StretchedTextView" parent="Widget.AppCompat.TextView"></style>
     <!-- base hue: 261.2245° -->
     <!-- target primary color: #935FF2 -->
     <!-- theme list start -->
