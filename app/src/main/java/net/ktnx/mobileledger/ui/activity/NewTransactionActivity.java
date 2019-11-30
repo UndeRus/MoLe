@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -158,13 +157,6 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
     }
     public void toggleSimulateSave(MenuItem item) {
         model.toggleSimulateSave();
-    }
-
-    private class AsyncCrasher extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            throw new RuntimeException("Simulated crash");
-        }
     }
 
 }
