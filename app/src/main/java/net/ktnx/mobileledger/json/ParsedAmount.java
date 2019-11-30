@@ -25,7 +25,7 @@ public class ParsedAmount {
     private ParsedQuantity aquantity;
     private boolean aismultiplier;
     private ParsedStyle astyle;
-    private ParsedPrice aprice = new ParsedPrice();
+    private ParsedPrice aprice;
     public ParsedAmount() {
     }
     public ParsedPrice getAprice() {

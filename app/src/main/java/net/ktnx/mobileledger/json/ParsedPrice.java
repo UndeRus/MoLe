@@ -42,6 +42,7 @@ class ParsedPrice {
         private boolean aismultiplier;
         private ParsedStyle astyle;
         public Contents() {
+            acommodity = "";
         }
         public ParsedPrice getAprice() {
             return aprice;
