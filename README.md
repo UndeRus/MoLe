@@ -1,4 +1,4 @@
-MoLe is a front-end to [[http://hledger-web.org hledger-web]]
+MoLe is a front-end to [[https://hledger.org/hledger-web.html hledger-web]]
 
 # Copyright and licensing
 
