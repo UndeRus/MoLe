@@ -1,5 +1,24 @@
 # Changes
 
+## [0.11.0] - 2019-12-01
+
+* NEW
+    + new transaction: add clear button to text input fields
+* SECURITY
+    + avoid exposing basic HTTP authentication to wifi portals
+    + profile editor: warn when using authentication with insecure HTTP scheme
+    + permit cleartext HTTP traffic on Android 8+ (still, please use HTTPS to keep yout data safe while in transit)
+* IMPROVEMENTS
+    + clarify that crash reports are sent via email and user can review them before sending
+    + allow toggling password visibility in profile details
+    + reworked new transaction screen:
+* FIXES
+    - re-enable app shortcuts on Android 7.1 (Nougat)
+    - fix possible crash when returning to new transaction screen from another app
+    - fix race in setting up theme colors while creating UI
+    - rotating screen no longer restarts new transaction entry
+    - fix JSON API for hledger-web 1.15.2
+
 ## [0.10.3] - 2019-06-30
 
 * FIXES:
