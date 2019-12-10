@@ -71,7 +71,19 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         simulate = false;
     }
     private boolean sendOK() throws IOException {
+        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
+        http.setRequestMethod("PUT");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "*/*");
+
+        ParsedLedgerTransaction jsonTransaction;
+        jsonTransaction = ltr.toParsedLedgerTransaction();
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writerFor(ParsedLedgerTransaction.class);
+        String body = writer.writeValueAsString(jsonTransaction);
+
         if (simulate) {
+            debug("network", "The request would be: " + body);
             try {
                 Thread.sleep(1500);
                 if (Math.random() > 0.3)
@@ -83,17 +95,6 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
 
             return true;
         }
-
-        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
-        http.setRequestMethod("PUT");
-        http.setRequestProperty("Content-Type", "application/json");
-        http.setRequestProperty("Accept", "*/*");
-
-        ParsedLedgerTransaction jsonTransaction;
-        jsonTransaction = ltr.toParsedLedgerTransaction();
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writerFor(ParsedLedgerTransaction.class);
-        String body = writer.writeValueAsString(jsonTransaction);
 
         byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
         http.setDoOutput(true);
