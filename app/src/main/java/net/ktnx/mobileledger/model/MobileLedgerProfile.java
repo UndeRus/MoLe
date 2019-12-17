@@ -314,6 +314,7 @@ public final class MobileLedgerProfile {
             db.execSQL("delete from account_values where profile=?", uuid_param);
             db.execSQL("delete from transactions where profile=?", uuid_param);
             db.execSQL("delete from transaction_accounts where profile=?", uuid_param);
+            db.execSQL("delete from options where profile=?", uuid_param);
             db.setTransactionSuccessful();
         }
         finally {
