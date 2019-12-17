@@ -117,5 +117,13 @@
     <string name="simulate_save_label">Симулиране на заявките за съхраняване</string>
     <string name="simulate_save_condensed_label">Симул. съхр.</string>
     <string name="simulation_label">СИМУЛАЦИЯ</string>
+    <string name="future_dates_180">До шест месеца</string>
+    <string name="future_dates_30">До един месец</string>
+    <string name="future_dates_365">До една година</string>
+    <string name="future_dates_60">До два месеца</string>
+    <string name="future_dates_90">До три месеца</string>
+    <string name="future_dates_all">Без ограничения</string>
+    <string name="future_dates_none">Без въвеждане на бъдещи дати</string>
+    <string name="profile_future_dates_label">Въвеждане на дати в бъдещето</string>
 
 </resources>

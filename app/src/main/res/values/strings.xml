@@ -159,4 +159,12 @@
     <string name="simulate_save_label">Simulate save requests</string>
     <string name="simulate_save_condensed_label">Simul. save</string>
     <string name="simulation_label">SIMULATION</string>
+    <string name="profile_future_dates_label">Allow input of dates in the future</string>
+    <string name="future_dates_none">No future dates are allowed</string>
+    <string name="future_dates_30">Up to a month</string>
+    <string name="future_dates_60">Up to two months</string>
+    <string name="future_dates_90">Up to three months</string>
+    <string name="future_dates_180">Up to six months</string>
+    <string name="future_dates_365">Up to a year</string>
+    <string name="future_dates_all">Without restrictions</string>
 </resources>

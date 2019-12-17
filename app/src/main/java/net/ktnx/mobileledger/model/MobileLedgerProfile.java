@@ -17,10 +17,13 @@
 
 package net.ktnx.mobileledger.model;
 
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.SparseArray;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
@@ -48,6 +51,7 @@ public final class MobileLedgerProfile {
     private String authPassword;
     private int themeId;
     private int orderNo = -1;
+    private FutureDates futureDates = FutureDates.None;
     public MobileLedgerProfile() {
         this.uuid = String.valueOf(UUID.randomUUID());
     }
@@ -65,6 +69,7 @@ public final class MobileLedgerProfile {
         authPassword = origin.authPassword;
         themeId = origin.themeId;
         orderNo = origin.orderNo;
+        futureDates = origin.futureDates;
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
@@ -74,7 +79,7 @@ public final class MobileLedgerProfile {
         SQLiteDatabase db = App.getDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
-                                         "preferred_accounts_filter FROM " +
+                                         "preferred_accounts_filter, future_dates FROM " +
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
@@ -88,6 +93,7 @@ public final class MobileLedgerProfile {
                 item.setThemeId(cursor.getInt(7));
                 item.orderNo = cursor.getInt(8);
                 item.setPreferredAccountsFilter(cursor.getString(9));
+                item.setFutureDates(cursor.getInt(10));
                 list.add(item);
                 if (item.getUuid().equals(currentProfileUUID)) result = item;
             }
@@ -111,6 +117,15 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public FutureDates getFutureDates() {
+        return futureDates;
+    }
+    public void setFutureDates(int anInt) {
+        futureDates = FutureDates.valueOf(anInt);
+    }
+    public void setFutureDates(FutureDates futureDates) {
+        this.futureDates = futureDates;
     }
     public String getPreferredAccountsFilter() {
         return preferredAccountsFilter;
@@ -182,12 +197,12 @@ public final class MobileLedgerProfile {
 //                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeId));
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, " +
-                       "auth_password, theme, order_no, preferred_accounts_filter) " +
-                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       "auth_password, theme, order_no, preferred_accounts_filter, future_dates) " +
+                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeId, orderNo,
-                                 preferredAccountsFilter
+                                 preferredAccountsFilter, futureDates.toInt()
                     });
             db.setTransactionSuccessful();
         }
@@ -203,9 +218,8 @@ public final class MobileLedgerProfile {
                 new Object[]{acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded(), uuid,
                              acc.getName()
                 });
-        db.execSQL(
-                "insert into accounts(profile, name, name_upper, parent_name, level, hidden, expanded, keep) " +
-                "select ?,?,?,?,?,?,?,1 where (select changes() = 0)",
+        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, hidden, " +
+                   "expanded, keep) " + "select ?,?,?,?,?,?,?,1 where (select changes() = 0)",
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
                              acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded()
                 });
@@ -453,6 +467,46 @@ public final class MobileLedgerProfile {
         }
         finally {
             db.endTransaction();
+        }
+    }
+    public enum FutureDates {
+        None(0), OneMonth(30), TwoMonths(60), ThreeMonths(90), SixMonths(180), OneYear(365),
+        All(-1);
+        private static SparseArray<FutureDates> map = new SparseArray<>();
+
+        static {
+            for (FutureDates item : FutureDates.values()) {
+                map.put(item.value, item);
+            }
+        }
+
+        private int value;
+        FutureDates(int value) {
+            this.value = value;
+        }
+        public static FutureDates valueOf(int i) {
+            return map.get(i, None);
+        }
+        public int toInt() {
+            return this.value;
+        }
+        public String getText(Resources resources) {
+            switch (value) {
+                case 30:
+                    return resources.getString(R.string.future_dates_30);
+                case 60:
+                    return resources.getString(R.string.future_dates_60);
+                case 90:
+                    return resources.getString(R.string.future_dates_90);
+                case 180:
+                    return resources.getString(R.string.future_dates_180);
+                case 365:
+                    return resources.getString(R.string.future_dates_365);
+                case -1:
+                    return resources.getString(R.string.future_dates_all);
+                default:
+                    return resources.getString(R.string.future_dates_none);
+            }
         }
     }
 }
