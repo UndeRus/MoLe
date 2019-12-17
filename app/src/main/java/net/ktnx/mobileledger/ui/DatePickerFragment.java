@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -39,6 +40,13 @@ public class DatePickerFragment extends AppCompatDialogFragment
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
     private DatePickedListener onDatePickedListener;
+    private MobileLedgerProfile.FutureDates futureDates = MobileLedgerProfile.FutureDates.None;
+    public MobileLedgerProfile.FutureDates getFutureDates() {
+        return futureDates;
+    }
+    public void setFutureDates(MobileLedgerProfile.FutureDates futureDates) {
+        this.futureDates = futureDates;
+    }
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -78,8 +86,36 @@ public class DatePickerFragment extends AppCompatDialogFragment
         dpd.setContentView(R.layout.date_picker_view);
         dpd.setTitle(null);
         CalendarView cv = dpd.findViewById(R.id.calendarView);
-        cv.setDate(c.getTime().getTime());
-        cv.setMaxDate(todayStamp);
+        cv.setDate(c.getTime()
+                    .getTime());
+
+        if (futureDates == MobileLedgerProfile.FutureDates.All) {
+            cv.setMaxDate(Long.MAX_VALUE);
+        }
+        else {
+            switch (futureDates) {
+                case None:
+                    // already there
+                    break;
+                case OneMonth:
+                    c.add(Calendar.MONTH, 1);
+                    break;
+                case TwoMonths:
+                    c.add(Calendar.MONTH, 2);
+                    break;
+                case ThreeMonths:
+                    c.add(Calendar.MONTH, 3);
+                    break;
+                case SixMonths:
+                    c.add(Calendar.MONTH, 6);
+                    break;
+                case OneYear:
+                    c.add(Calendar.YEAR, 1);
+                    break;
+            }
+            cv.setMaxDate(c.getTime()
+                           .getTime());
+        }
 
         cv.setOnDateChangeListener(this);
 
