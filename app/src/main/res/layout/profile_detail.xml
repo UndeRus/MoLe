@@ -69,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:textAppearance="?android:textAppearanceListItem"
             android:text="@string/posting_permitted" />
 
         <LinearLayout
@@ -98,6 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:textAppearance="?android:textAppearanceListItem"
             android:text="@string/pref_title_use_http_auth" />
 
         <LinearLayout
@@ -173,7 +175,8 @@
                 android:ems="10"
                 android:fontFamily="monospace"
                 android:hint="@string/pref_preferred_autocompletion_account_filter_hint"
-                android:inputType="text" />
+                android:inputType="text"
+                android:textColor="?attr/editTextColor" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
@@ -186,6 +189,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="100"
                 android:gravity="center_vertical"
+                android:textAppearance="?android:textAppearanceListItem"
                 android:text="@string/profile_color_label" />
 
             <ImageButton
