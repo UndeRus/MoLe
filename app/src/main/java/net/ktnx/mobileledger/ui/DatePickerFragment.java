@@ -55,8 +55,8 @@ public class DatePickerFragment extends AppCompatDialogFragment
         int month = c.get(GregorianCalendar.MONTH);
         int day = c.get(GregorianCalendar.DAY_OF_MONTH);
         long todayStamp = c.getTimeInMillis();
-        TextView date =
-                Objects.requireNonNull(getActivity()).findViewById(R.id.new_transaction_date);
+        TextView date = Objects.requireNonNull(getActivity())
+                               .findViewById(R.id.new_transaction_date);
 
         CharSequence present = date.getText();
 

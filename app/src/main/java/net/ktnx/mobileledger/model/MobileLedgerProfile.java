@@ -22,6 +22,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.SparseArray;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
@@ -34,9 +37,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -95,7 +95,9 @@ public final class MobileLedgerProfile {
                 item.setPreferredAccountsFilter(cursor.getString(9));
                 item.setFutureDates(cursor.getInt(10));
                 list.add(item);
-                if (item.getUuid().equals(currentProfileUUID)) result = item;
+                if (item.getUuid()
+                        .equals(currentProfileUUID))
+                    result = item;
             }
         }
         Data.profiles.setValue(list);
@@ -264,11 +266,13 @@ public final class MobileLedgerProfile {
                     debug("profile", "returning default value for " + name);
                     result = default_value;
                 }
-                else debug("profile", String.format("option %s=%s", name, result));
+                else
+                    debug("profile", String.format("option %s=%s", name, result));
 
                 return result;
             }
-            else return default_value;
+            else
+                return default_value;
         }
         catch (Exception e) {
             debug("db", "returning default value for " + name, e);
@@ -335,7 +339,8 @@ public final class MobileLedgerProfile {
     public LedgerAccount loadAccount(SQLiteDatabase db, String accName) {
         LedgerAccount acc = tryLoadAccount(db, accName);
 
-        if (acc == null) throw new RuntimeException("Unable to load account with name " + accName);
+        if (acc == null)
+            throw new RuntimeException("Unable to load account with name " + accName);
 
         return acc;
     }
@@ -377,7 +382,8 @@ public final class MobileLedgerProfile {
         return this.themeId;
     }
     public void setThemeId(Object o) {
-        setThemeId(Integer.valueOf(String.valueOf(o)).intValue());
+        setThemeId(Integer.valueOf(String.valueOf(o))
+                          .intValue());
     }
     public void setThemeId(int themeId) {
 //        debug("profile", String.format("Profile.setThemeId(%d) called", themeId));

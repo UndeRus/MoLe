@@ -248,7 +248,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                 focused = tvAccount.requestFocus();
                                 tvAccount.dismissDropDown();
                                 if (focused)
-                                    Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+                                    Misc.showSoftKeyboard(
+                                            (NewTransactionActivity) tvAccount.getContext());
                             }
                         }
 

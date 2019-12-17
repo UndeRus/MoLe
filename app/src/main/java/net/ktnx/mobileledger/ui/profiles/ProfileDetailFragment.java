@@ -118,7 +118,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                         String.format("[fragment] removing profile %s", mProfile.getUuid()));
                 mProfile.removeFromDB();
                 ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
-                if (oldList == null) throw new AssertionError();
+                if (oldList == null)
+                    throw new AssertionError();
                 ArrayList<MobileLedgerProfile> newList = new ArrayList<>(oldList);
                 newList.remove(mProfile);
                 Data.profiles.setValue(newList);
@@ -128,14 +129,15 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                 }
 
                 final FragmentActivity activity = getActivity();
-                if (activity != null) activity.finish();
+                if (activity != null)
+                    activity.finish();
             });
             builder.show();
             return false;
         });
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        menuDeleteProfile
-                .setVisible((mProfile != null) && (profiles != null) && (profiles.size() > 1));
+        menuDeleteProfile.setVisible(
+                (mProfile != null) && (profiles != null) && (profiles.size() > 1));
 
         if (BuildConfig.DEBUG) {
             final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
@@ -146,20 +148,24 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private boolean onWipeDataMenuClicked() {
         // this is a development option, so no confirmation
         mProfile.wipeAllData();
-        if (mProfile.equals(Data.profile.getValue())) triggerProfileChange();
+        if (mProfile.equals(Data.profile.getValue()))
+            triggerProfileChange();
         return true;
     }
     private void triggerProfileChange() {
         int index = Data.getProfileIndex(mProfile);
         MobileLedgerProfile newProfile = new MobileLedgerProfile(mProfile);
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        if (profiles == null) throw new AssertionError();
+        if (profiles == null)
+            throw new AssertionError();
         profiles.set(index, newProfile);
 
         ProfilesRecyclerViewAdapter prva = ProfilesRecyclerViewAdapter.getInstance();
-        if (prva != null) prva.notifyItemChanged(index);
+        if (prva != null)
+            prva.notifyItemChanged(index);
 
-        if (mProfile.equals(Data.profile.getValue())) Data.profile.setValue(newProfile);
+        if (mProfile.equals(Data.profile.getValue()))
+            Data.profile.setValue(newProfile);
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -172,11 +178,14 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                 mProfile = profiles.get(index);
 
             Activity activity = this.getActivity();
-            if (activity == null) throw new AssertionError();
+            if (activity == null)
+                throw new AssertionError();
             CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-                if (mProfile != null) appBarLayout.setTitle(mProfile.getName());
-                else appBarLayout.setTitle(getResources().getString(R.string.new_profile_title));
+                if (mProfile != null)
+                    appBarLayout.setTitle(mProfile.getName());
+                else
+                    appBarLayout.setTitle(getResources().getString(R.string.new_profile_title));
             }
         }
     }
@@ -184,7 +193,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Activity context = getActivity();
-        if (context == null) return;
+        if (context == null)
+            return;
 
         FloatingActionButton fab = context.findViewById(R.id.fab);
         fab.setOnClickListener(v -> onSaveFabClicked());
@@ -192,7 +202,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         profileName.requestFocus();
     }
     private void onSaveFabClicked() {
-        if (!checkValidity()) return;
+        if (!checkValidity())
+            return;
 
         if (mProfile != null) {
             updateProfileFromUI();
@@ -206,18 +217,21 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             updateProfileFromUI();
             mProfile.storeInDB();
             final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-            if (profiles == null) throw new AssertionError();
+            if (profiles == null)
+                throw new AssertionError();
             ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);
             newList.add(mProfile);
             Data.profiles.setValue(newList);
             MobileLedgerProfile.storeProfilesOrder();
 
             // first profile ever?
-            if (newList.size() == 1) Data.profile.setValue(mProfile);
+            if (newList.size() == 1)
+                Data.profile.setValue(mProfile);
         }
 
         Activity activity = getActivity();
-        if (activity != null) activity.finish();
+        if (activity != null)
+            activity.finish();
     }
     private void updateProfileFromUI() {
         mProfile.setName(profileName.getText());
@@ -290,7 +304,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             debug("profiles", isChecked ? "auth enabled " : "auth disabled");
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            if (isChecked) userName.requestFocus();
+            if (isChecked)
+                userName.requestFocus();
             checkInsecureSchemeWithAuth();
         });
 
@@ -366,7 +381,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private boolean checkUrlValidity() {
         boolean valid = true;
 
-        String val = String.valueOf(url.getText()).trim();
+        String val = String.valueOf(url.getText())
+                           .trim();
         if (val.isEmpty()) {
             valid = false;
             urlLayout.setError(getResources().getText(R.string.err_profile_url_empty));
@@ -374,8 +390,10 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         try {
             URL url = new URL(val);
             String host = url.getHost();
-            if (host == null || host.isEmpty()) throw new MalformedURLException("Missing host");
-            String protocol = url.getProtocol().toUpperCase();
+            if (host == null || host.isEmpty())
+                throw new MalformedURLException("Missing host");
+            String protocol = url.getProtocol()
+                                 .toUpperCase();
             if (!protocol.equals("HTTP") && !protocol.equals("HTTPS")) {
                 valid = false;
                 urlLayout.setError(getResources().getText(R.string.err_invalid_url));
@@ -392,16 +410,21 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         boolean showWarning = false;
 
         if (useAuthentication.isChecked()) {
-            String urlText = url.getText().toString();
-            if (urlText.startsWith("http") && !urlText.startsWith("https")) showWarning = true;
+            String urlText = url.getText()
+                                .toString();
+            if (urlText.startsWith("http") && !urlText.startsWith("https"))
+                showWarning = true;
         }
 
-        if (showWarning) insecureWarningText.setVisibility(View.VISIBLE);
-        else insecureWarningText.setVisibility(View.GONE);
+        if (showWarning)
+            insecureWarningText.setVisibility(View.VISIBLE);
+        else
+            insecureWarningText.setVisibility(View.GONE);
     }
     private void hookClearErrorOnFocusListener(TextView view, TextInputLayout layout) {
         view.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) layout.setError(null);
+            if (hasFocus)
+                layout.setError(null);
         });
         view.addTextChangedListener(new TextWatcher() {
             @Override
@@ -420,26 +443,33 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         boolean valid = true;
 
         String val = String.valueOf(profileName.getText());
-        if (val.trim().isEmpty()) {
+        if (val.trim()
+               .isEmpty())
+        {
             valid = false;
             profileNameLayout.setError(getResources().getText(R.string.err_profile_name_empty));
         }
 
-        if (!checkUrlValidity()) valid = false;
+        if (!checkUrlValidity())
+            valid = false;
 
         if (useAuthentication.isChecked()) {
             val = String.valueOf(userName.getText());
-            if (val.trim().isEmpty()) {
+            if (val.trim()
+                   .isEmpty())
+            {
                 valid = false;
-                userNameLayout
-                        .setError(getResources().getText(R.string.err_profile_user_name_empty));
+                userNameLayout.setError(
+                        getResources().getText(R.string.err_profile_user_name_empty));
             }
 
             val = String.valueOf(password.getText());
-            if (val.trim().isEmpty()) {
+            if (val.trim()
+                   .isEmpty())
+            {
                 valid = false;
-                passwordLayout
-                        .setError(getResources().getText(R.string.err_profile_password_empty));
+                passwordLayout.setError(
+                        getResources().getText(R.string.err_profile_password_empty));
             }
         }
 
