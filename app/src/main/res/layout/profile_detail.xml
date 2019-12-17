@@ -71,6 +71,28 @@
             android:layout_marginBottom="16dp"
             android:text="@string/posting_permitted" />
 
+        <LinearLayout
+            android:id="@+id/future_dates_layout"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="16dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/future_dates_title"
+                android:textAppearance="?android:textAppearanceListItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_future_dates_label" />
+
+            <TextView
+                android:id="@+id/future_dates_text"
+                android:textAppearance="?android:textAppearanceListItemSecondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?attr/textColor"/>
+        </LinearLayout>
+
         <Switch
             android:id="@+id/enable_http_auth"
             android:layout_width="match_parent"

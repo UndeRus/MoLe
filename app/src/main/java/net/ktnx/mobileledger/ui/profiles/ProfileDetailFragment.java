@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -92,6 +93,9 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private TextInputLayout preferredAccountsFilterLayout;
     private View huePickerView;
     private View insecureWarningText;
+    private TextView futureDatesText;
+    private MobileLedgerProfile.FutureDates futureDates;
+    private View futureDatesLayout;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -224,6 +228,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         mProfile.setAuthUserName(userName.getText());
         mProfile.setAuthPassword(password.getText());
         mProfile.setThemeId(huePickerView.getTag());
+        mProfile.setFutureDates(futureDates);
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -235,6 +240,41 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         url = rootView.findViewById(R.id.url);
         urlLayout = rootView.findViewById(R.id.url_layout);
         postingPermitted = rootView.findViewById(R.id.profile_permit_posting);
+        futureDatesLayout = rootView.findViewById(R.id.future_dates_layout);
+        futureDatesText = rootView.findViewById(R.id.future_dates_text);
+        rootView.findViewById(R.id.future_dates_layout)
+                .setOnClickListener(v -> {
+                    MenuInflater mi = new MenuInflater(getContext());
+                    PopupMenu menu = new PopupMenu(getContext(), v);
+                    menu.inflate(R.menu.future_dates);
+                    menu.setOnMenuItemClickListener(item -> {
+                        switch (item.getItemId()) {
+                            case R.id.menu_future_dates_30:
+                                futureDates = MobileLedgerProfile.FutureDates.OneMonth;
+                                break;
+                            case R.id.menu_future_dates_60:
+                                futureDates = MobileLedgerProfile.FutureDates.TwoMonths;
+                                break;
+                            case R.id.menu_future_dates_90:
+                                futureDates = MobileLedgerProfile.FutureDates.ThreeMonths;
+                                break;
+                            case R.id.menu_future_dates_180:
+                                futureDates = MobileLedgerProfile.FutureDates.SixMonths;
+                                break;
+                            case R.id.menu_future_dates_365:
+                                futureDates = MobileLedgerProfile.FutureDates.OneYear;
+                                break;
+                            case R.id.menu_future_dates_all:
+                                futureDates = MobileLedgerProfile.FutureDates.All;
+                                break;
+                            default:
+                                futureDates = MobileLedgerProfile.FutureDates.None;
+                        }
+                        futureDatesText.setText(futureDates.getText(getResources()));
+                        return true;
+                    });
+                    menu.show();
+                });
         authParams = rootView.findViewById(R.id.auth_params);
         useAuthentication = rootView.findViewById(R.id.enable_http_auth);
         userName = rootView.findViewById(R.id.auth_user_name);
@@ -254,9 +294,10 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             checkInsecureSchemeWithAuth();
         });
 
-        postingPermitted.setOnCheckedChangeListener(
-                ((buttonView, isChecked) -> preferredAccountsFilterLayout
-                        .setVisibility(isChecked ? View.VISIBLE : View.GONE)));
+        postingPermitted.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            futureDatesLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        }));
 
         hookClearErrorOnFocusListener(profileName, profileNameLayout);
         hookClearErrorOnFocusListener(url, urlLayout);
@@ -267,6 +308,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         if (mProfile != null) {
             profileName.setText(mProfile.getName());
             postingPermitted.setChecked(mProfile.isPostingPermitted());
+            futureDates = mProfile.getFutureDates();
+            futureDatesText.setText(futureDates.getText(getResources()));
             url.setText(mProfile.getUrl());
             useAuthentication.setChecked(mProfile.isAuthEnabled());
             authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
@@ -279,6 +322,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             profileName.setText("");
             url.setText(HTTPS_URL_START);
             postingPermitted.setChecked(true);
+            futureDates = MobileLedgerProfile.FutureDates.None;
+            futureDatesText.setText(futureDates.getText(getResources()));
             useAuthentication.setChecked(false);
             authParams.setVisibility(View.GONE);
             userName.setText("");
