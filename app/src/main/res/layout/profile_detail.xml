@@ -65,47 +65,18 @@
         android:orientation="vertical">
 
         <Switch
-            android:id="@+id/profile_permit_posting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:textAppearance="?android:textAppearanceListItem"
-            android:text="@string/posting_permitted" />
-
-        <LinearLayout
-            android:id="@+id/future_dates_layout"
-            android:layout_width="match_parent"
-            android:layout_marginBottom="16dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/future_dates_title"
-                android:textAppearance="?android:textAppearanceListItem"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_future_dates_label" />
-
-            <TextView
-                android:id="@+id/future_dates_text"
-                android:textAppearance="?android:textAppearanceListItemSecondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/textColor"/>
-        </LinearLayout>
-
-        <Switch
             android:id="@+id/enable_http_auth"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:textAppearance="?android:textAppearanceListItem"
-            android:text="@string/pref_title_use_http_auth" />
+            android:text="@string/pref_title_use_http_auth"
+            android:textAppearance="?android:textAppearanceListItem" />
 
         <LinearLayout
             android:id="@+id/auth_params"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:paddingStart="8dp"
@@ -161,6 +132,36 @@
 
         </LinearLayout>
 
+        <Switch
+            android:id="@+id/profile_permit_posting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/posting_permitted"
+            android:textAppearance="?android:textAppearanceListItem" />
+
+        <LinearLayout
+            android:id="@+id/future_dates_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/future_dates_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_future_dates_label"
+                android:textAppearance="?android:textAppearanceListItem" />
+
+            <TextView
+                android:id="@+id/future_dates_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceListItemSecondary"
+                android:textColor="?attr/textColor" />
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/preferred_accounts_accounts_filter_layout"
             android:layout_width="match_parent"
@@ -189,8 +190,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="100"
                 android:gravity="center_vertical"
-                android:textAppearance="?android:textAppearanceListItem"
-                android:text="@string/profile_color_label" />
+                android:text="@string/profile_color_label"
+                android:textAppearance="?android:textAppearanceListItem" />
 
             <ImageButton
                 android:id="@+id/btn_pick_ring_color"
