@@ -134,6 +134,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
             publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, odd));
 
             int rowIndex = 0;
+            // FIXME ConcurrentModificationException in ArrayList$ltr.next (ArrayList.java:831)
             for (LedgerTransactionAccount acc : tr.getAccounts()) {
 //                debug(c.getAccountName(), acc.getAmount()));
                 publishProgress(new TransactionLoaderStep(p[0].holder, acc, rowIndex++,
