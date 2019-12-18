@@ -31,6 +31,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
@@ -44,10 +48,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
