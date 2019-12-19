@@ -168,8 +168,11 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             Data.profile.setValue(newProfile);
     }
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Activity context = getActivity();
+        if (context == null)
+            return;
 
         if ((getArguments() != null) && getArguments().containsKey(ARG_ITEM_ID)) {
             int index = getArguments().getInt(ARG_ITEM_ID, -1);
@@ -188,118 +191,60 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                     appBarLayout.setTitle(getResources().getString(R.string.new_profile_title));
             }
         }
-    }
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Activity context = getActivity();
-        if (context == null)
-            return;
 
         FloatingActionButton fab = context.findViewById(R.id.fab);
         fab.setOnClickListener(v -> onSaveFabClicked());
-
-        profileName.requestFocus();
-    }
-    private void onSaveFabClicked() {
-        if (!checkValidity())
-            return;
-
-        if (mProfile != null) {
-            updateProfileFromUI();
-//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
-            mProfile.storeInDB();
-            debug("profiles", "profile stored in DB");
-            triggerProfileChange();
-        }
-        else {
-            mProfile = new MobileLedgerProfile();
-            updateProfileFromUI();
-            mProfile.storeInDB();
-            final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-            if (profiles == null)
-                throw new AssertionError();
-            ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);
-            newList.add(mProfile);
-            Data.profiles.setValue(newList);
-            MobileLedgerProfile.storeProfilesOrder();
-
-            // first profile ever?
-            if (newList.size() == 1)
-                Data.profile.setValue(mProfile);
-        }
-
-        Activity activity = getActivity();
-        if (activity != null)
-            activity.finish();
-    }
-    private void updateProfileFromUI() {
-        mProfile.setName(profileName.getText());
-        mProfile.setUrl(url.getText());
-        mProfile.setPostingPermitted(postingPermitted.isChecked());
-        mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getText());
-        mProfile.setAuthEnabled(useAuthentication.isChecked());
-        mProfile.setAuthUserName(userName.getText());
-        mProfile.setAuthPassword(password.getText());
-        mProfile.setThemeId(huePickerView.getTag());
-        mProfile.setFutureDates(futureDates);
-    }
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.profile_detail, container, false);
-
-        profileName = rootView.findViewById(R.id.profile_name);
-        profileNameLayout = rootView.findViewById(R.id.profile_name_layout);
-        url = rootView.findViewById(R.id.url);
-        urlLayout = rootView.findViewById(R.id.url_layout);
-        postingPermitted = rootView.findViewById(R.id.profile_permit_posting);
-        futureDatesLayout = rootView.findViewById(R.id.future_dates_layout);
-        futureDatesText = rootView.findViewById(R.id.future_dates_text);
-        rootView.findViewById(R.id.future_dates_layout)
-                .setOnClickListener(v -> {
-                    MenuInflater mi = new MenuInflater(getContext());
-                    PopupMenu menu = new PopupMenu(getContext(), v);
-                    menu.inflate(R.menu.future_dates);
-                    menu.setOnMenuItemClickListener(item -> {
-                        switch (item.getItemId()) {
-                            case R.id.menu_future_dates_30:
-                                futureDates = MobileLedgerProfile.FutureDates.OneMonth;
-                                break;
-                            case R.id.menu_future_dates_60:
-                                futureDates = MobileLedgerProfile.FutureDates.TwoMonths;
-                                break;
-                            case R.id.menu_future_dates_90:
-                                futureDates = MobileLedgerProfile.FutureDates.ThreeMonths;
-                                break;
-                            case R.id.menu_future_dates_180:
-                                futureDates = MobileLedgerProfile.FutureDates.SixMonths;
-                                break;
-                            case R.id.menu_future_dates_365:
-                                futureDates = MobileLedgerProfile.FutureDates.OneYear;
-                                break;
-                            case R.id.menu_future_dates_all:
-                                futureDates = MobileLedgerProfile.FutureDates.All;
-                                break;
-                            default:
-                                futureDates = MobileLedgerProfile.FutureDates.None;
-                        }
-                        futureDatesText.setText(futureDates.getText(getResources()));
-                        return true;
-                    });
-                    menu.show();
-                });
-        authParams = rootView.findViewById(R.id.auth_params);
-        useAuthentication = rootView.findViewById(R.id.enable_http_auth);
-        userName = rootView.findViewById(R.id.auth_user_name);
-        userNameLayout = rootView.findViewById(R.id.auth_user_name_layout);
-        password = rootView.findViewById(R.id.password);
-        passwordLayout = rootView.findViewById(R.id.password_layout);
-        huePickerView = rootView.findViewById(R.id.btn_pick_ring_color);
-        preferredAccountsFilter = rootView.findViewById(R.id.preferred_accounts_filter_filter);
+        profileName = context.findViewById(R.id.profile_name);
+        profileNameLayout = context.findViewById(R.id.profile_name_layout);
+        url = context.findViewById(R.id.url);
+        urlLayout = context.findViewById(R.id.url_layout);
+        postingPermitted = context.findViewById(R.id.profile_permit_posting);
+        futureDatesLayout = context.findViewById(R.id.future_dates_layout);
+        futureDatesText = context.findViewById(R.id.future_dates_text);
+        context.findViewById(R.id.future_dates_layout)
+               .setOnClickListener(v -> {
+                   MenuInflater mi = new MenuInflater(context);
+                   PopupMenu menu = new PopupMenu(context, v);
+                   menu.inflate(R.menu.future_dates);
+                   menu.setOnMenuItemClickListener(item -> {
+                       switch (item.getItemId()) {
+                           case R.id.menu_future_dates_30:
+                               futureDates = MobileLedgerProfile.FutureDates.OneMonth;
+                               break;
+                           case R.id.menu_future_dates_60:
+                               futureDates = MobileLedgerProfile.FutureDates.TwoMonths;
+                               break;
+                           case R.id.menu_future_dates_90:
+                               futureDates = MobileLedgerProfile.FutureDates.ThreeMonths;
+                               break;
+                           case R.id.menu_future_dates_180:
+                               futureDates = MobileLedgerProfile.FutureDates.SixMonths;
+                               break;
+                           case R.id.menu_future_dates_365:
+                               futureDates = MobileLedgerProfile.FutureDates.OneYear;
+                               break;
+                           case R.id.menu_future_dates_all:
+                               futureDates = MobileLedgerProfile.FutureDates.All;
+                               break;
+                           default:
+                               futureDates = MobileLedgerProfile.FutureDates.None;
+                       }
+                       futureDatesText.setText(futureDates.getText(getResources()));
+                       return true;
+                   });
+                   menu.show();
+               });
+        authParams = context.findViewById(R.id.auth_params);
+        useAuthentication = context.findViewById(R.id.enable_http_auth);
+        userName = context.findViewById(R.id.auth_user_name);
+        userNameLayout = context.findViewById(R.id.auth_user_name_layout);
+        password = context.findViewById(R.id.password);
+        passwordLayout = context.findViewById(R.id.password_layout);
+        huePickerView = context.findViewById(R.id.btn_pick_ring_color);
+        preferredAccountsFilter = context.findViewById(R.id.preferred_accounts_filter_filter);
         preferredAccountsFilterLayout =
-                rootView.findViewById(R.id.preferred_accounts_accounts_filter_layout);
-        insecureWarningText = rootView.findViewById(R.id.insecure_scheme_text);
+                context.findViewById(R.id.preferred_accounts_accounts_filter_layout);
+        insecureWarningText = context.findViewById(R.id.insecure_scheme_text);
 
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             debug("profiles", isChecked ? "auth enabled " : "auth disabled");
@@ -376,6 +321,57 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             d.show();
             d.setColorSelectedListener(this);
         });
+
+        profileName.requestFocus();
+    }
+    private void onSaveFabClicked() {
+        if (!checkValidity())
+            return;
+
+        if (mProfile != null) {
+            updateProfileFromUI();
+//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
+            mProfile.storeInDB();
+            debug("profiles", "profile stored in DB");
+            triggerProfileChange();
+        }
+        else {
+            mProfile = new MobileLedgerProfile();
+            updateProfileFromUI();
+            mProfile.storeInDB();
+            final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+            if (profiles == null)
+                throw new AssertionError();
+            ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);
+            newList.add(mProfile);
+            Data.profiles.setValue(newList);
+            MobileLedgerProfile.storeProfilesOrder();
+
+            // first profile ever?
+            if (newList.size() == 1)
+                Data.profile.setValue(mProfile);
+        }
+
+        Activity activity = getActivity();
+        if (activity != null)
+            activity.finish();
+    }
+    private void updateProfileFromUI() {
+        mProfile.setName(profileName.getText());
+        mProfile.setUrl(url.getText());
+        mProfile.setPostingPermitted(postingPermitted.isChecked());
+        mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getText());
+        mProfile.setAuthEnabled(useAuthentication.isChecked());
+        mProfile.setAuthUserName(userName.getText());
+        mProfile.setAuthPassword(password.getText());
+        mProfile.setThemeId(huePickerView.getTag());
+        mProfile.setFutureDates(futureDates);
+    }
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.profile_detail, container, false);
+
         return rootView;
     }
     private boolean checkUrlValidity() {
