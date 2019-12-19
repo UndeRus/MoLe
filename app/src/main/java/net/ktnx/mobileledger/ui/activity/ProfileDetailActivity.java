@@ -20,6 +20,9 @@ package net.ktnx.mobileledger.ui.activity;
 import android.os.Bundle;
 import android.view.Menu;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -28,9 +31,6 @@ import net.ktnx.mobileledger.utils.Colors;
 
 import java.util.ArrayList;
 import java.util.Locale;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -51,9 +51,10 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
             if (profiles != null) {
                 profile = profiles.get(index);
-                if (profile == null) throw new AssertionError(
-                        String.format("Can't get profile " + "(index:%d) from the global list",
-                                index));
+                if (profile == null)
+                    throw new AssertionError(
+                            String.format("Can't get profile " + "(index:%d) from the global list",
+                                    index));
 
                 debug("profiles", String.format(Locale.ENGLISH, "Editing profile %s (%s); hue=%d",
                         profile.getName(), profile.getUuid(), profile.getThemeId()));
@@ -89,14 +90,16 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             mFragment = new ProfileDetailFragment();
             mFragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.profile_detail_container, mFragment).commit();
+                                       .add(R.id.profile_detail_container, mFragment)
+                                       .commit();
         }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         debug("profiles", "[activity] Creating profile details options menu");
-        if (mFragment != null) mFragment.onCreateOptionsMenu(menu, getMenuInflater());
+        if (mFragment != null)
+            mFragment.onCreateOptionsMenu(menu, getMenuInflater());
 
         return true;
     }
