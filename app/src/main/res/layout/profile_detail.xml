@@ -132,6 +132,27 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/api_version_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_api_version_title"
+                android:textAppearance="?android:textAppearanceListItem" />
+
+            <TextView
+                android:id="@+id/api_version_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceListItemSecondary"
+                android:textColor="?attr/textColor" />
+        </LinearLayout>
+
         <Switch
             android:id="@+id/profile_permit_posting"
             android:layout_width="match_parent"
