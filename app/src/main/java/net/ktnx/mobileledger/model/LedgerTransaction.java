@@ -36,10 +36,14 @@ public class LedgerTransaction {
             new Comparator<LedgerTransactionAccount>() {
                 @Override
                 public int compare(LedgerTransactionAccount o1, LedgerTransactionAccount o2) {
-                    int res = o1.getAccountName().compareTo(o2.getAccountName());
-                    if (res != 0) return res;
-                    res = o1.getCurrency().compareTo(o2.getCurrency());
-                    if (res != 0) return res;
+                    int res = o1.getAccountName()
+                                .compareTo(o2.getAccountName());
+                    if (res != 0)
+                        return res;
+                    res = o1.getCurrency()
+                            .compareTo(o2.getCurrency());
+                    if (res != 0)
+                        return res;
                     return Float.compare(o1.getAmount(), o2.getAmount());
                 }
             };
@@ -54,7 +58,8 @@ public class LedgerTransaction {
             throws ParseException {
         this(id, Globals.parseLedgerDate(dateString), description);
     }
-    public LedgerTransaction(Integer id, Date date, String description, MobileLedgerProfile profile) {
+    public LedgerTransaction(Integer id, Date date, String description,
+                             MobileLedgerProfile profile) {
         this.profile = profile.getUuid();
         this.id = id;
         this.date = date;
@@ -106,7 +111,8 @@ public class LedgerTransaction {
         return id;
     }
     protected void fillDataHash() {
-        if (dataHash != null) return;
+        if (dataHash != null)
+            return;
         try {
             Digest sha = new Digest(DIGEST_TYPE);
             StringBuilder data = new StringBuilder();
@@ -124,7 +130,8 @@ public class LedgerTransaction {
                 data.append('\0');
                 data.append(item.getAmount());
             }
-            sha.update(data.toString().getBytes(Charset.forName("UTF-8")));
+            sha.update(data.toString()
+                           .getBytes(Charset.forName("UTF-8")));
             dataHash = sha.digestToHexString();
         }
         catch (NoSuchAlgorithmException e) {
@@ -134,8 +141,8 @@ public class LedgerTransaction {
     }
     public boolean existsInDb(SQLiteDatabase db) {
         fillDataHash();
-        try (Cursor c = db
-                .rawQuery("SELECT 1 from transactions where data_hash = ?", new String[]{dataHash}))
+        try (Cursor c = db.rawQuery("SELECT 1 from transactions where data_hash = ?",
+                new String[]{dataHash}))
         {
             boolean result = c.moveToFirst();
 //            debug("db", String.format("Transaction %d (%s) %s", id, dataHash,
@@ -144,11 +151,12 @@ public class LedgerTransaction {
         }
     }
     public void loadData(SQLiteDatabase db) {
-        if (dataLoaded) return;
+        if (dataLoaded)
+            return;
 
-        try (Cursor cTr = db
-                .rawQuery("SELECT date, description from transactions WHERE profile=? AND id=?",
-                        new String[]{profile, String.valueOf(id)}))
+        try (Cursor cTr = db.rawQuery(
+                "SELECT date, description from transactions WHERE profile=? AND id=?",
+                new String[]{profile, String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
                 String dateString = cTr.getString(0);
