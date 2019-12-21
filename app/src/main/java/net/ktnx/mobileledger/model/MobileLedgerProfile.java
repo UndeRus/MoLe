@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
+import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -52,6 +53,7 @@ public final class MobileLedgerProfile {
     private int themeId;
     private int orderNo = -1;
     private FutureDates futureDates = FutureDates.None;
+    private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
     public MobileLedgerProfile() {
         this.uuid = String.valueOf(UUID.randomUUID());
     }
@@ -70,6 +72,7 @@ public final class MobileLedgerProfile {
         themeId = origin.themeId;
         orderNo = origin.orderNo;
         futureDates = origin.futureDates;
+        apiVersion = origin.apiVersion;
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
@@ -119,6 +122,15 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public SendTransactionTask.API getApiVersion() {
+        return apiVersion;
+    }
+    public void setApiVersion(SendTransactionTask.API apiVersion) {
+        this.apiVersion = apiVersion;
+    }
+    public void setApiVersion(int apiVersion) {
+        this.apiVersion = SendTransactionTask.API.valueOf(apiVersion);
     }
     public FutureDates getFutureDates() {
         return futureDates;

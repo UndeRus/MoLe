@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json;
+package net.ktnx.mobileledger.json.v1_15;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

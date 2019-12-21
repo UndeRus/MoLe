@@ -15,11 +15,11 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+package net.ktnx.mobileledger.json.v1_15;
 
 import androidx.annotation.NonNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedBalance {

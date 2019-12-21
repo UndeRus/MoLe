@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json;
+package net.ktnx.mobileledger.json.v1_15;
 
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +36,7 @@ public class AccountListParser {
 
         iter = reader.readValues(input);
     }
-    public ParsedLedgerAccount nextAccount() throws IOException {
+    public ParsedLedgerAccount nextAccount() {
         if (!iter.hasNext()) return null;
 
         ParsedLedgerAccount next = iter.next();

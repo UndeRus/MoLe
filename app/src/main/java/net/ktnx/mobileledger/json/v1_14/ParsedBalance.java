@@ -15,30 +15,18 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json;
+package net.ktnx.mobileledger.json.v1_14;
+
+import androidx.annotation.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedAmount {
-    private String acommodity;
+public class ParsedBalance {
     private ParsedQuantity aquantity;
-    private boolean aismultiplier;
+    private String acommodity;
     private ParsedStyle astyle;
-    private ParsedPrice aprice;
-    public ParsedAmount() {
-    }
-    public ParsedPrice getAprice() {
-        return aprice;
-    }
-    public void setAprice(ParsedPrice aprice) {
-        this.aprice = aprice;
-    }
-    public String getAcommodity() {
-        return acommodity;
-    }
-    public void setAcommodity(String acommodity) {
-        this.acommodity = acommodity;
+    public ParsedBalance() {
     }
     public ParsedQuantity getAquantity() {
         return aquantity;
@@ -46,11 +34,12 @@ public class ParsedAmount {
     public void setAquantity(ParsedQuantity aquantity) {
         this.aquantity = aquantity;
     }
-    public boolean isAismultiplier() {
-        return aismultiplier;
+    @NonNull
+    public String getAcommodity() {
+        return (acommodity == null) ? "" : acommodity;
     }
-    public void setAismultiplier(boolean aismultiplier) {
-        this.aismultiplier = aismultiplier;
+    public void setAcommodity(String acommodity) {
+        this.acommodity = acommodity;
     }
     public ParsedStyle getAstyle() {
         return astyle;
@@ -58,5 +47,4 @@ public class ParsedAmount {
     public void setAstyle(ParsedStyle astyle) {
         this.astyle = astyle;
     }
-
 }

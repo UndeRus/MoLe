@@ -167,4 +167,8 @@
     <string name="future_dates_180">Up to six months</string>
     <string name="future_dates_365">Up to a year</string>
     <string name="future_dates_all">Without restrictions</string>
+    <string name="api_html">Simulate HTML form</string>
+    <string name="api_pre_1_15">version before 1.15</string>
+    <string name="api_post_1_14">version 1.15 and above</string>
+    <string name="api_auto">Detect automaticaly</string>
 </resources>

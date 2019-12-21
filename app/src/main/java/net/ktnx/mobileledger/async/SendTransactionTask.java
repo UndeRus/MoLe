@@ -17,13 +17,15 @@
 
 package net.ktnx.mobileledger.async;
 
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
-import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -70,18 +72,37 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         mProfile = profile;
         simulate = false;
     }
-    private boolean sendOK() throws IOException {
+    private boolean send_1_15_OK() throws IOException {
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("PUT");
         http.setRequestProperty("Content-Type", "application/json");
         http.setRequestProperty("Accept", "*/*");
 
-        ParsedLedgerTransaction jsonTransaction;
-        jsonTransaction = ltr.toParsedLedgerTransaction();
+        net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction jsonTransaction =
+                net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.fromLedgerTransaction(ltr);
         ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writerFor(ParsedLedgerTransaction.class);
+        ObjectWriter writer =
+                mapper.writerFor(net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.class);
         String body = writer.writeValueAsString(jsonTransaction);
 
+        return sendRequest(http, body);
+    }
+    private boolean send_1_14_OK() throws IOException {
+        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
+        http.setRequestMethod("PUT");
+        http.setRequestProperty("Content-Type", "application/json");
+        http.setRequestProperty("Accept", "*/*");
+
+        net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction jsonTransaction =
+                net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.fromLedgerTransaction(ltr);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer =
+                mapper.writerFor(net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.class);
+        String body = writer.writeValueAsString(jsonTransaction);
+
+        return sendRequest(http, body);
+    }
+    private boolean sendRequest(HttpURLConnection http, String body) throws IOException {
         if (simulate) {
             debug("network", "The request would be: " + body);
             try {
@@ -118,6 +139,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     case 200:
                     case 201:
                         break;
+                    case 400:
                     case 405:
                         return false; // will cause a retry with the legacy method
                     default:
@@ -227,21 +249,41 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             }
         }
     }
-
     @Override
     protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
         error = null;
         try {
             ltr = ledgerTransactions[0];
 
-            if (!sendOK()) {
-                int tried = 0;
-                while (!legacySendOK()) {
-                    tried++;
-                    if (tried >= 2)
-                        throw new IOException(String.format("aborting after %d tries", tried));
-                    sleep(100);
-                }
+            switch (mProfile.getApiVersion()) {
+                case auto:
+                    Logger.debug("network", "Trying version 1.5.");
+                    if (!send_1_15_OK()) {
+                        Logger.debug("network", "Version 1.5 request failed. Trying with 1.14");
+                        if (!send_1_14_OK()) {
+                            Logger.debug("network", "Version 1.14 failed too. Trying HTML form emulation");
+                            legacySendOkWithRetry();
+                        }
+                        else {
+                            Logger.debug("network", "Version 1.14 request succeeded");
+                        }
+                    }
+                    else {
+                        Logger.debug("network", "Version 1.15 request succeeded");
+                    }
+                    break;
+                case html:
+                    legacySendOkWithRetry();
+                    break;
+                case pre_1_15:
+                    send_1_14_OK();
+                    break;
+                case post_1_14:
+                    send_1_15_OK();
+                    break;
+                default:
+                    throw new IllegalStateException(
+                            "Unexpected API version: " + mProfile.getApiVersion());
             }
         }
         catch (Exception e) {
@@ -251,10 +293,56 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
 
         return null;
     }
-
+    private void legacySendOkWithRetry() throws IOException {
+        int tried = 0;
+        while (!legacySendOK()) {
+            tried++;
+            if (tried >= 2)
+                throw new IOException(
+                        String.format("aborting after %d tries", tried));
+            sleep(100);
+        }
+    }
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         taskCallback.done(error);
+    }
+
+    public enum API {
+        auto(0), html(-1), pre_1_15(-2), post_1_14(-3);
+        private static SparseArray<API> map = new SparseArray<>();
+
+        static {
+            for (API item : API.values()) {
+                map.put(item.value, item);
+            }
+        }
+
+        private int value;
+
+        API(int value) {
+            this.value = value;
+        }
+        public static API valueOf(int i) {
+            return map.get(i, auto);
+        }
+        public int toInt() {
+            return this.value;
+        }
+        public String getDescription(Resources resources) {
+            switch (this) {
+                case auto:
+                    return resources.getString(R.string.api_auto);
+                case html:
+                    return resources.getString(R.string.api_html);
+                case pre_1_15:
+                    return resources.getString(R.string.api_pre_1_15);
+                case post_1_14:
+                    return resources.getString(R.string.api_post_1_14);
+                default:
+                    throw new IllegalStateException("Unexpected value: " + value);
+            }
+        }
     }
 }

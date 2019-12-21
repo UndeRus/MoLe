@@ -15,23 +15,29 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json;
+package net.ktnx.mobileledger.json.v1_15;
 
-import net.ktnx.mobileledger.json.v1_15.ParsedQuantity;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.Test;
-
-import static junit.framework.TestCase.assertEquals;
-
-public class ParsedQuantityTest {
-    @Test
-    public void fromString() {
-        ParsedQuantity pq = new ParsedQuantity("-22");
-        assertEquals(0, pq.getDecimalPlaces());
-        assertEquals(-22, pq.getDecimalMantissa());
-
-        pq = new ParsedQuantity("-123.45");
-        assertEquals(2, pq.getDecimalPlaces());
-        assertEquals(-12345, pq.getDecimalMantissa());
+class ParsedSourcePos {
+    private String tag = "JournalSourcePos";
+    private List<Object> contents;
+    public ParsedSourcePos() {
+        contents = new ArrayList<>();
+        contents.add("");
+        contents.add(new Integer[]{1, 1});
+    }
+    public String getTag() {
+        return tag;
+    }
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+    public List<Object> getContents() {
+        return contents;
+    }
+    public void setContents(List<Object> contents) {
+        this.contents = contents;
     }
 }

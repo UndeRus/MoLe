@@ -20,8 +20,6 @@ package net.ktnx.mobileledger.model;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.ktnx.mobileledger.json.ParsedLedgerTransaction;
-import net.ktnx.mobileledger.json.ParsedPosting;
 import net.ktnx.mobileledger.utils.Digest;
 import net.ktnx.mobileledger.utils.Globals;
 
@@ -31,7 +29,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -190,26 +187,5 @@ public class LedgerTransaction {
     }
     public void finishLoading() {
         dataLoaded = true;
-    }
-    public ParsedLedgerTransaction toParsedLedgerTransaction() {
-        ParsedLedgerTransaction result = new ParsedLedgerTransaction();
-        result.setTcomment("");
-        result.setTprecedingcomment("");
-
-        ArrayList<ParsedPosting> postings = new ArrayList<>();
-        for (LedgerTransactionAccount acc : accounts) {
-            if (!acc.getAccountName().isEmpty()) postings.add(acc.asParsedPosting());
-        }
-
-        result.setTpostings(postings);
-        Date transactionDate = date;
-        if (transactionDate == null) {
-            transactionDate = new GregorianCalendar().getTime();
-        }
-        result.setTdate(Globals.formatIsoDate(transactionDate));
-        result.setTdate2(null);
-        result.setTindex(1);
-        result.setTdescription(description);
-        return result;
     }
 }
