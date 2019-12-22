@@ -56,6 +56,9 @@ import java.util.Date;
  * {@link OnNewTransactionFragmentInteractionListener} interface
  * to handle interaction events.
  */
+
+// TODO: offer to undo account remove-on-swipe
+
 public class NewTransactionFragment extends Fragment {
     private NewTransactionItemsAdapter listAdapter;
     private NewTransactionModel viewModel;
