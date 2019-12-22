@@ -166,7 +166,6 @@ public class NewTransactionFragment extends Fragment {
         if (args != null) {
             String error = args.getString("error");
             if (error != null) {
-                // TODO display error
                 Logger.debug("new-trans-f", String.format("Got error: %s", error));
                 Snackbar.make(list, error, Snackbar.LENGTH_LONG)
                         .show();
