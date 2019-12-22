@@ -30,7 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -93,8 +93,7 @@ public class NewTransactionFragment extends Fragment {
                     "getActivity() returned null within onActivityCreated()");
 
         list = activity.findViewById(R.id.new_transaction_accounts);
-        viewModel = ViewModelProviders.of(activity)
-                                      .get(NewTransactionModel.class);
+        viewModel = new ViewModelProvider(activity).get(NewTransactionModel.class);
         mProfile = Data.profile.getValue();
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
         list.setAdapter(listAdapter);

@@ -24,7 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -65,8 +65,7 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         Objects.requireNonNull(getSupportActionBar())
                .setDisplayHomeAsUpEnabled(true);
 
-        model = ViewModelProviders.of(this)
-                                  .get(NewTransactionModel.class);
+        model = new ViewModelProvider(this).get(NewTransactionModel.class);
     }
     @Override
     protected void initProfile() {
