@@ -29,8 +29,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
@@ -43,11 +41,6 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
     public AccountSummaryAdapter modelAdapter;
-    /*
-        private MenuItem mShowOnlyStarred;
-        private Menu optMenu;
-    */
-    private FloatingActionButton fab;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +79,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         DividerItemDecoration did =
                 new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
         root.addItemDecoration(did);
-
-        fab = mActivity.findViewById(R.id.btn_add_transaction);
 
         mActivity.fabShouldShow();
 
