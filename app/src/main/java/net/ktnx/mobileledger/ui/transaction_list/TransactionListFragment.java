@@ -56,8 +56,6 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        Data.backgroundTasksRunning.observe(getViewLifecycleOwner(),
-                this::onBackgroundTaskRunningChanged);
     }
     @Override
     public void onAttach(@NotNull Context context) {
@@ -89,6 +87,9 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         debug("flow", "TransactionListFragment.onActivityCreated called");
         super.onActivityCreated(savedInstanceState);
+
+        Data.backgroundTasksRunning.observe(getViewLifecycleOwner(),
+                this::onBackgroundTaskRunningChanged);
 
         swiper = mActivity.findViewById(R.id.transaction_swipe);
         if (swiper == null)
