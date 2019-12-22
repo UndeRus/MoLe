@@ -407,9 +407,8 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.profile_detail, container, false);
 
-        return rootView;
+        return inflater.inflate(R.layout.profile_detail, container, false);
     }
     private boolean checkUrlValidity() {
         boolean valid = true;
