@@ -505,11 +505,6 @@ public class MainActivity extends ProfileThemedActivity {
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_up, R.anim.dummy);
     }
-    public void navSettingsClicked(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
-        drawer.closeDrawers();
-    }
     public void markDrawerItemCurrent(int id) {
         TextView item = drawer.findViewById(id);
         item.setBackgroundColor(Colors.tableRowDarkBG);

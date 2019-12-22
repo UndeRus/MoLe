@@ -50,7 +50,6 @@
                 style="@style/nav_button"
                 android:layout_weight="1"
                 android:drawableStart="@drawable/ic_settings_black_24dp"
-                android:onClick="navSettingsClicked"
                 android:text="@string/action_settings" />
 
         </LinearLayout>
