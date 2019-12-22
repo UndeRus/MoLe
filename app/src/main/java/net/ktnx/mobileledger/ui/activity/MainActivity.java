@@ -121,12 +121,16 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onDestroy() {
         mSectionsPagerAdapter = null;
         RecyclerView root = findViewById(R.id.nav_profile_list);
-        if (root != null) root.setAdapter(null);
-        if (drawer != null) drawer.removeDrawerListener(drawerListener);
+        if (root != null)
+            root.setAdapter(null);
+        if (drawer != null)
+            drawer.removeDrawerListener(drawerListener);
         drawerListener = null;
-        if (drawer != null) drawer.removeDrawerListener(barDrawerToggle);
+        if (drawer != null)
+            drawer.removeDrawerListener(barDrawerToggle);
         barDrawerToggle = null;
-        if (mViewPager != null) mViewPager.removeOnPageChangeListener(pageChangeListener);
+        if (mViewPager != null)
+            mViewPager.removeOnPageChangeListener(pageChangeListener);
         pageChangeListener = null;
         super.onDestroy();
     }
@@ -134,7 +138,8 @@ public class MainActivity extends ProfileThemedActivity {
     protected void setupProfileColors() {
         SharedPreferences prefs = getPreferences(MODE_PRIVATE);
         int profileColor = prefs.getInt(PREF_THEME_ID, -2);
-        if (profileColor == -2) profileColor = Data.retrieveCurrentThemeIdFromDb();
+        if (profileColor == -2)
+            profileColor = Data.retrieveCurrentThemeIdFromDb();
         Colors.setupTheme(this, profileColor);
         Colors.profileThemeId = profileColor;
         storeThemeIdInPrefs(profileColor);
@@ -162,7 +167,8 @@ public class MainActivity extends ProfileThemedActivity {
         mViewPager = findViewById(R.id.root_frame);
 
         Bundle extra = getIntent().getBundleExtra(BUNDLE_SAVED_STATE);
-        if (extra != null && savedInstanceState == null) savedInstanceState = extra;
+        if (extra != null && savedInstanceState == null)
+            savedInstanceState = extra;
 
 
         mToolbar = findViewById(R.id.toolbar);
@@ -182,8 +188,8 @@ public class MainActivity extends ProfileThemedActivity {
         TextView ver = drawer.findViewById(R.id.drawer_version_text);
 
         try {
-            PackageInfo pi =
-                    getApplicationContext().getPackageManager().getPackageInfo(getPackageName(), 0);
+            PackageInfo pi = getApplicationContext().getPackageManager()
+                                                    .getPackageInfo(getPackageName(), 0);
             ver.setText(pi.versionName);
         }
         catch (Exception e) {
@@ -228,19 +234,20 @@ public class MainActivity extends ProfileThemedActivity {
 
         Data.lastUpdateDate.observe(this, this::updateLastUpdateDisplay);
 
-        findViewById(R.id.btn_no_profiles_add)
-                .setOnClickListener(v -> startEditProfileActivity(null));
+        findViewById(R.id.btn_no_profiles_add).setOnClickListener(
+                v -> startEditProfileActivity(null));
 
         findViewById(R.id.btn_add_transaction).setOnClickListener(this::fabNewTransactionClicked);
 
-        findViewById(R.id.nav_new_profile_button)
-                .setOnClickListener(v -> startEditProfileActivity(null));
+        findViewById(R.id.nav_new_profile_button).setOnClickListener(
+                v -> startEditProfileActivity(null));
 
         RecyclerView root = findViewById(R.id.nav_profile_list);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
 
-        if (mProfileListAdapter == null) mProfileListAdapter = new ProfilesRecyclerViewAdapter();
+        if (mProfileListAdapter == null)
+            mProfileListAdapter = new ProfilesRecyclerViewAdapter();
         root.setAdapter(mProfileListAdapter);
 
         mProfileListAdapter.editingProfiles.observe(this, newValue -> {
@@ -281,8 +288,8 @@ public class MainActivity extends ProfileThemedActivity {
 
         profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
         profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
-        profileListHeadMoreAndCancel
-                .setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
+        profileListHeadMoreAndCancel.setOnClickListener(
+                (v) -> mProfileListAdapter.flipEditingProfiles());
         if (drawerListener == null) {
             drawerListener = new DrawerLayout.SimpleDrawerListener() {
                 @Override
@@ -304,28 +311,43 @@ public class MainActivity extends ProfileThemedActivity {
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
         if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
-            if (lastUpdate == null) debug("db::", "WEB data never fetched. scheduling a fetch");
-            else debug("db", String.format(Locale.ENGLISH,
-                    "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
-                    lastUpdate.getTime() / 1000f, now / 1000f));
+            if (lastUpdate == null)
+                debug("db::", "WEB data never fetched. scheduling a fetch");
+            else
+                debug("db", String.format(Locale.ENGLISH,
+                        "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
+                        lastUpdate.getTime() / 1000f, now / 1000f));
 
             Data.scheduleTransactionListRetrieval(this);
         }
     }
     private void createShortcuts(List<MobileLedgerProfile> list) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1) return;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1)
+            return;
 
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         int i = 0;
         for (MobileLedgerProfile p : list) {
-            if (!p.isPostingPermitted()) continue;
+            if (!p.isPostingPermitted())
+                continue;
 
-            ShortcutInfo si = new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid())
-                    .setShortLabel(p.getName())
-                    .setIcon(Icon.createWithResource(this, R.drawable.svg_thick_plus_white))
-                    .setIntent(
-                            new Intent(Intent.ACTION_VIEW, null, this, NewTransactionActivity.class)
-                                    .putExtra("profile_uuid", p.getUuid())).setRank(i).build();
+            ShortcutInfo si =
+                    new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid()).setShortLabel(
+                            p.getName())
+                                                                                    .setIcon(
+                                                                                            Icon.createWithResource(
+                                                                                                    this,
+                                                                                                    R.drawable.svg_thick_plus_white))
+                                                                                    .setIntent(
+                                                                                            new Intent(
+                                                                                                    Intent.ACTION_VIEW,
+                                                                                                    null,
+                                                                                                    this,
+                                                                                                    NewTransactionActivity.class).putExtra(
+                                                                                                    "profile_uuid",
+                                                                                                    p.getUuid()))
+                                                                                    .setRank(i)
+                                                                                    .build();
             shortcuts.add(si);
             i++;
         }
@@ -368,8 +390,10 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
         findViewById(R.id.pager_layout).setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
-        if (haveProfile) setTitle(profile.getName());
-        else setTitle(R.string.app_name);
+        if (haveProfile)
+            setTitle(profile.getName());
+        else
+            setTitle(R.string.app_name);
 
         this.profile = profile;
 
@@ -421,7 +445,8 @@ public class MainActivity extends ProfileThemedActivity {
             debug("main", "no last update date :(");
         }
         else {
-            final String text = DateFormat.getDateTimeInstance().format(newValue);
+            final String text = DateFormat.getDateTimeInstance()
+                                          .format(newValue);
             v.setText(text);
             l.setVisibility(View.VISIBLE);
             debug("main", String.format("Date formatted: %s", text));
@@ -458,7 +483,8 @@ public class MainActivity extends ProfileThemedActivity {
         Bundle args = new Bundle();
         if (profile != null) {
             int index = Data.getProfileIndex(profile);
-            if (index != -1) intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
+            if (index != -1)
+                intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
         }
         intent.putExtras(args);
         startActivity(intent, args);
@@ -542,7 +568,8 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void updateLastUpdateTextFromDB() {
-        if (profile == null) return;
+        if (profile == null)
+            return;
 
         long last_update = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
 
@@ -569,7 +596,9 @@ public class MainActivity extends ProfileThemedActivity {
             new RefreshDescriptionsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             TransactionListViewModel.scheduleTransactionListReload();
         }
-        else Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, error, Toast.LENGTH_LONG)
+                 .show();
     }
     public void onRetrieveStart() {
         ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
@@ -578,8 +607,10 @@ public class MainActivity extends ProfileThemedActivity {
         progressBar.setIndeterminateTintList(csl);
         progressBar.setProgressTintList(csl);
         progressBar.setIndeterminate(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) progressBar.setProgress(0, false);
-        else progressBar.setProgress(0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            progressBar.setProgress(0, false);
+        else
+            progressBar.setProgress(0);
         findViewById(R.id.transaction_progress_layout).setVisibility(View.VISIBLE);
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
@@ -597,20 +628,25 @@ public class MainActivity extends ProfileThemedActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 progressBar.setProgress(progress.getProgress(), true);
             }
-            else progressBar.setProgress(progress.getProgress());
+            else
+                progressBar.setProgress(progress.getProgress());
             progressBar.setIndeterminate(false);
         }
     }
     public void fabShouldShow() {
-        if ((profile != null) && profile.isPostingPermitted()) fab.show();
+        if ((profile != null) && profile.isPostingPermitted())
+            fab.show();
     }
     public void fabHide() {
         fab.hide();
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;
-        if (view.getId() == R.id.account_expander) row = (ViewGroup) view.getParent().getParent();
-        else row = (ViewGroup) view.getParent();
+        if (view.getId() == R.id.account_expander)
+            row = (ViewGroup) view.getParent()
+                                  .getParent();
+        else
+            row = (ViewGroup) view.getParent();
 
         LedgerAccount acc = (LedgerAccount) row.getTag();
         switch (view.getId()) {
@@ -618,7 +654,8 @@ public class MainActivity extends ProfileThemedActivity {
             case R.id.account_expander:
             case R.id.account_expander_container:
                 debug("accounts", "Account expander clicked");
-                if (!acc.hasSubAccounts()) return;
+                if (!acc.hasSubAccounts())
+                    return;
 
                 boolean wasExpanded = acc.isExpanded();
 
@@ -642,7 +679,8 @@ public class MainActivity extends ProfileThemedActivity {
                     try (LockHolder ignored = Data.accounts.lockForWriting()) {
                         for (int i = 0; i < Data.accounts.size(); i++) {
                             if (acc.isParentOf(Data.accounts.get(i))) {
-//                                debug("accounts", String.format("Found a child '%s' at position %d",
+//                                debug("accounts", String.format("Found a child '%s' at position
+//                                %d",
 //                                        Data.accounts.get(i).getName(), i));
                                 if (start == -1) {
                                     start = i;
@@ -666,8 +704,8 @@ public class MainActivity extends ProfileThemedActivity {
                                 Data.accounts.removeQuietly(start);
                             }
 
-                            mAccountSummaryFragment.modelAdapter
-                                    .notifyItemRangeRemoved(start, count);
+                            mAccountSummaryFragment.modelAdapter.notifyItemRangeRemoved(start,
+                                    count);
                         }
                     }
                 }
@@ -681,8 +719,8 @@ public class MainActivity extends ProfileThemedActivity {
                         if (parentPos != -1) {
                             // may have disappeared in a concurrent refresh operation
                             Data.accounts.addAllQuietly(parentPos + 1, children);
-                            mAccountSummaryFragment.modelAdapter
-                                    .notifyItemRangeInserted(parentPos + 1, children.size());
+                            mAccountSummaryFragment.modelAdapter.notifyItemRangeInserted(
+                                    parentPos + 1, children.size());
                         }
                     }
                 }
@@ -690,11 +728,10 @@ public class MainActivity extends ProfileThemedActivity {
             case R.id.account_row_acc_amounts:
                 if (acc.getAmountCount() > AccountSummaryAdapter.AMOUNT_LIMIT) {
                     acc.toggleAmountsExpanded();
-                    DbOpQueue
-                            .add("update accounts set amounts_expanded=? where name=? and profile=?",
-                                    new Object[]{acc.amountsExpanded(), acc.getName(),
-                                                 profile.getUuid()
-                                    });
+                    DbOpQueue.add(
+                            "update accounts set amounts_expanded=? where name=? and profile=?",
+                            new Object[]{acc.amountsExpanded(), acc.getName(), profile.getUuid()
+                            });
                     Data.accounts.triggerItemChangedNotification(acc);
                 }
                 break;
