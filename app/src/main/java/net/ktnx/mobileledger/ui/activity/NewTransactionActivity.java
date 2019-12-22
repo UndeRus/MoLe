@@ -40,10 +40,7 @@ import java.util.Objects;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /*
- * TODO: nicer progress while transaction is submitted
  * TODO: reports
- * TODO: get rid of the custom session/cookie and auth code?
- *         (the last problem with the POST was the missing content-length header)
  *  */
 
 public class NewTransactionActivity extends ProfileThemedActivity implements TaskCallback,

@@ -52,6 +52,12 @@ import java.util.regex.Pattern;
 import static android.os.SystemClock.sleep;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
+/* TODO: get rid of the custom session/cookie and auth code?
+ *       (the last problem with the POST was the missing content-length header)
+ *       This will resolve itself when hledger-web 1.14+ is released with Debian/stable,
+ *       at which point the HTML form emulation can be dropped entirely
+ */
+
 public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private final TaskCallback taskCallback;
     protected String error;
@@ -261,7 +267,8 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     if (!send_1_15_OK()) {
                         Logger.debug("network", "Version 1.5 request failed. Trying with 1.14");
                         if (!send_1_14_OK()) {
-                            Logger.debug("network", "Version 1.14 failed too. Trying HTML form emulation");
+                            Logger.debug("network",
+                                    "Version 1.14 failed too. Trying HTML form emulation");
                             legacySendOkWithRetry();
                         }
                         else {
@@ -298,8 +305,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         while (!legacySendOK()) {
             tried++;
             if (tried >= 2)
-                throw new IOException(
-                        String.format("aborting after %d tries", tried));
+                throw new IOException(String.format("aborting after %d tries", tried));
             sleep(100);
         }
     }
