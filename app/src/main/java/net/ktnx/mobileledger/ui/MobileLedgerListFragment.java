@@ -19,15 +19,15 @@ package net.ktnx.mobileledger.ui;
 
 import android.view.MotionEvent;
 
-import net.ktnx.mobileledger.ui.activity.MainActivity;
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;
-import net.ktnx.mobileledger.utils.Colors;
-import net.ktnx.mobileledger.utils.DimensionUtils;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import net.ktnx.mobileledger.ui.activity.MainActivity;
+import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;
+import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.DimensionUtils;
 
 public class MobileLedgerListFragment extends Fragment {
     public SwipeRefreshLayout swiper;
@@ -38,8 +38,10 @@ public class MobileLedgerListFragment extends Fragment {
         swiper.setColorSchemeColors(Colors.getColors());
     }
     public void onBackgroundTaskRunningChanged(Boolean isRunning) {
-        if (mActivity == null) return;
-        if (swiper == null) return;
+        if (mActivity == null)
+            return;
+        if (swiper == null)
+            return;
         swiper.setRefreshing(isRunning);
     }
     protected void manageFabOnScroll() {
@@ -66,7 +68,8 @@ public class MobileLedgerListFragment extends Fragment {
                             // swipe up
                             downAnchor = lastY;
 
-                            if (currentY < upAnchor - triggerPixels) mActivity.fabHide();
+                            if (currentY < upAnchor - triggerPixels)
+                                mActivity.fabHide();
                         }
 
                         lastY = currentY;
