@@ -80,6 +80,10 @@ import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
+/*
+ * TODO: reports
+ *  */
+
 public class MainActivity extends ProfileThemedActivity {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";

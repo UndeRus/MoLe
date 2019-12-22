@@ -39,10 +39,6 @@ import java.util.Objects;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
-/*
- * TODO: reports
- *  */
-
 public class NewTransactionActivity extends ProfileThemedActivity implements TaskCallback,
         NewTransactionFragment.OnNewTransactionFragmentInteractionListener {
     private NavController navController;
