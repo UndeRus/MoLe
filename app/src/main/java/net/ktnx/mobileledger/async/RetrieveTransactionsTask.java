@@ -122,7 +122,6 @@ public class RetrieveTransactionsTask
         HashMap<String, Void> accountNames = new HashMap<>();
         HashMap<String, LedgerAccount> syntheticAccounts = new HashMap<>();
         LedgerAccount lastAccount = null, prevAccount = null;
-        boolean onlyStarred = Data.optShowOnlyStarred.get();
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "journal");
         http.setAllowUserInteraction(false);
@@ -218,8 +217,8 @@ public class RetrieveTransactionsTask
                                         }
                                         acc.setHasSubAccounts(true);
                                         acc.removeAmounts();    // filled below when amounts are parsed
-                                        if ((!onlyStarred || !acc.isHiddenByStar()) &&
-                                            acc.isVisible(accountList)) accountList.add(acc);
+                                        if (acc.isVisible(accountList))
+                                            accountList.add(acc);
                                         L(String.format("gap-filling with %s", aName));
                                         accountNames.put(aName, null);
                                         profile.storeAccount(db, acc);
@@ -227,8 +226,7 @@ public class RetrieveTransactionsTask
                                     }
                                 }
 
-                                if ((!onlyStarred || !lastAccount.isHiddenByStar()) &&
-                                    lastAccount.isVisible(accountList))
+                                if (lastAccount.isVisible(accountList))
                                     accountList.add(lastAccount);
                                 accountNames.put(acct_name, null);
 

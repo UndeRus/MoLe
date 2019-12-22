@@ -21,6 +21,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import androidx.lifecycle.MutableLiveData;
+
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
@@ -29,7 +31,6 @@ import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableList;
-import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -37,8 +38,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import androidx.lifecycle.MutableLiveData;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -51,7 +50,6 @@ public final class Data {
     public static MutableLiveData<MobileLedgerProfile> profile = new MutableLiveData<>();
     public static MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
-    public static ObservableValue<Boolean> optShowOnlyStarred = new ObservableValue<>();
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static Locker profilesLocker = new Locker();

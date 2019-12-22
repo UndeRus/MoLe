@@ -17,11 +17,9 @@
 
 package net.ktnx.mobileledger.ui.account_summary;
 
-import android.content.Context;
 import android.os.AsyncTask;
 
 import net.ktnx.mobileledger.async.CommitAccountsTask;
-import net.ktnx.mobileledger.async.CommitAccountsTaskParams;
 import net.ktnx.mobileledger.async.UpdateAccountsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -33,11 +31,6 @@ import androidx.lifecycle.ViewModel;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryViewModel extends ViewModel {
-    static void commitSelections(Context context) {
-        CAT task = new CAT();
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                new CommitAccountsTaskParams(Data.accounts, Data.optShowOnlyStarred.get()));
-    }
     static public void scheduleAccountListReload() {
         if (Data.profile.getValue() == null) return;
 

@@ -37,11 +37,9 @@ public class UpdateAccountsTask extends AsyncTask<Void, Void, ArrayList<LedgerAc
             MobileLedgerProfile profile = Data.profile.getValue();
             if (profile == null) throw new AssertionError();
             String profileUUID = profile.getUuid();
-            boolean onlyStarred = Data.optShowOnlyStarred.get();
             ArrayList<LedgerAccount> newList = new ArrayList<>();
 
             String sql = "SELECT a.name from accounts a WHERE a.profile = ?";
-            if (onlyStarred) sql += " AND a.hidden = 0";
             sql += " ORDER BY a.name";
 
             SQLiteDatabase db = App.getDatabase();

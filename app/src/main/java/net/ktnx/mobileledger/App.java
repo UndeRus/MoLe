@@ -18,11 +18,9 @@
 package net.ktnx.mobileledger;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
@@ -35,8 +33,6 @@ import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-
-import static net.ktnx.mobileledger.ui.activity.SettingsActivity.PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS;
 
 public class App extends Application {
     public static App instance;
@@ -52,12 +48,6 @@ public class App extends Application {
         instance = this;
         super.onCreate();
         updateMonthNames();
-        SharedPreferences p = PreferenceManager.getDefaultSharedPreferences(this);
-        Data.optShowOnlyStarred.set(p.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
-        SharedPreferences.OnSharedPreferenceChangeListener handler =
-                (preference, value) -> Data.optShowOnlyStarred
-                        .set(preference.getBoolean(PREF_KEY_SHOW_ONLY_STARRED_ACCOUNTS, false));
-        p.registerOnSharedPreferenceChangeListener(handler);
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
