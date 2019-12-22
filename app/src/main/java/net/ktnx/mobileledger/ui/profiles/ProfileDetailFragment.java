@@ -163,9 +163,9 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             throw new AssertionError();
         profiles.set(index, newProfile);
 
-        ProfilesRecyclerViewAdapter prva = ProfilesRecyclerViewAdapter.getInstance();
-        if (prva != null)
-            prva.notifyItemChanged(index);
+        ProfilesRecyclerViewAdapter viewAdapter = ProfilesRecyclerViewAdapter.getInstance();
+        if (viewAdapter != null)
+            viewAdapter.notifyItemChanged(index);
 
         if (mProfile.equals(Data.profile.getValue()))
             Data.profile.setValue(newProfile);
