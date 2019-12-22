@@ -19,14 +19,13 @@ package net.ktnx.mobileledger.ui.account_summary;
 
 import android.os.AsyncTask;
 
-import net.ktnx.mobileledger.async.CommitAccountsTask;
+import androidx.lifecycle.ViewModel;
+
 import net.ktnx.mobileledger.async.UpdateAccountsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 
 import java.util.ArrayList;
-
-import androidx.lifecycle.ViewModel;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -50,15 +49,5 @@ public class AccountSummaryViewModel extends ViewModel {
         }
     }
 
-    private static class CAT extends CommitAccountsTask {
-        @Override
-        protected void onPostExecute(ArrayList<LedgerAccount> list) {
-            super.onPostExecute(list);
-            if (list != null) {
-                debug("acc", "setting new account list");
-                Data.accounts.setList(list);
-            }
-        }
-    }
 }
 
