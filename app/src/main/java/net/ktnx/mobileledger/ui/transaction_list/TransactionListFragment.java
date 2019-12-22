@@ -30,6 +30,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
@@ -39,11 +44,6 @@ import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -91,7 +91,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         super.onActivityCreated(savedInstanceState);
 
         swiper = mActivity.findViewById(R.id.transaction_swipe);
-        if (swiper == null) throw new RuntimeException("Can't get hold on the swipe layout");
+        if (swiper == null)
+            throw new RuntimeException("Can't get hold on the swipe layout");
         root = mActivity.findViewById(R.id.transaction_root);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
@@ -131,24 +132,29 @@ public class TransactionListFragment extends MobileLedgerListFragment {
                 (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
         TransactionListViewModel.updateError.addObserver((o, arg) -> {
             String err = TransactionListViewModel.updateError.get();
-            if (err == null) return;
+            if (err == null)
+                return;
 
-            Toast.makeText(mActivity, err, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mActivity, err, Toast.LENGTH_SHORT)
+                 .show();
             TransactionListViewModel.updateError.set(null);
         });
         Data.transactions.addObserver(
                 (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
 
-        mActivity.findViewById(R.id.clearAccountNameFilter).setOnClickListener(v -> {
-            Data.accountFilter.setValue(null);
-            vAccountFilter.setVisibility(View.GONE);
-            menuTransactionListFilter.setVisible(true);
-            Globals.hideSoftKeyboard(mActivity);
-        });
+        mActivity.findViewById(R.id.clearAccountNameFilter)
+                 .setOnClickListener(v -> {
+                     Data.accountFilter.setValue(null);
+                     vAccountFilter.setVisibility(View.GONE);
+                     menuTransactionListFilter.setVisible(true);
+                     Globals.hideSoftKeyboard(mActivity);
+                 });
     }
     private void onAccountNameFilterChanged(String accName) {
-        final String fieldText = accNameFilter.getText().toString();
-        if ((accName == null) && (fieldText.equals(""))) return;
+        final String fieldText = accNameFilter.getText()
+                                              .toString();
+        if ((accName == null) && (fieldText.equals("")))
+            return;
 
         if (accNameFilter != null) {
             accNameFilter.setText(accName, false);
@@ -157,7 +163,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         if (vAccountFilter != null) {
             vAccountFilter.setVisibility(filterActive ? View.VISIBLE : View.GONE);
         }
-        if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(!filterActive);
+        if (menuTransactionListFilter != null)
+            menuTransactionListFilter.setVisible(!filterActive);
 
         TransactionListViewModel.scheduleTransactionListReload();
 
@@ -167,7 +174,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         inflater.inflate(R.menu.transaction_list, menu);
 
         menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
-        if ((menuTransactionListFilter == null)) throw new AssertionError();
+        if ((menuTransactionListFilter == null))
+            throw new AssertionError();
 
         if ((Data.accountFilter.getValue() != null) ||
             (vAccountFilter.getVisibility() == View.VISIBLE))
@@ -179,7 +187,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
         menuTransactionListFilter.setOnMenuItemClickListener(item -> {
             vAccountFilter.setVisibility(View.VISIBLE);
-            if (menuTransactionListFilter != null) menuTransactionListFilter.setVisible(false);
+            if (menuTransactionListFilter != null)
+                menuTransactionListFilter.setVisible(false);
             accNameFilter.requestFocus();
             InputMethodManager imm =
                     (InputMethodManager) mActivity.getSystemService(INPUT_METHOD_SERVICE);
