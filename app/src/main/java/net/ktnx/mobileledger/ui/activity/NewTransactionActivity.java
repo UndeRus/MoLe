@@ -86,12 +86,6 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         }
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // FIXME if (tvDescription.getText().toString().isEmpty()) tvDescription.requestFocus();
-    }
     public void onTransactionSave(LedgerTransaction tr) {
         navController.navigate(R.id.action_newTransactionFragment_to_newTransactionSavingFragment);
         try {
