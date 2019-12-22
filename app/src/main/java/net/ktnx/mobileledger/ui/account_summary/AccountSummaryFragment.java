@@ -46,9 +46,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         super.onCreate(savedInstanceState);
         debug("flow", "AccountSummaryFragment.onCreate()");
         setHasOptionsMenu(true);
-
-        Data.backgroundTasksRunning.observe(this.getViewLifecycleOwner(),
-                this::onBackgroundTaskRunningChanged);
     }
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
@@ -67,6 +64,9 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         debug("flow", "AccountSummaryFragment.onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
+
+        Data.backgroundTasksRunning.observe(this.getViewLifecycleOwner(),
+                this::onBackgroundTaskRunningChanged);
 
         modelAdapter = new AccountSummaryAdapter();
 
