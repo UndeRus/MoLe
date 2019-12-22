@@ -98,7 +98,6 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private MobileLedgerProfile.FutureDates futureDates;
     private View futureDatesLayout;
     private TextView apiVersionText;
-    private View apiVersionLayout;
     private SendTransactionTask.API apiVersion;
 
     /**
@@ -238,32 +237,32 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                    });
                    menu.show();
                });
-        apiVersionLayout = context.findViewById(R.id.api_version_layout);
         apiVersionText = context.findViewById(R.id.api_version_text);
-        apiVersionLayout.setOnClickListener(v -> {
-            MenuInflater mi = new MenuInflater(context);
-            PopupMenu menu = new PopupMenu(context, v);
-            menu.inflate(R.menu.api_version);
-            menu.setOnMenuItemClickListener(item -> {
-                switch (item.getItemId()) {
-                    case R.id.api_version_menu_html:
-                        apiVersion = SendTransactionTask.API.html;
-                        break;
-                    case R.id.api_version_menu_post_1_14:
-                        apiVersion = SendTransactionTask.API.post_1_14;
-                        break;
-                    case R.id.api_version_menu_pre_1_15:
-                        apiVersion = SendTransactionTask.API.pre_1_15;
-                        break;
-                    case R.id.api_version_menu_auto:
-                    default:
-                        apiVersion = SendTransactionTask.API.auto;
-                }
-                apiVersionText.setText(apiVersion.getDescription(getResources()));
-                return true;
-            });
-            menu.show();
-        });
+        context.findViewById(R.id.api_version_layout)
+               .setOnClickListener(v -> {
+                   MenuInflater mi = new MenuInflater(context);
+                   PopupMenu menu = new PopupMenu(context, v);
+                   menu.inflate(R.menu.api_version);
+                   menu.setOnMenuItemClickListener(item -> {
+                       switch (item.getItemId()) {
+                           case R.id.api_version_menu_html:
+                               apiVersion = SendTransactionTask.API.html;
+                               break;
+                           case R.id.api_version_menu_post_1_14:
+                               apiVersion = SendTransactionTask.API.post_1_14;
+                               break;
+                           case R.id.api_version_menu_pre_1_15:
+                               apiVersion = SendTransactionTask.API.pre_1_15;
+                               break;
+                           case R.id.api_version_menu_auto:
+                           default:
+                               apiVersion = SendTransactionTask.API.auto;
+                       }
+                       apiVersionText.setText(apiVersion.getDescription(getResources()));
+                       return true;
+                   });
+                   menu.show();
+               });
         authParams = context.findViewById(R.id.auth_params);
         useAuthentication = context.findViewById(R.id.enable_http_auth);
         userName = context.findViewById(R.id.auth_user_name);
