@@ -98,7 +98,7 @@ public class NewTransactionFragment extends Fragment {
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(activity));
-        Data.profile.observe(this, profile -> {
+        Data.profile.observe(getViewLifecycleOwner(), profile -> {
             mProfile = profile;
             listAdapter.setProfile(profile);
         });
@@ -142,7 +142,7 @@ public class NewTransactionFragment extends Fragment {
         }).attachToRecyclerView(list);
 
         viewModel.isSubmittable()
-                 .observe(this, isSubmittable -> {
+                 .observe(getViewLifecycleOwner(), isSubmittable -> {
                      if (isSubmittable) {
                          if (fab != null) {
                              fab.show();

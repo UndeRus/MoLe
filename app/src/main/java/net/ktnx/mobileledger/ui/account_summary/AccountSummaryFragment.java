@@ -54,7 +54,8 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         debug("flow", "AccountSummaryFragment.onCreate()");
         setHasOptionsMenu(true);
 
-        Data.backgroundTasksRunning.observe(this, this::onBackgroundTaskRunningChanged);
+        Data.backgroundTasksRunning.observe(this.getViewLifecycleOwner(),
+                this::onBackgroundTaskRunningChanged);
     }
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
@@ -93,7 +94,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         manageFabOnScroll();
 
         swiper = mActivity.findViewById(R.id.account_swiper);
-        Colors.themeWatch.observe(this, this::themeChanged);
+        Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
         swiper.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");
             Data.scheduleTransactionListRetrieval(mActivity);

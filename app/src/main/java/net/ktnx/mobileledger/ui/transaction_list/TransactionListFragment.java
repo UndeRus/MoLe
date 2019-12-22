@@ -56,7 +56,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        Data.backgroundTasksRunning.observe(this, this::onBackgroundTaskRunningChanged);
+        Data.backgroundTasksRunning.observe(getViewLifecycleOwner(),
+                this::onBackgroundTaskRunningChanged);
     }
     @Override
     public void onAttach(@NotNull Context context) {
@@ -111,7 +112,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             Data.scheduleTransactionListRetrieval(mActivity);
         });
 
-        Colors.themeWatch.observe(this, this::themeChanged);
+        Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
 
         vAccountFilter = mActivity.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = mActivity.findViewById(R.id.transaction_filter_account_name);
@@ -124,7 +125,7 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             Globals.hideSoftKeyboard(mActivity);
         });
 
-        Data.accountFilter.observe(this, this::onAccountNameFilterChanged);
+        Data.accountFilter.observe(getViewLifecycleOwner(), this::onAccountNameFilterChanged);
 
         TransactionListViewModel.updating.addObserver(
                 (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
