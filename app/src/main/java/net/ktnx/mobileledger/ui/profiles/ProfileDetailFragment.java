@@ -246,9 +246,6 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             menu.inflate(R.menu.api_version);
             menu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
-                    case R.id.api_version_menu_auto:
-                        apiVersion = SendTransactionTask.API.auto;
-                        break;
                     case R.id.api_version_menu_html:
                         apiVersion = SendTransactionTask.API.html;
                         break;
@@ -258,6 +255,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                     case R.id.api_version_menu_pre_1_15:
                         apiVersion = SendTransactionTask.API.pre_1_15;
                         break;
+                    case R.id.api_version_menu_auto:
                     default:
                         apiVersion = SendTransactionTask.API.auto;
                 }
