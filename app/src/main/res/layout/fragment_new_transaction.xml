@@ -25,6 +25,7 @@
         tools:context="net.ktnx.mobileledger.ui.activity.NewTransactionActivity">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:orientation="vertical"
             android:id="@+id/new_transaction_accounts"
             android:layout_width="0dp"
             android:layout_height="0dp"
