@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -106,44 +105,6 @@ public class NewTransactionFragment extends Fragment {
             listAdapter.setProfile(profile);
         });
         listAdapter.notifyDataSetChanged();
-        new ItemTouchHelper(new ItemTouchHelper.Callback() {
-            @Override
-            public int getMovementFlags(@NonNull RecyclerView recyclerView,
-                                        @NonNull RecyclerView.ViewHolder viewHolder) {
-                int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
-                // the top item is always there (date and description)
-                if (viewHolder.getAdapterPosition() > 0) {
-                    if (viewModel.getAccountCount() > 2) {
-                        flags |= makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
-                                ItemTouchHelper.START | ItemTouchHelper.END);
-                    }
-                }
-
-                return flags;
-            }
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                  @NonNull RecyclerView.ViewHolder viewHolder,
-                                  @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                if (viewModel.getAccountCount() == 2)
-                    Snackbar.make(list, R.string.msg_at_least_two_accounts_are_required,
-                            Snackbar.LENGTH_LONG)
-                            .setAction("Action", null)
-                            .show();
-                else {
-                    int pos = viewHolder.getAdapterPosition();
-                    viewModel.removeItem(pos - 1);
-                    listAdapter.notifyItemRemoved(pos);
-                    viewModel.sendCountNotifications(); // needed after items re-arrangement
-                    viewModel.checkTransactionSubmittable(listAdapter);
-                }
-            }
-        }).attachToRecyclerView(list);
-
         viewModel.isSubmittable()
                  .observe(getViewLifecycleOwner(), isSubmittable -> {
                      if (isSubmittable) {

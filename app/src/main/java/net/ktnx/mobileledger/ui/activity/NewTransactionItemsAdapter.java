@@ -23,7 +23,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
@@ -43,6 +46,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         implements DescriptionSelectedCallback {
     NewTransactionModel model;
     private MobileLedgerProfile mProfile;
+    private ItemTouchHelper touchHelper;
+    private RecyclerView recyclerView;
     NewTransactionItemsAdapter(NewTransactionModel viewModel, MobileLedgerProfile profile) {
         super();
         model = viewModel;
@@ -53,6 +58,70 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                     String.format(Locale.US, "%d accounts is too little, Calling addRow()", size));
             size = addRow();
         }
+
+        NewTransactionItemsAdapter adapter = this;
+
+        touchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+            @Override
+            public boolean canDropOver(@NonNull RecyclerView recyclerView,
+                                       @NonNull RecyclerView.ViewHolder current,
+                                       @NonNull RecyclerView.ViewHolder target) {
+                final int adapterPosition = target.getAdapterPosition();
+
+                // first and last items are immovable
+                if (adapterPosition == 0)
+                    return false;
+                if (adapterPosition == adapter.getItemCount() - 1)
+                    return false;
+
+                return super.canDropOver(recyclerView, current, target);
+            }
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView,
+                                        @NonNull RecyclerView.ViewHolder viewHolder) {
+                int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
+                // the top item is always there (date and description)
+                if (viewHolder.getAdapterPosition() > 0) {
+                    flags |= makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                            ItemTouchHelper.UP | ItemTouchHelper.DOWN);
+
+                    if (viewModel.getAccountCount() > 2) {
+                        flags |= makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
+                                ItemTouchHelper.START | ItemTouchHelper.END);
+                    }
+                }
+
+                return flags;
+            }
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+
+                model.swapItems(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
+            }
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                if (viewModel.getAccountCount() == 2)
+                    Snackbar.make(recyclerView, R.string.msg_at_least_two_accounts_are_required,
+                            Snackbar.LENGTH_LONG)
+                            .setAction("Action", null)
+                            .show();
+                else {
+                    int pos = viewHolder.getAdapterPosition();
+                    viewModel.removeItem(pos - 1);
+                    notifyItemRemoved(pos);
+                    viewModel.sendCountNotifications(); // needed after items re-arrangement
+                    viewModel.checkTransactionSubmittable(adapter);
+                }
+            }
+        });
     }
     public void setProfile(MobileLedgerProfile profile) {
         mProfile = profile;
@@ -72,6 +141,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         LinearLayout row = (LinearLayout) LayoutInflater.from(parent.getContext())
                                                         .inflate(R.layout.new_transaction_row,
                                                                 parent, false);
+
         return new NewTransactionItemHolder(row, this);
     }
     @Override
@@ -98,6 +168,18 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         }
 
         return true;
+    }
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
+        touchHelper.attachToRecyclerView(recyclerView);
+    }
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        touchHelper.attachToRecyclerView(null);
+        super.onDetachedFromRecyclerView(recyclerView);
+        this.recyclerView = null;
     }
     public void descriptionSelected(String description) {
         debug("descr selected", description);

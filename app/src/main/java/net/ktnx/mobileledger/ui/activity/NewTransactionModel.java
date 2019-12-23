@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -297,6 +298,9 @@ public class NewTransactionModel extends ViewModel {
     }
     public void noteFocusIsOnAmount(int position) {
         getItem(position).setFocusIsOnAmount(true);
+    }
+    public void swapItems(int one, int two) {
+        Collections.swap(items, one-1, two-1);
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
