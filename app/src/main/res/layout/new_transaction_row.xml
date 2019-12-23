@@ -75,12 +75,11 @@
             app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ntr_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
 
         <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
             android:id="@+id/account_row_acc_name"
@@ -91,7 +90,10 @@
             android:hint="@string/new_transaction_account_hint"
             android:imeOptions="actionNext"
             android:inputType="text"
-            android:selectAllOnFocus="false" />
+            android:selectAllOnFocus="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/account_row_acc_amounts"
@@ -105,11 +107,13 @@
             android:hint="@string/zero_amount"
             android:imeOptions="actionNext"
             android:inputType="numberSigned|numberDecimal|number"
-            android:minWidth="70sp"
+            android:minWidth="80sp"
             android:selectAllOnFocus="true"
-            android:textAlignment="viewEnd" />
+            android:textAlignment="viewEnd"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
         android:id="@+id/ntr_padding"

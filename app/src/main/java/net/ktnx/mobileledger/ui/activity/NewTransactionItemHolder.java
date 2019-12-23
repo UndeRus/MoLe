@@ -23,6 +23,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
@@ -60,7 +61,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private AutoCompleteTextView tvAccount;
     private TextView tvAmount;
     private LinearLayout lHead;
-    private LinearLayout lAccount;
+    private ViewGroup lAccount;
     private FrameLayout lPadding;
     private MobileLedgerProfile mProfile;
     private Date date;
