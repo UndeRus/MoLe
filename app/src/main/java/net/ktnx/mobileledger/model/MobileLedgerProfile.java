@@ -109,7 +109,7 @@ public final class MobileLedgerProfile {
     }
     public static void storeProfilesOrder() {
         SQLiteDatabase db = App.getDatabase();
-        db.beginTransaction();
+        db.beginTransactionNonExclusive();
         try {
             int orderNo = 0;
             for (MobileLedgerProfile p : Data.profiles.getValue()) {
@@ -204,7 +204,7 @@ public final class MobileLedgerProfile {
     }
     public void storeInDB() {
         SQLiteDatabase db = App.getDatabase();
-        db.beginTransaction();
+        db.beginTransactionNonExclusive();
         try {
 //            debug("profiles", String.format("Storing profile in DB: uuid=%s, name=%s, " +
 //                                            "url=%s, permit_posting=%s, authEnabled=%s, " +
@@ -323,7 +323,7 @@ public final class MobileLedgerProfile {
     public void removeFromDB() {
         SQLiteDatabase db = App.getDatabase();
         debug("db", String.format("removing profile %s from DB", uuid));
-        db.beginTransaction();
+        db.beginTransactionNonExclusive();
         try {
             Object[] uuid_param = new Object[]{uuid};
             db.execSQL("delete from profiles where uuid=?", uuid_param);

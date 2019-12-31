@@ -39,7 +39,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
 
         Data.backgroundTaskStarted();
         try {
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
             try {
                 db.execSQL("UPDATE description_history set keep=0");
                 try (Cursor c = db

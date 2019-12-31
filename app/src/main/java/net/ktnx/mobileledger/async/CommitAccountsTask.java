@@ -38,7 +38,7 @@ public class CommitAccountsTask
         try {
 
             SQLiteDatabase db = App.getDatabase();
-            db.beginTransaction();
+            db.beginTransactionNonExclusive();
             try {
                 try (LockHolder lh = params[0].accountList.lockForWriting()) {
                     for (int i = 0; i < params[0].accountList.size(); i++ ){
