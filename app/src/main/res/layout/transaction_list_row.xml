@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:cardUseCompatPadding="false"
@@ -70,8 +70,8 @@
                 android:id="@+id/transaction_row_header_border"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/dashed_border_1dp"
                 android:alpha="0.3"
+                android:background="@drawable/dashed_border_1dp"
                 android:minHeight="2dp"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -88,57 +88,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/transaction_row_header_border">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="0dp">
+                <include layout="@layout/transaction_list_row_accounts_table_row"/>
+                <include layout="@layout/transaction_list_row_accounts_table_row"/>
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:text="---"
-                        android:textAlignment="viewStart"
-                        tools:ignore="HardcodedText" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:minWidth="60dp"
-                        android:text="€ --,--"
-                        android:textAlignment="viewEnd"
-                        tools:ignore="HardcodedText" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="0dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:text="---"
-                        android:textAlignment="viewStart"
-                        tools:ignore="HardcodedText" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="0dp"
-                        android:minWidth="60dp"
-                        android:text="---,--"
-                        android:textAlignment="viewEnd"
-                        tools:ignore="HardcodedText" />
-                </LinearLayout>
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -186,8 +138,8 @@
             android:layout_height="16dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/dashed_border_1dp"
             android:alpha="0.3"
+            android:background="@drawable/dashed_border_1dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/transaction_delimiter_date"
             app:layout_constraintStart_toEndOf="@id/transaction_delimiter_month"

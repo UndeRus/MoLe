@@ -163,35 +163,16 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     int rowIndex = step.getAccountPosition();
                     Context ctx = holder.row.getContext();
                     LinearLayout row = (LinearLayout) holder.tableAccounts.getChildAt(rowIndex);
-                    TextView accName, accAmount;
                     if (row == null) {
-                        row = new LinearLayout(ctx);
-                        row.setLayoutParams(new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT));
-                        row.setGravity(Gravity.CENTER_VERTICAL);
-                        row.setOrientation(LinearLayout.HORIZONTAL);
-                        row.setPaddingRelative(dp2px(ctx, 8), 0, 0, 0);
-                        accName = new AppCompatTextView(ctx);
-                        accName.setLayoutParams(new LinearLayout.LayoutParams(0,
-                                LinearLayout.LayoutParams.WRAP_CONTENT, 5f));
-                        accName.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-                        row.addView(accName);
-                        accAmount = new AppCompatTextView(ctx);
-                        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT);
-                        llp.setMarginEnd(0);
-                        accAmount.setLayoutParams(llp);
-                        accAmount.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
-                        accAmount.setMinWidth(dp2px(ctx, 60));
-                        row.addView(accAmount);
-                        holder.tableAccounts.addView(row);
+                        LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
+                        row = (LinearLayout) inflater.inflate(
+                                R.layout.transaction_list_row_accounts_table_row,
+                                holder.tableAccounts);
                     }
-                    else {
-                        accName = (TextView) row.getChildAt(0);
-                        accAmount = (TextView) row.getChildAt(1);
-                    }
+                    TextView accName = row.findViewById(R.id.transaction_list_acc_row_acc_name);
+                    TextView accComment =
+                            row.findViewById(R.id.transaction_list_acc_row_acc_comment);
+                    TextView accAmount = row.findViewById(R.id.transaction_list_acc_row_acc_amount);
                     LedgerTransactionAccount acc = step.getAccount();
 
 
@@ -214,6 +195,15 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         accName.setTextColor(Colors.defaultTextColor);
                         accAmount.setTextColor(Colors.defaultTextColor);
                         accName.setText(acc.getAccountName());
+                    }
+
+                    String comment = acc.getComment();
+                    if (comment != null && !comment.isEmpty()) {
+                        accComment.setText(comment);
+                        accComment.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        accComment.setVisibility(View.GONE);
                     }
                     accAmount.setText(acc.toString());
 
