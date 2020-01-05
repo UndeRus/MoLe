@@ -300,6 +300,10 @@ public class NewTransactionModel extends ViewModel {
     public void swapItems(int one, int two) {
         Collections.swap(items, one-1, two-1);
     }
+    public void toggleComment(int position) {
+        final MutableLiveData<Boolean> commentVisible = getItem(position).commentVisible;
+        commentVisible.postValue(!commentVisible.getValue());
+    }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
     //==========================================================================================
@@ -315,6 +319,8 @@ public class NewTransactionModel extends ViewModel {
         private NewTransactionModel model;
         private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
         private FocusedElement focusedElement = FocusedElement.Account;
+        private MutableLiveData<String> comment = new MutableLiveData<>(null);
+        private MutableLiveData<Boolean> commentVisible = new MutableLiveData<>(false);
         public Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
@@ -505,6 +511,24 @@ public class NewTransactionModel extends ViewModel {
         }
         public void stopObservingEditableFlag(Observer<Boolean> observer) {
             editable.removeObserver(observer);
+        }
+        public void observeCommentVisible(NewTransactionActivity activity,
+                                          Observer<Boolean> observer) {
+            commentVisible.observe(activity, observer);
+        }
+        public void stopObservingCommentVisible(Observer<Boolean> observer) {
+            commentVisible.removeObserver(observer);
+        }
+        public void observeComment(NewTransactionActivity activity,
+                                          Observer<String> observer) {
+            comment.observe(activity, observer);
+        }
+        public void stopObservingComment(Observer<String> observer) {
+            comment.removeObserver(observer);
+        }
+        public void setComment(String comment) {
+            getAccount().setComment(comment);
+            this.comment.postValue(comment);
         }
     }
 }

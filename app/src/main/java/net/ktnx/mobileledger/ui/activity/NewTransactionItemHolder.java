@@ -26,11 +26,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,8 +42,10 @@ import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear;
+import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
+import net.ktnx.mobileledger.ui.TextViewClearHelper;
+import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
@@ -74,12 +79,17 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Integer> focusedAccountObserver;
     private Observer<Integer> accountCountObserver;
     private Observer<Boolean> editableObserver;
+    private Observer<Boolean> commentVisibleObserver;
+    private Observer<String> commentObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
+    private View commentButton;
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
         super(itemView);
         tvAccount = itemView.findViewById(R.id.account_row_acc_name);
         tvComment = itemView.findViewById(R.id.comment);
+        new TextViewClearHelper().attachToTextView((EditText) tvComment);
+        commentButton = itemView.findViewById(R.id.comment_button);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
         tvDescription = itemView.findViewById(R.id.new_transaction_description);
@@ -126,6 +136,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAccount.setOnFocusChangeListener(focusMonitor);
         tvAmount.setOnFocusChangeListener(focusMonitor);
 
+        itemView.findViewById(R.id.comment_button)
+                .setOnClickListener(v -> {
+                    final int pos = getAdapterPosition();
+                    adapter.toggleComment(pos);
+                });
         MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
         MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
@@ -236,6 +251,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         editableObserver = this::setEditable;
+        commentVisibleObserver = this::setCommentVisible;
+        commentObserver = this::setComment;
         focusedAccountObserver = index -> {
             if ((index != null) && index.equals(getAdapterPosition())) {
                 switch (item.getType()) {
@@ -305,6 +322,33 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAccount.setEnabled(editable);
         tvAmount.setEnabled(editable);
     }
+    private void setCommentVisible(Boolean visible) {
+        if (visible) {
+            // showing; show the comment view and align the comment button to it
+            tvComment.setVisibility(View.VISIBLE);
+            tvComment.requestFocus();
+            ConstraintLayout.LayoutParams lp =
+                    (ConstraintLayout.LayoutParams) commentButton.getLayoutParams();
+            lp.bottomToBottom = R.id.comment;
+
+            commentButton.setLayoutParams(lp);
+        }
+        else {
+            // hiding; hide the comment comment view and align amounts layout under it
+            tvComment.setVisibility(View.GONE);
+            ConstraintLayout.LayoutParams lp =
+                    (ConstraintLayout.LayoutParams) commentButton.getLayoutParams();
+            lp.bottomToBottom = R.id.ntr_account;   // R.id.parent doesn't work here
+
+            commentButton.setLayoutParams(lp);
+        }
+    }
+    private void setComment(String comment) {
+        if ((comment != null) && !comment.isEmpty())
+            commentButton.setBackgroundResource(R.drawable.ic_comment_black_24dp);
+        else
+            commentButton.setBackgroundResource(R.drawable.ic_comment_gray_24dp);
+    }
     private void beginUpdates() {
         if (inUpdate)
             throw new RuntimeException("Already in update mode");
@@ -341,7 +385,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     final LedgerTransactionAccount account = item.getAccount();
                     account.setAccountName(String.valueOf(tvAccount.getText()));
 
-                    account.setComment(String.valueOf(tvComment.getText()));
+                    item.setComment(String.valueOf(tvComment.getText()));
 
                     // TODO: handle multiple amounts
                     String amount = String.valueOf(tvAmount.getText());
@@ -393,6 +437,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 this.item.stopObservingDescription(descriptionObserver);
                 this.item.stopObservingAmountHint(hintObserver);
                 this.item.stopObservingEditableFlag(editableObserver);
+                this.item.stopObservingCommentVisible(commentVisibleObserver);
+                this.item.stopObservingComment(commentObserver);
                 this.item.getModel()
                          .stopObservingFocusedItem(focusedAccountObserver);
                 this.item.getModel()
@@ -443,6 +489,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 item.observeDescription(activity, descriptionObserver);
                 item.observeAmountHint(activity, hintObserver);
                 item.observeEditableFlag(activity, editableObserver);
+                item.observeCommentVisible(activity, commentVisibleObserver);
+                item.observeComment(activity, commentObserver);
                 item.getModel()
                     .observeFocusedItem(activity, focusedAccountObserver);
                 item.getModel()

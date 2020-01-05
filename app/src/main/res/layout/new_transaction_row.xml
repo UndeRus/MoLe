@@ -78,7 +78,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ntr_account"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
             android:id="@+id/account_row_acc_name"
@@ -98,9 +99,8 @@
             android:id="@+id/comment_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:alpha="0.5"
-            android:drawableStart="@drawable/ic_comment_black_24dp"
-            app:layout_constraintBottom_toBottomOf="@+id/comment"
+            android:background="@drawable/ic_comment_gray_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/ntr_account"
             app:layout_constraintTop_toBottomOf="@+id/account_row_acc_name" />
 
@@ -111,6 +111,7 @@
             android:hint="@string/transaction_account_comment_hint"
             android:imeOptions="actionNext"
             android:inputType="text"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/ntr_account"
             app:layout_constraintStart_toEndOf="@id/comment_button"
             app:layout_constraintTop_toBottomOf="@id/account_row_acc_name" />
