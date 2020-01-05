@@ -31,25 +31,52 @@ public class ParsedPosting {
     private String paccount;
     private List<ParsedAmount> pamount;
     private String pdate = null;
-    public String getPdate2() {
-        return pdate2;
-    }
-    public void setPdate2(String pdate2) {
-        this.pdate2 = pdate2;
-    }
     private String pdate2 = null;
     private String ptype = "RegularPosting";
     private String pcomment = "";
     private List<List<String>> ptags = new ArrayList<>();
     private String poriginal = null;
     private int ptransaction_;
+    public ParsedPosting() {
+    }
+    public static ParsedPosting fromLedgerAccount(LedgerTransactionAccount acc) {
+        ParsedPosting result = new ParsedPosting();
+        result.setPaccount(acc.getAccountName());
+
+        String comment = acc.getComment();
+        if (comment == null)
+            comment = "";
+        result.setPcomment(comment);
+
+        ArrayList<ParsedAmount> amounts = new ArrayList<>();
+        ParsedAmount amt = new ParsedAmount();
+        amt.setAcommodity((acc.getCurrency() == null) ? "" : acc.getCurrency());
+        amt.setAismultiplier(false);
+        ParsedQuantity qty = new ParsedQuantity();
+        qty.setDecimalPlaces(2);
+        qty.setDecimalMantissa(Math.round(acc.getAmount() * 100));
+        amt.setAquantity(qty);
+        ParsedStyle style = new ParsedStyle();
+        style.setAscommodityside('L');
+        style.setAscommodityspaced(false);
+        style.setAsprecision(2);
+        style.setAsdecimalpoint('.');
+        amt.setAstyle(style);
+        amounts.add(amt);
+        result.setPamount(amounts);
+        return result;
+    }
+    public String getPdate2() {
+        return pdate2;
+    }
+    public void setPdate2(String pdate2) {
+        this.pdate2 = pdate2;
+    }
     public int getPtransaction_() {
         return ptransaction_;
     }
     public void setPtransaction_(int ptransaction_) {
         this.ptransaction_ = ptransaction_;
-    }
-    public ParsedPosting() {
     }
     public String getPdate() {
         return pdate;
@@ -107,35 +134,9 @@ public class ParsedPosting {
     }
     public LedgerTransactionAccount asLedgerAccount() {
         ParsedAmount amt = pamount.get(0);
-        return new LedgerTransactionAccount(paccount, amt.getAquantity().asFloat(),
-                amt.getAcommodity());
-    }
-    public static ParsedPosting fromLedgerAccount(LedgerTransactionAccount acc) {
-        ParsedPosting result = new ParsedPosting();
-        result.setPaccount(acc.getAccountName());
-
-        String comment = acc.getComment();
-        if (comment == null)
-            comment = "";
-        result.setPcomment(comment);
-
-        ArrayList<ParsedAmount> amounts = new ArrayList<>();
-        ParsedAmount amt = new ParsedAmount();
-        amt.setAcommodity((acc.getCurrency() == null) ? "" : acc.getCurrency());
-        amt.setAismultiplier(false);
-        ParsedQuantity qty = new ParsedQuantity();
-        qty.setDecimalPlaces(2);
-        qty.setDecimalMantissa(Math.round(acc.getAmount() * 100));
-        amt.setAquantity(qty);
-        ParsedStyle style = new ParsedStyle();
-        style.setAscommodityside('L');
-        style.setAscommodityspaced(false);
-        style.setAsprecision(2);
-        style.setAsdecimalpoint('.');
-        amt.setAstyle(style);
-        amounts.add(amt);
-        result.setPamount(amounts);
-        return result;
+        return new LedgerTransactionAccount(paccount, amt.getAquantity()
+                                                         .asFloat(), amt.getAcommodity(),
+                getPcomment());
     }
 
 }

@@ -135,7 +135,8 @@ public class ParsedPosting {
     public LedgerTransactionAccount asLedgerAccount() {
         ParsedAmount amt = pamount.get(0);
         return new LedgerTransactionAccount(paccount, amt.getAquantity()
-                                                         .asFloat(), amt.getAcommodity());
+                                                         .asFloat(), amt.getAcommodity(),
+                getPcomment());
     }
 
 }

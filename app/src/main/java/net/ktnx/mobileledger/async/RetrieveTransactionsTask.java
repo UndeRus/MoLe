@@ -371,7 +371,7 @@ public class RetrieveTransactionsTask
                                     if (currency == null) currency = "";
                                     amount = amount.replace(',', '.');
                                     transaction.addAccount(new LedgerTransactionAccount(acc_name,
-                                            Float.valueOf(amount), currency));
+                                            Float.valueOf(amount), currency, null));
                                     L(String.format(Locale.ENGLISH, "%d: %s = %s",
                                             transaction.getId(), acc_name, amount));
                                 }
