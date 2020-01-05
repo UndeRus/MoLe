@@ -94,7 +94,7 @@ public class ParsedPosting {
         return pcomment;
     }
     public void setPcomment(String pcomment) {
-        this.pcomment = pcomment;
+        this.pcomment = (pcomment == null) ? null : pcomment.trim();
     }
     public List<List<String>> getPtags() {
         return ptags;
