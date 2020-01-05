@@ -1,0 +1,1 @@
+create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap boolean not null);

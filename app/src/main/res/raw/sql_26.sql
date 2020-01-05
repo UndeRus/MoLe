@@ -1,0 +1,1 @@
+alter table transaction_accounts add comment varchar;
