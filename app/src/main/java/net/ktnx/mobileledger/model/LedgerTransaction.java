@@ -171,7 +171,7 @@ public class LedgerTransaction {
                 }
                 description = cTr.getString(1);
 
-                try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency FROM " +
+                try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency, comment FROM " +
                                                "transaction_accounts WHERE " +
                                                "profile=? AND transaction_id = ?",
                         new String[]{profile, String.valueOf(id)}))
@@ -181,7 +181,7 @@ public class LedgerTransaction {
 //                                String.format("Loaded %d: %s %1.2f %s", id, cAcc.getString(0),
 //                                        cAcc.getFloat(1), cAcc.getString(2)));
                         addAccount(new LedgerTransactionAccount(cAcc.getString(0), cAcc.getFloat(1),
-                                cAcc.getString(2)));
+                                cAcc.getString(2), cAcc.getString(3)));
                     }
 
                     finishLoading();

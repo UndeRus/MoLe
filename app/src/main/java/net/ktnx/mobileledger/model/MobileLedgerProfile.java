@@ -260,9 +260,9 @@ public final class MobileLedgerProfile {
 
         for (LedgerTransactionAccount item : tr.getAccounts()) {
             db.execSQL("INSERT INTO transaction_accounts(profile, transaction_id, " +
-                       "account_name, amount, currency) values(?, ?, ?, ?, ?)",
+                       "account_name, amount, currency, comment) values(?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, tr.getId(), item.getAccountName(), item.getAmount(),
-                                 item.getCurrency()
+                                 item.getCurrency(), item.getComment()
                     });
         }
 //        debug("profile", String.format("Transaction %d stored", tr.getId()));

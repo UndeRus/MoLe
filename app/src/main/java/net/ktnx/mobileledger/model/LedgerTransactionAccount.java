@@ -26,14 +26,13 @@ public class LedgerTransactionAccount {
     private boolean amountSet = false;
     private String currency;
     private String comment;
-    public LedgerTransactionAccount(String accountName, float amount) {
-        this(accountName, amount, null);
-    }
-    public LedgerTransactionAccount(String accountName, float amount, String currency) {
+    public LedgerTransactionAccount(String accountName, float amount, String currency,
+                                    String comment) {
         this.setAccountName(accountName);
         this.amount = amount;
         this.amountSet = true;
         this.currency = currency;
+        this.comment = comment;
     }
     public LedgerTransactionAccount(String accountName) {
         this.accountName = accountName;
