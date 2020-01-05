@@ -42,6 +42,12 @@ public class ParsedPosting {
     public static ParsedPosting fromLedgerAccount(LedgerTransactionAccount acc) {
         ParsedPosting result = new ParsedPosting();
         result.setPaccount(acc.getAccountName());
+
+        String comment = acc.getComment();
+        if (comment == null)
+            comment = "";
+        result.setPcomment(comment);
+
         ArrayList<ParsedAmount> amounts = new ArrayList<>();
         ParsedAmount amt = new ParsedAmount();
         amt.setAcommodity((acc.getCurrency() == null) ? "" : acc.getCurrency());

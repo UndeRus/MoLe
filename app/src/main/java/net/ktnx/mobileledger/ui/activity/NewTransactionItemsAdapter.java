@@ -287,9 +287,12 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         model.updateFocusedItem(position);
     }
     public void noteFocusIsOnAccount(int position) {
-        model.noteFocusIsOnAccount(position);
+        model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Account);
     }
     public void noteFocusIsOnAmount(int position) {
-        model.noteFocusIsOnAmount(position);
+        model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Amount);
+    }
+    public void noteFocusIsOnComment(int position) {
+        model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Comment);
     }
 }

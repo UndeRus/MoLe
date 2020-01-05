@@ -78,8 +78,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ntr_account"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
             android:id="@+id/account_row_acc_name"
@@ -95,23 +94,50 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/account_row_acc_amounts"
+        <TextView
+            android:id="@+id/comment_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_weight="0"
-            android:width="0dp"
-            android:foregroundGravity="bottom"
-            android:gravity="bottom|end"
-            android:hint="@string/zero_amount"
+            android:alpha="0.5"
+            android:drawableStart="@drawable/ic_comment_black_24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/comment"
+            app:layout_constraintStart_toStartOf="@+id/ntr_account"
+            app:layout_constraintTop_toBottomOf="@+id/account_row_acc_name" />
+
+        <EditText
+            android:id="@+id/comment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/transaction_account_comment_hint"
             android:imeOptions="actionNext"
-            android:inputType="numberSigned|numberDecimal|number"
-            android:minWidth="80sp"
-            android:selectAllOnFocus="true"
-            android:textAlignment="viewEnd"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="@+id/ntr_account"
+            app:layout_constraintStart_toEndOf="@id/comment_button"
             app:layout_constraintTop_toBottomOf="@id/account_row_acc_name" />
+
+        <LinearLayout
+            android:id="@+id/amount_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/comment">
+
+            <EditText
+                android:id="@+id/account_row_acc_amounts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_weight="0"
+                android:width="0dp"
+                android:foregroundGravity="bottom"
+                android:gravity="bottom|end"
+                android:hint="@string/zero_amount"
+                android:imeOptions="actionNext"
+                android:inputType="numberSigned|numberDecimal|number"
+                android:minWidth="80sp"
+                android:selectAllOnFocus="true"
+                android:textAlignment="viewEnd" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

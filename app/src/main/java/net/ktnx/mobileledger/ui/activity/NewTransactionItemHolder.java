@@ -51,6 +51,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
+import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
+
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
         implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
     private final String decimalSeparator;
@@ -59,6 +61,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
     private AutoCompleteTextView tvAccount;
+    private TextView tvComment;
     private TextView tvAmount;
     private LinearLayout lHead;
     private ViewGroup lAccount;
@@ -76,6 +79,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
         super(itemView);
         tvAccount = itemView.findViewById(R.id.account_row_acc_name);
+        tvComment = itemView.findViewById(R.id.comment);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
         tvDescription = itemView.findViewById(R.id.new_transaction_description);
@@ -100,11 +104,16 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 try {
                     final int pos = getAdapterPosition();
                     adapter.updateFocusedItem(pos);
-                    if (v instanceof AutoCompleteTextViewWithClear) {
-                        adapter.noteFocusIsOnAccount(pos);
-                    }
-                    else {
-                        adapter.noteFocusIsOnAmount(pos);
+                    switch (v.getId()) {
+                        case R.id.account_row_acc_name:
+                            adapter.noteFocusIsOnAccount(pos);
+                            break;
+                        case R.id.account_row_acc_amounts:
+                            adapter.noteFocusIsOnAmount(pos);
+                            break;
+                        case R.id.comment:
+                            adapter.noteFocusIsOnComment(pos);
+                            break;
                     }
                 }
                 finally {
@@ -180,6 +189,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         };
         tvDescription.addTextChangedListener(tw);
         tvAccount.addTextChangedListener(tw);
+        tvComment.addTextChangedListener(tw);
         tvAmount.addTextChangedListener(amountWatcher);
 
         // FIXME: react on locale changes
@@ -242,15 +252,20 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     case transactionRow:
                         // do nothing if a row element already has the focus
                         if (!itemView.hasFocus()) {
-                            if (item.focusIsOnAmount()) {
-                                tvAmount.requestFocus();
-                            }
-                            else {
-                                focused = tvAccount.requestFocus();
-                                tvAccount.dismissDropDown();
-                                if (focused)
-                                    Misc.showSoftKeyboard(
-                                            (NewTransactionActivity) tvAccount.getContext());
+                            switch (item.getFocusedElement()) {
+                                case Amount:
+                                    tvAmount.requestFocus();
+                                    break;
+                                case Comment:
+                                    tvComment.requestFocus();
+                                    break;
+                                case Account:
+                                    focused = tvAccount.requestFocus();
+                                    tvAccount.dismissDropDown();
+                                    if (focused)
+                                        Misc.showSoftKeyboard(
+                                                (NewTransactionActivity) tvAccount.getContext());
+                                    break;
                             }
                         }
 
@@ -266,7 +281,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                             adapterPosition, layoutPosition, item.getType()
                                                                  .toString()
                                                                  .concat(item.getType() ==
-                                                                         NewTransactionModel.ItemType.transactionRow
+                                                                         ItemType.transactionRow
                                                                          ? String.format(Locale.US,
                                                                          "'%s'=%s",
                                                                          item.getAccount()
@@ -323,29 +338,28 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     item.setDescription(String.valueOf(tvDescription.getText()));
                     break;
                 case transactionRow:
-                    item.getAccount()
-                        .setAccountName(String.valueOf(tvAccount.getText()));
+                    final LedgerTransactionAccount account = item.getAccount();
+                    account.setAccountName(String.valueOf(tvAccount.getText()));
+
+                    account.setComment(String.valueOf(tvComment.getText()));
 
                     // TODO: handle multiple amounts
                     String amount = String.valueOf(tvAmount.getText());
                     amount = amount.trim();
 
                     if (amount.isEmpty()) {
-                        item.getAccount()
-                            .resetAmount();
+                        account.resetAmount();
                     }
                     else {
                         try {
                             amount = amount.replace(decimalSeparator, decimalDot);
-                            item.getAccount()
-                                .setAmount(Float.parseFloat(amount));
+                            account.setAmount(Float.parseFloat(amount));
                         }
                         catch (NumberFormatException e) {
                             Logger.debug("new-trans", String.format(
                                     "assuming amount is not set due to number format exception. " +
                                     "input was '%s'", amount));
-                            item.getAccount()
-                                .resetAmount();
+                            account.resetAmount();
                         }
                     }
 
@@ -399,6 +413,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 case transactionRow:
                     LedgerTransactionAccount acc = item.getAccount();
                     tvAccount.setText(acc.getAccountName());
+                    tvComment.setText(acc.getComment());
                     if (acc.isAmountSet()) {
                         tvAmount.setText(String.format("%1.2f", acc.getAmount()));
                     }

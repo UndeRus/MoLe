@@ -265,8 +265,9 @@ public class NewTransactionModel extends ViewModel {
                 for (int i = 0; i < items.size(); i++) {
                     Item item = items.get(i);
                     LedgerTransactionAccount acc = item.getAccount();
-                    debug("submittable", String.format("Item %2d: [%4.2f] %s", i,
-                            acc.isAmountSet() ? acc.getAmount() : 0, acc.getAccountName()));
+                    debug("submittable", String.format("Item %2d: [%4.2f] %s (%s)", i,
+                            acc.isAmountSet() ? acc.getAmount() : 0, acc.getAccountName(),
+                            acc.getComment()));
                 }
             }
         }
@@ -293,11 +294,8 @@ public class NewTransactionModel extends ViewModel {
     public void updateFocusedItem(int position) {
         focusedItem.setValue(position);
     }
-    public void noteFocusIsOnAccount(int position) {
-        getItem(position).setFocusIsOnAmount(false);
-    }
-    public void noteFocusIsOnAmount(int position) {
-        getItem(position).setFocusIsOnAmount(true);
+    public void noteFocusChanged(int position, FocusedElement element) {
+        getItem(position).setFocusedElement(element);
     }
     public void swapItems(int one, int two) {
         Collections.swap(items, one-1, two-1);
@@ -306,7 +304,9 @@ public class NewTransactionModel extends ViewModel {
 
     //==========================================================================================
 
-    class Item extends Object {
+    enum FocusedElement {Account, Comment, Amount}
+
+    class Item {
         private ItemType type;
         private MutableLiveData<Date> date = new MutableLiveData<>();
         private MutableLiveData<String> description = new MutableLiveData<>();
@@ -314,7 +314,7 @@ public class NewTransactionModel extends ViewModel {
         private MutableLiveData<String> amountHint = new MutableLiveData<>(null);
         private NewTransactionModel model;
         private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
-        private boolean focusIsOnAmount = false;
+        private FocusedElement focusedElement = FocusedElement.Account;
         public Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
@@ -333,8 +333,11 @@ public class NewTransactionModel extends ViewModel {
             this.account = account;
             this.editable.setValue(true);
         }
-        public boolean focusIsOnAmount() {
-            return focusIsOnAmount;
+        public FocusedElement getFocusedElement() {
+            return focusedElement;
+        }
+        public void setFocusedElement(FocusedElement focusedElement) {
+            this.focusedElement = focusedElement;
         }
         public NewTransactionModel getModel() {
             return model;
@@ -502,9 +505,6 @@ public class NewTransactionModel extends ViewModel {
         }
         public void stopObservingEditableFlag(Observer<Boolean> observer) {
             editable.removeObserver(observer);
-        }
-        public void setFocusIsOnAmount(boolean flag) {
-            focusIsOnAmount = flag;
         }
     }
 }

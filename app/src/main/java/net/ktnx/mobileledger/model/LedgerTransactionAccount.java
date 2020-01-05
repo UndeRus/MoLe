@@ -25,7 +25,7 @@ public class LedgerTransactionAccount {
     private float amount;
     private boolean amountSet = false;
     private String currency;
-
+    private String comment;
     public LedgerTransactionAccount(String accountName, float amount) {
         this(accountName, amount, null);
     }
@@ -35,18 +35,23 @@ public class LedgerTransactionAccount {
         this.amountSet = true;
         this.currency = currency;
     }
-
     public LedgerTransactionAccount(String accountName) {
         this.accountName = accountName;
     }
     public LedgerTransactionAccount(LedgerTransactionAccount origin) {
         // copy constructor
         setAccountName(origin.getAccountName());
+        setComment(origin.getComment());
         if (origin.isAmountSet())
             setAmount(origin.getAmount());
         currency = origin.getCurrency();
     }
-
+    public String getComment() {
+        return comment;
+    }
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
     public String getAccountName() {
         return accountName;
     }
