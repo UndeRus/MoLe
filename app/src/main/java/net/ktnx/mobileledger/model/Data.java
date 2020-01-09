@@ -33,6 +33,7 @@ import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableList;
 
 import java.lang.ref.WeakReference;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +52,8 @@ public final class Data {
     public static MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
+    public static MutableLiveData<Currency.Position> currencySymbolPosition =
+            new MutableLiveData<>();
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static Locker profilesLocker = new Locker();
     private static RetrieveTransactionsTask retrieveTransactionsTask;
@@ -149,4 +152,21 @@ public final class Data {
     public static void transactionRetrievalDone() {
         retrieveTransactionsTask = null;
     }
+    public static void refreshCurrencyData(Locale locale) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
+        java.util.Currency currency = formatter.getCurrency();
+        Logger.debug("locale",
+                String.format("Discovering currency symbol position for locale %s (currency is %s)",
+                        locale.toString(), currency.toString()));
+        String formatted = formatter.format(1234.56f);
+        Logger.debug("locale", String.format("1234.56 formats as '%s'", formatted));
+        String symbol = currency.getSymbol();
+        if (formatted.startsWith(symbol))
+            currencySymbolPosition.setValue(Currency.Position.before);
+        else if (formatted.endsWith(symbol))
+            currencySymbolPosition.setValue(Currency.Position.after);
+        else
+            currencySymbolPosition.setValue(Currency.Position.none);
+    }
+
 }

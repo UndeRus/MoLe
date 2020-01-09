@@ -33,6 +33,7 @@ import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
+import java.util.Locale;
 
 public class App extends Application {
     public static App instance;
@@ -48,6 +49,7 @@ public class App extends Application {
         instance = this;
         super.onCreate();
         updateMonthNames();
+        Data.refreshCurrencyData(Locale.getDefault());
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
