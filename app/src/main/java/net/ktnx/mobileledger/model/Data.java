@@ -79,10 +79,12 @@ public final class Data {
     public static int getProfileIndex(MobileLedgerProfile profile) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
-            if (prList == null) throw new AssertionError();
+            if (prList == null)
+                throw new AssertionError();
             for (int i = 0; i < prList.size(); i++) {
                 MobileLedgerProfile p = prList.get(i);
-                if (p.equals(profile)) return i;
+                if (p.equals(profile))
+                    return i;
             }
 
             return -1;
@@ -92,10 +94,13 @@ public final class Data {
     public static int getProfileIndex(String profileUUID) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
-            if (prList == null) throw new AssertionError();
+            if (prList == null)
+                throw new AssertionError();
             for (int i = 0; i < prList.size(); i++) {
                 MobileLedgerProfile p = prList.get(i);
-                if (p.getUuid().equals(profileUUID)) return i;
+                if (p.getUuid()
+                     .equals(profileUUID))
+                    return i;
             }
 
             return -1;
@@ -103,13 +108,15 @@ public final class Data {
     }
     public static int retrieveCurrentThemeIdFromDb() {
         String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-        if (profileUUID == null) return -1;
+        if (profileUUID == null)
+            return -1;
 
         SQLiteDatabase db = App.getDatabase();
-        try (Cursor c = db
-                .rawQuery("SELECT theme from profiles where uuid=?", new String[]{profileUUID}))
+        try (Cursor c = db.rawQuery("SELECT theme from profiles where uuid=?",
+                new String[]{profileUUID}))
         {
-            if (c.moveToNext()) return c.getInt(0);
+            if (c.moveToNext())
+                return c.getInt(0);
         }
 
         return -1;
@@ -126,7 +133,8 @@ public final class Data {
             }
             else {
                 int i = getProfileIndex(profileUUID);
-                if (i == -1) i = 0;
+                if (i == -1)
+                    i = 0;
                 profile = prList.get(i);
             }
         }
@@ -138,7 +146,8 @@ public final class Data {
             return;
         }
         MobileLedgerProfile pr = profile.getValue();
-        if (pr == null) throw new IllegalStateException("No current profile");
+        if (pr == null)
+            throw new IllegalStateException("No current profile");
 
         retrieveTransactionsTask =
                 new RetrieveTransactionsTask(new WeakReference<>(activity), profile.getValue());
@@ -147,7 +156,8 @@ public final class Data {
         retrieveTransactionsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
     public static synchronized void stopTransactionsRetrieval() {
-        if (retrieveTransactionsTask != null) retrieveTransactionsTask.cancel(false);
+        if (retrieveTransactionsTask != null)
+            retrieveTransactionsTask.cancel(false);
     }
     public static void transactionRetrievalDone() {
         retrieveTransactionsTask = null;

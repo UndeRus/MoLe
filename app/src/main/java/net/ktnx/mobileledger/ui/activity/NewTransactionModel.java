@@ -298,7 +298,7 @@ public class NewTransactionModel extends ViewModel {
         getItem(position).setFocusedElement(element);
     }
     public void swapItems(int one, int two) {
-        Collections.swap(items, one-1, two-1);
+        Collections.swap(items, one - 1, two - 1);
     }
     public void toggleComment(int position) {
         final MutableLiveData<Boolean> commentVisible = getItem(position).commentVisible;

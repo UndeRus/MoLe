@@ -59,7 +59,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         // the view will disappear when the notifications reaches the model, so by simply omitting
         // the out-of-range get() call nothing bad happens - just a to-be-deleted view remains
         // a bit longer
-        if (item == null) return;
+        if (item == null)
+            return;
 
         switch (item.getType()) {
             case TRANSACTION:
@@ -67,39 +68,44 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 holder.vDelimiter.setVisibility(View.GONE);
                 LedgerTransaction tr = item.getTransaction();
 
-                //        debug("transactions", String.format("Filling position %d with %d accounts", position,
+                //        debug("transactions", String.format("Filling position %d with %d
+                //        accounts", position,
                 //                tr.getAccounts().size()));
 
                 TransactionLoader loader = new TransactionLoader();
                 loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                        new TransactionLoaderParams(tr, holder, position, Data.accountFilter.getValue(),
-                                item.isOdd()));
+                        new TransactionLoaderParams(tr, holder, position,
+                                Data.accountFilter.getValue(), item.isOdd()));
 
                 // WORKAROUND what seems to be a bug in CardHolder somewhere
                 // when a view that was previously holding a delimiter is re-purposed
                 // occasionally it stays too short (not high enough)
-                holder.vTransaction.measure(View.MeasureSpec
-                                .makeMeasureSpec(holder.itemView.getWidth(), View.MeasureSpec.EXACTLY),
+                holder.vTransaction.measure(
+                        View.MeasureSpec.makeMeasureSpec(holder.itemView.getWidth(),
+                                View.MeasureSpec.EXACTLY),
                         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 break;
             case DELIMITER:
                 Date date = item.getDate();
                 holder.vTransaction.setVisibility(View.GONE);
                 holder.vDelimiter.setVisibility(View.VISIBLE);
-                holder.tvDelimiterDate.setText(DateFormat.getDateInstance().format(date));
+                holder.tvDelimiterDate.setText(DateFormat.getDateInstance()
+                                                         .format(date));
                 if (item.isMonthShown()) {
                     GregorianCalendar cal = new GregorianCalendar(TimeZone.getDefault());
                     cal.setTime(date);
-                    holder.tvDelimiterMonth
-                            .setText(Globals.monthNames[cal.get(GregorianCalendar.MONTH)]);
+                    holder.tvDelimiterMonth.setText(
+                            Globals.monthNames[cal.get(GregorianCalendar.MONTH)]);
                     holder.tvDelimiterMonth.setVisibility(View.VISIBLE);
-                    //                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_8dp);
+                    //                holder.vDelimiterLine.setBackgroundResource(R.drawable
+                    //                .dashed_border_8dp);
                     holder.vDelimiterLine.setVisibility(View.GONE);
                     holder.vDelimiterThick.setVisibility(View.VISIBLE);
                 }
                 else {
                     holder.tvDelimiterMonth.setVisibility(View.GONE);
-                    //                holder.vDelimiterLine.setBackgroundResource(R.drawable.dashed_border_1dp);
+                    //                holder.vDelimiterLine.setBackgroundResource(R.drawable
+                    //                .dashed_border_1dp);
                     holder.vDelimiterLine.setVisibility(View.VISIBLE);
                     holder.vDelimiterThick.setVisibility(View.GONE);
                 }
@@ -112,7 +118,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     public TransactionRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 //        debug("perf", "onCreateViewHolder called");
         View row = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.transaction_list_row, parent, false);
+                                 .inflate(R.layout.transaction_list_row, parent, false);
         return new TransactionRowHolder(row);
     }
 
@@ -121,6 +127,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         return Data.transactions.size();
     }
     enum LoaderStep {HEAD, ACCOUNTS, DONE}
+
     private static class TransactionLoader
             extends AsyncTask<TransactionLoaderParams, TransactionLoaderStep, Void> {
         @Override
@@ -153,10 +160,13 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
             switch (step.getStep()) {
                 case HEAD:
-                    holder.tvDescription.setText(step.getTransaction().getDescription());
+                    holder.tvDescription.setText(step.getTransaction()
+                                                     .getDescription());
 
-                    if (step.isOdd()) holder.row.setBackgroundColor(Colors.tableRowDarkBG);
-                    else holder.row.setBackgroundColor(Colors.tableRowLightBG);
+                    if (step.isOdd())
+                        holder.row.setBackgroundColor(Colors.tableRowDarkBG);
+                    else
+                        holder.row.setBackgroundColor(Colors.tableRowLightBG);
 
                     break;
                 case ACCOUNTS:
@@ -180,8 +190,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 //                            acc.getAccountName(), acc.getAmount()));
 
                     String boldAccountName = step.getBoldAccountName();
-                    if ((boldAccountName != null) &&
-                        acc.getAccountName().startsWith(boldAccountName))
+                    if ((boldAccountName != null) && acc.getAccountName()
+                                                        .startsWith(boldAccountName))
                     {
                         accName.setTextColor(Colors.accent);
                         accAmount.setTextColor(Colors.accent);
