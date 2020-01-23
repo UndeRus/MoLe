@@ -129,6 +129,8 @@ public class LedgerTransaction {
                 data.append(item.getCurrency());
                 data.append('\0');
                 data.append(item.getAmount());
+                data.append('\0');
+                data.append(item.getComment());
             }
             sha.update(data.toString()
                            .getBytes(Charset.forName("UTF-8")));
