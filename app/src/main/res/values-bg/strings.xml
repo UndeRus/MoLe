@@ -130,5 +130,6 @@
     <string name="api_post_1_14">Версия 1.15 или по-нова</string>
     <string name="api_pre_1_15">Версия 1.14.x</string>
     <string name="profile_api_version_title">Версия на сървъра</string>
+    <string name="transaction_account_comment_hint">бележка</string>
 
 </resources>
