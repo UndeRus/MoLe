@@ -67,7 +67,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private AutoCompleteTextView tvDescription;
     private AutoCompleteTextView tvAccount;
     private TextView tvComment;
-    private TextView tvAmount;
+    private EditText tvAmount;
     private LinearLayout lHead;
     private ViewGroup lAccount;
     private FrameLayout lPadding;
@@ -187,15 +187,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                     // only one decimal separator is allowed
                     // plus and minus are allowed only at the beginning
+                    String allowed = "0123456789";
                     String val = s.toString();
-                    if (val.isEmpty())
-                        tvAmount.setKeyListener(DigitsKeyListener.getInstance(
-                                "0123456789+-" + decimalSeparator + decimalDot));
-                    else if (val.contains(decimalSeparator) || val.contains(decimalDot))
-                        tvAmount.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
-                    else
-                        tvAmount.setKeyListener(DigitsKeyListener.getInstance(
-                                "0123456789" + decimalSeparator + decimalDot));
+                    if (val.isEmpty() || (tvAmount.getSelectionStart() == 0))
+                        allowed += "-";
+                    if (!val.contains(decimalSeparator) && !val.contains(decimalDot))
+                        allowed += decimalSeparator + decimalDot;
+
+                    tvAmount.setKeyListener(DigitsKeyListener.getInstance(allowed));
 
                     syncData();
                     adapter.model.checkTransactionSubmittable(adapter);
