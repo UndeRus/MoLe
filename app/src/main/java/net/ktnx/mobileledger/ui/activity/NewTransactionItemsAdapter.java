@@ -227,7 +227,9 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             tr = profile.loadTransaction(transactionId);
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
             NewTransactionModel.Item firstNegative = null;
+            NewTransactionModel.Item firstPositive = null;
             boolean singleNegative = false;
+            boolean singlePositive = false;
             int negativeCount = 0;
             for (int i = 0; i < accounts.size(); i++) {
                 LedgerTransactionAccount acc = accounts.get(i);
@@ -251,6 +253,14 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                         else
                             singleNegative = false;
                     }
+                    else {
+                        if (firstPositive == null) {
+                            firstPositive = item;
+                            singlePositive = true;
+                        }
+                        else
+                            singlePositive = false;
+                    }
                 }
                 else
                     item.getAccount()
@@ -260,6 +270,10 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
 
             if (singleNegative) {
                 firstNegative.getAccount()
+                             .resetAmount();
+            }
+            else if (singlePositive) {
+                firstPositive.getAccount()
                              .resetAmount();
             }
         }
