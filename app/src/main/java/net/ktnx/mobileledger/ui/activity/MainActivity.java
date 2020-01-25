@@ -325,9 +325,13 @@ public class MainActivity extends ProfileThemedActivity {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1)
             return;
 
+        ShortcutManager sm = getSystemService(ShortcutManager.class);
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         int i = 0;
         for (MobileLedgerProfile p : list) {
+            if (shortcuts.size() >= sm.getMaxShortcutCountPerActivity())
+                break;
+
             if (!p.isPostingPermitted())
                 continue;
 
@@ -351,7 +355,6 @@ public class MainActivity extends ProfileThemedActivity {
             shortcuts.add(si);
             i++;
         }
-        ShortcutManager sm = getSystemService(ShortcutManager.class);
         sm.setDynamicShortcuts(shortcuts);
     }
     private void onProfileListChanged(List<MobileLedgerProfile> newList) {
