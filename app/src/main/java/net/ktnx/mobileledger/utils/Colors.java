@@ -133,9 +133,10 @@ public class Colors {
         int r, g, b;
 
         if ((hue < -0.00005) || (hue > 1.0000005) || (saturation < 0) || (saturation > 1) ||
-            (value < 0) || (value > 1)) throw new IllegalArgumentException(String.format(
-                "hue, saturation, value and alpha must all be between 0 and 1. Arguments given: " +
-                "hue=%1.5f, sat=%1.5f, val=%1.5f", hue, saturation, value));
+            (value < 0) || (value > 1))
+            throw new IllegalArgumentException(String.format(
+                    "hue, saturation, value and alpha must all be between 0 and 1. Arguments " +
+                    "given: " + "hue=%1.5f, sat=%1.5f, val=%1.5f", hue, saturation, value));
 
         int h = (int) (hue * 6);
         float f = hue * 6 - h;
@@ -173,12 +174,18 @@ public class Colors {
         int r, g, b;
         float m = lightness - c / 2f;
 
-        if (h < 1 || h == 6) return tupleToColor(c + m, x + m, 0 + m);
-        if (h < 2) return tupleToColor(x + m, c + m, 0 + m);
-        if (h < 3) return tupleToColor(0 + m, c + m, x + m);
-        if (h < 4) return tupleToColor(0 + m, x + m, c + m);
-        if (h < 5) return tupleToColor(x + m, 0 + m, c + m);
-        if (h < 6) return tupleToColor(c + m, 0 + m, x + m);
+        if (h < 1 || h == 6)
+            return tupleToColor(c + m, x + m, 0 + m);
+        if (h < 2)
+            return tupleToColor(x + m, c + m, 0 + m);
+        if (h < 3)
+            return tupleToColor(0 + m, c + m, x + m);
+        if (h < 4)
+            return tupleToColor(0 + m, x + m, c + m);
+        if (h < 5)
+            return tupleToColor(x + m, 0 + m, c + m);
+        if (h < 6)
+            return tupleToColor(c + m, 0 + m, x + m);
 
         throw new IllegalArgumentException(String.format(
                 "Unexpected value for h (%1.3f) while converting hsl(%1.3f, %1.3f, %1.3f) to rgb",
@@ -196,7 +203,8 @@ public class Colors {
     int getPrimaryColorForHue(int hueDegrees) {
 //        int result = hsvColor(hueDegrees, 0.61f, 0.95f);
         float y = hueDegrees - 60;
-        if (y < 0) y += 360;
+        if (y < 0)
+            y += 360;
         float l = yellowLightness + (blueLightness - yellowLightness) *
                                     (float) Math.cos(Math.toRadians(Math.abs(180 - y) / 2f));
         int result = hslColor(hueDegrees / 360f, 0.845f, l);
@@ -215,7 +223,8 @@ public class Colors {
     public static void setupTheme(Activity activity, int themeHue) {
         int themeId = -1;
         // Relies that theme resource IDs are sequential numbers
-        if (themeHue == 360) themeHue = 0;
+        if (themeHue == 360)
+            themeHue = 0;
         if ((themeHue >= 0) && (themeHue < 360) && ((themeHue % HueRing.hueStepDegrees) == 0)) {
             themeId = themeIDs[themeHue / HueRing.hueStepDegrees];
         }

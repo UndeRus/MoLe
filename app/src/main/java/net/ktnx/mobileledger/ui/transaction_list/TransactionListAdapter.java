@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
@@ -24,7 +25,6 @@ import android.os.AsyncTask;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +32,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.App;
@@ -48,8 +47,6 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
-import static net.ktnx.mobileledger.utils.DimensionUtils.dp2px;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowHolder> {
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
