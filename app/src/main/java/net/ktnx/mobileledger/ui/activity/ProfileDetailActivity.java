@@ -62,7 +62,13 @@ public class ProfileDetailActivity extends CrashReportingActivity {
         }
 
         super.onCreate(savedInstanceState);
-        Colors.setupTheme(this, profile);
+        int themeHue;
+        if (profile != null)
+            themeHue = profile.getThemeHue();
+        else {
+            themeHue = Colors.getNewProfileThemeHue(Data.profiles.getValue());
+        }
+        Colors.setupTheme(this, themeHue);
         setContentView(R.layout.activity_profile_detail);
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
@@ -87,6 +93,7 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             // using a fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putInt(ProfileDetailFragment.ARG_ITEM_ID, index);
+            arguments.putInt(ProfileDetailFragment.ARG_HUE, themeHue);
             mFragment = new ProfileDetailFragment();
             mFragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

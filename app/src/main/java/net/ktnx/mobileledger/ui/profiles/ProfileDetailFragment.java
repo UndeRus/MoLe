@@ -72,6 +72,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_HUE = "hue";
     @NonNls
     private static final String HTTPS_URL_START = "https://";
 
@@ -293,7 +294,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         hookClearErrorOnFocusListener(userName, userNameLayout);
         hookClearErrorOnFocusListener(password, passwordLayout);
 
-        int profileThemeId;
+        final int profileThemeId;
         if (mProfile != null) {
             profileName.setText(mProfile.getName());
             postingPermitted.setChecked(mProfile.isPostingPermitted());
@@ -322,7 +323,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             userName.setText("");
             password.setText("");
             preferredAccountsFilter.setText(null);
-            profileThemeId = -1;
+            profileThemeId = getArguments().getInt(ARG_HUE, -1);
         }
 
         checkInsecureSchemeWithAuth();

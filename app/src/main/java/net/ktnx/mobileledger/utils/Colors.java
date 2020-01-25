@@ -32,6 +32,8 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.HueRing;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 
 import static java.lang.Math.abs;
@@ -39,6 +41,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
+    public static final int THEME_HUE_STEP_DEG = 5;
     private static final float blueLightness = 0.665f;
     private static final float yellowLightness = 0.350f;
     private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
@@ -247,5 +250,71 @@ public class Colors {
             colors[i] = getPrimaryColorForHue(hue);
         }
         return colors;
+    }
+    public static int getNewProfileThemeHue(ArrayList<MobileLedgerProfile> profiles) {
+        if ((profiles == null) || (profiles.size() == 0))
+            return DEFAULT_HUE_DEG;
+
+        if (profiles.size() == 1) {
+            int opposite = profiles.get(0)
+                                   .getThemeHue() + 180;
+            opposite %= 360;
+            return opposite;
+        }
+
+        ArrayList<Integer> hues = new ArrayList<>();
+        for (MobileLedgerProfile p : profiles) {
+            int hue = p.getThemeHue();
+            if (hue == -1)
+                hue = DEFAULT_HUE_DEG;
+            hues.add(hue);
+        }
+        Collections.sort(hues);
+        hues.add(hues.get(0));
+
+        int lastHue = -1;
+        int largestInterval = 0;
+        ArrayList<Integer> largestIntervalStarts = new ArrayList<>();
+
+        for (int h : hues) {
+            if (lastHue == -1) {
+                lastHue = h;
+                continue;
+            }
+
+            int interval;
+            if (h > lastHue)
+                interval = h - lastHue;     // 10 -> 20 is a step of 10
+            else
+                interval = h + (360 - lastHue);    // 350 -> 20 is a step of 30
+
+            if (interval > largestInterval) {
+                largestInterval = interval;
+                largestIntervalStarts.clear();
+                largestIntervalStarts.add(lastHue);
+            }
+            else if (interval == largestInterval) {
+                largestIntervalStarts.add(lastHue);
+            }
+
+            lastHue = h;
+        }
+
+        final int chosenIndex = (int) (Math.random() * largestIntervalStarts.size());
+        int chosenIntervalStart = largestIntervalStarts.get(chosenIndex);
+
+        if (largestInterval % 2 != 0)
+            largestInterval++;    // round up the middle point
+        int chosenHue = (chosenIntervalStart + (largestInterval / 2)) % 360;
+
+        final int mod = chosenHue % THEME_HUE_STEP_DEG;
+        if (mod != 0) {
+            if (mod > THEME_HUE_STEP_DEG / 2)
+                chosenHue += (THEME_HUE_STEP_DEG - mod); // 13 += (5-3) = 15
+            else
+                chosenHue -= mod;       // 12 -= 2 = 10
+        }
+
+        return chosenHue;
     }
 }
