@@ -180,7 +180,7 @@ public class ProfilesRecyclerViewAdapter
                 profile.getUuid(), (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
         holder.itemView.setTag(profile);
 
-        int hue = profile.getThemeId();
+        int hue = profile.getThemeHue();
         if (hue == -1) holder.mColorTag
                 .setBackgroundColor(Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
         else holder.mColorTag.setBackgroundColor(Colors.getPrimaryColorForHue(hue));

@@ -399,7 +399,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         mProfileListAdapter.notifyDataSetChanged();
 
-        int newProfileTheme = haveProfile ? profile.getThemeId() : -1;
+        int newProfileTheme = haveProfile ? profile.getThemeHue() : -1;
         if (newProfileTheme != Colors.profileThemeId) {
             debug("profiles",
                     String.format(Locale.ENGLISH, "profile theme %d → %d", Colors.profileThemeId,
@@ -458,7 +458,7 @@ public class MainActivity extends ProfileThemedActivity {
         Bundle bundle = new Bundle();
         onSaveInstanceState(bundle);
 
-        storeThemeIdInPrefs(profile.getThemeId());
+        storeThemeIdInPrefs(profile.getThemeHue());
 
         // restart activity to reflect theme change
         finish();

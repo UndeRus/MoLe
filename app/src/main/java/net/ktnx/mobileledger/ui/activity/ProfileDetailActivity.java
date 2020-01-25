@@ -57,7 +57,7 @@ public class ProfileDetailActivity extends CrashReportingActivity {
                                     index));
 
                 debug("profiles", String.format(Locale.ENGLISH, "Editing profile %s (%s); hue=%d",
-                        profile.getName(), profile.getUuid(), profile.getThemeId()));
+                        profile.getName(), profile.getUuid(), profile.getThemeHue()));
             }
         }
 

@@ -206,7 +206,7 @@ public class Colors {
         setupTheme(activity, profile);
     }
     public static void setupTheme(Activity activity, MobileLedgerProfile profile) {
-        final int themeHue = (profile == null) ? -1 : profile.getThemeId();
+        final int themeHue = (profile == null) ? -1 : profile.getThemeHue();
         setupTheme(activity, themeHue);
     }
     public static void setupTheme(Activity activity, int themeHue) {

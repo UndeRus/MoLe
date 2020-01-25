@@ -307,7 +307,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
             password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
             preferredAccountsFilter.setText(mProfile.getPreferredAccountsFilter());
-            profileThemeId = mProfile.getThemeId();
+            profileThemeId = mProfile.getThemeHue();
         }
         else {
             profileName.setText("");
@@ -363,7 +363,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
 
         if (mProfile != null) {
             updateProfileFromUI();
-//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeId()));
+//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
             mProfile.storeInDB();
             debug("profiles", "profile stored in DB");
             triggerProfileChange();
@@ -397,7 +397,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         mProfile.setAuthEnabled(useAuthentication.isChecked());
         mProfile.setAuthUserName(userName.getText());
         mProfile.setAuthPassword(password.getText());
-        mProfile.setThemeId(huePickerView.getTag());
+        mProfile.setThemeHue(huePickerView.getTag());
         mProfile.setFutureDates(futureDates);
         mProfile.setApiVersion(apiVersion);
     }

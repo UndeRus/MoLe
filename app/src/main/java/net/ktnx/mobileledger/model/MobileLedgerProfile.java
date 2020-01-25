@@ -50,7 +50,7 @@ public final class MobileLedgerProfile {
     private boolean authEnabled;
     private String authUserName;
     private String authPassword;
-    private int themeId;
+    private int themeHue;
     private int orderNo = -1;
     private FutureDates futureDates = FutureDates.None;
     private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
@@ -69,7 +69,7 @@ public final class MobileLedgerProfile {
         authEnabled = origin.authEnabled;
         authUserName = origin.authUserName;
         authPassword = origin.authPassword;
-        themeId = origin.themeId;
+        themeHue = origin.themeHue;
         orderNo = origin.orderNo;
         futureDates = origin.futureDates;
         apiVersion = origin.apiVersion;
@@ -208,15 +208,15 @@ public final class MobileLedgerProfile {
         try {
 //            debug("profiles", String.format("Storing profile in DB: uuid=%s, name=%s, " +
 //                                            "url=%s, permit_posting=%s, authEnabled=%s, " +
-//                                            "themeId=%d", uuid, name, url,
-//                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeId));
+//                                            "themeHue=%d", uuid, name, url,
+//                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeHue));
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, " +
                        "auth_password, theme, order_no, preferred_accounts_filter, future_dates, " +
                        "api_version) " + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
-                                 authEnabled ? authPassword : null, themeId, orderNo,
+                                 authEnabled ? authPassword : null, themeHue, orderNo,
                                  preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt()
                     });
             db.setTransactionSuccessful();
@@ -390,17 +390,16 @@ public final class MobileLedgerProfile {
 
         return tr;
     }
-    public int getThemeId() {
-//        debug("profile", String.format("Profile.getThemeId() returning %d", themeId));
-        return this.themeId;
+    public int getThemeHue() {
+//        debug("profile", String.format("Profile.getThemeHue() returning %d", themeHue));
+        return this.themeHue;
     }
-    public void setThemeId(Object o) {
-        setThemeId(Integer.valueOf(String.valueOf(o))
-                          .intValue());
+    public void setThemeHue(Object o) {
+        setThemeId(Integer.valueOf(String.valueOf(o)));
     }
-    public void setThemeId(int themeId) {
-//        debug("profile", String.format("Profile.setThemeId(%d) called", themeId));
-        this.themeId = themeId;
+    public void setThemeId(int themeHue) {
+//        debug("profile", String.format("Profile.setThemeHue(%d) called", themeHue));
+        this.themeHue = themeHue;
     }
     public void markTransactionsAsNotPresent(SQLiteDatabase db) {
         db.execSQL("UPDATE transactions set keep=0 where profile=?", new String[]{uuid});
