@@ -228,8 +228,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
             NewTransactionModel.Item firstNegative = null;
             NewTransactionModel.Item firstPositive = null;
-            boolean singleNegative = false;
-            boolean singlePositive = false;
+            int singleNegativeIndex = -1;
+            int singlePositiveIndex = -1;
             int negativeCount = 0;
             for (int i = 0; i < accounts.size(); i++) {
                 LedgerTransactionAccount acc = accounts.get(i);
@@ -248,18 +248,18 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                     if (acc.getAmount() < 0) {
                         if (firstNegative == null) {
                             firstNegative = item;
-                            singleNegative = true;
+                            singleNegativeIndex = i;
                         }
                         else
-                            singleNegative = false;
+                            singleNegativeIndex = -1;
                     }
                     else {
                         if (firstPositive == null) {
                             firstPositive = item;
-                            singlePositive = true;
+                            singlePositiveIndex = i;
                         }
                         else
-                            singlePositive = false;
+                            singlePositiveIndex = -1;
                     }
                 }
                 else
@@ -268,13 +268,15 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 notifyItemChanged(i + 1);
             }
 
-            if (singleNegative) {
+            if (singleNegativeIndex != -1) {
                 firstNegative.getAccount()
                              .resetAmount();
+                model.moveItemLast(singleNegativeIndex);
             }
-            else if (singlePositive) {
+            else if (singlePositiveIndex != -1) {
                 firstPositive.getAccount()
                              .resetAmount();
+                model.moveItemLast(singlePositiveIndex);
             }
         }
         model.checkTransactionSubmittable(this);

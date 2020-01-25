@@ -304,6 +304,19 @@ public class NewTransactionModel extends ViewModel {
         final MutableLiveData<Boolean> commentVisible = getItem(position).commentVisible;
         commentVisible.postValue(!commentVisible.getValue());
     }
+    public void moveItemLast(int index) {
+        /*   0
+             1   <-- index
+             2
+             3   <-- desired position
+         */
+        int itemCount = items.size();
+
+        if (index < itemCount - 1) {
+            Item acc = items.remove(index);
+            items.add(itemCount - 1, acc);
+        }
+    }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
     //==========================================================================================
