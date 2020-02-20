@@ -54,6 +54,7 @@ public final class Data {
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
     public static MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
+    public static MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static Locker profilesLocker = new Locker();
     private static RetrieveTransactionsTask retrieveTransactionsTask;
@@ -171,10 +172,21 @@ public final class Data {
                 locale.toString(), currency.toString(), symbol));
         String formatted = formatter.format(1234.56f);
         Logger.debug("locale", String.format("1234.56 formats as '%s'", formatted));
-        if (formatted.startsWith(symbol))
+
+        if (formatted.startsWith(symbol)) {
             currencySymbolPosition.setValue(Currency.Position.before);
-        else if (formatted.endsWith(symbol))
+
+            // is the currency symbol directly followed by the first formatted digit?
+            final char canary = formatted.charAt(symbol.length());
+            currencyGap.setValue(canary != '1');
+        }
+        else if (formatted.endsWith(symbol)) {
             currencySymbolPosition.setValue(Currency.Position.after);
+
+            // is the currency symbol directly preceded bu the last formatted digit?
+            final char canary = formatted.charAt(formatted.length() - symbol.length() - 1);
+            currencyGap.setValue(canary != '6');
+        }
         else
             currencySymbolPosition.setValue(Currency.Position.none);
     }
