@@ -22,6 +22,7 @@ import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -39,13 +40,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
+import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
+import net.ktnx.mobileledger.ui.OnCurrencySelectedListener;
 import net.ktnx.mobileledger.ui.TextViewClearHelper;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.DimensionUtils;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
@@ -59,9 +63,11 @@ import java.util.Locale;
 import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
 
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
-        implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
+        implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback,
+        OnCurrencySelectedListener {
     private final String decimalSeparator;
     private final String decimalDot;
+    private final TextView tvCurrency;
     private NewTransactionModel.Item item;
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
@@ -81,10 +87,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Boolean> editableObserver;
     private Observer<Boolean> commentVisibleObserver;
     private Observer<String> commentObserver;
+    private Observer<Currency.Position> currencyPositionObserver;
+    private Observer<Boolean> currencyGapObserver;
     private Observer<Locale> localeObserver;
+    private Observer<Currency> currencyObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
+    //TODO multiple amounts with different currencies per posting
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
         super(itemView);
         tvAccount = itemView.findViewById(R.id.account_row_acc_name);
@@ -92,6 +102,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         new TextViewClearHelper().attachToTextView((EditText) tvComment);
         commentButton = itemView.findViewById(R.id.comment_button);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
+        tvCurrency = itemView.findViewById(R.id.currency);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
         tvDescription = itemView.findViewById(R.id.new_transaction_description);
         lHead = itemView.findViewById(R.id.ntr_data);
@@ -178,10 +189,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         final TextWatcher amountWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                Logger.debug("num",
+                        String.format(Locale.US, "beforeTextChanged: start=%d, count=%d, after=%d",
+                                start, count, after));
             }
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                Logger.debug("num",
+                        String.format(Locale.US, "onTextChanged: start=%d, before=%d, count=%d",
+                                start, before, count));
             }
             @Override
             public void afterTextChanged(Editable s) {
@@ -206,6 +222,13 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAccount.addTextChangedListener(tw);
         tvComment.addTextChangedListener(tw);
         tvAmount.addTextChangedListener(amountWatcher);
+
+        tvCurrency.setOnClickListener(v -> {
+            CurrencySelectorFragment cpf = new CurrencySelectorFragment();
+            cpf.setOnCurrencySelectedListener(this);
+            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
+            cpf.show(activity.getSupportFragmentManager(), "currency-selector");
+        });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             tvAmount.setKeyListener(DigitsKeyListener.getInstance(Locale.getDefault(), true, true));
@@ -315,10 +338,78 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         };
 
+        currencyPositionObserver = position -> {
+            updateCurrencyPositionAndPadding(position, Data.currencyGap.getValue());
+        };
+
+        currencyGapObserver = hasGap -> {
+            updateCurrencyPositionAndPadding(Data.currencySymbolPosition.getValue(), hasGap);
+        };
+
         localeObserver = locale -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 tvAmount.setKeyListener(DigitsKeyListener.getInstance(locale, true, true));
         };
+
+        currencyObserver = this::setCurrency;
+    }
+    private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
+        ConstraintLayout.LayoutParams amountLP =
+                (ConstraintLayout.LayoutParams) tvAmount.getLayoutParams();
+        ConstraintLayout.LayoutParams currencyLP =
+                (ConstraintLayout.LayoutParams) tvCurrency.getLayoutParams();
+
+        if (position == Currency.Position.before) {
+            currencyLP.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+            currencyLP.endToEnd = ConstraintLayout.LayoutParams.UNSET;
+
+            amountLP.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+            amountLP.endToStart = ConstraintLayout.LayoutParams.UNSET;
+            amountLP.startToStart = ConstraintLayout.LayoutParams.UNSET;
+            amountLP.startToEnd = tvCurrency.getId();
+
+            tvCurrency.setGravity(Gravity.END);
+        }
+        else {
+            currencyLP.startToStart = ConstraintLayout.LayoutParams.UNSET;
+            currencyLP.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+
+            amountLP.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
+            amountLP.startToEnd = ConstraintLayout.LayoutParams.UNSET;
+            amountLP.endToEnd = ConstraintLayout.LayoutParams.UNSET;
+            amountLP.endToStart = tvCurrency.getId();
+
+            tvCurrency.setGravity(Gravity.START);
+        }
+
+        amountLP.resolveLayoutDirection(tvAmount.getLayoutDirection());
+        currencyLP.resolveLayoutDirection(tvCurrency.getLayoutDirection());
+
+        tvAmount.setLayoutParams(amountLP);
+        tvCurrency.setLayoutParams(currencyLP);
+
+        // distance between the amount and the currency symbol
+        int gapSize = DimensionUtils.sp2px(tvCurrency.getContext(), 5);
+
+        if (position == Currency.Position.before) {
+            tvCurrency.setPaddingRelative(0, 0, hasGap ? gapSize : 0, 0);
+        }
+        else {
+            tvCurrency.setPaddingRelative(hasGap ? gapSize : 0, 0, 0, 0);
+        }
+    }
+    private void setCurrencyString(String currency) {
+        if ((currency == null) || currency.isEmpty()) {
+            tvCurrency.setText(R.string.currency_symbol);
+            tvCurrency.setTextColor(0x7f000000 + (0x00ffffff & Colors.defaultTextColor));
+        }
+        else {
+            tvCurrency.setText(currency);
+            tvCurrency.setTextColor(Colors.defaultTextColor);
+        }
+    }
+    private void setCurrency(Currency currency) {
+        setCurrencyString((currency == null) ? null : currency.getName());
     }
     private void setEditable(Boolean editable) {
         tvDate.setEnabled(editable);
@@ -397,6 +488,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     if (amount.isEmpty()) {
                         account.resetAmount();
+                        account.setCurrency(null);
                     }
                     else {
                         try {
@@ -409,6 +501,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                     "input was '%s'", amount));
                             account.resetAmount();
                         }
+                        final String curr = String.valueOf(tvCurrency.getText());
+                        if (curr.equals(tvCurrency.getContext()
+                                                  .getResources()
+                                                  .getString(R.string.currency_symbol)) ||
+                            curr.isEmpty())
+                            account.setCurrency(null);
+                        else
+                            account.setCurrency(curr);
                     }
 
                     break;
@@ -447,7 +547,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                          .stopObservingFocusedItem(focusedAccountObserver);
                 this.item.getModel()
                          .stopObservingAccountCount(accountCountObserver);
+                Data.currencySymbolPosition.removeObserver(currencyPositionObserver);
+                Data.currencyGap.removeObserver(currencyGapObserver);
                 Data.locale.removeObserver(localeObserver);
+                this.item.stopObservingCurrency(currencyObserver);
 
                 this.item = null;
             }
@@ -473,6 +576,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 //                        tvAmount.setHint(R.string.zero_amount);
                     }
                     tvAmount.setHint(item.getAmountHint());
+                    setCurrencyString(acc.getCurrency());
                     lHead.setVisibility(View.GONE);
                     lAccount.setVisibility(View.VISIBLE);
                     lPadding.setVisibility(View.GONE);
@@ -500,7 +604,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     .observeFocusedItem(activity, focusedAccountObserver);
                 item.getModel()
                     .observeAccountCount(activity, accountCountObserver);
+                Data.currencySymbolPosition.observe(activity, currencyPositionObserver);
+                Data.currencyGap.observe(activity, currencyGapObserver);
                 Data.locale.observe(activity, localeObserver);
+                item.observeCurrency(activity, currencyObserver);
             }
         }
         finally {
@@ -516,6 +623,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         if (focused)
             Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
 
+    }
+    @Override
+    public void onCurrencySelected(Currency item) {
+        this.item.setCurrency(item);
     }
     @Override
     public void descriptionSelected(String description) {

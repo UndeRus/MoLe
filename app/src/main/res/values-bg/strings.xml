@@ -132,6 +132,14 @@
     <string name="api_post_1_14">Версия 1.15 или по-нова</string>
     <string name="api_pre_1_15">Версия 1.14.x</string>
     <string name="profile_api_version_title">Версия на сървъра</string>
+    <string name="add_button">Добавяне…</string>
+    <string name="close_button">Затваряне</string>
     <string name="transaction_account_comment_hint">бележка</string>
+    <string name="btn_no_currency">без</string>
+    <string name="choose_currency_label">Валута</string>
+    <string name="currency_has_gap">Отстояние от сумата</string>
+    <string name="currency_position_left">Вляво</string>
+    <string name="currency_position_right">Вдясно</string>
+    <string name="new_currency_name_hint">валута/ценност</string>
 
 </resources>

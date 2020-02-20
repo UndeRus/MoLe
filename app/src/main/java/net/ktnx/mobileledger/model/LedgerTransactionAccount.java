@@ -67,21 +67,21 @@ public class LedgerTransactionAccount {
 
         return amount;
     }
-
     public void setAmount(float account_amount) {
         this.amount = account_amount;
         this.amountSet = true;
     }
-
     public void resetAmount() {
         this.amountSet = false;
     }
-
     public boolean isAmountSet() {
         return amountSet;
     }
     public String getCurrency() {
         return currency;
+    }
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
     @NonNull
     public String toString() {

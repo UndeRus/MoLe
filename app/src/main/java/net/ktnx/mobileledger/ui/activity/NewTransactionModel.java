@@ -26,6 +26,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.BuildConfig;
+import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -334,6 +335,7 @@ public class NewTransactionModel extends ViewModel {
         private FocusedElement focusedElement = FocusedElement.Account;
         private MutableLiveData<String> comment = new MutableLiveData<>(null);
         private MutableLiveData<Boolean> commentVisible = new MutableLiveData<>(false);
+        private MutableLiveData<Currency> currency = new MutableLiveData<>(null);
         public Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
@@ -532,8 +534,7 @@ public class NewTransactionModel extends ViewModel {
         public void stopObservingCommentVisible(Observer<Boolean> observer) {
             commentVisible.removeObserver(observer);
         }
-        public void observeComment(NewTransactionActivity activity,
-                                          Observer<String> observer) {
+        public void observeComment(NewTransactionActivity activity, Observer<String> observer) {
             comment.observe(activity, observer);
         }
         public void stopObservingComment(Observer<String> observer) {
@@ -542,6 +543,21 @@ public class NewTransactionModel extends ViewModel {
         public void setComment(String comment) {
             getAccount().setComment(comment);
             this.comment.postValue(comment);
+        }
+        public Currency getCurrency() {
+            return this.currency.getValue();
+        }
+        public void setCurrency(Currency currency) {
+            getAccount().setCurrency((currency != null && !currency.getName()
+                                                                   .isEmpty()) ? currency.getName()
+                                                                               : null);
+            this.currency.setValue(currency);
+        }
+        public void observeCurrency(NewTransactionActivity activity, Observer<Currency> observer) {
+            currency.observe(activity, observer);
+        }
+        public void stopObservingCurrency(Observer<Currency> observer) {
+            currency.removeObserver(observer);
         }
     }
 }

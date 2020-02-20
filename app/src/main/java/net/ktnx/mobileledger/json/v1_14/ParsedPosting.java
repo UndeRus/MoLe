@@ -57,11 +57,13 @@ public class ParsedPosting extends net.ktnx.mobileledger.json.ParsedPosting {
         qty.setDecimalMantissa(Math.round(acc.getAmount() * 100));
         amt.setAquantity(qty);
         ParsedStyle style = new ParsedStyle();
-        style.setAscommodityside('L');
-        style.setAscommodityspaced(false);
+        style.setAscommodityside(getCommoditySide());
+        style.setAscommodityspaced(getCommoditySpaced());
         style.setAsprecision(2);
         style.setAsdecimalpoint('.');
         amt.setAstyle(style);
+        if (acc.getCurrency() != null)
+            amt.setAcommodity(acc.getCurrency());
         amounts.add(amt);
         result.setPamount(amounts);
         return result;

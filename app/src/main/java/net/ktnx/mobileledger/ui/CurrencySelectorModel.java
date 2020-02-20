@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -15,19 +15,18 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.utils;
+package net.ktnx.mobileledger.ui;
 
-import android.content.Context;
-import android.util.TypedValue;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-public class DimensionUtils {
-    public static int dp2px(Context context, float dp) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-               context.getResources().getDisplayMetrics()));
+import net.ktnx.mobileledger.model.Currency;
+
+import java.util.List;
+
+public class CurrencySelectorModel extends ViewModel {
+    public final MutableLiveData<List<Currency>> currencies;
+    public CurrencySelectorModel() {
+        this.currencies = new MutableLiveData<>();
     }
-    public static int sp2px(Context context, float sp) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
-               context.getResources().getDisplayMetrics()));
-    }
-
 }

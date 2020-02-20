@@ -116,7 +116,7 @@
             app:layout_constraintStart_toEndOf="@id/comment_button"
             app:layout_constraintTop_toBottomOf="@id/account_row_acc_name" />
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/amount_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -124,6 +124,10 @@
             app:layout_constraintTop_toBottomOf="@id/comment">
 
             <EditText
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/currency"
                 android:id="@+id/account_row_acc_amounts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -137,8 +141,24 @@
                 android:inputType="numberSigned|numberDecimal|number"
                 android:minWidth="80sp"
                 android:selectAllOnFocus="true"
-                android:textAlignment="viewEnd" />
-        </LinearLayout>
+                android:textAlignment="viewEnd"
+                app:layout_constraintWidth_min="@dimen/text_margin"/>
+
+            <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:id="@+id/currency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/currency_symbol"
+                style="@style/TextAppearance.AppCompat.Widget.Button"
+                android:textAllCaps="false"
+                android:visibility="visible"
+                android:minWidth="24dp"
+                android:gravity="center_horizontal"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

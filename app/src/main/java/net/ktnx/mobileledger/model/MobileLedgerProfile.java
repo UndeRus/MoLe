@@ -488,6 +488,23 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
+    public List<Currency> getCurrencies() {
+        SQLiteDatabase db = App.getDatabase();
+
+        ArrayList<Currency> result = new ArrayList<>();
+
+        try (Cursor c = db.rawQuery("SELECT c.id, c.name, c.position, c.has_gap FROM currencies c",
+                new String[]{}))
+        {
+            while (c.moveToNext()) {
+                Currency currency = new Currency(c.getInt(0), c.getString(1),
+                        Currency.Position.valueOf(c.getInt(2)), c.getInt(3) == 1);
+                result.add(currency);
+            }
+        }
+
+        return result;
+    }
     public enum FutureDates {
         None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),
         SixMonths(180), OneYear(365), All(-1);

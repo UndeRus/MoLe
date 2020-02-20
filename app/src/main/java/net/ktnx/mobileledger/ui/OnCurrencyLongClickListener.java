@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -15,19 +15,20 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.utils;
+package net.ktnx.mobileledger.ui;
 
-import android.content.Context;
-import android.util.TypedValue;
+import net.ktnx.mobileledger.model.Currency;
 
-public class DimensionUtils {
-    public static int dp2px(Context context, float dp) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-               context.getResources().getDisplayMetrics()));
-    }
-    public static int sp2px(Context context, float sp) {
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp,
-               context.getResources().getDisplayMetrics()));
-    }
-
+/**
+ * This interface must be implemented by activities that contain this
+ * fragment to allow an interaction in this fragment to be communicated
+ * to the activity and potentially other fragments contained in that
+ * activity.
+ * <p/>
+ * See the Android Training lesson <a href=
+ * "http://developer.android.com/training/basics/fragments/communicating.html"
+ * >Communicating with Other Fragments</a> for more information.
+ */
+public interface OnCurrencyLongClickListener {
+    void onCurrencyLongClick(Currency item);
 }

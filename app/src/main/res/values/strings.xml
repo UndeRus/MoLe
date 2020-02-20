@@ -144,5 +144,14 @@
     <string name="api_post_1_14">Version 1.15 and above</string>
     <string name="api_auto">Detect automaticaly</string>
     <string name="profile_api_version_title">Backend server version</string>
+    <string name="currency_symbol" translatable="false">¤</string>
+    <string name="add_button">Add…</string>
+    <string name="close_button">Close</string>
     <string name="transaction_account_comment_hint">comment</string>
+    <string name="choose_currency_label">Currency</string>
+    <string name="new_currency_name_hint">currency/commodity</string>
+    <string name="btn_no_currency">none</string>
+    <string name="currency_position_left">Left</string>
+    <string name="currency_position_right">Right</string>
+    <string name="currency_has_gap">Offset from the value</string>
 </resources>
