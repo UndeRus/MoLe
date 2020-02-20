@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedPosting {
+public class ParsedPosting extends net.ktnx.mobileledger.json.ParsedPosting {
     private Void pbalanceassertion;
     private String pstatus = "Unmarked";
     private String paccount;
