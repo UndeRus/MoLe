@@ -212,6 +212,12 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
                    menu.inflate(R.menu.future_dates);
                    menu.setOnMenuItemClickListener(item -> {
                        switch (item.getItemId()) {
+                           case R.id.menu_future_dates_7:
+                               futureDates = MobileLedgerProfile.FutureDates.OneWeek;
+                               break;
+                           case R.id.menu_future_dates_14:
+                               futureDates = MobileLedgerProfile.FutureDates.TwoWeeks;
+                               break;
                            case R.id.menu_future_dates_30:
                                futureDates = MobileLedgerProfile.FutureDates.OneMonth;
                                break;

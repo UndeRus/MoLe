@@ -131,6 +131,8 @@
     <string name="simulation_label">SIMULATION</string>
     <string name="profile_future_dates_label">Allow input of dates in the future</string>
     <string name="future_dates_none">No future dates are allowed</string>
+    <string name="future_dates_7">Up to a week</string>
+    <string name="future_dates_14">Up to two weeks</string>
     <string name="future_dates_30">Up to a month</string>
     <string name="future_dates_60">Up to two months</string>
     <string name="future_dates_90">Up to three months</string>

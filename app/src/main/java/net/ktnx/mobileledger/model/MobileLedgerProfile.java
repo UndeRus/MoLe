@@ -489,8 +489,8 @@ public final class MobileLedgerProfile {
         }
     }
     public enum FutureDates {
-        None(0), OneMonth(30), TwoMonths(60), ThreeMonths(90), SixMonths(180), OneYear(365),
-        All(-1);
+        None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),
+        SixMonths(180), OneYear(365), All(-1);
         private static SparseArray<FutureDates> map = new SparseArray<>();
 
         static {
@@ -511,6 +511,10 @@ public final class MobileLedgerProfile {
         }
         public String getText(Resources resources) {
             switch (value) {
+                case 7:
+                    return resources.getString(R.string.future_dates_7);
+                case 14:
+                    return resources.getString(R.string.future_dates_14);
                 case 30:
                     return resources.getString(R.string.future_dates_30);
                 case 60:

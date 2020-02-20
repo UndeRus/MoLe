@@ -19,6 +19,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:title="@string/future_dates_none" android:id="@+id/menu_future_dates_none"/>
+    <item android:title="@string/future_dates_7" android:id="@+id/menu_future_dates_7"/>
+    <item android:title="@string/future_dates_14" android:id="@+id/menu_future_dates_14"/>
     <item android:title="@string/future_dates_30" android:id="@+id/menu_future_dates_30"/>
     <item android:title="@string/future_dates_60" android:id="@+id/menu_future_dates_60"/>
     <item android:title="@string/future_dates_90" android:id="@+id/menu_future_dates_90"/>

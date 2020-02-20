@@ -97,6 +97,12 @@ public class DatePickerFragment extends AppCompatDialogFragment
                 case None:
                     // already there
                     break;
+                case OneWeek:
+                    dateLimit.add(Calendar.DAY_OF_MONTH, 7);
+                    break;
+                case TwoWeeks:
+                    dateLimit.add(Calendar.DAY_OF_MONTH, 14);
+                    break;
                 case OneMonth:
                     dateLimit.add(Calendar.MONTH, 1);
                     break;
