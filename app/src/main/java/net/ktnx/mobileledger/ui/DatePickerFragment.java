@@ -92,28 +92,29 @@ public class DatePickerFragment extends AppCompatDialogFragment
             cv.setMaxDate(Long.MAX_VALUE);
         }
         else {
+            final Calendar dateLimit = GregorianCalendar.getInstance();
             switch (futureDates) {
                 case None:
                     // already there
                     break;
                 case OneMonth:
-                    c.add(Calendar.MONTH, 1);
+                    dateLimit.add(Calendar.MONTH, 1);
                     break;
                 case TwoMonths:
-                    c.add(Calendar.MONTH, 2);
+                    dateLimit.add(Calendar.MONTH, 2);
                     break;
                 case ThreeMonths:
-                    c.add(Calendar.MONTH, 3);
+                    dateLimit.add(Calendar.MONTH, 3);
                     break;
                 case SixMonths:
-                    c.add(Calendar.MONTH, 6);
+                    dateLimit.add(Calendar.MONTH, 6);
                     break;
                 case OneYear:
-                    c.add(Calendar.YEAR, 1);
+                    dateLimit.add(Calendar.YEAR, 1);
                     break;
             }
-            cv.setMaxDate(c.getTime()
-                           .getTime());
+            cv.setMaxDate(dateLimit.getTime()
+                                   .getTime());
         }
 
         cv.setOnDateChangeListener(this);
