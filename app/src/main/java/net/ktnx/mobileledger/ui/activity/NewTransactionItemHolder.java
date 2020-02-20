@@ -81,6 +81,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Boolean> editableObserver;
     private Observer<Boolean> commentVisibleObserver;
     private Observer<String> commentObserver;
+    private Observer<Locale> localeObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
@@ -206,7 +207,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvComment.addTextChangedListener(tw);
         tvAmount.addTextChangedListener(amountWatcher);
 
-        // FIXME: react on locale changes
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             tvAmount.setKeyListener(DigitsKeyListener.getInstance(Locale.getDefault(), true, true));
         else
@@ -313,6 +313,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
             else
                 tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+        };
+
+        localeObserver = locale -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                tvAmount.setKeyListener(DigitsKeyListener.getInstance(locale, true, true));
         };
     }
     private void setEditable(Boolean editable) {
@@ -442,6 +447,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                          .stopObservingFocusedItem(focusedAccountObserver);
                 this.item.getModel()
                          .stopObservingAccountCount(accountCountObserver);
+                Data.locale.removeObserver(localeObserver);
 
                 this.item = null;
             }
@@ -494,6 +500,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     .observeFocusedItem(activity, focusedAccountObserver);
                 item.getModel()
                     .observeAccountCount(activity, accountCountObserver);
+                Data.locale.observe(activity, localeObserver);
             }
         }
         finally {

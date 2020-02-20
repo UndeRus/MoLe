@@ -55,6 +55,7 @@ public final class Data {
     public static MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
     public static MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
+    public static MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static Locker profilesLocker = new Locker();
     private static RetrieveTransactionsTask retrieveTransactionsTask;

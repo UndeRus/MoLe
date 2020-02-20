@@ -89,6 +89,8 @@ public class App extends Application {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateMonthNames();
+        Data.refreshCurrencyData(Locale.getDefault());
+        Data.locale.setValue(Locale.getDefault());
     }
     public SQLiteDatabase getDB() {
         if (dbHelper == null) initDb();
