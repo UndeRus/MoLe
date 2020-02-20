@@ -43,10 +43,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="0.75"
+            android:paddingStart="8dp"
             android:text="account comment"
             android:textAlignment="viewStart"
             android:textStyle="italic"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText,RtlSymmetry" />
     </LinearLayout>
 
     <TextView
