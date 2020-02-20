@@ -206,7 +206,7 @@ sub hslStyleForHue {
                         $baseTheme;
                 $result .= "$indent<item name=\"windowActionBar\">false</item>\n";
                 $result .= "$indent<item name=\"windowNoTitle\">true</item>\n";
-                $result .= "$indent<item name=\"textColor\">#8a000000</item>\n";
+                $result .= "$indent<item name=\"textColor\">#757575</item>\n";
         }
         my $S = 0.845;
         $result .= sprintf "$indent<item name=\"colorPrimary\">#%s</item>\n",
