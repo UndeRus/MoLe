@@ -231,7 +231,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            tvAmount.setKeyListener(DigitsKeyListener.getInstance(Locale.getDefault(), true, true));
+            tvAmount.setKeyListener(
+                    DigitsKeyListener.getInstance(Data.locale.getValue(), true, true));
         else
             tvAmount.setKeyListener(
                     DigitsKeyListener.getInstance("0123456789+-" + decimalSeparator + decimalDot));
