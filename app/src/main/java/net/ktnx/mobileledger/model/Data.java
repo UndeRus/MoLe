@@ -165,12 +165,12 @@ public final class Data {
     public static void refreshCurrencyData(Locale locale) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
         java.util.Currency currency = formatter.getCurrency();
-        Logger.debug("locale",
-                String.format("Discovering currency symbol position for locale %s (currency is %s)",
-                        locale.toString(), currency.toString()));
+        String symbol = currency.getSymbol();
+        Logger.debug("locale", String.format(
+                "Discovering currency symbol position for locale %s (currency is %s; symbol is %s)",
+                locale.toString(), currency.toString(), symbol));
         String formatted = formatter.format(1234.56f);
         Logger.debug("locale", String.format("1234.56 formats as '%s'", formatted));
-        String symbol = currency.getSymbol();
         if (formatted.startsWith(symbol))
             currencySymbolPosition.setValue(Currency.Position.before);
         else if (formatted.endsWith(symbol))
