@@ -102,7 +102,7 @@
     <string name="posting_permitted">Posting of new transactions enabled</string>
     <string name="profile_subitlte_read_only">(Read only)</string>
     <string name="crash_report_contents_label">Crash report contents:</string>
-    <string name="crash_dialog_title">MoLe chashed</string>
+    <string name="crash_dialog_title">MoLe crashed</string>
     <string name="btn_send_crash_report">Send…</string>
     <string name="btn_not_now">Not now</string>
     <string name="crash_app_label">Crash app</string>
@@ -142,7 +142,7 @@
     <string name="api_html">Version before 1.14</string>
     <string name="api_pre_1_15">Version 1.14.x</string>
     <string name="api_post_1_14">Version 1.15 and above</string>
-    <string name="api_auto">Detect automaticaly</string>
+    <string name="api_auto">Detect automatically</string>
     <string name="profile_api_version_title">Backend server version</string>
     <string name="currency_symbol" translatable="false">¤</string>
     <string name="add_button">Add…</string>
