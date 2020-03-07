@@ -56,6 +56,7 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
+    final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     public boolean getSimulateSave() {
         return simulateSave.getValue();
     }
@@ -317,6 +318,9 @@ public class NewTransactionModel extends ViewModel {
             Item acc = items.remove(index);
             items.add(itemCount - 1, acc);
         }
+    }
+    public void toggleCurrencyVisible() {
+        showCurrency.setValue(!showCurrency.getValue());
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 

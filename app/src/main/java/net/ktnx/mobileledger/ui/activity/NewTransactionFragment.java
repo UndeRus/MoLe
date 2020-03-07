@@ -23,6 +23,7 @@ import android.renderscript.RSInvalidStateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -78,6 +79,14 @@ public class NewTransactionFragment extends Fragment {
                 listAdapter.reset();
                 return true;
             });
+        final MenuItem toggleCurrencyItem = menu.findItem(R.id.toggle_currency);
+        toggleCurrencyItem.setOnMenuItemClickListener(item -> {
+            viewModel.toggleCurrencyVisible();
+            return true;
+        });
+        final FragmentActivity activity = getActivity();
+        if (activity != null)
+            viewModel.showCurrency.observe(activity, toggleCurrencyItem::setChecked);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -91,6 +91,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Boolean> currencyGapObserver;
     private Observer<Locale> localeObserver;
     private Observer<Currency> currencyObserver;
+    private Observer<Boolean> showCurrencyObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
@@ -353,6 +354,16 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         };
 
         currencyObserver = this::setCurrency;
+
+        showCurrencyObserver = showCurrency -> {
+              if (showCurrency) {
+                  tvCurrency.setVisibility(View.VISIBLE);
+              }
+            else {
+                tvCurrency.setVisibility(View.GONE);
+                setCurrencyString(null);
+              }
+        };
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
         ConstraintLayout.LayoutParams amountLP =
@@ -552,6 +563,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 Data.currencyGap.removeObserver(currencyGapObserver);
                 Data.locale.removeObserver(localeObserver);
                 this.item.stopObservingCurrency(currencyObserver);
+                this.item.getModel().showCurrency.removeObserver(showCurrencyObserver);
 
                 this.item = null;
             }
@@ -609,6 +621,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 Data.currencyGap.observe(activity, currencyGapObserver);
                 Data.locale.observe(activity, localeObserver);
                 item.observeCurrency(activity, currencyObserver);
+                item.getModel().showCurrency.observe(activity, showCurrencyObserver);
             }
         }
         finally {

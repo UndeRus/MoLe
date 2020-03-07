@@ -19,6 +19,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/toggle_currency"
+        android:title="@string/show_currency_input"
+        android:checkable="true"
+        android:checked="false"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_reset_new_transaction_activity"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:title="@string/action_reset_new_transaction_activity_title"

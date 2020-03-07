@@ -154,4 +154,5 @@
     <string name="currency_position_left">Left</string>
     <string name="currency_position_right">Right</string>
     <string name="currency_has_gap">Offset from the value</string>
+    <string name="show_currency_input">Currency</string>
 </resources>

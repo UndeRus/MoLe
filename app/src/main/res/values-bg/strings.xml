@@ -141,5 +141,6 @@
     <string name="currency_position_left">Вляво</string>
     <string name="currency_position_right">Вдясно</string>
     <string name="new_currency_name_hint">валута/ценност</string>
+    <string name="show_currency_input">Валута</string>
 
 </resources>
