@@ -429,7 +429,7 @@ public class MainActivity extends ProfileThemedActivity {
                 fab.show();
             }
             else {
-                mToolbar.setSubtitle(R.string.profile_subitlte_read_only);
+                mToolbar.setSubtitle(R.string.profile_subtitle_read_only);
                 fab.hide();
             }
         }

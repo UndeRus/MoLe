@@ -94,7 +94,7 @@
     <string name="crash_app_label">Тестов срив</string>
     <string name="crash_dialog_title">MoLe се срина</string>
     <string name="crash_report_contents_label">Съдържание на доклада:</string>
-    <string name="profile_subitlte_read_only">(Само за преглед)</string>
+    <string name="profile_subtitle_read_only">(Само за преглед)</string>
     <string name="menu_acc_summary_confirm_selection_title">Потвърждаване на избора</string>
     <string name="menu_acc_summary_hide_selected_title">Скриване на маркираните сметки</string>
     <string name="btn_show_report">Показване на доклада</string>
