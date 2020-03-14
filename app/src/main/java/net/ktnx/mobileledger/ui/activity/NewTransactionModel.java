@@ -153,6 +153,8 @@ public class NewTransactionModel extends ViewModel {
      3a) there must be exactly one empty amount (with account)
      4) empty accounts with empty amounts are ignored
      5) a row with an empty account name or empty amount is guaranteed to exist
+     6) at least two rows need to be present in the ledger
+
     */
     @SuppressLint("DefaultLocale")
     public void checkTransactionSubmittable(NewTransactionItemsAdapter adapter) {
@@ -257,6 +259,9 @@ public class NewTransactionModel extends ViewModel {
             {
                 adapter.addRow();
             }
+
+            // 6) at least two rows need to be present in the ledger
+            while (this.items.size() < 2) adapter.addRow();
 
 
             debug("submittable", submittable ? "YES" : "NO");

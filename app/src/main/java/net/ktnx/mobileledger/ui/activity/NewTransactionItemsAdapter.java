@@ -26,8 +26,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
@@ -84,15 +82,13 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                         @NonNull RecyclerView.ViewHolder viewHolder) {
                 int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
-                // the top item is always there (date and description)
-                if (viewHolder.getAdapterPosition() > 0) {
+                // the top (date and description) and the bottom (padding) items are always there
+                final int adapterPosition = viewHolder.getAdapterPosition();
+                if ((adapterPosition > 0) && (adapterPosition < adapter.getItemCount() - 1)) {
                     flags |= makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
-                            ItemTouchHelper.UP | ItemTouchHelper.DOWN);
-
-                    if (viewModel.getAccountCount() > 2) {
-                        flags |= makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
-                                ItemTouchHelper.START | ItemTouchHelper.END);
-                    }
+                            ItemTouchHelper.UP | ItemTouchHelper.DOWN) |
+                             makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
+                                     ItemTouchHelper.START | ItemTouchHelper.END);
                 }
 
                 return flags;
