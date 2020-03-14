@@ -64,3 +64,13 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
 }
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs <<
+                    "-Xlint:deprecation" <<
+                    "-Xlint:unchecked"
+        }
+    }
+}
