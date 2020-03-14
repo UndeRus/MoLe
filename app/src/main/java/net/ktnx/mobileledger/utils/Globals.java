@@ -82,6 +82,12 @@ public final class Globals {
 
         return dateFormatter.get().parse(toParse);
     }
+    public static Calendar parseLedgerDateAsCalendar(String dateString) throws ParseException {
+        Date date = parseLedgerDate(dateString);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar;
+    }
     public static Date parseIsoDate(String dateString) throws ParseException {
         return isoDateFormatter.get().parse(dateString);
     }

@@ -65,20 +65,22 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             debug("UTT", sql);
             SQLiteDatabase db = App.getDatabase();
             String lastDateString = Globals.formatLedgerDate(new Date());
-            Date lastDate = Globals.parseLedgerDate(lastDateString);
+            Calendar lastDate = Globals.parseLedgerDateAsCalendar(lastDateString);
             boolean odd = true;
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
-                    if (isCancelled()) return null;
+                    if (isCancelled())
+                        return null;
 
                     int transaction_id = cursor.getInt(0);
                     String dateString = cursor.getString(1);
-                    Date date = Globals.parseLedgerDate(dateString);
+                    Calendar date = Globals.parseLedgerDateAsCalendar(dateString);
 
                     if (!lastDateString.equals(dateString)) {
-                        boolean showMonth = (date.getMonth() != lastDate.getMonth() ||
-                                             date.getYear() != lastDate.getYear());
-                        newList.add(new TransactionListItem(date, showMonth));
+                        boolean showMonth =
+                                (date.get(Calendar.MONTH) != lastDate.get(Calendar.MONTH)) ||
+                                (date.get(Calendar.YEAR) != lastDate.get(Calendar.YEAR));
+                        newList.add(new TransactionListItem(date.getTime(), showMonth));
                     }
                     newList.add(
                             new TransactionListItem(new LedgerTransaction(transaction_id), odd));
