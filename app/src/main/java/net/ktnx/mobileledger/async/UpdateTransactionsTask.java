@@ -38,7 +38,8 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String[] filterAccName) {
         final MobileLedgerProfile profile = Data.profile.getValue();
-        if (profile == null) return "Profile not configured";
+        if (profile == null)
+            return "Profile not configured";
 
         String profile_uuid = profile.getUuid();
         Data.backgroundTaskStarted();
