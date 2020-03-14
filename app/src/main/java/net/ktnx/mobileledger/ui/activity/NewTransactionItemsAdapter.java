@@ -108,18 +108,11 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             }
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                if (viewModel.getAccountCount() == 2)
-                    Snackbar.make(recyclerView, R.string.msg_at_least_two_accounts_are_required,
-                            Snackbar.LENGTH_LONG)
-                            .setAction("Action", null)
-                            .show();
-                else {
-                    int pos = viewHolder.getAdapterPosition();
-                    viewModel.removeItem(pos - 1);
-                    notifyItemRemoved(pos);
-                    viewModel.sendCountNotifications(); // needed after items re-arrangement
-                    viewModel.checkTransactionSubmittable(adapter);
-                }
+                int pos = viewHolder.getAdapterPosition();
+                viewModel.removeItem(pos - 1);
+                notifyItemRemoved(pos);
+                viewModel.sendCountNotifications(); // needed after items re-arrangement
+                viewModel.checkTransactionSubmittable(adapter);
             }
         });
     }
