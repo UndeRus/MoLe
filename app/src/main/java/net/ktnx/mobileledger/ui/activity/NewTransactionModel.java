@@ -38,8 +38,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +51,7 @@ public class NewTransactionModel extends ViewModel {
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
+    final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     private final Item header = new Item(this, null, "");
     private final Item trailer = new Item(this);
     private final ArrayList<Item> items = new ArrayList<>();
@@ -56,7 +59,6 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
-    final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     public boolean getSimulateSave() {
         return simulateSave.getValue();
     }
@@ -148,11 +150,12 @@ public class NewTransactionModel extends ViewModel {
      A transaction is submittable if:
      0) has description
      1) has at least two account names
-     2) each amount has account name
-     3) amounts must balance to 0, or
-     3a) there must be exactly one empty amount (with account)
+     2) each row with amount has account name
+     3) for each commodity:
+     3a) amounts must balance to 0, or
+     3b) there must be exactly one empty amount (with account)
      4) empty accounts with empty amounts are ignored
-     5) a row with an empty account name or empty amount is guaranteed to exist
+     5) a row with an empty account name or empty amount is guaranteed to exist for each commodity
      6) at least two rows need to be present in the ledger
 
     */
@@ -161,11 +164,11 @@ public class NewTransactionModel extends ViewModel {
         int accounts = 0;
         int amounts = 0;
         int empty_rows = 0;
-        float balance = 0f;
+        final Map<String, Float> balance = new HashMap<>();
         final String descriptionText = getDescription();
         boolean submittable = true;
-        List<Item> itemsWithEmptyAmount = new ArrayList<>();
-        List<Item> itemsWithAccountAndEmptyAmount = new ArrayList<>();
+        final Map<String, List<Item>> itemsWithEmptyAmountForCurrency = new HashMap<>();
+        final Map<String, List<Item>> itemsWithAccountAndEmptyAmountForCurrency = new HashMap<>();
 
         try {
             if ((descriptionText == null) || descriptionText.trim()
@@ -181,6 +184,8 @@ public class NewTransactionModel extends ViewModel {
                 LedgerTransactionAccount acc = item.getAccount();
                 String acc_name = acc.getAccountName()
                                      .trim();
+                String currName = acc.getCurrency();
+
                 if (acc_name.isEmpty()) {
                     empty_rows++;
 
@@ -198,70 +203,110 @@ public class NewTransactionModel extends ViewModel {
 
                 if (acc.isAmountSet()) {
                     amounts++;
-                    balance += acc.getAmount();
+                    Float bal = balance.get(currName);
+                    if (bal == null)
+                        bal = 0f;
+                    bal += acc.getAmount();
+                    balance.put(currName, bal);
                 }
                 else {
-                    itemsWithEmptyAmount.add(item);
+                    {
+                        List<Item> list = itemsWithEmptyAmountForCurrency.get(currName);
+                        if (list == null)
+                            list = new ArrayList<>();
+                        itemsWithEmptyAmountForCurrency.put(currName, list);
+                        list.add(item);
+                    }
 
                     if (!acc_name.isEmpty()) {
-                        itemsWithAccountAndEmptyAmount.add(item);
+                        List<Item> list =
+                                itemsWithAccountAndEmptyAmountForCurrency.get(acc.getCurrency());
+                        if (list == null) {
+                            list = new ArrayList<>();
+                            itemsWithAccountAndEmptyAmountForCurrency.put(acc.getCurrency(), list);
+                        }
+                        list.add(item);
                     }
                 }
             }
 
             // 1) has at least two account names
             if (accounts < 2) {
-                Logger.debug("submittable",
-                        String.format("Transaction not submittable: only %d account names",
-                                accounts));
+                if (accounts == 0)
+                    Logger.debug("submittable", "Transaction not submittable: no account names");
+                else if (accounts == 1)
+                    Logger.debug("submittable",
+                            "Transaction not submittable: only one account name");
+                else
+                    Logger.debug("submittable",
+                            String.format("Transaction not submittable: only %d account names",
+                                    accounts));
                 submittable = false;
             }
 
-            // 3) amount must balance to 0, or
-            // 3a) there must be exactly one empty amount (with account)
-            if (Misc.isZero(balance)) {
-                for (Item item : items) {
-                    item.setAmountHint(null);
-                }
-            }
-            else {
-                int balanceReceiversCount = itemsWithAccountAndEmptyAmount.size();
-                if (balanceReceiversCount != 1) {
-                    Logger.debug("submittable", (balanceReceiversCount == 0) ?
-                                                "Transaction not submittable: non-zero balance " +
-                                                "with no empty amounts with accounts" :
-                                                "Transaction not submittable: non-zero balance " +
-                                                "with multiple empty amounts with accounts");
-                    submittable = false;
-                }
-
-                // suggest off-balance amount to a row and remove hints on other rows
-                Item receiver = null;
-                if (!itemsWithAccountAndEmptyAmount.isEmpty())
-                    receiver = itemsWithAccountAndEmptyAmount.get(0);
-                else if (!itemsWithEmptyAmount.isEmpty())
-                    receiver = itemsWithEmptyAmount.get(0);
-
-                for (Item item : items) {
-                    if (item.equals(receiver)) {
-                        Logger.debug("submittable",
-                                String.format("Setting amount hint to %1.2f", -balance));
-                        item.setAmountHint(String.format("%1.2f", -balance));
+            // 3) for each commodity:
+            // 3a) amount must balance to 0, or
+            // 3b) there must be exactly one empty amount (with account)
+            for (String balCurrency : balance.keySet()) {
+                Float bal = balance.get(balCurrency);
+                float currencyBalance = (bal == null) ? 0f : bal;
+                if (Misc.isZero(currencyBalance)) {
+                    // remove hints from all amount inputs in that currency
+                    for (Item item : items) {
+                        final String itemCurrency = item.getCurrency()
+                                                        .getName();
+                        if (((balCurrency == null) && (null == itemCurrency)) ||
+                            ((balCurrency != null) && balCurrency.equals(itemCurrency)))
+                            item.setAmountHint(null);
                     }
-                    else
-                        item.setAmountHint(null);
+                }
+                else {
+                    List<Item> list = itemsWithAccountAndEmptyAmountForCurrency.get(balCurrency);
+                    int balanceReceiversCount = (list == null) ? 0 : list.size();
+                    if (balanceReceiversCount != 1) {
+                        Logger.debug("submittable", (balanceReceiversCount == 0) ? String.format(
+                                "Transaction not submittable [%s]: non-zero balance " +
+                                "with no empty amounts with accounts", balCurrency) : String.format(
+                                "Transaction not submittable [%s]: non-zero balance " +
+                                "with multiple empty amounts with accounts", balCurrency));
+                        submittable = false;
+                    }
+
+                    List<Item> emptyAmountList = itemsWithEmptyAmountForCurrency.get(balCurrency);
+
+                    // suggest off-balance amount to a row and remove hints on other rows
+                    Item receiver = null;
+                    if ((list != null) && !list.isEmpty())
+                        receiver = list.get(0);
+                    else if ((emptyAmountList != null) && !emptyAmountList.isEmpty())
+                        receiver = emptyAmountList.get(0);
+
+                    for (Item item : items) {
+                        if (item.equals(receiver)) {
+                            Logger.debug("submittable",
+                                    String.format("Setting amount hint to %1.2f",
+                                            -currencyBalance));
+                            item.setAmountHint(String.format("%1.2f", -currencyBalance));
+                        }
+                        else
+                            item.setAmountHint(null);
+                    }
                 }
             }
 
-            // 5) a row with an empty account name or empty amount is guaranteed to exist
-            if ((empty_rows == 0) &&
-                ((this.items.size() == accounts) || (this.items.size() == amounts)))
-            {
-                adapter.addRow();
+            // 5) a row with an empty account name or empty amount is guaranteed to exist for
+            // each commodity
+            for (String balCurrency : balance.keySet()) {
+                if ((empty_rows == 0) &&
+                    ((this.items.size() == accounts) || (this.items.size() == amounts)))
+                {
+                    adapter.addRow(balCurrency);
+                }
             }
 
             // 6) at least two rows need to be present in the ledger
-            while (this.items.size() < 2) adapter.addRow();
+            while (this.items.size() < 2)
+                adapter.addRow();
 
 
             debug("submittable", submittable ? "YES" : "NO");
@@ -272,9 +317,9 @@ public class NewTransactionModel extends ViewModel {
                 for (int i = 0; i < items.size(); i++) {
                     Item item = items.get(i);
                     LedgerTransactionAccount acc = item.getAccount();
-                    debug("submittable", String.format("Item %2d: [%4.2f] %s (%s)", i,
-                            acc.isAmountSet() ? acc.getAmount() : 0, acc.getAccountName(),
-                            acc.getComment()));
+                    debug("submittable", String.format("Item %2d: [%4.2f %s] %s // %s", i,
+                            acc.isAmountSet() ? acc.getAmount() : 0, acc.getCurrency(),
+                            acc.getAccountName(), acc.getComment()));
                 }
             }
         }

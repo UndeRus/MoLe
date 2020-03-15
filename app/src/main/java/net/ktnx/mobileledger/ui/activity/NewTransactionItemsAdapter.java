@@ -116,7 +116,10 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         mProfile = profile;
     }
     int addRow() {
-        final int newAccountCount = model.addAccount(new LedgerTransactionAccount(""));
+        return addRow(null);
+    }
+    int addRow(String commodity) {
+        final int newAccountCount = model.addAccount(new LedgerTransactionAccount("", commodity));
         Logger.debug("new-transaction",
                 String.format(Locale.US, "invoking notifyItemInserted(%d)", newAccountCount));
         // the header is at position 0

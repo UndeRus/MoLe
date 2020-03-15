@@ -37,6 +37,10 @@ public class LedgerTransactionAccount {
     public LedgerTransactionAccount(String accountName) {
         this.accountName = accountName;
     }
+    public LedgerTransactionAccount(String accountName, String currency) {
+        this.accountName = accountName;
+        this.currency = currency;
+    }
     public LedgerTransactionAccount(LedgerTransactionAccount origin) {
         // copy constructor
         setAccountName(origin.getAccountName());

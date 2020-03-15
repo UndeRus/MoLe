@@ -353,7 +353,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 tvAmount.setKeyListener(DigitsKeyListener.getInstance(locale, true, true));
         };
 
-        currencyObserver = this::setCurrency;
+        currencyObserver = currency -> {
+            setCurrency(currency);
+            adapter.model.checkTransactionSubmittable(adapter);
+        };
 
         showCurrencyObserver = showCurrency -> {
             if (item.getType() == ItemType.transactionRow) {
@@ -502,7 +505,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     if (amount.isEmpty()) {
                         account.resetAmount();
-                        account.setCurrency(null);
+//                        account.setCurrency(null);
                     }
                     else {
                         try {
