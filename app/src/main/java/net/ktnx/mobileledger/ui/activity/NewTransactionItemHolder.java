@@ -356,13 +356,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         currencyObserver = this::setCurrency;
 
         showCurrencyObserver = showCurrency -> {
-              if (showCurrency) {
-                  tvCurrency.setVisibility(View.VISIBLE);
-              }
-            else {
-                tvCurrency.setVisibility(View.GONE);
-                setCurrencyString(null);
-              }
+            if (item.getType() == ItemType.transactionRow) {
+                if (showCurrency) {
+                    tvCurrency.setVisibility(View.VISIBLE);
+                }
+                else {
+                    tvCurrency.setVisibility(View.GONE);
+                    item.setCurrency(null);
+                }
+            }
         };
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
