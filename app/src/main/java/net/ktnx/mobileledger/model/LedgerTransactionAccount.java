@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.utils.Misc;
 
+import java.util.Locale;
+
 public class LedgerTransactionAccount {
     private String accountName;
     private String shortAccountName;
@@ -99,7 +101,7 @@ public class LedgerTransactionAccount {
             sb.append(currency);
             sb.append(' ');
         }
-        sb.append(String.format("%,1.2f", amount));
+        sb.append(String.format(Locale.US, "%,1.2f", amount));
 
         return sb.toString();
     }
