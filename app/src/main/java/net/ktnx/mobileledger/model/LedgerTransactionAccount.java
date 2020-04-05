@@ -19,6 +19,8 @@ package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
 
+import net.ktnx.mobileledger.utils.Misc;
+
 public class LedgerTransactionAccount {
     private String accountName;
     private String shortAccountName;
@@ -31,15 +33,15 @@ public class LedgerTransactionAccount {
         this.setAccountName(accountName);
         this.amount = amount;
         this.amountSet = true;
-        this.currency = currency;
-        this.comment = comment;
+        this.currency = Misc.emptyIsNull(currency);
+        this.comment = Misc.emptyIsNull(comment);
     }
     public LedgerTransactionAccount(String accountName) {
         this.accountName = accountName;
     }
     public LedgerTransactionAccount(String accountName, String currency) {
         this.accountName = accountName;
-        this.currency = currency;
+        this.currency = Misc.emptyIsNull(currency);
     }
     public LedgerTransactionAccount(LedgerTransactionAccount origin) {
         // copy constructor
@@ -85,7 +87,7 @@ public class LedgerTransactionAccount {
         return currency;
     }
     public void setCurrency(String currency) {
-        this.currency = currency;
+        this.currency = Misc.emptyIsNull(currency);
     }
     @NonNull
     public String toString() {
