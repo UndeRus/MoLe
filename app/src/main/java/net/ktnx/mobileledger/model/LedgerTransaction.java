@@ -168,7 +168,7 @@ public class LedgerTransaction {
                 catch (ParseException e) {
                     e.printStackTrace();
                     throw new RuntimeException(
-                            String.format("Error parsing date '%s' from " + "transacion %d",
+                            String.format("Error parsing date '%s' from " + "transaction %d",
                                     dateString, id));
                 }
                 description = cTr.getString(1);
