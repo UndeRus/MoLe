@@ -56,4 +56,10 @@ public class Misc {
                     .setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
     }
+    public static String emptyIsNull(String str) {
+        return "".equals(str) ? null : str;
+    }
+    public static String nullIsEmpty(String str) {
+        return (str == null) ? "" : str;
+    }
 }
