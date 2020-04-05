@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.utils.Misc;
 
 public class Currency {
     public static final DiffUtil.ItemCallback<Currency> DIFF_CALLBACK =
@@ -103,6 +104,27 @@ public class Currency {
     }
     public void setHasGap(boolean hasGap) {
         this.hasGap = hasGap;
+    }
+    static public boolean equal(Currency left, Currency right) {
+        if (left == null) {
+            return right == null;
+        }
+        else
+            return left.equals(right);
+    }
+    static public boolean equal(Currency left, String right) {
+        right = Misc.emptyIsNull(right);
+        if (left == null) {
+            return right == null;
+        }
+        else {
+            String leftName = Misc.emptyIsNull(left.getName());
+            if (leftName == null) {
+                return right == null;
+            }
+            else
+                return leftName.equals(right);
+        }
     }
     public enum Position {
         before(-1), after(1), unknown(0), none(-2);
