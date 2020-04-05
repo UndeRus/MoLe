@@ -32,6 +32,7 @@ import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -243,7 +244,7 @@ public final class MobileLedgerProfile {
     public void storeAccountValue(SQLiteDatabase db, String name, String currency, Float amount) {
         db.execSQL("replace into account_values(profile, account, " +
                    "currency, value, keep) values(?, ?, ?, ?, 1);",
-                new Object[]{uuid, name, currency, amount});
+                new Object[]{uuid, name, Misc.emptyIsNull(currency), amount});
     }
     public void storeTransaction(SQLiteDatabase db, LedgerTransaction tr) {
         tr.fillDataHash();
@@ -262,7 +263,7 @@ public final class MobileLedgerProfile {
             db.execSQL("INSERT INTO transaction_accounts(profile, transaction_id, " +
                        "account_name, amount, currency, comment) values(?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, tr.getId(), item.getAccountName(), item.getAmount(),
-                                 item.getCurrency(), item.getComment()
+                                 Misc.nullIsEmpty(item.getCurrency()), item.getComment()
                     });
         }
 //        debug("profile", String.format("Transaction %d stored", tr.getId()));
