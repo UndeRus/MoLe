@@ -506,6 +506,25 @@ public final class MobileLedgerProfile {
 
         return result;
     }
+    Currency loadCurrencyByName(String name) {
+        SQLiteDatabase db = App.getDatabase();
+        Currency result = tryLoadCurrencyByName(db, name);
+        if (result == null)
+            throw new RuntimeException(String.format("Unable to load currency '%s'", name));
+        return result;
+    }
+    private Currency tryLoadCurrencyByName(SQLiteDatabase db, String name) {
+        try (Cursor cursor = db.rawQuery(
+                "SELECT c.id, c.name, c.position, c.has_gap FROM currencies c WHERE c.name=?",
+                new String[]{name}))
+        {
+            if (cursor.moveToFirst()) {
+                return new Currency(cursor.getInt(0), cursor.getString(1),
+                        Currency.Position.valueOf(cursor.getInt(2)), cursor.getInt(3) == 1);
+            }
+            return null;
+        }
+    }
     public enum FutureDates {
         None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),
         SixMonths(180), OneYear(365), All(-1);
