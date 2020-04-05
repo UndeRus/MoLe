@@ -128,7 +128,7 @@ public class NewTransactionFragment extends Fragment {
                          }
                      }
                  });
-        viewModel.checkTransactionSubmittable(listAdapter);
+//        viewModel.checkTransactionSubmittable(listAdapter);
 
         fab = activity.findViewById(R.id.fab);
         fab.setOnClickListener(v -> onFabPressed());

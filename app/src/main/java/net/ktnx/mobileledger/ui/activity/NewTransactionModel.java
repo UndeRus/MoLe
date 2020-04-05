@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.activity;
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -41,16 +42,17 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class NewTransactionModel extends ViewModel {
-    static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
-    static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
-    static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
+    private static final Pattern reYMD =
+            Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
+    private static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
+    private static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
     final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     private final Item header = new Item(this, null, "");
     private final Item trailer = new Item(this);
@@ -59,21 +61,36 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
-    public boolean getSimulateSave() {
+    /*
+     Slots contain lists of items, all using the same currency, including the possible
+     item with no account/amount that is used to help balancing the transaction
+
+     There is one slot per currency
+     */
+    private final HashMap<String, List<Item>> slots = new HashMap<>();
+    private int checkHoldCounter = 0;
+    void holdSubmittableChecks() {
+        checkHoldCounter++;
+    }
+    void releaseSubmittableChecks() {
+        if (checkHoldCounter == 0)
+            throw new RuntimeException("Asymmetrical call to releaseSubmittableChecks");
+        checkHoldCounter--;
+    }
+    boolean getSimulateSave() {
         return simulateSave.getValue();
     }
     public void setSimulateSave(boolean simulateSave) {
         this.simulateSave.setValue(simulateSave);
     }
-    public void toggleSimulateSave() {
+    void toggleSimulateSave() {
         simulateSave.setValue(!simulateSave.getValue());
     }
-    public void observeSimulateSave(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                    @NonNull
-                                            androidx.lifecycle.Observer<? super Boolean> observer) {
+    void observeSimulateSave(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                             @NonNull androidx.lifecycle.Observer<? super Boolean> observer) {
         this.simulateSave.observe(owner, observer);
     }
-    public int getAccountCount() {
+    int getAccountCount() {
         return items.size();
     }
     public Date getDate() {
@@ -82,7 +99,7 @@ public class NewTransactionModel extends ViewModel {
     public String getDescription() {
         return header.description.getValue();
     }
-    public LiveData<Boolean> isSubmittable() {
+    LiveData<Boolean> isSubmittable() {
         return this.isSubmittable;
     }
     void reset() {
@@ -93,28 +110,25 @@ public class NewTransactionModel extends ViewModel {
         items.add(new Item(this, new LedgerTransactionAccount("")));
         focusedItem.setValue(0);
     }
-    public void observeFocusedItem(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                   @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
+    void observeFocusedItem(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                            @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
         this.focusedItem.observe(owner, observer);
     }
-    public void stopObservingFocusedItem(
-            @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
+    void stopObservingFocusedItem(@NonNull androidx.lifecycle.Observer<? super Integer> observer) {
         this.focusedItem.removeObserver(observer);
     }
-    public void observeAccountCount(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                    @NonNull
-                                            androidx.lifecycle.Observer<? super Integer> observer) {
+    void observeAccountCount(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                             @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
         this.accountCount.observe(owner, observer);
     }
-    public void stopObservingAccountCount(
-            @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
+    void stopObservingAccountCount(@NonNull androidx.lifecycle.Observer<? super Integer> observer) {
         this.accountCount.removeObserver(observer);
     }
-    public int getFocusedItem() { return focusedItem.getValue(); }
-    public void setFocusedItem(int position) {
+    int getFocusedItem() { return focusedItem.getValue(); }
+    void setFocusedItem(int position) {
         focusedItem.setValue(position);
     }
-    public int addAccount(LedgerTransactionAccount acc) {
+    int addAccount(LedgerTransactionAccount acc) {
         items.add(new Item(this, acc));
         accountCount.setValue(getAccountCount());
         return items.size();
@@ -136,7 +150,7 @@ public class NewTransactionModel extends ViewModel {
         return items.get(index)
                     .getAccount();
     }
-    public Item getItem(int index) {
+    Item getItem(int index) {
         if (index == 0) {
             return header;
         }
@@ -155,20 +169,28 @@ public class NewTransactionModel extends ViewModel {
      3a) amounts must balance to 0, or
      3b) there must be exactly one empty amount (with account)
      4) empty accounts with empty amounts are ignored
+     Side effects:
      5) a row with an empty account name or empty amount is guaranteed to exist for each commodity
      6) at least two rows need to be present in the ledger
 
     */
     @SuppressLint("DefaultLocale")
-    public void checkTransactionSubmittable(NewTransactionItemsAdapter adapter) {
+    void checkTransactionSubmittable(NewTransactionItemsAdapter adapter) {
+        if (checkHoldCounter > 0)
+            return;
+
         int accounts = 0;
-        int amounts = 0;
-        int empty_rows = 0;
-        final Map<String, Float> balance = new HashMap<>();
+        final BalanceForCurrency balance = new BalanceForCurrency();
         final String descriptionText = getDescription();
         boolean submittable = true;
-        final Map<String, List<Item>> itemsWithEmptyAmountForCurrency = new HashMap<>();
-        final Map<String, List<Item>> itemsWithAccountAndEmptyAmountForCurrency = new HashMap<>();
+        final ItemsForCurrency itemsForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithEmptyAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAccountAndEmptyAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithEmptyAccountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAccountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency emptyRowsForCurrency = new ItemsForCurrency();
+        final List<Item> emptyRows = new ArrayList<>();
 
         try {
             if ((descriptionText == null) || descriptionText.trim()
@@ -186,54 +208,44 @@ public class NewTransactionModel extends ViewModel {
                                      .trim();
                 String currName = acc.getCurrency();
 
+                itemsForCurrency.add(currName, item);
+
                 if (acc_name.isEmpty()) {
-                    empty_rows++;
+                    itemsWithEmptyAccountForCurrency.add(currName, item);
 
                     if (acc.isAmountSet()) {
                         // 2) each amount has account name
                         Logger.debug("submittable", String.format(
-                                "Transaction not submittable: row %d has no account name, but has" +
-                                " amount %1.2f", i + 1, acc.getAmount()));
+                                "Transaction not submittable: row %d has no account name, but" +
+                                " has" + " amount %1.2f", i + 1, acc.getAmount()));
                         submittable = false;
+                    }
+                    else {
+                        emptyRowsForCurrency.add(currName, item);
                     }
                 }
                 else {
                     accounts++;
+                    itemsWithAccountForCurrency.add(currName, item);
                 }
 
                 if (acc.isAmountSet()) {
-                    amounts++;
-                    Float bal = balance.get(currName);
-                    if (bal == null)
-                        bal = 0f;
-                    bal += acc.getAmount();
-                    balance.put(currName, bal);
+                    itemsWithAmountForCurrency.add(currName, item);
+                    balance.add(currName, acc.getAmount());
                 }
                 else {
-                    {
-                        List<Item> list = itemsWithEmptyAmountForCurrency.get(currName);
-                        if (list == null)
-                            list = new ArrayList<>();
-                        itemsWithEmptyAmountForCurrency.put(currName, list);
-                        list.add(item);
-                    }
+                    itemsWithEmptyAmountForCurrency.add(currName, item);
 
-                    if (!acc_name.isEmpty()) {
-                        List<Item> list =
-                                itemsWithAccountAndEmptyAmountForCurrency.get(acc.getCurrency());
-                        if (list == null) {
-                            list = new ArrayList<>();
-                            itemsWithAccountAndEmptyAmountForCurrency.put(acc.getCurrency(), list);
-                        }
-                        list.add(item);
-                    }
+                    if (!acc_name.isEmpty())
+                        itemsWithAccountAndEmptyAmountForCurrency.add(currName, item);
                 }
             }
 
             // 1) has at least two account names
             if (accounts < 2) {
                 if (accounts == 0)
-                    Logger.debug("submittable", "Transaction not submittable: no account names");
+                    Logger.debug("submittable",
+                            "Transaction not submittable: no account " + "names");
                 else if (accounts == 1)
                     Logger.debug("submittable",
                             "Transaction not submittable: only one account name");
@@ -247,60 +259,115 @@ public class NewTransactionModel extends ViewModel {
             // 3) for each commodity:
             // 3a) amount must balance to 0, or
             // 3b) there must be exactly one empty amount (with account)
-            for (String balCurrency : balance.keySet()) {
-                Float bal = balance.get(balCurrency);
-                float currencyBalance = (bal == null) ? 0f : bal;
+            for (String balCurrency : itemsForCurrency.currencies()) {
+                float currencyBalance = balance.get(balCurrency);
                 if (Misc.isZero(currencyBalance)) {
                     // remove hints from all amount inputs in that currency
                     for (Item item : items) {
-                        final String itemCurrency = item.getCurrency()
-                                                        .getName();
-                        if (((balCurrency == null) && (null == itemCurrency)) ||
-                            ((balCurrency != null) && balCurrency.equals(itemCurrency)))
+                        if (Currency.equal(item.getCurrency(), balCurrency))
                             item.setAmountHint(null);
                     }
                 }
                 else {
-                    List<Item> list = itemsWithAccountAndEmptyAmountForCurrency.get(balCurrency);
-                    int balanceReceiversCount = (list == null) ? 0 : list.size();
+                    List<Item> list =
+                            itemsWithAccountAndEmptyAmountForCurrency.getList(balCurrency);
+                    int balanceReceiversCount = list.size();
                     if (balanceReceiversCount != 1) {
-                        Logger.debug("submittable", (balanceReceiversCount == 0) ? String.format(
-                                "Transaction not submittable [%s]: non-zero balance " +
-                                "with no empty amounts with accounts", balCurrency) : String.format(
-                                "Transaction not submittable [%s]: non-zero balance " +
-                                "with multiple empty amounts with accounts", balCurrency));
+                        if (BuildConfig.DEBUG) {
+                            if (balanceReceiversCount == 0)
+                                Logger.debug("submittable", String.format(
+                                        "Transaction not submittable [%s]: non-zero balance " +
+                                        "with no empty amounts with accounts", balCurrency));
+                            else
+                                Logger.debug("submittable", String.format(
+                                        "Transaction not submittable [%s]: non-zero balance " +
+                                        "with multiple empty amounts with accounts", balCurrency));
+                        }
                         submittable = false;
                     }
 
-                    List<Item> emptyAmountList = itemsWithEmptyAmountForCurrency.get(balCurrency);
+                    List<Item> emptyAmountList =
+                            itemsWithEmptyAmountForCurrency.getList(balCurrency);
 
                     // suggest off-balance amount to a row and remove hints on other rows
                     Item receiver = null;
-                    if ((list != null) && !list.isEmpty())
+                    if (!list.isEmpty())
                         receiver = list.get(0);
-                    else if ((emptyAmountList != null) && !emptyAmountList.isEmpty())
+                    else if (!emptyAmountList.isEmpty())
                         receiver = emptyAmountList.get(0);
 
                     for (Item item : items) {
+                        if (!Currency.equal(item.getCurrency(), balCurrency))
+                            continue;
+
                         if (item.equals(receiver)) {
-                            Logger.debug("submittable",
-                                    String.format("Setting amount hint to %1.2f",
-                                            -currencyBalance));
+                            if (BuildConfig.DEBUG)
+                                Logger.debug("submittable",
+                                        String.format("Setting amount hint to %1.2f [%s]",
+                                                -currencyBalance, balCurrency));
                             item.setAmountHint(String.format("%1.2f", -currencyBalance));
                         }
-                        else
+                        else {
+                            if (BuildConfig.DEBUG)
+                                Logger.debug("submittable",
+                                        String.format("Resetting hint of '%s' [%s]",
+                                                (item.getAccount() == null) ? "" : item.getAccount()
+                                                                                       .getAccountName(),
+                                                balCurrency));
                             item.setAmountHint(null);
+                        }
                     }
                 }
             }
 
             // 5) a row with an empty account name or empty amount is guaranteed to exist for
             // each commodity
-            for (String balCurrency : balance.keySet()) {
-                if ((empty_rows == 0) &&
-                    ((this.items.size() == accounts) || (this.items.size() == amounts)))
+            for (String balCurrency : balance.currencies()) {
+                int currEmptyRows = itemsWithEmptyAccountForCurrency.size(balCurrency);
+                int currRows = itemsForCurrency.size(balCurrency);
+                int currAccounts = itemsWithAccountForCurrency.size(balCurrency);
+                int currAmounts = itemsWithAmountForCurrency.size(balCurrency);
+                if ((currEmptyRows == 0) &&
+                    ((currRows == currAccounts) || (currRows == currAmounts)))
                 {
+                    // perhaps there already is an unused empty row for another currency that
+                    // is not used?
+//                        boolean foundIt = false;
+//                        for (Item item : emptyRows) {
+//                            Currency itemCurrency = item.getCurrency();
+//                            String itemCurrencyName =
+//                                    (itemCurrency == null) ? "" : itemCurrency.getName();
+//                            if (Misc.isZero(balance.get(itemCurrencyName))) {
+//                                item.setCurrency(Currency.loadByName(balCurrency));
+//                                item.setAmountHint(
+//                                        String.format("%1.2f", -balance.get(balCurrency)));
+//                                foundIt = true;
+//                                break;
+//                            }
+//                        }
+//
+//                        if (!foundIt)
                     adapter.addRow(balCurrency);
+                }
+            }
+
+            // drop extra empty rows, not needed
+            for (String currName : emptyRowsForCurrency.currencies()) {
+                List<Item> emptyItems = emptyRowsForCurrency.getList(currName);
+                while ((this.items.size() > 2) && (emptyItems.size() > 1)) {
+                    Item item = emptyItems.get(1);
+                    emptyItems.remove(1);
+                    removeRow(item, adapter);
+                }
+
+                // unused currency, remove last item (which is also an empty one)
+                if ((items.size() > 2) && (emptyItems.size() == 1)) {
+                    List<Item> currItems = itemsForCurrency.getList(currName);
+
+                    if (currItems.size() == 1){
+                        Item item = emptyItems.get(0);
+                        removeRow(item, adapter);
+                    }
                 }
             }
 
@@ -317,8 +384,9 @@ public class NewTransactionModel extends ViewModel {
                 for (int i = 0; i < items.size(); i++) {
                     Item item = items.get(i);
                     LedgerTransactionAccount acc = item.getAccount();
-                    debug("submittable", String.format("Item %2d: [%4.2f %s] %s // %s", i,
-                            acc.isAmountSet() ? acc.getAmount() : 0, acc.getCurrency(),
+                    debug("submittable", String.format("Item %2d: [%4.2f(%s) %s] %s ; %s", i,
+                            acc.isAmountSet() ? acc.getAmount() : 0,
+                            item.isAmountHintSet() ? item.getAmountHint() : "ø", acc.getCurrency(),
                             acc.getAccountName(), acc.getComment()));
                 }
             }
@@ -333,30 +401,38 @@ public class NewTransactionModel extends ViewModel {
             isSubmittable.setValue(false);
         }
     }
-    public void removeItem(int pos) {
+    private void removeRow(Item item, NewTransactionItemsAdapter adapter) {
+        int pos = items.indexOf(item);
+        items.remove(pos);
+        if (adapter != null) {
+            adapter.notifyItemRemoved(pos + 1);
+            sendCountNotifications();
+        }
+    }
+    void removeItem(int pos) {
         items.remove(pos);
         accountCount.setValue(getAccountCount());
     }
-    public void sendCountNotifications() {
+    void sendCountNotifications() {
         accountCount.setValue(getAccountCount());
     }
     public void sendFocusedNotification() {
         focusedItem.setValue(focusedItem.getValue());
     }
-    public void updateFocusedItem(int position) {
+    void updateFocusedItem(int position) {
         focusedItem.setValue(position);
     }
-    public void noteFocusChanged(int position, FocusedElement element) {
+    void noteFocusChanged(int position, FocusedElement element) {
         getItem(position).setFocusedElement(element);
     }
-    public void swapItems(int one, int two) {
+    void swapItems(int one, int two) {
         Collections.swap(items, one - 1, two - 1);
     }
-    public void toggleComment(int position) {
+    void toggleComment(int position) {
         final MutableLiveData<Boolean> commentVisible = getItem(position).commentVisible;
         commentVisible.postValue(!commentVisible.getValue());
     }
-    public void moveItemLast(int index) {
+    void moveItemLast(int index) {
         /*   0
              1   <-- index
              2
@@ -369,14 +445,77 @@ public class NewTransactionModel extends ViewModel {
             items.add(itemCount - 1, acc);
         }
     }
-    public void toggleCurrencyVisible() {
+    void toggleCurrencyVisible() {
         showCurrency.setValue(!showCurrency.getValue());
+    }
+    public void setItemCurrency(Item item, Currency newCurrency,
+                                NewTransactionItemsAdapter adapter) {
+        Currency oldCurrency = item.getCurrency();
+        if (!Currency.equal(newCurrency, oldCurrency)) {
+            holdSubmittableChecks();
+            try {
+                item.setCurrency(newCurrency);
+//                for (Item i : items) {
+//                    if (Currency.equal(i.getCurrency(), oldCurrency))
+//                        i.setCurrency(newCurrency);
+//                }
+            }
+            finally {
+                releaseSubmittableChecks();
+            }
+
+            checkTransactionSubmittable(adapter);
+        }
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
+    enum FocusedElement {Account, Comment, Amount}
+
+    private class ItemsForCurrency {
+        private HashMap<String, List<Item>> hashMap = new HashMap<>();
+        @NonNull
+        List<Item> getList(@Nullable String currencyName) {
+            List<Item> list = hashMap.get(currencyName);
+            if (list == null) {
+                list = new ArrayList<>();
+                hashMap.put(currencyName, list);
+            }
+            return list;
+        }
+        void add(@Nullable String currencyName, @NonNull Item item) {
+            getList(currencyName).add(item);
+        }
+        int size(@Nullable String currencyName) {
+            return this.getList(currencyName)
+                       .size();
+        }
+        Set<String> currencies() {
+            return hashMap.keySet();
+        }
+    }
+
     //==========================================================================================
 
-    enum FocusedElement {Account, Comment, Amount}
+    private class BalanceForCurrency {
+        private HashMap<String, Float> hashMap = new HashMap<>();
+        float get(String currencyName) {
+            Float f = hashMap.get(currencyName);
+            if (f == null) {
+                f = 0f;
+                hashMap.put(currencyName, f);
+            }
+            return f;
+        }
+        void add(String currencyName, float amount) {
+            hashMap.put(currencyName, get(currencyName) + amount);
+        }
+        Set<String> currencies() {
+            return hashMap.keySet();
+        }
+        boolean containsCurrency(String currencyName) {
+            return hashMap.containsKey(currencyName);
+        }
+    }
 
     class Item {
         private ItemType type;
@@ -390,34 +529,40 @@ public class NewTransactionModel extends ViewModel {
         private MutableLiveData<String> comment = new MutableLiveData<>(null);
         private MutableLiveData<Boolean> commentVisible = new MutableLiveData<>(false);
         private MutableLiveData<Currency> currency = new MutableLiveData<>(null);
-        public Item(NewTransactionModel model) {
+        private boolean amountHintIsSet = false;
+        Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
             editable.setValue(false);
         }
-        public Item(NewTransactionModel model, Date date, String description) {
+        Item(NewTransactionModel model, Date date, String description) {
             this.model = model;
             this.type = ItemType.generalData;
             this.date.setValue(date);
             this.description.setValue(description);
             this.editable.setValue(true);
         }
-        public Item(NewTransactionModel model, LedgerTransactionAccount account) {
+        Item(NewTransactionModel model, LedgerTransactionAccount account) {
             this.model = model;
             this.type = ItemType.transactionRow;
             this.account = account;
+            String currName = account.getCurrency();
+            Currency curr = null;
+            if ((currName != null) && !currName.isEmpty())
+                curr = Currency.loadByName(currName);
+            this.currency.setValue(curr);
             this.editable.setValue(true);
         }
-        public FocusedElement getFocusedElement() {
+        FocusedElement getFocusedElement() {
             return focusedElement;
         }
-        public void setFocusedElement(FocusedElement focusedElement) {
+        void setFocusedElement(FocusedElement focusedElement) {
             this.focusedElement = focusedElement;
         }
         public NewTransactionModel getModel() {
             return model;
         }
-        public void setEditable(boolean editable) {
+        void setEditable(boolean editable) {
             ensureType(ItemType.generalData, ItemType.transactionRow);
             this.editable.setValue(editable);
         }
@@ -428,38 +573,39 @@ public class NewTransactionModel extends ViewModel {
                                 type1, type2));
             }
         }
-        public String getAmountHint() {
+        String getAmountHint() {
             ensureType(ItemType.transactionRow);
             return amountHint.getValue();
         }
-        public void setAmountHint(String amountHint) {
+        void setAmountHint(String amountHint) {
             ensureType(ItemType.transactionRow);
 
             // avoid unnecessary triggers
             if (amountHint == null) {
                 if (this.amountHint.getValue() == null)
                     return;
+                amountHintIsSet = false;
             }
             else {
                 if (amountHint.equals(this.amountHint.getValue()))
                     return;
+                amountHintIsSet = true;
             }
 
             this.amountHint.setValue(amountHint);
         }
-        public void observeAmountHint(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                      @NonNull
-                                              androidx.lifecycle.Observer<? super String> observer) {
+        void observeAmountHint(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                               @NonNull androidx.lifecycle.Observer<? super String> observer) {
             this.amountHint.observe(owner, observer);
         }
-        public void stopObservingAmountHint(
+        void stopObservingAmountHint(
                 @NonNull androidx.lifecycle.Observer<? super String> observer) {
             this.amountHint.removeObserver(observer);
         }
-        public ItemType getType() {
+        ItemType getType() {
             return type;
         }
-        public void ensureType(ItemType wantedType) {
+        void ensureType(ItemType wantedType) {
             if (type != wantedType) {
                 throw new RuntimeException(
                         String.format("Actual type (%s) differs from wanted (%s)", type,
@@ -513,11 +659,11 @@ public class NewTransactionModel extends ViewModel {
 
             this.setDate(c.getTime());
         }
-        public void observeDate(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                @NonNull androidx.lifecycle.Observer<? super Date> observer) {
+        void observeDate(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                         @NonNull androidx.lifecycle.Observer<? super Date> observer) {
             this.date.observe(owner, observer);
         }
-        public void stopObservingDate(@NonNull androidx.lifecycle.Observer<? super Date> observer) {
+        void stopObservingDate(@NonNull androidx.lifecycle.Observer<? super Date> observer) {
             this.date.removeObserver(observer);
         }
         public String getDescription() {
@@ -528,12 +674,11 @@ public class NewTransactionModel extends ViewModel {
             ensureType(ItemType.generalData);
             this.description.setValue(description);
         }
-        public void observeDescription(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                       @NonNull
-                                               androidx.lifecycle.Observer<? super String> observer) {
+        void observeDescription(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
+                                @NonNull androidx.lifecycle.Observer<? super String> observer) {
             this.description.observe(owner, observer);
         }
-        public void stopObservingDescription(
+        void stopObservingDescription(
                 @NonNull androidx.lifecycle.Observer<? super String> observer) {
             this.description.removeObserver(observer);
         }
@@ -549,7 +694,7 @@ public class NewTransactionModel extends ViewModel {
          *
          * @return nicely formatted, shortest available date representation
          */
-        public String getFormattedDate() {
+        String getFormattedDate() {
             if (date == null)
                 return null;
             Date time = date.getValue();
@@ -574,24 +719,22 @@ public class NewTransactionModel extends ViewModel {
 
             return String.valueOf(myDay);
         }
-        public void observeEditableFlag(NewTransactionActivity activity,
-                                        Observer<Boolean> observer) {
+        void observeEditableFlag(NewTransactionActivity activity, Observer<Boolean> observer) {
             editable.observe(activity, observer);
         }
-        public void stopObservingEditableFlag(Observer<Boolean> observer) {
+        void stopObservingEditableFlag(Observer<Boolean> observer) {
             editable.removeObserver(observer);
         }
-        public void observeCommentVisible(NewTransactionActivity activity,
-                                          Observer<Boolean> observer) {
+        void observeCommentVisible(NewTransactionActivity activity, Observer<Boolean> observer) {
             commentVisible.observe(activity, observer);
         }
-        public void stopObservingCommentVisible(Observer<Boolean> observer) {
+        void stopObservingCommentVisible(Observer<Boolean> observer) {
             commentVisible.removeObserver(observer);
         }
-        public void observeComment(NewTransactionActivity activity, Observer<String> observer) {
+        void observeComment(NewTransactionActivity activity, Observer<String> observer) {
             comment.observe(activity, observer);
         }
-        public void stopObservingComment(Observer<String> observer) {
+        void stopObservingComment(Observer<String> observer) {
             comment.removeObserver(observer);
         }
         public void setComment(String comment) {
@@ -602,16 +745,27 @@ public class NewTransactionModel extends ViewModel {
             return this.currency.getValue();
         }
         public void setCurrency(Currency currency) {
-            getAccount().setCurrency((currency != null && !currency.getName()
-                                                                   .isEmpty()) ? currency.getName()
-                                                                               : null);
-            this.currency.setValue(currency);
+            Currency present = this.currency.getValue();
+            if ((currency == null) && (present != null) ||
+                (currency != null) && !currency.equals(present))
+            {
+                getAccount().setCurrency((currency != null && !currency.getName()
+                                                                       .isEmpty())
+                                         ? currency.getName() : null);
+                this.currency.setValue(currency);
+            }
         }
-        public void observeCurrency(NewTransactionActivity activity, Observer<Currency> observer) {
+        void observeCurrency(NewTransactionActivity activity, Observer<Currency> observer) {
             currency.observe(activity, observer);
         }
-        public void stopObservingCurrency(Observer<Currency> observer) {
+        void stopObservingCurrency(Observer<Currency> observer) {
             currency.removeObserver(observer);
+        }
+        boolean isOfType(ItemType type) {
+            return this.type == type;
+        }
+        boolean isAmountHintSet() {
+            return amountHintIsSet;
         }
     }
 }
