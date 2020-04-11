@@ -105,6 +105,7 @@ public class NewTransactionFragment extends Fragment {
 
         list = activity.findViewById(R.id.new_transaction_accounts);
         viewModel = new ViewModelProvider(activity).get(NewTransactionModel.class);
+        viewModel.observeDataProfile(this);
         mProfile = Data.profile.getValue();
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
         list.setAdapter(listAdapter);

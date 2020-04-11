@@ -46,6 +46,7 @@ public final class MobileLedgerProfile {
     private String uuid;
     private String name;
     private boolean permitPosting;
+    private boolean showCommodityByDefault;
     private String preferredAccountsFilter;
     private String url;
     private boolean authEnabled;
@@ -65,6 +66,7 @@ public final class MobileLedgerProfile {
         uuid = origin.uuid;
         name = origin.name;
         permitPosting = origin.permitPosting;
+        showCommodityByDefault = origin.showCommodityByDefault;
         preferredAccountsFilter = origin.preferredAccountsFilter;
         url = origin.url;
         authEnabled = origin.authEnabled;
@@ -83,8 +85,9 @@ public final class MobileLedgerProfile {
         SQLiteDatabase db = App.getDatabase();
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
-                                         "preferred_accounts_filter, future_dates, api_version " +
-                                         "FROM " + "profiles order by order_no", null))
+                                         "preferred_accounts_filter, future_dates, api_version, " +
+                                         "show_commodity_by_default FROM " +
+                                         "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
                 MobileLedgerProfile item = new MobileLedgerProfile(cursor.getString(0));
@@ -99,6 +102,7 @@ public final class MobileLedgerProfile {
                 item.setPreferredAccountsFilter(cursor.getString(9));
                 item.setFutureDates(cursor.getInt(10));
                 item.setApiVersion(cursor.getInt(11));
+                item.setShowCommodityByDefault(cursor.getInt(12) == 1);
                 list.add(item);
                 if (item.getUuid()
                         .equals(currentProfileUUID))
@@ -124,6 +128,12 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public boolean getShowCommodityByDefault() {
+        return showCommodityByDefault;
+    }
+    public void setShowCommodityByDefault(boolean showCommodityByDefault) {
+        this.showCommodityByDefault = showCommodityByDefault;
     }
     public SendTransactionTask.API getApiVersion() {
         return apiVersion;
@@ -212,13 +222,15 @@ public final class MobileLedgerProfile {
 //                                            "themeHue=%d", uuid, name, url,
 //                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeHue));
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
-                       "use_authentication, auth_user, " +
-                       "auth_password, theme, order_no, preferred_accounts_filter, future_dates, " +
-                       "api_version) " + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       "use_authentication, auth_user, auth_password, theme, order_no, " +
+                       "preferred_accounts_filter, future_dates, api_version, " +
+                       "show_commodity_by_default) " +
+                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeHue, orderNo,
-                                 preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt()
+                                 preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt(),
+                                 showCommodityByDefault
                     });
             db.setTransactionSuccessful();
         }

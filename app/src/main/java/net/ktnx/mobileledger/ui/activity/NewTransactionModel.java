@@ -21,6 +21,7 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -28,7 +29,9 @@ import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.model.Currency;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
@@ -69,6 +72,10 @@ public class NewTransactionModel extends ViewModel {
      */
     private final HashMap<String, List<Item>> slots = new HashMap<>();
     private int checkHoldCounter = 0;
+    private Observer<MobileLedgerProfile> profileObserver = profile ->showCurrency.postValue(profile.getShowCommodityByDefault());
+    public void observeDataProfile(LifecycleOwner activity) {
+        Data.profile.observe(activity, profileObserver);
+    }
     void holdSubmittableChecks() {
         checkHoldCounter++;
     }

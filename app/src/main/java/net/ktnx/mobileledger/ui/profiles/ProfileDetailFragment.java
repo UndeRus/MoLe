@@ -82,6 +82,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private MobileLedgerProfile mProfile;
     private TextView url;
     private Switch postingPermitted;
+    private Switch showCommodityByDefault;
     private TextInputLayout urlLayout;
     private LinearLayout authParams;
     private Switch useAuthentication;
@@ -203,6 +204,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         url = context.findViewById(R.id.url);
         urlLayout = context.findViewById(R.id.url_layout);
         postingPermitted = context.findViewById(R.id.profile_permit_posting);
+        showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
         futureDatesLayout = context.findViewById(R.id.future_dates_layout);
         futureDatesText = context.findViewById(R.id.future_dates_text);
         context.findViewById(R.id.future_dates_layout)
@@ -304,6 +306,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         if (mProfile != null) {
             profileName.setText(mProfile.getName());
             postingPermitted.setChecked(mProfile.isPostingPermitted());
+            showCommodityByDefault.setChecked(mProfile.getShowCommodityByDefault());
             futureDates = mProfile.getFutureDates();
             futureDatesText.setText(futureDates.getText(getResources()));
             apiVersion = mProfile.getApiVersion();
@@ -320,6 +323,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             profileName.setText("");
             url.setText(HTTPS_URL_START);
             postingPermitted.setChecked(true);
+            showCommodityByDefault.setChecked(false);
             futureDates = MobileLedgerProfile.FutureDates.None;
             futureDatesText.setText(futureDates.getText(getResources()));
             apiVersion = SendTransactionTask.API.auto;
@@ -400,6 +404,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         mProfile.setName(profileName.getText());
         mProfile.setUrl(url.getText());
         mProfile.setPostingPermitted(postingPermitted.isChecked());
+        mProfile.setShowCommodityByDefault(showCommodityByDefault.isChecked());
         mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getText());
         mProfile.setAuthEnabled(useAuthentication.isChecked());
         mProfile.setAuthUserName(userName.getText());

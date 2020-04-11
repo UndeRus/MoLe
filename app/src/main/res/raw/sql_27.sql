@@ -1,0 +1,1 @@
+alter table profiles add show_commodity_by_default boolean default 0;

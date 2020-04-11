@@ -161,6 +161,14 @@
             android:text="@string/posting_permitted"
             android:textAppearance="?android:textAppearanceListItem" />
 
+        <Switch
+            android:id="@+id/profile_show_commodity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/currency_input_by_default"
+            android:textAppearance="?android:textAppearanceListItem"/>
+
         <LinearLayout
             android:id="@+id/future_dates_layout"
             android:layout_width="match_parent"

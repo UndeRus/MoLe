@@ -142,5 +142,6 @@
     <string name="currency_position_right">Вдясно</string>
     <string name="new_currency_name_hint">валута/ценност</string>
     <string name="show_currency_input">Валута</string>
+    <string name="currency_input_by_default">Показване по подразбиране на полето за валута</string>
 
 </resources>
