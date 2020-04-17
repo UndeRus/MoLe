@@ -423,7 +423,7 @@ public final class MobileLedgerProfile {
         return this.themeHue;
     }
     public void setThemeHue(Object o) {
-        setThemeId(Integer.valueOf(String.valueOf(o)));
+        setThemeId(Integer.parseInt(String.valueOf(o)));
     }
     public void setThemeId(int themeHue) {
 //        debug("profile", String.format("Profile.setThemeHue(%d) called", themeHue));
