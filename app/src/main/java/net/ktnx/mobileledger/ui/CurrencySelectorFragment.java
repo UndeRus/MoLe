@@ -139,7 +139,7 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
 
             String currName = String.valueOf(tvNewCurrName.getText());
             if (!currName.isEmpty()) {
-                List<Currency> list = new ArrayList<>( model.currencies.getValue());
+                List<Currency> list = new ArrayList<>(model.currencies.getValue());
                 // FIXME hardcoded position and gap setting
                 list.add(new Currency(profile, String.valueOf(tvNewCurrName.getText()),
                         Currency.Position.after, false));
@@ -201,7 +201,8 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
     @Override
     public void onCurrencyLongClick(Currency item) {
         ArrayList<Currency> list = new ArrayList<>(model.currencies.getValue());
-        App.getDatabase().execSQL("delete from currencies where id=?", new Object[]{item.getId()});
+        App.getDatabase()
+           .execSQL("delete from currencies where id=?", new Object[]{item.getId()});
         list.remove(item);
         model.currencies.setValue(list);
     }

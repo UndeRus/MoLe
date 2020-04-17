@@ -371,7 +371,7 @@ public class NewTransactionModel extends ViewModel {
                 if ((items.size() > 2) && (emptyItems.size() == 1)) {
                     List<Item> currItems = itemsForCurrency.getList(currName);
 
-                    if (currItems.size() == 1){
+                    if (currItems.size() == 1) {
                         Item item = emptyItems.get(0);
                         removeRow(item, adapter);
                     }
