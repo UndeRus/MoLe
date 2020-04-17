@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -45,11 +47,15 @@ import com.google.android.material.textfield.TextInputLayout;
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.HueRingDialog;
+import net.ktnx.mobileledger.ui.OnCurrencySelectedListener;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +72,8 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
  * a {@link ProfileDetailActivity}
  * on handsets.
  */
-public class ProfileDetailFragment extends Fragment implements HueRingDialog.HueSelectedListener {
+public class ProfileDetailFragment extends Fragment
+        implements HueRingDialog.HueSelectedListener, OnCurrencySelectedListener {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -77,12 +84,14 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     private static final String HTTPS_URL_START = "https://";
 
     /**
-     * The dummy content this fragment is presenting.
+     * The content this fragment is presenting.
      */
     private MobileLedgerProfile mProfile;
     private TextView url;
     private Switch postingPermitted;
     private Switch showCommodityByDefault;
+    private TextView defaultCommodity;
+    private boolean defaultCommoditySet;
     private TextInputLayout urlLayout;
     private LinearLayout authParams;
     private Switch useAuthentication;
@@ -205,6 +214,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         urlLayout = context.findViewById(R.id.url_layout);
         postingPermitted = context.findViewById(R.id.profile_permit_posting);
         showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
+        defaultCommodity = context.findViewById(R.id.default_commodity_text);
         futureDatesLayout = context.findViewById(R.id.future_dates_layout);
         futureDatesText = context.findViewById(R.id.future_dates_text);
         context.findViewById(R.id.future_dates_layout)
@@ -307,6 +317,13 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             profileName.setText(mProfile.getName());
             postingPermitted.setChecked(mProfile.isPostingPermitted());
             showCommodityByDefault.setChecked(mProfile.getShowCommodityByDefault());
+            {
+                String comm = mProfile.getDefaultCommodity();
+                if (Misc.isEmptyOrNull(comm))
+                    resetDefaultCommodity();
+                else
+                    setDefaultCommodity(comm);
+            }
             futureDates = mProfile.getFutureDates();
             futureDatesText.setText(futureDates.getText(getResources()));
             apiVersion = mProfile.getApiVersion();
@@ -324,6 +341,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             url.setText(HTTPS_URL_START);
             postingPermitted.setChecked(true);
             showCommodityByDefault.setChecked(false);
+            resetDefaultCommodity();
             futureDates = MobileLedgerProfile.FutureDates.None;
             futureDatesText.setText(futureDates.getText(getResources()));
             apiVersion = SendTransactionTask.API.auto;
@@ -366,6 +384,12 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
             d.setColorSelectedListener(this);
         });
 
+        context.findViewById(R.id.default_commodity_layout).setOnClickListener(v -> {
+            CurrencySelectorFragment cpf = CurrencySelectorFragment.newInstance(CurrencySelectorFragment.DEFAULT_COLUMN_COUNT, false);
+            cpf.setOnCurrencySelectedListener(this);
+            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
+            cpf.show(activity.getSupportFragmentManager(), "currency-selector");
+        });
         profileName.requestFocus();
     }
     private void onSaveFabClicked() {
@@ -404,6 +428,7 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
         mProfile.setName(profileName.getText());
         mProfile.setUrl(url.getText());
         mProfile.setPostingPermitted(postingPermitted.isChecked());
+        mProfile.setDefaultCommodity(defaultCommoditySet ? defaultCommodity.getText() : null);
         mProfile.setShowCommodityByDefault(showCommodityByDefault.isChecked());
         mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getText());
         mProfile.setAuthEnabled(useAuthentication.isChecked());
@@ -520,5 +545,22 @@ public class ProfileDetailFragment extends Fragment implements HueRingDialog.Hue
     public void onHueSelected(int hue) {
         huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
         huePickerView.setTag(hue);
+    }
+    @Override
+    public void onCurrencySelected(Currency item) {
+        if (item == null)
+            resetDefaultCommodity();
+        else
+            setDefaultCommodity(item.getName());
+    }
+    private void resetDefaultCommodity() {
+        defaultCommoditySet = false;
+        defaultCommodity.setText(R.string.btn_no_currency);
+        defaultCommodity.setTypeface(defaultCommodity.getTypeface(), Typeface.ITALIC);
+    }
+    private void setDefaultCommodity(@NonNull @NotNull String name) {
+        defaultCommoditySet = true;
+        defaultCommodity.setText(name);
+        defaultCommodity.setTypeface(defaultCommodity.getTypeface(), Typeface.BOLD);
     }
 }

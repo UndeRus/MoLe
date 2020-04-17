@@ -156,4 +156,5 @@
     <string name="currency_has_gap">Offset from the value</string>
     <string name="show_currency_input">Currency</string>
     <string name="currency_input_by_default">Commodity input visible by default</string>
+    <string name="profile_default_commodity">Default commodity</string>
 </resources>

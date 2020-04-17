@@ -161,6 +161,30 @@
             android:text="@string/posting_permitted"
             android:textAppearance="?android:textAppearanceListItem" />
 
+        <LinearLayout
+            android:id="@+id/default_commodity_layout"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_default_commodity"
+                android:textAppearance="?android:textAppearanceListItem" />
+
+            <TextView
+                android:id="@+id/default_commodity_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:textAppearanceListItemSecondary"
+                android:textColor="?attr/textColor"
+                android:text="@string/btn_no_currency"/>
+        </LinearLayout>
+
         <Switch
             android:id="@+id/profile_show_commodity"
             android:layout_width="match_parent"

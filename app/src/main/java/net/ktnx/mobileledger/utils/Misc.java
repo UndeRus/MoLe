@@ -62,4 +62,8 @@ public class Misc {
     public static String nullIsEmpty(String str) {
         return (str == null) ? "" : str;
     }
+    public static boolean isEmptyOrNull (String str) {
+        if (str == null) return true;
+        return str.isEmpty();
+    }
 }
