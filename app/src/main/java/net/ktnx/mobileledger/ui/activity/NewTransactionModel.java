@@ -72,9 +72,13 @@ public class NewTransactionModel extends ViewModel {
      */
     private final HashMap<String, List<Item>> slots = new HashMap<>();
     private int checkHoldCounter = 0;
-    private Observer<MobileLedgerProfile> profileObserver = profile ->showCurrency.postValue(profile.getShowCommodityByDefault());
+    private boolean observingDataProfile;
+    private Observer<MobileLedgerProfile> profileObserver =
+            profile -> showCurrency.postValue(profile.getShowCommodityByDefault());
     public void observeDataProfile(LifecycleOwner activity) {
-        Data.profile.observe(activity, profileObserver);
+        if (!observingDataProfile)
+            Data.profile.observe(activity, profileObserver);
+        observingDataProfile = true;
     }
     void holdSubmittableChecks() {
         checkHoldCounter++;
