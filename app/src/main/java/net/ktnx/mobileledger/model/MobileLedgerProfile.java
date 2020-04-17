@@ -47,6 +47,7 @@ public final class MobileLedgerProfile {
     private String name;
     private boolean permitPosting;
     private boolean showCommodityByDefault;
+    private String defaultCommodity;
     private String preferredAccountsFilter;
     private String url;
     private boolean authEnabled;
@@ -76,6 +77,7 @@ public final class MobileLedgerProfile {
         orderNo = origin.orderNo;
         futureDates = origin.futureDates;
         apiVersion = origin.apiVersion;
+        defaultCommodity = origin.defaultCommodity;
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
@@ -86,7 +88,7 @@ public final class MobileLedgerProfile {
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
                                          "preferred_accounts_filter, future_dates, api_version, " +
-                                         "show_commodity_by_default FROM " +
+                                         "show_commodity_by_default, default_commodity FROM " +
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
@@ -103,6 +105,7 @@ public final class MobileLedgerProfile {
                 item.setFutureDates(cursor.getInt(10));
                 item.setApiVersion(cursor.getInt(11));
                 item.setShowCommodityByDefault(cursor.getInt(12) == 1);
+                item.setDefaultCommodity(cursor.getString(13));
                 list.add(item);
                 if (item.getUuid()
                         .equals(currentProfileUUID))
@@ -134,6 +137,18 @@ public final class MobileLedgerProfile {
     }
     public void setShowCommodityByDefault(boolean showCommodityByDefault) {
         this.showCommodityByDefault = showCommodityByDefault;
+    }
+    public String getDefaultCommodity() {
+        return defaultCommodity;
+    }
+    public void setDefaultCommodity(String defaultCommodity) {
+        this.defaultCommodity = defaultCommodity;
+    }
+    public void setDefaultCommodity(CharSequence defaultCommodity) {
+        if (defaultCommodity == null)
+            this.defaultCommodity = null;
+        else
+            this.defaultCommodity = String.valueOf(defaultCommodity);
     }
     public SendTransactionTask.API getApiVersion() {
         return apiVersion;
@@ -224,13 +239,13 @@ public final class MobileLedgerProfile {
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, auth_password, theme, order_no, " +
                        "preferred_accounts_filter, future_dates, api_version, " +
-                       "show_commodity_by_default) " +
+                       "show_commodity_by_default, default_commodity) " +
                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeHue, orderNo,
                                  preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt(),
-                                 showCommodityByDefault
+                                 showCommodityByDefault, defaultCommodity
                     });
             db.setTransactionSuccessful();
         }

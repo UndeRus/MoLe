@@ -5,7 +5,7 @@ create unique index un_options on options(profile,name);
 create table account_values(profile varchar not null, account varchar not null, currency varchar not null default '', keep boolean, value decimal not null );
 create unique index un_account_values on account_values(profile,account,currency);
 create table description_history(description varchar not null primary key, keep boolean, description_upper varchar);
-create table profiles(uuid varchar not null primary key, name not null, url not null, use_authentication boolean not null, auth_user varchar, auth_password varchar, order_no integer, permit_posting boolean default 0, theme integer default -1, preferred_accounts_filter varchar, future_dates integer, api_version integer, show_commodity_by_default boolean default 0);
+create table profiles(uuid varchar not null primary key, name not null, url not null, use_authentication boolean not null, auth_user varchar, auth_password varchar, order_no integer, permit_posting boolean default 0, theme integer default -1, preferred_accounts_filter varchar, future_dates integer, api_version integer, show_commodity_by_default boolean default 0, default_commodity varchar);
 create table transactions(profile varchar not null, id integer not null, data_hash varchar not null, date varchar not null, description varchar not null, keep boolean not null default 0);
 create unique index un_transactions_id on transactions(profile,id);
 create unique index un_transactions_data_hash on transactions(profile,data_hash);
