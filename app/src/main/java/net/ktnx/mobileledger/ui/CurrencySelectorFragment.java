@@ -55,10 +55,13 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         implements OnCurrencySelectedListener, OnCurrencyLongClickListener {
 
     public static final int DEFAULT_COLUMN_COUNT = 2;
-    private static final String ARG_COLUMN_COUNT = "column-count";
+    public static final String ARG_COLUMN_COUNT = "column-count";
+    public static final String ARG_SHOW_PARAMS = "show-params";
+    public static final boolean DEFAULT_SHOW_PARAMS = true;
     private int mColumnCount = DEFAULT_COLUMN_COUNT;
     private OnCurrencySelectedListener mListener;
     private CurrencySelectorModel model;
+    private boolean deferredShowPositionAndPadding;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -68,12 +71,13 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
     }
     @SuppressWarnings("unused")
     public static CurrencySelectorFragment newInstance() {
-        return newInstance(DEFAULT_COLUMN_COUNT);
+        return newInstance(DEFAULT_COLUMN_COUNT, DEFAULT_SHOW_PARAMS);
     }
-    public static CurrencySelectorFragment newInstance(int columnCount) {
+    public static CurrencySelectorFragment newInstance(int columnCount, boolean showParams) {
         CurrencySelectorFragment fragment = new CurrencySelectorFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putBoolean(ARG_SHOW_PARAMS, showParams);
         fragment.setArguments(args);
         return fragment;
     }
@@ -182,6 +186,17 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
             Data.currencyGap.setValue(checked);
         });
 
+        model.observePositionAndPaddingVisible(this, visible -> {
+            csd.findViewById(R.id.params_panel)
+               .setVisibility(visible ? View.VISIBLE : View.GONE);
+        });
+
+        if ((savedInstanceState != null) ? savedInstanceState.getBoolean(ARG_SHOW_PARAMS,
+                DEFAULT_SHOW_PARAMS) : DEFAULT_SHOW_PARAMS)
+            model.showPositionAndPadding();
+        else
+            model.hidePositionAndPadding();
+
         return csd;
     }
     public void setOnCurrencySelectedListener(OnCurrencySelectedListener listener) {
@@ -205,5 +220,11 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
            .execSQL("delete from currencies where id=?", new Object[]{item.getId()});
         list.remove(item);
         model.currencies.setValue(list);
+    }
+    public void showPositionAndPadding() {
+        deferredShowPositionAndPadding = true;
+    }
+    public void hidePositionAndPadding() {
+        deferredShowPositionAndPadding = false;
     }
 }

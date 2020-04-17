@@ -17,7 +17,9 @@
 
 package net.ktnx.mobileledger.ui;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.model.Currency;
@@ -26,7 +28,17 @@ import java.util.List;
 
 public class CurrencySelectorModel extends ViewModel {
     public final MutableLiveData<List<Currency>> currencies;
+    private final MutableLiveData<Boolean> positionAndPaddingVisible = new MutableLiveData<>(true);
     public CurrencySelectorModel() {
         this.currencies = new MutableLiveData<>();
+    }
+    public void showPositionAndPadding() {
+        positionAndPaddingVisible.postValue(true);
+    }
+    public void hidePositionAndPadding() {
+        positionAndPaddingVisible.postValue(false);
+    }
+    public void observePositionAndPaddingVisible(LifecycleOwner activity, Observer<Boolean> observer) {
+        positionAndPaddingVisible.observe(activity, observer);
     }
 }
