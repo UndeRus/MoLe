@@ -240,7 +240,7 @@ public final class MobileLedgerProfile {
                        "use_authentication, auth_user, auth_password, theme, order_no, " +
                        "preferred_accounts_filter, future_dates, api_version, " +
                        "show_commodity_by_default, default_commodity) " +
-                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeHue, orderNo,
