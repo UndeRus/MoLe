@@ -185,7 +185,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 syncData();
                 Logger.debug("textWatcher",
                         "syncData() returned, checking if transaction is submittable");
-                adapter.model.checkTransactionSubmittable(adapter);
+                adapter.checkTransactionSubmittable();
                 Logger.debug("textWatcher", "done");
             }
         };
@@ -215,7 +215,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 }
 
                 if (syncData())
-                    adapter.model.checkTransactionSubmittable(adapter);
+                    adapter.checkTransactionSubmittable();
             }
         };
         tvDescription.addTextChangedListener(tw);
@@ -347,7 +347,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         currencyObserver = currency -> {
             setCurrency(currency);
-            adapter.model.checkTransactionSubmittable(adapter);
+            adapter.checkTransactionSubmittable();
         };
 
         currencyGapObserver = hasGap -> {
