@@ -39,6 +39,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -47,12 +49,10 @@ import com.google.android.material.textfield.TextInputLayout;
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.SendTransactionTask;
-import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.HueRingDialog;
-import net.ktnx.mobileledger.ui.OnCurrencySelectedListener;
 import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Misc;
@@ -65,6 +65,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import static net.ktnx.mobileledger.utils.Colors.profileThemeId;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /**
@@ -72,8 +73,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
  * a {@link ProfileDetailActivity}
  * on handsets.
  */
-public class ProfileDetailFragment extends Fragment
-        implements HueRingDialog.HueSelectedListener, OnCurrencySelectedListener {
+public class ProfileDetailFragment extends Fragment {
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.
@@ -81,16 +81,13 @@ public class ProfileDetailFragment extends Fragment
     public static final String ARG_ITEM_ID = "item_id";
     public static final String ARG_HUE = "hue";
     @NonNls
-    private static final String HTTPS_URL_START = "https://";
 
     /**
      * The content this fragment is presenting.
-     */
-    private MobileLedgerProfile mProfile;
+     */ private MobileLedgerProfile mProfile;
     private TextView url;
-    private Switch postingPermitted;
-    private Switch showCommodityByDefault;
     private TextView defaultCommodity;
+    private View defaultCommodityLayout;
     private boolean defaultCommoditySet;
     private TextInputLayout urlLayout;
     private LinearLayout authParams;
@@ -106,11 +103,9 @@ public class ProfileDetailFragment extends Fragment
     private View huePickerView;
     private View insecureWarningText;
     private TextView futureDatesText;
-    private MobileLedgerProfile.FutureDates futureDates;
     private View futureDatesLayout;
     private TextView apiVersionText;
-    private SendTransactionTask.API apiVersion;
-
+    private boolean syncingModelFromUI = false;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -181,6 +176,16 @@ public class ProfileDetailFragment extends Fragment
         if (mProfile.equals(Data.profile.getValue()))
             Data.profile.setValue(newProfile);
     }
+    private void hookTextChangeSyncRoutine(TextView view, TextChangeSyncProc syncRoutine) {
+        view.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(Editable s) { syncRoutine.onTextChanged(s.toString());}
+        });
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -206,15 +211,64 @@ public class ProfileDetailFragment extends Fragment
             }
         }
 
+        final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
+        final ProfileDetailModel model = getModel();
+
+        model.observeDefaultCommodity(viewLifecycleOwner, c -> {
+            if (c != null)
+                setDefaultCommodity(c.getName());
+            else
+                resetDefaultCommodity();
+        });
+
         FloatingActionButton fab = context.findViewById(R.id.fab);
         fab.setOnClickListener(v -> onSaveFabClicked());
+
         profileName = context.findViewById(R.id.profile_name);
+        hookTextChangeSyncRoutine(profileName, model::setProfileName);
+        model.observeProfileName(viewLifecycleOwner, pn -> {
+            if (!Misc.equalStrings(pn, profileName.getText()))
+                profileName.setText(pn);
+        });
+
         profileNameLayout = context.findViewById(R.id.profile_name_layout);
+
         url = context.findViewById(R.id.url);
+        hookTextChangeSyncRoutine(url, model::setUrl);
+        model.observeUrl(viewLifecycleOwner, u -> {
+            if (!Misc.equalStrings(u, url.getText()))
+                url.setText(u);
+        });
+
         urlLayout = context.findViewById(R.id.url_layout);
-        postingPermitted = context.findViewById(R.id.profile_permit_posting);
-        showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
+
+        defaultCommodityLayout = context.findViewById(R.id.default_commodity_layout);
+        defaultCommodityLayout.setOnClickListener(v -> {
+            CurrencySelectorFragment cpf = CurrencySelectorFragment.newInstance(
+                    CurrencySelectorFragment.DEFAULT_COLUMN_COUNT, false);
+            cpf.setOnCurrencySelectedListener(model::setDefaultCommodity);
+            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
+            cpf.show(activity.getSupportFragmentManager(), "currency-selector");
+        });
+
+        Switch showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
+        showCommodityByDefault.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> model.setShowCommodityByDefault(isChecked));
+        model.observeShowCommodityByDefault(viewLifecycleOwner, showCommodityByDefault::setChecked);
+
+        Switch postingPermitted = context.findViewById(R.id.profile_permit_posting);
+        model.observePostingPermitted(viewLifecycleOwner, isChecked -> {
+            postingPermitted.setChecked(isChecked);
+            defaultCommodityLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            showCommodityByDefault.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            futureDatesLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+        postingPermitted.setOnCheckedChangeListener(
+                ((buttonView, isChecked) -> model.setPostingPermitted(isChecked)));
+
         defaultCommodity = context.findViewById(R.id.default_commodity_text);
+
         futureDatesLayout = context.findViewById(R.id.future_dates_layout);
         futureDatesText = context.findViewById(R.id.future_dates_text);
         context.findViewById(R.id.future_dates_layout)
@@ -223,181 +277,157 @@ public class ProfileDetailFragment extends Fragment
                    PopupMenu menu = new PopupMenu(context, v);
                    menu.inflate(R.menu.future_dates);
                    menu.setOnMenuItemClickListener(item -> {
-                       switch (item.getItemId()) {
-                           case R.id.menu_future_dates_7:
-                               futureDates = MobileLedgerProfile.FutureDates.OneWeek;
-                               break;
-                           case R.id.menu_future_dates_14:
-                               futureDates = MobileLedgerProfile.FutureDates.TwoWeeks;
-                               break;
-                           case R.id.menu_future_dates_30:
-                               futureDates = MobileLedgerProfile.FutureDates.OneMonth;
-                               break;
-                           case R.id.menu_future_dates_60:
-                               futureDates = MobileLedgerProfile.FutureDates.TwoMonths;
-                               break;
-                           case R.id.menu_future_dates_90:
-                               futureDates = MobileLedgerProfile.FutureDates.ThreeMonths;
-                               break;
-                           case R.id.menu_future_dates_180:
-                               futureDates = MobileLedgerProfile.FutureDates.SixMonths;
-                               break;
-                           case R.id.menu_future_dates_365:
-                               futureDates = MobileLedgerProfile.FutureDates.OneYear;
-                               break;
-                           case R.id.menu_future_dates_all:
-                               futureDates = MobileLedgerProfile.FutureDates.All;
-                               break;
-                           default:
-                               futureDates = MobileLedgerProfile.FutureDates.None;
-                       }
-                       futureDatesText.setText(futureDates.getText(getResources()));
+                       model.setFutureDates(futureDatesSettingFromMenuItemId(item.getItemId()));
                        return true;
                    });
                    menu.show();
                });
+        model.observeFutureDates(viewLifecycleOwner,
+                v -> futureDatesText.setText(v.getText(getResources())));
+
         apiVersionText = context.findViewById(R.id.api_version_text);
+        model.observeApiVersion(viewLifecycleOwner, apiVer -> {
+            apiVersionText.setText(apiVer.getDescription(getResources()));
+        });
         context.findViewById(R.id.api_version_layout)
                .setOnClickListener(v -> {
                    MenuInflater mi = new MenuInflater(context);
                    PopupMenu menu = new PopupMenu(context, v);
                    menu.inflate(R.menu.api_version);
                    menu.setOnMenuItemClickListener(item -> {
+                       SendTransactionTask.API apiVer;
                        switch (item.getItemId()) {
                            case R.id.api_version_menu_html:
-                               apiVersion = SendTransactionTask.API.html;
+                               apiVer = SendTransactionTask.API.html;
                                break;
                            case R.id.api_version_menu_post_1_14:
-                               apiVersion = SendTransactionTask.API.post_1_14;
+                               apiVer = SendTransactionTask.API.post_1_14;
                                break;
                            case R.id.api_version_menu_pre_1_15:
-                               apiVersion = SendTransactionTask.API.pre_1_15;
+                               apiVer = SendTransactionTask.API.pre_1_15;
                                break;
                            case R.id.api_version_menu_auto:
                            default:
-                               apiVersion = SendTransactionTask.API.auto;
+                               apiVer = SendTransactionTask.API.auto;
                        }
-                       apiVersionText.setText(apiVersion.getDescription(getResources()));
+                       model.setApiVersion(apiVer);
+                       apiVersionText.setText(apiVer.getDescription(getResources()));
                        return true;
                    });
                    menu.show();
                });
         authParams = context.findViewById(R.id.auth_params);
-        useAuthentication = context.findViewById(R.id.enable_http_auth);
-        userName = context.findViewById(R.id.auth_user_name);
-        userNameLayout = context.findViewById(R.id.auth_user_name_layout);
-        password = context.findViewById(R.id.password);
-        passwordLayout = context.findViewById(R.id.password_layout);
-        huePickerView = context.findViewById(R.id.btn_pick_ring_color);
-        preferredAccountsFilter = context.findViewById(R.id.preferred_accounts_filter_filter);
-        preferredAccountsFilterLayout =
-                context.findViewById(R.id.preferred_accounts_accounts_filter_layout);
-        insecureWarningText = context.findViewById(R.id.insecure_scheme_text);
 
+        useAuthentication = context.findViewById(R.id.enable_http_auth);
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            debug("profiles", isChecked ? "auth enabled " : "auth disabled");
+            model.setUseAuthentication(isChecked);
             authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (isChecked)
                 userName.requestFocus();
             checkInsecureSchemeWithAuth();
         });
+        model.observeUseAuthentication(viewLifecycleOwner, useAuthentication::setChecked);
 
-        postingPermitted.setOnCheckedChangeListener(((buttonView, isChecked) -> {
-            preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            futureDatesLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-        }));
+        userName = context.findViewById(R.id.auth_user_name);
+        model.observeUserName(viewLifecycleOwner, text -> {
+            if (!Misc.equalStrings(text, userName.getText()))
+                userName.setText(text);
+        });
+        hookTextChangeSyncRoutine(userName, model::setAuthUserName);
+        userNameLayout = context.findViewById(R.id.auth_user_name_layout);
+
+        password = context.findViewById(R.id.password);
+        model.observePassword(viewLifecycleOwner, text -> {
+            if (!Misc.equalStrings(text, password.getText()))
+                password.setText(text);
+        });
+        hookTextChangeSyncRoutine(password, model::setAuthPassword);
+        passwordLayout = context.findViewById(R.id.password_layout);
+
+        huePickerView = context.findViewById(R.id.btn_pick_ring_color);
+        model.observeThemeId(viewLifecycleOwner, themeId -> {
+            final int hue = (themeId == -1) ? Colors.DEFAULT_HUE_DEG : themeId;
+            final int profileColor = Colors.getPrimaryColorForHue(hue);
+            huePickerView.setBackgroundColor(profileColor);
+            huePickerView.setTag(hue);
+        });
+
+        preferredAccountsFilter = context.findViewById(R.id.preferred_accounts_filter_filter);
+        model.observePreferredAccountsFilter(viewLifecycleOwner, text -> {
+            if (!Misc.equalStrings(text, preferredAccountsFilter.getText()))
+                preferredAccountsFilter.setText(text);
+        });
+        hookTextChangeSyncRoutine(preferredAccountsFilter, model::setPreferredAccountsFilter);
+        preferredAccountsFilterLayout =
+                context.findViewById(R.id.preferred_accounts_accounts_filter_layout);
+
+        insecureWarningText = context.findViewById(R.id.insecure_scheme_text);
 
         hookClearErrorOnFocusListener(profileName, profileNameLayout);
         hookClearErrorOnFocusListener(url, urlLayout);
         hookClearErrorOnFocusListener(userName, userNameLayout);
         hookClearErrorOnFocusListener(password, passwordLayout);
 
-        final int profileThemeId;
-        if (mProfile != null) {
-            profileName.setText(mProfile.getName());
-            postingPermitted.setChecked(mProfile.isPostingPermitted());
-            showCommodityByDefault.setChecked(mProfile.getShowCommodityByDefault());
-            {
-                String comm = mProfile.getDefaultCommodity();
-                if (Misc.isEmptyOrNull(comm))
-                    resetDefaultCommodity();
-                else
-                    setDefaultCommodity(comm);
-            }
-            futureDates = mProfile.getFutureDates();
-            futureDatesText.setText(futureDates.getText(getResources()));
-            apiVersion = mProfile.getApiVersion();
-            apiVersionText.setText(apiVersion.getDescription(getResources()));
-            url.setText(mProfile.getUrl());
-            useAuthentication.setChecked(mProfile.isAuthEnabled());
-            authParams.setVisibility(mProfile.isAuthEnabled() ? View.VISIBLE : View.GONE);
-            userName.setText(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
-            password.setText(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
-            preferredAccountsFilter.setText(mProfile.getPreferredAccountsFilter());
-            profileThemeId = mProfile.getThemeHue();
+        if (savedInstanceState == null) {
+            model.setValuesFromProfile(mProfile, getArguments().getInt(ARG_HUE, -1));
         }
-        else {
-            profileName.setText("");
-            url.setText(HTTPS_URL_START);
-            postingPermitted.setChecked(true);
-            showCommodityByDefault.setChecked(false);
-            resetDefaultCommodity();
-            futureDates = MobileLedgerProfile.FutureDates.None;
-            futureDatesText.setText(futureDates.getText(getResources()));
-            apiVersion = SendTransactionTask.API.auto;
-            apiVersionText.setText(apiVersion.getDescription(getResources()));
-            useAuthentication.setChecked(false);
-            authParams.setVisibility(View.GONE);
-            userName.setText("");
-            password.setText("");
-            preferredAccountsFilter.setText(null);
-            profileThemeId = getArguments().getInt(ARG_HUE, -1);
-        }
-
         checkInsecureSchemeWithAuth();
 
         url.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 checkInsecureSchemeWithAuth();
             }
         });
 
-        final int hue = (profileThemeId == -1) ? Colors.DEFAULT_HUE_DEG : profileThemeId;
-        final int profileColor = Colors.getPrimaryColorForHue(hue);
-
-        huePickerView.setBackgroundColor(profileColor);
-        huePickerView.setTag(profileThemeId);
         huePickerView.setOnClickListener(v -> {
             HueRingDialog d = new HueRingDialog(
                     Objects.requireNonNull(ProfileDetailFragment.this.getContext()), profileThemeId,
                     (Integer) v.getTag());
             d.show();
-            d.setColorSelectedListener(this);
+            d.setColorSelectedListener(model::setThemeId);
         });
 
-        context.findViewById(R.id.default_commodity_layout).setOnClickListener(v -> {
-            CurrencySelectorFragment cpf = CurrencySelectorFragment.newInstance(CurrencySelectorFragment.DEFAULT_COLUMN_COUNT, false);
-            cpf.setOnCurrencySelectedListener(this);
-            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
-            cpf.show(activity.getSupportFragmentManager(), "currency-selector");
-        });
         profileName.requestFocus();
+    }
+    private MobileLedgerProfile.FutureDates futureDatesSettingFromMenuItemId(int itemId) {
+        switch (itemId) {
+            case R.id.menu_future_dates_7:
+                return MobileLedgerProfile.FutureDates.OneWeek;
+            case R.id.menu_future_dates_14:
+                return MobileLedgerProfile.FutureDates.TwoWeeks;
+            case R.id.menu_future_dates_30:
+                return MobileLedgerProfile.FutureDates.OneMonth;
+            case R.id.menu_future_dates_60:
+                return MobileLedgerProfile.FutureDates.TwoMonths;
+            case R.id.menu_future_dates_90:
+                return MobileLedgerProfile.FutureDates.ThreeMonths;
+            case R.id.menu_future_dates_180:
+                return MobileLedgerProfile.FutureDates.SixMonths;
+            case R.id.menu_future_dates_365:
+                return MobileLedgerProfile.FutureDates.OneYear;
+            case R.id.menu_future_dates_all:
+                return MobileLedgerProfile.FutureDates.All;
+            default:
+                return MobileLedgerProfile.FutureDates.None;
+        }
+    }
+    @NotNull
+    private ProfileDetailModel getModel() {
+        return new ViewModelProvider(this).get(ProfileDetailModel.class);
     }
     private void onSaveFabClicked() {
         if (!checkValidity())
             return;
 
+        ProfileDetailModel model = getModel();
+
         if (mProfile != null) {
-            updateProfileFromUI();
+            model.updateProfile(mProfile);
 //                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
             mProfile.storeInDB();
             debug("profiles", "profile stored in DB");
@@ -405,7 +435,7 @@ public class ProfileDetailFragment extends Fragment
         }
         else {
             mProfile = new MobileLedgerProfile();
-            updateProfileFromUI();
+            model.updateProfile(mProfile);
             mProfile.storeInDB();
             final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
             if (profiles == null)
@@ -424,20 +454,6 @@ public class ProfileDetailFragment extends Fragment
         if (activity != null)
             activity.finish();
     }
-    private void updateProfileFromUI() {
-        mProfile.setName(profileName.getText());
-        mProfile.setUrl(url.getText());
-        mProfile.setPostingPermitted(postingPermitted.isChecked());
-        mProfile.setDefaultCommodity(defaultCommoditySet ? defaultCommodity.getText() : null);
-        mProfile.setShowCommodityByDefault(showCommodityByDefault.isChecked());
-        mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getText());
-        mProfile.setAuthEnabled(useAuthentication.isChecked());
-        mProfile.setAuthUserName(userName.getText());
-        mProfile.setAuthPassword(password.getText());
-        mProfile.setThemeHue(huePickerView.getTag());
-        mProfile.setFutureDates(futureDates);
-        mProfile.setApiVersion(apiVersion);
-    }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -447,8 +463,10 @@ public class ProfileDetailFragment extends Fragment
     private boolean checkUrlValidity() {
         boolean valid = true;
 
-        String val = String.valueOf(url.getText())
-                           .trim();
+        ProfileDetailModel model = getModel();
+
+        String val = model.getUrl()
+                          .trim();
         if (val.isEmpty()) {
             valid = false;
             urlLayout.setError(getResources().getText(R.string.err_profile_url_empty));
@@ -475,9 +493,10 @@ public class ProfileDetailFragment extends Fragment
     private void checkInsecureSchemeWithAuth() {
         boolean showWarning = false;
 
-        if (useAuthentication.isChecked()) {
-            String urlText = url.getText()
-                                .toString();
+        final ProfileDetailModel model = getModel();
+
+        if (model.getUseAuthentication()) {
+            String urlText = model.getUrl();
             if (urlText.startsWith("http") && !urlText.startsWith("https"))
                 showWarning = true;
         }
@@ -504,6 +523,25 @@ public class ProfileDetailFragment extends Fragment
             public void afterTextChanged(Editable s) {
             }
         });
+    }
+    private void syncModelFromUI() {
+        if (syncingModelFromUI)
+            return;
+
+        syncingModelFromUI = true;
+
+        try {
+            ProfileDetailModel model = getModel();
+
+            model.setProfileName(profileName.getText());
+            model.setUrl(url.getText());
+            model.setPreferredAccountsFilter(preferredAccountsFilter.getText());
+            model.setAuthUserName(userName.getText());
+            model.setAuthPassword(password.getText());
+        }
+        finally {
+            syncingModelFromUI = false;
+        }
     }
     private boolean checkValidity() {
         boolean valid = true;
@@ -541,18 +579,6 @@ public class ProfileDetailFragment extends Fragment
 
         return valid;
     }
-    @Override
-    public void onHueSelected(int hue) {
-        huePickerView.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
-        huePickerView.setTag(hue);
-    }
-    @Override
-    public void onCurrencySelected(Currency item) {
-        if (item == null)
-            resetDefaultCommodity();
-        else
-            setDefaultCommodity(item.getName());
-    }
     private void resetDefaultCommodity() {
         defaultCommoditySet = false;
         defaultCommodity.setText(R.string.btn_no_currency);
@@ -562,5 +588,8 @@ public class ProfileDetailFragment extends Fragment
         defaultCommoditySet = true;
         defaultCommodity.setText(name);
         defaultCommodity.setTypeface(defaultCommodity.getTypeface(), Typeface.BOLD);
+    }
+    interface TextChangeSyncProc {
+        void onTextChanged(String text);
     }
 }
