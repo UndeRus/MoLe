@@ -66,4 +66,10 @@ public class Misc {
         if (str == null) return true;
         return str.isEmpty();
     }
+    public static boolean equalStrings(String u, CharSequence text) {
+        return nullIsEmpty(u).equals(text.toString());
+    }
+    public static boolean equalStrings(String a, String b) {
+        return nullIsEmpty(a).equals(nullIsEmpty(b));
+    }
 }
