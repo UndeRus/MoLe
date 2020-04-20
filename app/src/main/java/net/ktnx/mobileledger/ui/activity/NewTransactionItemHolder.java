@@ -46,7 +46,6 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
-import net.ktnx.mobileledger.ui.OnCurrencySelectedListener;
 import net.ktnx.mobileledger.ui.TextViewClearHelper;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.DimensionUtils;
@@ -63,8 +62,7 @@ import java.util.Locale;
 import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
 
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
-        implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback,
-        OnCurrencySelectedListener {
+        implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
     private final String decimalSeparator;
     private final String decimalDot;
     private final TextView tvCurrency;
@@ -225,8 +223,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         tvCurrency.setOnClickListener(v -> {
             CurrencySelectorFragment cpf = new CurrencySelectorFragment();
-            cpf.setOnCurrencySelectedListener(this);
             cpf.showPositionAndPadding();
+            cpf.setOnCurrencySelectedListener(c -> item.setCurrency(c));
             final AppCompatActivity activity = (AppCompatActivity) v.getContext();
             cpf.show(activity.getSupportFragmentManager(), "currency-selector");
         });
@@ -651,10 +649,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         if (focused)
             Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
 
-    }
-    @Override
-    public void onCurrencySelected(Currency currency) {
-        adapter.model.setItemCurrency(this.item, currency, adapter);
     }
     @Override
     public void descriptionSelected(String description) {
