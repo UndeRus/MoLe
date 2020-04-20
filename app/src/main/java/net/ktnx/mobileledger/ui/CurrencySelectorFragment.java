@@ -59,9 +59,9 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
     public static final String ARG_SHOW_PARAMS = "show-params";
     public static final boolean DEFAULT_SHOW_PARAMS = true;
     private int mColumnCount = DEFAULT_COLUMN_COUNT;
-    private OnCurrencySelectedListener mListener;
     private CurrencySelectorModel model;
     private boolean deferredShowPositionAndPadding;
+    private OnCurrencySelectedListener onCurrencySelectedListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -106,6 +106,8 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
         model = new ViewModelProvider(this).get(CurrencySelectorModel.class);
+        if (onCurrencySelectedListener != null)
+            model.setOnCurrencySelectedListener(onCurrencySelectedListener);
         MobileLedgerProfile profile = Objects.requireNonNull(Data.profile.getValue());
 
         model.currencies.setValue(new CopyOnWriteArrayList<>(profile.getCurrencies()));
@@ -200,15 +202,17 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         return csd;
     }
     public void setOnCurrencySelectedListener(OnCurrencySelectedListener listener) {
-        mListener = listener;
+        onCurrencySelectedListener = listener;
+
+        if (model != null)
+            model.setOnCurrencySelectedListener(listener);
     }
     public void resetOnCurrencySelectedListener() {
-        mListener = null;
+        model.resetOnCurrencySelectedListener();
     }
     @Override
     public void onCurrencySelected(Currency item) {
-        if (mListener != null)
-            mListener.onCurrencySelected(item);
+        model.triggerOnCurrencySelectedListener(item);
 
         dismiss();
     }

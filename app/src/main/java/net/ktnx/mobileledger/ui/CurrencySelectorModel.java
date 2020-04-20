@@ -29,6 +29,7 @@ import java.util.List;
 public class CurrencySelectorModel extends ViewModel {
     public final MutableLiveData<List<Currency>> currencies;
     private final MutableLiveData<Boolean> positionAndPaddingVisible = new MutableLiveData<>(true);
+    private OnCurrencySelectedListener selectionListener;
     public CurrencySelectorModel() {
         this.currencies = new MutableLiveData<>();
     }
@@ -40,5 +41,15 @@ public class CurrencySelectorModel extends ViewModel {
     }
     public void observePositionAndPaddingVisible(LifecycleOwner activity, Observer<Boolean> observer) {
         positionAndPaddingVisible.observe(activity, observer);
+    }
+    void setOnCurrencySelectedListener(OnCurrencySelectedListener listener) {
+        selectionListener = listener;
+    }
+    void resetOnCurrencySelectedListener() {
+        selectionListener = null;
+    }
+    void triggerOnCurrencySelectedListener(Currency c) {
+        if (selectionListener != null)
+            selectionListener.onCurrencySelected(c);
     }
 }
