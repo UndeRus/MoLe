@@ -212,74 +212,94 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         try (Cursor c = App.getDatabase()
                            .rawQuery(sql, params.toArray(new String[]{})))
         {
-            if (!c.moveToNext())
-                return;
+            String profileUUID;
+            int transactionId;
 
-            String profileUUID = c.getString(0);
-            int transactionId = c.getInt(1);
-            LedgerTransaction tr;
-            MobileLedgerProfile profile = Data.getProfile(profileUUID);
-            if (profile == null)
-                throw new RuntimeException(String.format(
-                        "Unable to find profile %s, which is supposed to contain " +
-                        "transaction %d with description %s", profileUUID, transactionId,
-                        description));
+            if (!c.moveToNext()) {
+                sb = new StringBuilder("select t.profile, t.id from transactions t where t.description=?");
+                sb.append(" ORDER BY date desc LIMIT 1");
 
-            tr = profile.loadTransaction(transactionId);
-            ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
-            NewTransactionModel.Item firstNegative = null;
-            NewTransactionModel.Item firstPositive = null;
-            int singleNegativeIndex = -1;
-            int singlePositiveIndex = -1;
-            int negativeCount = 0;
-            for (int i = 0; i < accounts.size(); i++) {
-                LedgerTransactionAccount acc = accounts.get(i);
-                NewTransactionModel.Item item;
-                if (model.getAccountCount() < i + 1) {
-                    model.addAccount(acc);
-                    notifyItemInserted(i + 1);
+                final String broaderSql = sb.toString();
+                debug("descr", broaderSql);
+                debug("descr", params.toString());
+                try (Cursor c2 = App.getDatabase().rawQuery(broaderSql, new String[]{description})) {
+                    if (!c2.moveToNext()) return;
+
+                    profileUUID = c2.getString(0);
+                    transactionId = c2.getInt(1);
                 }
-                item = model.getItem(i + 1);
-
-                item.getAccount()
-                    .setAccountName(acc.getAccountName());
-                if (acc.isAmountSet()) {
-                    item.getAccount()
-                        .setAmount(acc.getAmount());
-                    if (acc.getAmount() < 0) {
-                        if (firstNegative == null) {
-                            firstNegative = item;
-                            singleNegativeIndex = i;
-                        }
-                        else
-                            singleNegativeIndex = -1;
-                    }
-                    else {
-                        if (firstPositive == null) {
-                            firstPositive = item;
-                            singlePositiveIndex = i;
-                        }
-                        else
-                            singlePositiveIndex = -1;
-                    }
-                }
-                else
-                    item.getAccount()
-                        .resetAmount();
-                notifyItemChanged(i + 1);
+            }
+            else {
+                profileUUID = c.getString(0);
+                transactionId = c.getInt(1);
             }
 
-            if (singleNegativeIndex != -1) {
-                firstNegative.getAccount()
-                             .resetAmount();
-                model.moveItemLast(singleNegativeIndex);
-            }
-            else if (singlePositiveIndex != -1) {
-                firstPositive.getAccount()
-                             .resetAmount();
-                model.moveItemLast(singlePositiveIndex);
-            }
+            loadTransactionIntoModel(profileUUID, transactionId);
         }
+    }
+    private void loadTransactionIntoModel(String profileUUID, int transactionId) {
+        LedgerTransaction tr;
+        MobileLedgerProfile profile = Data.getProfile(profileUUID);
+        if (profile == null)
+            throw new RuntimeException(String.format(
+                    "Unable to find profile %s, which is supposed to contain transaction %d",
+                    profileUUID, transactionId));
+
+        tr = profile.loadTransaction(transactionId);
+        ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
+        NewTransactionModel.Item firstNegative = null;
+        NewTransactionModel.Item firstPositive = null;
+        int singleNegativeIndex = -1;
+        int singlePositiveIndex = -1;
+        int negativeCount = 0;
+        for (int i = 0; i < accounts.size(); i++) {
+            LedgerTransactionAccount acc = accounts.get(i);
+            NewTransactionModel.Item item;
+            if (model.getAccountCount() < i + 1) {
+                model.addAccount(acc);
+                notifyItemInserted(i + 1);
+            }
+            item = model.getItem(i + 1);
+
+            item.getAccount()
+                .setAccountName(acc.getAccountName());
+            if (acc.isAmountSet()) {
+                item.getAccount()
+                    .setAmount(acc.getAmount());
+                if (acc.getAmount() < 0) {
+                    if (firstNegative == null) {
+                        firstNegative = item;
+                        singleNegativeIndex = i;
+                    }
+                    else
+                        singleNegativeIndex = -1;
+                }
+                else {
+                    if (firstPositive == null) {
+                        firstPositive = item;
+                        singlePositiveIndex = i;
+                    }
+                    else
+                        singlePositiveIndex = -1;
+                }
+            }
+            else
+                item.getAccount()
+                    .resetAmount();
+            notifyItemChanged(i + 1);
+        }
+
+        if (singleNegativeIndex != -1) {
+            firstNegative.getAccount()
+                         .resetAmount();
+            model.moveItemLast(singleNegativeIndex);
+        }
+        else if (singlePositiveIndex != -1) {
+            firstPositive.getAccount()
+                         .resetAmount();
+            model.moveItemLast(singlePositiveIndex);
+        }
+
         checkTransactionSubmittable();
         model.setFocusedItem(1);
     }
