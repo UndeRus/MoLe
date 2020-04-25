@@ -348,13 +348,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             adapter.checkTransactionSubmittable();
         };
 
-        currencyGapObserver = hasGap -> {
-            updateCurrencyPositionAndPadding(Data.currencySymbolPosition.getValue(), hasGap);
-        };
+        currencyGapObserver =
+                hasGap -> updateCurrencyPositionAndPadding(Data.currencySymbolPosition.getValue(),
+                        hasGap);
 
-        currencyPositionObserver = position -> {
-            updateCurrencyPositionAndPadding(position, Data.currencyGap.getValue());
-        };
+        currencyPositionObserver =
+                position -> updateCurrencyPositionAndPadding(position, Data.currencyGap.getValue());
 
         showCurrencyObserver = showCurrency -> {
             if (showCurrency) {
