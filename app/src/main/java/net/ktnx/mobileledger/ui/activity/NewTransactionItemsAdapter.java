@@ -263,6 +263,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
 
             item.getAccount()
                 .setAccountName(acc.getAccountName());
+            item.setComment(acc.getComment());
             if (acc.isAmountSet()) {
                 item.getAccount()
                     .setAmount(acc.getAmount());
