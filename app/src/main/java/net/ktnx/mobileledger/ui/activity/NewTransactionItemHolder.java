@@ -53,6 +53,8 @@ import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DecimalFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
@@ -430,7 +432,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAccount.setEnabled(editable);
         tvAmount.setEnabled(editable);
     }
-    private void setCommentVisible(Boolean visible) {
+    private void setCommentVisible(@NotNull Boolean visible) {
         if (visible) {
             // showing; show the comment view and align the comment button to it
             tvComment.setVisibility(View.VISIBLE);
