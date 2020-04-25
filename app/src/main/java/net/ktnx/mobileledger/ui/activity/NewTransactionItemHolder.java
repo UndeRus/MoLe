@@ -444,11 +444,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             commentButton.setLayoutParams(lp);
         }
         else {
-            // hiding; hide the comment comment view and align amounts layout under it
+            // hiding; hide the comment view and align the comment bottom to the amount
             tvComment.setVisibility(View.GONE);
             ConstraintLayout.LayoutParams lp =
                     (ConstraintLayout.LayoutParams) commentButton.getLayoutParams();
-            lp.bottomToBottom = R.id.ntr_account;   // R.id.parent doesn't work here
+            lp.bottomToBottom = R.id.amount_layout;   // R.id.parent doesn't work here
 
             commentButton.setLayoutParams(lp);
         }
