@@ -386,18 +386,12 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         final String descriptionText = model.getDescription();
         boolean submittable = true;
         final ItemsForCurrency itemsForCurrency = new ItemsForCurrency();
-        final ItemsForCurrency itemsWithEmptyAmountForCurrency =
-                new ItemsForCurrency();
-        final ItemsForCurrency itemsWithAccountAndEmptyAmountForCurrency =
-                new ItemsForCurrency();
-        final ItemsForCurrency itemsWithEmptyAccountForCurrency =
-                new ItemsForCurrency();
-        final ItemsForCurrency itemsWithAmountForCurrency =
-                new ItemsForCurrency();
-        final ItemsForCurrency itemsWithAccountForCurrency =
-                new ItemsForCurrency();
-        final ItemsForCurrency emptyRowsForCurrency =
-                new ItemsForCurrency();
+        final ItemsForCurrency itemsWithEmptyAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAccountAndEmptyAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithEmptyAccountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAccountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency emptyRowsForCurrency = new ItemsForCurrency();
         final List<NewTransactionModel.Item> emptyRows = new ArrayList<>();
 
         try {
