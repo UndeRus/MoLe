@@ -95,11 +95,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
-    private NewTransactionItemsAdapter adapter;
     //TODO multiple amounts with different currencies per posting
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
         super(itemView);
-        this.adapter = adapter;
         tvAccount = itemView.findViewById(R.id.account_row_acc_name);
         tvComment = itemView.findViewById(R.id.comment);
         new TextViewClearHelper().attachToTextView((EditText) tvComment);
