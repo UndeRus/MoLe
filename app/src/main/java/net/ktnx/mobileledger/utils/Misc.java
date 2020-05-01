@@ -72,4 +72,9 @@ public class Misc {
     public static boolean equalStrings(String a, String b) {
         return nullIsEmpty(a).equals(nullIsEmpty(b));
     }
+    public static boolean isEmptyOrNull(CharSequence text) {
+        if (text == null)
+            return true;
+        return text.length() == 0;
+    }
 }
