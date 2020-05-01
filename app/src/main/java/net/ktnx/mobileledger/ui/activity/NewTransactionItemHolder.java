@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -85,13 +86,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Integer> focusedAccountObserver;
     private Observer<Integer> accountCountObserver;
     private Observer<Boolean> editableObserver;
-    private Observer<Boolean> commentVisibleObserver;
-    private Observer<String> commentObserver;
     private Observer<Currency.Position> currencyPositionObserver;
     private Observer<Boolean> currencyGapObserver;
     private Observer<Locale> localeObserver;
     private Observer<Currency> currencyObserver;
     private Observer<Boolean> showCurrencyObserver;
+    private Observer<String> commentObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
@@ -109,6 +109,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         lHead = itemView.findViewById(R.id.ntr_data);
         lAccount = itemView.findViewById(R.id.ntr_account);
         lPadding = itemView.findViewById(R.id.ntr_padding);
+        View commentLayout = itemView.findViewById(R.id.comment_layout);
 
         tvDescription.setNextFocusForwardId(View.NO_ID);
         tvAccount.setNextFocusForwardId(View.NO_ID);
@@ -116,18 +117,25 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         tvDate.setOnClickListener(v -> pickTransactionDate());
 
+        itemView.findViewById(R.id.comment_button)
+                .setOnClickListener(v -> {
+                    tvComment.setVisibility(View.VISIBLE);
+                    tvComment.requestFocus();
+                });
+
         mProfile = Data.profile.getValue();
         if (mProfile == null)
             throw new AssertionError();
 
         View.OnFocusChangeListener focusMonitor = (v, hasFocus) -> {
+            final int id = v.getId();
             if (hasFocus) {
                 boolean wasSyncing = syncingData;
                 syncingData = true;
                 try {
                     final int pos = getAdapterPosition();
                     adapter.updateFocusedItem(pos);
-                    switch (v.getId()) {
+                    switch (id) {
                         case R.id.account_row_acc_name:
                             adapter.noteFocusIsOnAccount(pos);
                             break;
@@ -143,17 +151,25 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     syncingData = wasSyncing;
                 }
             }
+
+            if (id == R.id.comment) {
+                commentLayout.setAlpha(hasFocus ? 1f : 0.5f);
+                tvComment.setTypeface(null, hasFocus ? Typeface.NORMAL : Typeface.ITALIC);
+                if (hasFocus)
+                    tvComment.setHint(R.string.transaction_account_comment_hint);
+                else
+                    tvComment.setHint("");
+
+                if (!hasFocus && Misc.isEmptyOrNull(tvComment.getText()))
+                    tvComment.setVisibility(View.INVISIBLE);
+            }
         };
 
         tvDescription.setOnFocusChangeListener(focusMonitor);
         tvAccount.setOnFocusChangeListener(focusMonitor);
         tvAmount.setOnFocusChangeListener(focusMonitor);
+        tvComment.setOnFocusChangeListener(focusMonitor);
 
-        itemView.findViewById(R.id.comment_button)
-                .setOnClickListener(v -> {
-                    final int pos = getAdapterPosition();
-                    adapter.toggleComment(pos);
-                });
         MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
         MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
@@ -273,8 +289,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         editableObserver = this::setEditable;
-        commentVisibleObserver = this::setCommentVisible;
-        commentObserver = this::setComment;
         focusedAccountObserver = index -> {
             if ((index != null) && index.equals(getAdapterPosition())) {
                 switch (item.getType()) {
@@ -364,6 +378,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 item.setCurrency(null);
             }
         };
+
+        commentObserver = comment -> {
+            final View focusedView = tvComment.findFocus();
+            tvComment.setTypeface(null,
+                    (focusedView == tvComment) ? Typeface.NORMAL : Typeface.ITALIC);
+            tvComment.setVisibility(
+                    ((focusedView != tvComment) && Misc.isEmptyOrNull(comment)) ? View.INVISIBLE
+                                                                                : View.VISIBLE);
+        };
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
         ConstraintLayout.LayoutParams amountLP =
@@ -449,12 +472,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
             commentButton.setLayoutParams(lp);
         }
-    }
-    private void setComment(String comment) {
-        if ((comment != null) && !comment.isEmpty())
-            commentButton.setBackgroundResource(R.drawable.ic_comment_black_24dp);
-        else
-            commentButton.setBackgroundResource(R.drawable.ic_comment_gray_24dp);
     }
     private void beginUpdates() {
         if (inUpdate)
@@ -556,8 +573,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 this.item.stopObservingDescription(descriptionObserver);
                 this.item.stopObservingAmountHint(hintObserver);
                 this.item.stopObservingEditableFlag(editableObserver);
-                this.item.stopObservingCommentVisible(commentVisibleObserver);
-                this.item.stopObservingComment(commentObserver);
                 this.item.getModel()
                          .stopObservingFocusedItem(focusedAccountObserver);
                 this.item.getModel()
@@ -567,6 +582,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 Data.locale.removeObserver(localeObserver);
                 this.item.stopObservingCurrency(currencyObserver);
                 this.item.getModel().showCurrency.removeObserver(showCurrencyObserver);
+                this.item.stopObservingComment(commentObserver);
 
                 this.item = null;
             }
@@ -622,13 +638,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         break;
                     case transactionRow:
                         item.observeAmountHint(activity, hintObserver);
-                        item.observeCommentVisible(activity, commentVisibleObserver);
-                        item.observeComment(activity, commentObserver);
                         Data.currencySymbolPosition.observe(activity, currencyPositionObserver);
                         Data.currencyGap.observe(activity, currencyGapObserver);
                         Data.locale.observe(activity, localeObserver);
                         item.observeCurrency(activity, currencyObserver);
                         item.getModel().showCurrency.observe(activity, showCurrencyObserver);
+                        item.observeComment(activity, commentObserver);
                         item.getModel()
                             .observeAccountCount(activity, accountCountObserver);
                         break;

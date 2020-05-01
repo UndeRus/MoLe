@@ -95,39 +95,44 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/comment_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_comment_gray_24dp"
-            app:layout_constraintBottom_toBottomOf="@id/amount_layout"
-            app:layout_constraintStart_toStartOf="@+id/ntr_account"
-            app:layout_constraintTop_toBottomOf="@+id/account_row_acc_name" />
-
-        <EditText
-            android:id="@+id/comment"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/comment_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/transaction_account_comment_hint"
-            android:imeOptions="actionNext"
-            android:inputType="text"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="@+id/ntr_account"
-            app:layout_constraintStart_toEndOf="@id/comment_button"
-            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name" />
+            android:alpha="0.50"
+            app:layout_constraintEnd_toStartOf="@id/amount_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name">
+
+            <TextView
+                android:id="@+id/comment_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_comment_gray_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <net.ktnx.mobileledger.ui.EditTextWithClear
+                android:id="@+id/comment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/comment_button"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/amount_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/comment">
+            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name">
 
             <EditText
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/currency"
                 android:id="@+id/account_row_acc_amounts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -142,22 +147,26 @@
                 android:minWidth="80sp"
                 android:selectAllOnFocus="true"
                 android:textAlignment="viewEnd"
-                app:layout_constraintWidth_min="@dimen/text_margin"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/currency"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_min="@dimen/text_margin" />
 
             <TextView
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
                 android:id="@+id/currency"
+                style="@style/TextAppearance.AppCompat.Widget.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
+                android:minWidth="24dp"
                 android:text="@string/currency_symbol"
-                style="@style/TextAppearance.AppCompat.Widget.Button"
                 android:textAllCaps="false"
                 android:visibility="gone"
-                android:minWidth="24dp"
-                android:gravity="center_horizontal"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

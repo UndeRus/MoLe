@@ -333,9 +333,6 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     public void noteFocusIsOnComment(int position) {
         model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Comment);
     }
-    public void toggleComment(int position) {
-        model.toggleComment(position);
-    }
     private void holdSubmittableChecks() {
         checkHoldCounter++;
     }

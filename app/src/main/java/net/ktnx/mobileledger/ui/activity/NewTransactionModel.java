@@ -171,10 +171,6 @@ public class NewTransactionModel extends ViewModel {
     void swapItems(int one, int two) {
         Collections.swap(items, one - 1, two - 1);
     }
-    void toggleComment(int position) {
-        final MutableLiveData<Boolean> commentVisible = getItem(position).commentVisible;
-        commentVisible.postValue(!commentVisible.getValue());
-    }
     void moveItemLast(int index) {
         /*   0
              1   <-- index
@@ -209,7 +205,6 @@ public class NewTransactionModel extends ViewModel {
         private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
         private FocusedElement focusedElement = FocusedElement.Account;
         private MutableLiveData<String> comment = new MutableLiveData<>(null);
-        private MutableLiveData<Boolean> commentVisible = new MutableLiveData<>(false);
         private MutableLiveData<Currency> currency = new MutableLiveData<>(null);
         private boolean amountHintIsSet = false;
         Item(NewTransactionModel model) {
@@ -406,12 +401,6 @@ public class NewTransactionModel extends ViewModel {
         }
         void stopObservingEditableFlag(Observer<Boolean> observer) {
             editable.removeObserver(observer);
-        }
-        void observeCommentVisible(NewTransactionActivity activity, Observer<Boolean> observer) {
-            commentVisible.observe(activity, observer);
-        }
-        void stopObservingCommentVisible(Observer<Boolean> observer) {
-            commentVisible.removeObserver(observer);
         }
         void observeComment(NewTransactionActivity activity, Observer<String> observer) {
             comment.observe(activity, observer);
