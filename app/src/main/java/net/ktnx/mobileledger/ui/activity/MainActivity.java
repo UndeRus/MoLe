@@ -185,12 +185,14 @@ public class MainActivity extends ProfileThemedActivity {
         }
         barDrawerToggle.syncState();
 
-        TextView ver = drawer.findViewById(R.id.drawer_version_text);
 
         try {
             PackageInfo pi = getApplicationContext().getPackageManager()
                                                     .getPackageInfo(getPackageName(), 0);
-            ver.setText(pi.versionName);
+            ((TextView) findViewById(R.id.nav_upper).findViewById(
+                    R.id.drawer_version_text)).setText(pi.versionName);
+            ((TextView) findViewById(R.id.no_profiles_layout).findViewById(
+                    R.id.drawer_version_text)).setText(pi.versionName);
         }
         catch (Exception e) {
             e.printStackTrace();
