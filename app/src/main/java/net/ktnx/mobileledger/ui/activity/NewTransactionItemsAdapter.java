@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.ArrayList;
@@ -190,52 +192,81 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         String accFilter = mProfile.getPreferredAccountsFilter();
 
         ArrayList<String> params = new ArrayList<>();
-        StringBuilder sb = new StringBuilder(
-                "select t.profile, t.id from transactions t where t.description=?");
-        params.add(description);
+        StringBuilder sb = new StringBuilder("select t.profile, t.id from transactions t");
 
-        if (accFilter != null) {
-            sb.append(" AND EXISTS (")
-              .append("SELECT 1 FROM transaction_accounts ta ")
-              .append("WHERE ta.profile = t.profile")
-              .append(" AND ta.transaction_id = t.id")
-              .append(" AND UPPER(ta.account_name) LIKE '%'||?||'%')");
-            params.add(accFilter.toUpperCase());
+        if (!Misc.isEmptyOrNull(accFilter)) {
+            sb.append(" JOIN transaction_accounts ta")
+              .append(" ON ta.profile = t.profile")
+              .append(" AND ta.transaction_id = t.id");
         }
 
-        sb.append(" ORDER BY date desc limit 1");
+        sb.append(" WHERE t.description=?");
+        params.add(description);
+
+        if (!Misc.isEmptyOrNull(accFilter)) {
+            sb.append(" AND ta.account_name LIKE '%'||?||'%'");
+            params.add(accFilter);
+        }
+
+        sb.append(" ORDER BY t.date DESC LIMIT 1");
 
         final String sql = sb.toString();
         debug("descr", sql);
         debug("descr", params.toString());
 
-        try (Cursor c = App.getDatabase()
-                           .rawQuery(sql, params.toArray(new String[]{})))
-        {
-            String profileUUID;
-            int transactionId;
+        Activity activity = (Activity) recyclerView.getContext();
+        // FIXME: handle exceptions?
+        MLDB.queryInBackground(sql, params.toArray(new String[]{}), new MLDB.CallbackHelper() {
+            @Override
+            public void onStart() {
+                model.incrementBusyCounter();
+            }
+            @Override
+            public void onDone() {
+                model.decrementBusyCounter();
+            }
+            @Override
+            public boolean onRow(@NonNull Cursor cursor) {
+                final String profileUUID = cursor.getString(0);
+                final int transactionId = cursor.getInt(1);
+                activity.runOnUiThread(() -> loadTransactionIntoModel(profileUUID, transactionId));
+                return false; // limit 1, by the way
+            }
+            @Override
+            public void onNoRows() {
+                if (Misc.isEmptyOrNull(accFilter))
+                    return;
 
-            if (!c.moveToNext()) {
-                sb = new StringBuilder("select t.profile, t.id from transactions t where t.description=?");
-                sb.append(" ORDER BY date desc LIMIT 1");
+                debug("descr", "Trying transaction search without preferred account filter");
 
-                final String broaderSql = sb.toString();
+                final String broaderSql =
+                        "select t.profile, t.id from transactions t where t.description=?" +
+                        " ORDER BY date desc LIMIT 1";
+                params.remove(1);
                 debug("descr", broaderSql);
-                debug("descr", params.toString());
-                try (Cursor c2 = App.getDatabase().rawQuery(broaderSql, new String[]{description})) {
-                    if (!c2.moveToNext()) return;
+                debug("descr", description);
 
-                    profileUUID = c2.getString(0);
-                    transactionId = c2.getInt(1);
-                }
+                MLDB.queryInBackground(broaderSql, new String[]{description},
+                        new MLDB.CallbackHelper() {
+                            @Override
+                            public void onStart() {
+                                model.incrementBusyCounter();
+                            }
+                            @Override
+                            public boolean onRow(@NonNull Cursor cursor) {
+                                final String profileUUID = cursor.getString(0);
+                                final int transactionId = cursor.getInt(1);
+                                activity.runOnUiThread(
+                                        () -> loadTransactionIntoModel(profileUUID, transactionId));
+                                return false;
+                            }
+                            @Override
+                            public void onDone() {
+                                model.decrementBusyCounter();
+                            }
+                        });
             }
-            else {
-                profileUUID = c.getString(0);
-                transactionId = c.getInt(1);
-            }
-
-            loadTransactionIntoModel(profileUUID, transactionId);
-        }
+        });
     }
     private void loadTransactionIntoModel(String profileUUID, int transactionId) {
         LedgerTransaction tr;
