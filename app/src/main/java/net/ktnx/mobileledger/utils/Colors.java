@@ -222,11 +222,19 @@ public class Colors {
     }
     public static void setupTheme(Activity activity, int themeHue) {
         int themeId = -1;
-        // Relies that theme resource IDs are sequential numbers
         if (themeHue == 360)
             themeHue = 0;
-        if ((themeHue >= 0) && (themeHue < 360) && ((themeHue % HueRing.hueStepDegrees) == 0)) {
-            themeId = themeIDs[themeHue / HueRing.hueStepDegrees];
+        if ((themeHue >= 0) && (themeHue < 360)) {
+            int index;
+            if ((themeHue % HueRing.hueStepDegrees) != 0) {
+                Logger.warn("profiles",
+                        String.format(Locale.US, "Adjusting unexpected hue %d", themeHue));
+                index = Math.round(1f * themeHue / HueRing.hueStepDegrees);
+            }
+            else
+                index = themeHue / HueRing.hueStepDegrees;
+
+            themeId = themeIDs[index];
         }
 
         if (themeId < 0) {
@@ -264,57 +272,61 @@ public class Colors {
         if ((profiles == null) || (profiles.size() == 0))
             return DEFAULT_HUE_DEG;
 
+        int chosenHue;
+
         if (profiles.size() == 1) {
             int opposite = profiles.get(0)
                                    .getThemeHue() + 180;
             opposite %= 360;
-            return opposite;
+            chosenHue = opposite;
         }
+        else {
+            ArrayList<Integer> hues = new ArrayList<>();
+            for (MobileLedgerProfile p : profiles) {
+                int hue = p.getThemeHue();
+                if (hue == -1)
+                    hue = DEFAULT_HUE_DEG;
+                hues.add(hue);
+            }
+            Collections.sort(hues);
+            hues.add(hues.get(0));
 
-        ArrayList<Integer> hues = new ArrayList<>();
-        for (MobileLedgerProfile p : profiles) {
-            int hue = p.getThemeHue();
-            if (hue == -1)
-                hue = DEFAULT_HUE_DEG;
-            hues.add(hue);
-        }
-        Collections.sort(hues);
-        hues.add(hues.get(0));
+            int lastHue = -1;
+            int largestInterval = 0;
+            ArrayList<Integer> largestIntervalStarts = new ArrayList<>();
 
-        int lastHue = -1;
-        int largestInterval = 0;
-        ArrayList<Integer> largestIntervalStarts = new ArrayList<>();
+            for (int h : hues) {
+                if (lastHue == -1) {
+                    lastHue = h;
+                    continue;
+                }
 
-        for (int h : hues) {
-            if (lastHue == -1) {
+                int interval;
+                if (h > lastHue)
+                    interval = h - lastHue;     // 10 -> 20 is a step of 10
+                else
+                    interval = h + (360 - lastHue);    // 350 -> 20 is a step of 30
+
+                if (interval > largestInterval) {
+                    largestInterval = interval;
+                    largestIntervalStarts.clear();
+                    largestIntervalStarts.add(lastHue);
+                }
+                else if (interval == largestInterval) {
+                    largestIntervalStarts.add(lastHue);
+                }
+
                 lastHue = h;
-                continue;
             }
 
-            int interval;
-            if (h > lastHue)
-                interval = h - lastHue;     // 10 -> 20 is a step of 10
-            else
-                interval = h + (360 - lastHue);    // 350 -> 20 is a step of 30
+            final int chosenIndex = (int) (Math.random() * largestIntervalStarts.size());
+            int chosenIntervalStart = largestIntervalStarts.get(chosenIndex);
 
-            if (interval > largestInterval) {
-                largestInterval = interval;
-                largestIntervalStarts.clear();
-                largestIntervalStarts.add(lastHue);
-            }
-            else if (interval == largestInterval) {
-                largestIntervalStarts.add(lastHue);
-            }
+            if (largestInterval % 2 != 0)
+                largestInterval++;    // round up the middle point
 
-            lastHue = h;
+            chosenHue = (chosenIntervalStart + (largestInterval / 2)) % 360;
         }
-
-        final int chosenIndex = (int) (Math.random() * largestIntervalStarts.size());
-        int chosenIntervalStart = largestIntervalStarts.get(chosenIndex);
-
-        if (largestInterval % 2 != 0)
-            largestInterval++;    // round up the middle point
-        int chosenHue = (chosenIntervalStart + (largestInterval / 2)) % 360;
 
         final int mod = chosenHue % THEME_HUE_STEP_DEG;
         if (mod != 0) {
