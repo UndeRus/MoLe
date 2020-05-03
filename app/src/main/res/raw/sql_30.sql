@@ -1,0 +1,1 @@
+delete from options where profile <> '-' and not exists (select 1 from profiles p where p.uuid=options.profile);
