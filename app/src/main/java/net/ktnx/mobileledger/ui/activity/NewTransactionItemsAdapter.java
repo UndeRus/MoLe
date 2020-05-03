@@ -632,7 +632,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             model.isSubmittable.setValue(false);
         }
     }
-    private class BalanceForCurrency {
+
+    private static class BalanceForCurrency {
         private HashMap<String, Float> hashMap = new HashMap<>();
         float get(String currencyName) {
             Float f = hashMap.get(currencyName);
@@ -653,7 +654,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         }
     }
 
-    private class ItemsForCurrency {
+    private static class ItemsForCurrency {
         private HashMap<String, List<NewTransactionModel.Item>> hashMap = new HashMap<>();
         @NonNull
         List<NewTransactionModel.Item> getList(@Nullable String currencyName) {
