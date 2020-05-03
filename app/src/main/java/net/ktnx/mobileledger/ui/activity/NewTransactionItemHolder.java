@@ -312,6 +312,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                     tvAmount.requestFocus();
                                     break;
                                 case Comment:
+                                    tvComment.setVisibility(View.VISIBLE);
                                     tvComment.requestFocus();
                                     break;
                                 case Account:
