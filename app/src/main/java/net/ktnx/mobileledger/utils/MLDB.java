@@ -191,7 +191,41 @@ public final class MLDB {
 
         if (callback != null) view.setOnItemClickListener((parent, itemView, position, id) -> {
             callback.descriptionSelected(String.valueOf(view.getText()));
+    }
+    public static void queryInBackground(@NonNull String statement, @NonNull String[] params,
+                                         @NonNull CallbackHelper callbackHelper) {
+        /* All callbacks are called in the new (asynchronous) thread! */
+        Thread t = new Thread(() -> {
+            callbackHelper.onStart();
+            try {
+                SQLiteDatabase db = App.getDatabase();
+
+                try (Cursor cursor = db.rawQuery(statement, params)) {
+                    boolean gotRow = false;
+                    while (cursor.moveToNext()) {
+                        gotRow = true;
+                        if (!callbackHelper.onRow(cursor))
+                            break;
+                    }
+                    if (!gotRow) {
+                        callbackHelper.onNoRows();
+                    }
+                }
+            }
+            catch (Exception e) {
+                callbackHelper.onException(e);
+            }
+            finally {
+                callbackHelper.onDone();
+            }
         });
+
+        t.start();
+    }
+    /* MLDB.CallbackHelper -- Abstract class for asynchronous SQL query callbacks */
+    @SuppressWarnings("WeakerAccess")
+    abstract public static class CallbackHelper {
+        public void onStart() {}
     }
 }
 
