@@ -48,6 +48,8 @@ import org.jetbrains.annotations.NotNull;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
+// TODO: support transaction-level comment
+
 public class TransactionListFragment extends MobileLedgerListFragment {
     private MenuItem menuTransactionListFilter;
     private View vAccountFilter;
