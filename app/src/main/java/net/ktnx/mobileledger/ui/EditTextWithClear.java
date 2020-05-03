@@ -57,7 +57,7 @@ public final class EditTextWithClear extends androidx.appcompat.widget.AppCompat
         setCompoundDrawablesRelative(null, null, null, null);
     }
     private void showClearDrawable() {
-        setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_clear_black_24dp, 0);
+        setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_clear_accent_24dp, 0);
     }
     @Override
     protected void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {

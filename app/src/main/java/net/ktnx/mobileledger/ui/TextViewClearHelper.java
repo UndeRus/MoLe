@@ -98,7 +98,7 @@ public class TextViewClearHelper {
         view.setCompoundDrawablesRelative(null, null, null, null);
     }
     private void showClearDrawable() {
-        view.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_clear_black_24dp,
+        view.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_clear_accent_24dp,
                 0);
     }
     public boolean onTouchEvent(EditText view, MotionEvent event) {
