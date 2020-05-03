@@ -28,4 +28,10 @@ public final class Logger {
     public static void debug(String tag, String msg, Throwable e) {
         if (BuildConfig.DEBUG) Log.d(tag, msg, e);
     }
+    public static void warn(String tag, String msg) {
+        Log.w(tag, msg);
+    }
+    public static void warn(String tag, String msg, Throwable e) {
+        Log.w(tag, msg, e);
+    }
 }
