@@ -29,6 +29,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
+
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
@@ -244,6 +246,12 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 params.remove(1);
                 debug("descr", broaderSql);
                 debug("descr", description);
+
+                activity.runOnUiThread(() -> {
+                    Snackbar.make(recyclerView, R.string.ignoring_preferred_account,
+                            Snackbar.LENGTH_LONG)
+                            .show();
+                });
 
                 MLDB.queryInBackground(broaderSql, new String[]{description},
                         new MLDB.CallbackHelper() {

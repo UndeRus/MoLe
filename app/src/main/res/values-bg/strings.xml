@@ -144,5 +144,6 @@
     <string name="show_currency_input">Валута</string>
     <string name="currency_input_by_default">Показване по подразбиране на полето за валута</string>
     <string name="profile_default_commodity">Валута по подразбиране</string>
+    <string name="ignoring_preferred_account">Липсват трансакции с предпочитаната сметка</string>
 
 </resources>
