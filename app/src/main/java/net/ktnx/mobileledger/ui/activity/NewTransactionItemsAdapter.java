@@ -52,7 +52,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItemHolder>
         implements DescriptionSelectedCallback {
-    NewTransactionModel model;
+    private NewTransactionModel model;
     private MobileLedgerProfile mProfile;
     private ItemTouchHelper touchHelper;
     private RecyclerView recyclerView;
@@ -126,10 +126,10 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     public void setProfile(MobileLedgerProfile profile) {
         mProfile = profile;
     }
-    int addRow() {
+    private int addRow() {
         return addRow(null);
     }
-    int addRow(String commodity) {
+    private int addRow(String commodity) {
         final int newAccountCount = model.addAccount(new LedgerTransactionAccount("", commodity));
         Logger.debug("new-transaction",
                 String.format(Locale.US, "invoking notifyItemInserted(%d)", newAccountCount));
@@ -160,7 +160,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     public int getItemCount() {
         return model.getAccountCount() + 2;
     }
-    boolean accountListIsEmpty() {
+    private boolean accountListIsEmpty() {
         for (int i = 0; i < model.getAccountCount(); i++) {
             LedgerTransactionAccount acc = model.getAccount(i);
             if (!acc.getAccountName()
@@ -344,7 +344,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             // TODO perhaps do only one notification about the whole range (notifyDatasetChanged)?
         }
     }
-    public void reset() {
+    void reset() {
         int presentItemCount = model.getAccountCount();
         model.reset();
         notifyItemChanged(0);       // header changed
@@ -352,16 +352,16 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         if (presentItemCount > 2)
             notifyItemRangeRemoved(3, presentItemCount - 2); // all the rest are gone
     }
-    public void updateFocusedItem(int position) {
+    void updateFocusedItem(int position) {
         model.updateFocusedItem(position);
     }
-    public void noteFocusIsOnAccount(int position) {
+    void noteFocusIsOnAccount(int position) {
         model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Account);
     }
-    public void noteFocusIsOnAmount(int position) {
+    void noteFocusIsOnAmount(int position) {
         model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Amount);
     }
-    public void noteFocusIsOnComment(int position) {
+    void noteFocusIsOnComment(int position) {
         model.noteFocusChanged(position, NewTransactionModel.FocusedElement.Comment);
     }
     private void holdSubmittableChecks() {
