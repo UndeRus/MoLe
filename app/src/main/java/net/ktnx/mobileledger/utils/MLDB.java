@@ -226,6 +226,12 @@ public final class MLDB {
     @SuppressWarnings("WeakerAccess")
     abstract public static class CallbackHelper {
         public void onStart() {}
+        public abstract boolean onRow(@NonNull Cursor cursor);
+        public void onNoRows() {}
+        public void onException(Exception exception) {
+            Logger.debug("MLDB", "Exception in asynchronous SQL", exception);
+        }
+        public void onDone() {}
     }
 }
 
