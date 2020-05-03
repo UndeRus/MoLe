@@ -158,4 +158,5 @@
     <string name="currency_input_by_default">Commodity input visible by default</string>
     <string name="profile_default_commodity">Default commodity</string>
     <string name="ignoring_preferred_account">No transactions with preferred account found</string>
+    <string name="icon">icon</string>
 </resources>
