@@ -148,8 +148,10 @@ public final class Data {
             return;
         }
         MobileLedgerProfile pr = profile.getValue();
-        if (pr == null)
-            throw new IllegalStateException("No current profile");
+        if (pr == null) {
+            Logger.debug("ui", "Ignoring refresh -- no current profile");
+            return;
+        }
 
         retrieveTransactionsTask =
                 new RetrieveTransactionsTask(new WeakReference<>(activity), profile.getValue());
