@@ -1,5 +1,28 @@
 # Changes
 
+## [0.12.0] - 2020-05-03
+
+* NEW
+    + support for adding account-level comments for new transactions
+    + currency/commodity support in new transaction screen
+    + Profiles:
+        - Control of entry dates in the future
+    + support 1.14 and 1.15+ JSON API
+* IMPROVEMENTS
+    + Profiles:
+        - suggest suitable color for new profiles
+        - hide the preferred last transaction filter when no new transactions
+          are allowed
+    + avoid UI lockup while looking for a previous transaction with the chosen
+      description
+* FIXES
+    + restore ability to scroll the profile details screen
+    + remove profile-specific options from the database when removing a profile
+    + consistent item colors in the profile details
+    + fixed stuck refreshing indicator when main view is slid to the
+      transaction list while transactions are loading
+    + limit the number of launcher shortcuts to the maximum supported
+
 ## [0.11.0] - 2019-12-01
 
 * NEW
