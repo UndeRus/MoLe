@@ -37,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -184,6 +185,23 @@ public class MainActivity extends ProfileThemedActivity {
             drawer.addDrawerListener(barDrawerToggle);
         }
         barDrawerToggle.syncState();
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                if (slideOffset > 0.2)
+                    fabHide();
+            }
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                fabHide();
+            }
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                fabShouldShow();
+            }
+            @Override
+            public void onDrawerStateChanged(int newState) {}
+        });
 
 
         try {
@@ -364,18 +382,18 @@ public class MainActivity extends ProfileThemedActivity {
             // profiles not yet loaded from DB
             findViewById(R.id.loading_layout).setVisibility(View.VISIBLE);
             findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
-            findViewById(R.id.pager_layout).setVisibility(View.GONE);
+            findViewById(R.id.main_app_layout).setVisibility(View.GONE);
             return;
         }
 
         if (newList.isEmpty()) {
             findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
-            findViewById(R.id.pager_layout).setVisibility(View.GONE);
+            findViewById(R.id.main_app_layout).setVisibility(View.GONE);
             findViewById(R.id.loading_layout).setVisibility(View.GONE);
             return;
         }
 
-        findViewById(R.id.pager_layout).setVisibility(View.VISIBLE);
+        findViewById(R.id.main_app_layout).setVisibility(View.VISIBLE);
         findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
         findViewById(R.id.loading_layout).setVisibility(View.GONE);
 
