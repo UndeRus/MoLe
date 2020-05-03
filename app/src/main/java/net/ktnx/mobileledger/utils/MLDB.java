@@ -20,14 +20,14 @@ package net.ktnx.mobileledger.utils;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.provider.FontsContract;
 import android.widget.AutoCompleteTextView;
 import android.widget.FilterQueryProvider;
 import android.widget.SimpleCursorAdapter;
+
+import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.DbOpQueue;
@@ -36,8 +36,6 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import org.jetbrains.annotations.NonNls;
-
-import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -157,46 +155,34 @@ public final class MLDB {
 
             String str = constraint.toString().toUpperCase();
             debug("autocompletion", "Looking for " + str);
-            String[] col_names = {FontsContract.Columns._ID, field};
-            MatrixCursor c = new MatrixCursor(col_names);
 
             String sql;
             String[] params;
             if (profileSpecific) {
                 MobileLedgerProfile p = (profile == null) ? Data.profile.getValue() : profile;
                 if (p == null) throw new AssertionError();
-                sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                                    "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                                    "WHEN %s_upper LIKE '%% '||?||'%%' then 3 else 9 end " +
-                                    "FROM %s " +
-                                    "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
-                                    "ORDER BY 2, 1;", field, field, field, field, table, field);
+                sql = String.format(
+                        "SELECT rowid as _id, %s, CASE WHEN %s_upper LIKE ?||'%%' THEN 1 " +
+                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
+                        "WHEN %s_upper LIKE '%% '||?||'%%' THEN 3 " + "ELSE 9 END " + "FROM %s " +
+                        "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
+                        "ORDER BY 3, %s_upper, 1;", field, field, field, field, table, field,
+                        field);
                 params = new String[]{str, str, str, p.getUuid(), str};
             }
             else {
-                sql = String.format("SELECT %s as a, case when %s_upper LIKE ?||'%%' then 1 " +
-                                    "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                                    "WHEN %s_upper LIKE '%% '||?||'%%' then 3 " + "else 9 end " +
-                                    "FROM %s " + "WHERE %s_upper LIKE '%%'||?||'%%' " +
-                                    "ORDER BY 2, 1;", field, field, field, field, table, field);
+                sql = String.format(
+                        "SELECT rowid as _id, %s, CASE WHEN %s_upper LIKE ?||'%%' THEN 1 " +
+                        "WHEN %s_upper LIKE '%%:'||?||'%%' THEN 2 " +
+                        "WHEN %s_upper LIKE '%% '||?||'%%' THEN 3 " + "ELSE 9 END " + "FROM %s " +
+                        "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 3, %s_upper, 1;", field,
+                        field, field, field, table, field, field);
                 params = new String[]{str, str, str, str};
             }
             debug("autocompletion", sql);
             SQLiteDatabase db = App.getDatabase();
 
-            try (Cursor matches = db.rawQuery(sql, params)) {
-                int i = 0;
-                while (matches.moveToNext()) {
-                    String match = matches.getString(0);
-                    int order = matches.getInt(1);
-                    debug("autocompletion",
-                            String.format(Locale.ENGLISH, "match: %s |%d", match, order));
-                    c.newRow().add(i++).add(match);
-                }
-            }
-
-            return c;
-
+            return db.rawQuery(sql, params);
         };
 
         adapter.setFilterQueryProvider(provider);
