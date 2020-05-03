@@ -73,19 +73,21 @@ public final class MLDB {
             @Override
             protected String doInBackground(Void... params) {
                 SQLiteDatabase db = App.getDatabase();
-                try (Cursor cursor = db
-                        .rawQuery("select value from options where profile = ? and name=?",
-                                new String[]{NO_PROFILE, name}))
+                try (Cursor cursor = db.rawQuery(
+                        "select value from options where profile=? and name=?",
+                        new String[]{NO_PROFILE, name}))
                 {
                     if (cursor.moveToFirst()) {
                         String result = cursor.getString(0);
 
-                        if (result == null) result = defaultValue;
+                        if (result == null)
+                            result = defaultValue;
 
                         debug("async-db", "option " + name + "=" + result);
                         return result;
                     }
-                    else return defaultValue;
+                    else
+                        return defaultValue;
                 }
                 catch (Exception e) {
                     debug("db", "returning default value for " + name, e);
@@ -103,18 +105,20 @@ public final class MLDB {
     static public String getOption(String name, String default_value) {
         debug("db", "about to fetch option " + name);
         SQLiteDatabase db = App.getDatabase();
-        try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
+        try (Cursor cursor = db.rawQuery("select value from options where profile=? and name=?",
                 new String[]{NO_PROFILE, name}))
         {
             if (cursor.moveToFirst()) {
                 String result = cursor.getString(0);
 
-                if (result == null) result = default_value;
+                if (result == null)
+                    result = default_value;
 
                 debug("db", "option " + name + "=" + result);
                 return result;
             }
-            else return default_value;
+            else
+                return default_value;
         }
         catch (Exception e) {
             debug("db", "returning default value for " + name, e);
@@ -151,16 +155,19 @@ public final class MLDB {
         adapter.setStringConversionColumn(1);
 
         FilterQueryProvider provider = constraint -> {
-            if (constraint == null) return null;
+            if (constraint == null)
+                return null;
 
-            String str = constraint.toString().toUpperCase();
+            String str = constraint.toString()
+                                   .toUpperCase();
             debug("autocompletion", "Looking for " + str);
 
             String sql;
             String[] params;
             if (profileSpecific) {
                 MobileLedgerProfile p = (profile == null) ? Data.profile.getValue() : profile;
-                if (p == null) throw new AssertionError();
+                if (p == null)
+                    throw new AssertionError();
                 sql = String.format(
                         "SELECT rowid as _id, %s, CASE WHEN %s_upper LIKE ?||'%%' THEN 1 " +
                         "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
@@ -189,8 +196,10 @@ public final class MLDB {
 
         view.setAdapter(adapter);
 
-        if (callback != null) view.setOnItemClickListener((parent, itemView, position, id) -> {
-            callback.descriptionSelected(String.valueOf(view.getText()));
+        if (callback != null)
+            view.setOnItemClickListener(
+                    (parent, itemView, position, id) -> callback.descriptionSelected(
+                            String.valueOf(view.getText())));
     }
     public static void queryInBackground(@NonNull String statement, @NonNull String[] params,
                                          @NonNull CallbackHelper callbackHelper) {
