@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +57,11 @@ public class NewTransactionModel extends ViewModel {
     private boolean observingDataProfile;
     private Observer<MobileLedgerProfile> profileObserver =
             profile -> showCurrency.postValue(profile.getShowCommodityByDefault());
+    private final AtomicInteger busyCounter = new AtomicInteger(0);
+    private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
+    void observeBusyFlag(LifecycleOwner owner, Observer<? super Boolean> observer) {
+        busyFlag.observe(owner, observer);
+    }
     void observeDataProfile(LifecycleOwner activity) {
         if (!observingDataProfile)
             Data.profile.observe(activity, profileObserver);
@@ -186,6 +192,17 @@ public class NewTransactionModel extends ViewModel {
     }
     void toggleCurrencyVisible() {
         showCurrency.setValue(!showCurrency.getValue());
+    }
+    void stopObservingBusyFlag(Observer<Boolean> observer) {
+        busyFlag.removeObserver(observer);
+    }
+    void incrementBusyCounter() {
+        int newValue = busyCounter.incrementAndGet();
+        if (newValue == 1) busyFlag.postValue(true);
+    }
+    void decrementBusyCounter() {
+        int newValue = busyCounter.decrementAndGet();
+        if (newValue == 0) busyFlag.postValue(false);
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
