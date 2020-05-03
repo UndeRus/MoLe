@@ -36,7 +36,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
@@ -50,6 +49,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
@@ -597,8 +597,8 @@ public class MainActivity extends ProfileThemedActivity {
             TransactionListViewModel.scheduleTransactionListReload();
         }
         else
-            Toast.makeText(this, error, Toast.LENGTH_LONG)
-                 .show();
+            Snackbar.make(mViewPager, error, Snackbar.LENGTH_LONG)
+                    .show();
     }
     public void onRetrieveStart() {
         ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);

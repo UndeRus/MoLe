@@ -28,12 +28,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
@@ -138,8 +139,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
             if (err == null)
                 return;
 
-            Toast.makeText(mActivity, err, Toast.LENGTH_SHORT)
-                 .show();
+            Snackbar.make(this.root, err, Snackbar.LENGTH_LONG)
+                    .show();
             TransactionListViewModel.updateError.set(null);
         });
         Data.transactions.addObserver(
