@@ -109,60 +109,9 @@ public class Colors {
         // trigger theme observers
         themeWatch.postValue(themeWatch.getValue() + 1);
     }
-    public static @ColorLong
-    long hsvaColor(float hue, float saturation, float value, float alpha) {
-        if (alpha < 0 || alpha > 1)
-            throw new IllegalArgumentException("alpha must be between 0 and 1");
-
-        @ColorLong long rgb = hsvTriplet(hue, saturation, value);
-
-        long a_bits = Math.round(255 * alpha);
-        return (a_bits << 24) | rgb;
-    }
-    public static @ColorInt
-    int hsvColor(float hue, float saturation, float value) {
-        return 0xff000000 | hsvTriplet(hue, saturation, value);
-    }
     public static @ColorInt
     int hslColor(float hueRatio, float saturation, float lightness) {
         return 0xff000000 | hslTriplet(hueRatio, saturation, lightness);
-    }
-    public static @ColorInt
-    int hsvTriplet(float hue, float saturation, float value) {
-        @ColorLong long result;
-        int r, g, b;
-
-        if ((hue < -0.00005) || (hue > 1.0000005) || (saturation < 0) || (saturation > 1) ||
-            (value < 0) || (value > 1))
-            throw new IllegalArgumentException(String.format(
-                    "hue, saturation, value and alpha must all be between 0 and 1. Arguments " +
-                    "given: " + "hue=%1.5f, sat=%1.5f, val=%1.5f", hue, saturation, value));
-
-        int h = (int) (hue * 6);
-        float f = hue * 6 - h;
-        float p = value * (1 - saturation);
-        float q = value * (1 - f * saturation);
-        float t = value * (1 - (1 - f) * saturation);
-
-        switch (h) {
-            case 0:
-            case 6:
-                return tupleToColor(value, t, p);
-            case 1:
-                return tupleToColor(q, value, p);
-            case 2:
-                return tupleToColor(p, value, t);
-            case 3:
-                return tupleToColor(p, q, value);
-            case 4:
-                return tupleToColor(t, p, value);
-            case 5:
-                return tupleToColor(value, p, q);
-            default:
-                throw new RuntimeException(String.format("Unexpected value for h (%d) while " +
-                                                         "converting hsv(%1.2f, %1.2f, %1.2f) to " +
-                                                         "rgb", h, hue, saturation, value));
-        }
     }
     public static @ColorInt
     int hslTriplet(float hueRatio, float saturation, float lightness) {
