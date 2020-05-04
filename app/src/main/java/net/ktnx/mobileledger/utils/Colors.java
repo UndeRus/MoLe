@@ -27,6 +27,7 @@ import androidx.annotation.ColorLong;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -42,6 +43,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
     public static final int THEME_HUE_STEP_DEG = 5;
+    public static final int baseHueStep = 60;
     private static final float blueLightness = 0.665f;
     private static final float yellowLightness = 0.350f;
     private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
@@ -140,7 +142,6 @@ public class Colors {
                 "Unexpected value for h (%1.3f) while converting hsl(%1.3f, %1.3f, %1.3f) to rgb",
                 h, hueRatio, saturation, lightness));
     }
-
     public static @ColorInt
     int tupleToColor(float r, float g, float b) {
         int r_int = Math.round(255 * r);
@@ -148,15 +149,39 @@ public class Colors {
         int b_int = Math.round(255 * b);
         return (r_int << 16) | (g_int << 8) | b_int;
     }
+    public static float baseHueLightness(int baseHueDegrees) {
+        switch (baseHueDegrees % 360) {
+            case 0:
+                return 0.450f;   // red
+            case 60:
+                return 0.400f;  // yellow
+            case 120:
+                return 0.400f;  // green
+            case 180:
+                return 0.400f;  // cyan
+            case 240:
+                return 0.750f;  // blue
+            case 300:
+                return 0.500f;   // magenta
+            default:
+                throw new IllegalStateException(
+                        String.format(Locale.US, "baseHueLightness called with invalid value %d",
+                                baseHueDegrees));
+        }
+    }
+    public static float hueLightness(int hueDegrees) {
+        int mod = hueDegrees % baseHueStep;
+        int x0 = hueDegrees - mod;
+        int x1 = x0 + baseHueStep;
+
+        float y0 = baseHueLightness(x0);
+        float y1 = baseHueLightness(x1);
+
+        return y0 + (hueDegrees - x0) * (y1 - y0) / (x1 - x0);
+    }
     public static @ColorInt
     int getPrimaryColorForHue(int hueDegrees) {
-//        int result = hsvColor(hueDegrees, 0.61f, 0.95f);
-        float y = hueDegrees - 60;
-        if (y < 0)
-            y += 360;
-        float l = yellowLightness + (blueLightness - yellowLightness) *
-                                    (float) Math.cos(Math.toRadians(Math.abs(180 - y) / 2f));
-        int result = hslColor(hueDegrees / 360f, 0.845f, l);
+        int result = hslColor(hueDegrees / 360f, 0.845f, hueLightness(hueDegrees));
         debug("colors", String.format(Locale.ENGLISH, "getPrimaryColorForHue(%d) = %x", hueDegrees,
                 result));
         return result;
@@ -169,7 +194,7 @@ public class Colors {
         final int themeHue = (profile == null) ? -1 : profile.getThemeHue();
         setupTheme(activity, themeHue);
     }
-    public static void setupTheme(Activity activity, int themeHue) {
+    public static int getThemeIdForHue(int themeHue) {
         int themeId = -1;
         if (themeHue == 360)
             themeHue = 0;
@@ -187,14 +212,17 @@ public class Colors {
         }
 
         if (themeId < 0) {
-            activity.setTheme(R.style.AppTheme_NoActionBar);
+            themeId = R.style.AppTheme_NoActionBar;
             debug("profiles",
                     String.format(Locale.ENGLISH, "Theme hue %d not supported, using the default",
                             themeHue));
         }
-        else {
-            activity.setTheme(themeId);
-        }
+
+        return themeId;
+    }
+    public static void setupTheme(Activity activity, int themeHue) {
+        int themeId = getThemeIdForHue(themeHue);
+        activity.setTheme(themeId);
 
         refreshColors(activity.getTheme());
     }
@@ -238,6 +266,15 @@ public class Colors {
                 hues.add(hue);
             }
             Collections.sort(hues);
+            if (BuildConfig.DEBUG) {
+                StringBuilder huesSB = new StringBuilder();
+                for (int h : hues) {
+                    if (huesSB.length() > 0)
+                        huesSB.append(", ");
+                    huesSB.append(String.valueOf(h));
+                }
+                debug("profiles", String.format("used hues: %s", huesSB.toString()));
+            }
             hues.add(hues.get(0));
 
             int lastHue = -1;
@@ -271,6 +308,10 @@ public class Colors {
             final int chosenIndex = (int) (Math.random() * largestIntervalStarts.size());
             int chosenIntervalStart = largestIntervalStarts.get(chosenIndex);
 
+            debug("profiles",
+                    String.format(Locale.US, "Choosing the middle colour between %d and %d",
+                            chosenIntervalStart, chosenIntervalStart + largestInterval));
+
             if (largestInterval % 2 != 0)
                 largestInterval++;    // round up the middle point
 
@@ -284,6 +325,8 @@ public class Colors {
             else
                 chosenHue -= mod;       // 12 -= 2 = 10
         }
+
+        debug("profiles", String.format(Locale.US, "New profile hue: %d", chosenHue));
 
         return chosenHue;
     }
