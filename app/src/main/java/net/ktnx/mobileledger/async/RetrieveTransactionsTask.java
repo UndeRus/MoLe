@@ -68,7 +68,7 @@ public class RetrieveTransactionsTask
     private static final Pattern reTransactionDescription =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
     private static final Pattern reTransactionDetails =
-            Pattern.compile("^\\s+(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
+            Pattern.compile("^\\s+([!*]\\s+)?(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
     private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
     private static final Pattern reDecimalPoint = Pattern.compile("\\.\\d\\d?$");
     private static final Pattern reDecimalComma = Pattern.compile(",\\d\\d?$");
@@ -365,9 +365,10 @@ public class RetrieveTransactionsTask
                             else {
                                 m = reTransactionDetails.matcher(line);
                                 if (m.find()) {
-                                    String acc_name = m.group(1);
-                                    String amount = m.group(2);
-                                    String currency = m.group(3);
+                                    String postingStatus = m.group(1);
+                                    String acc_name = m.group(2);
+                                    String amount = m.group(3);
+                                    String currency = m.group(4);
                                     if (currency == null) currency = "";
                                     amount = amount.replace(',', '.');
                                     transaction.addAccount(new LedgerTransactionAccount(acc_name,
