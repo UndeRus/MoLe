@@ -1,0 +1,16 @@
+Change log: <https://mole.ktnx.net/#index6h1>
+
+* NEW
+    + account-level comments and currency/commodity support for new transactions
+    + controllable entry dates in the future
+    + support 1.14 and 1.15+ JSON API
+* IMPROVEMENTS
+    + darker yellow, green and cyan theme colours
+    + suggest distinct color for new profiles
+    + improved profile editor interface
+    + avoid UI lockup while looking for a previous transaction with the chosen description
+* FIXES
+    + restore ability to scroll the profile details screen
+    + remove profile-specific options from the database when removing a profile
+    + fixed stuck refreshing indicator when main view is slid to the transaction list while transactions are loading
+    + limit the number of launcher shortcuts to the maximum supported
