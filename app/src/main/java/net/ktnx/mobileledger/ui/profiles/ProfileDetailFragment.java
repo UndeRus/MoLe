@@ -321,12 +321,14 @@ public class ProfileDetailFragment extends Fragment {
         useAuthentication = context.findViewById(R.id.enable_http_auth);
         useAuthentication.setOnCheckedChangeListener((buttonView, isChecked) -> {
             model.setUseAuthentication(isChecked);
-            authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             if (isChecked)
                 userName.requestFocus();
+        });
+        model.observeUseAuthentication(viewLifecycleOwner, isChecked -> {
+            useAuthentication.setChecked(isChecked);
+            authParams.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             checkInsecureSchemeWithAuth();
         });
-        model.observeUseAuthentication(viewLifecycleOwner, useAuthentication::setChecked);
 
         userName = context.findViewById(R.id.auth_user_name);
         model.observeUserName(viewLifecycleOwner, text -> {
