@@ -652,7 +652,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void fabShouldShow() {
-        if ((profile != null) && profile.isPostingPermitted())
+        if ((profile != null) && profile.isPostingPermitted() && !drawer.isOpen())
             fab.show();
     }
     public void fabHide() {
