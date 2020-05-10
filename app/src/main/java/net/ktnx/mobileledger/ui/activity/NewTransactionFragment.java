@@ -75,20 +75,30 @@ public class NewTransactionFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        final FragmentActivity activity = getActivity();
+
         inflater.inflate(R.menu.new_transaction_fragment, menu);
         menu.findItem(R.id.action_reset_new_transaction_activity)
             .setOnMenuItemClickListener(item -> {
                 listAdapter.reset();
                 return true;
             });
+
         final MenuItem toggleCurrencyItem = menu.findItem(R.id.toggle_currency);
         toggleCurrencyItem.setOnMenuItemClickListener(item -> {
             viewModel.toggleCurrencyVisible();
             return true;
         });
-        final FragmentActivity activity = getActivity();
         if (activity != null)
             viewModel.showCurrency.observe(activity, toggleCurrencyItem::setChecked);
+
+        final MenuItem toggleCommentsItem = menu.findItem(R.id.toggle_comments);
+        toggleCommentsItem.setOnMenuItemClickListener(item -> {
+            viewModel.toggleShowComments();
+            return true;
+        });
+        if (activity != null)
+            viewModel.showComments.observe(activity, toggleCommentsItem::setChecked);
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

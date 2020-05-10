@@ -25,6 +25,12 @@
         android:checked="false"
         app:showAsAction="never" />
     <item
+        android:id="@+id/toggle_comments"
+        android:checkable="true"
+        android:title="@string/show_comments_switch"
+        app:actionLayout="@layout/switch_item"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_reset_new_transaction_activity"
         android:icon="@drawable/ic_refresh_white_24dp"
         android:title="@string/action_reset_new_transaction_activity_title"

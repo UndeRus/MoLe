@@ -53,8 +53,6 @@ import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.text.DecimalFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,6 +66,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private final String decimalSeparator;
     private final String decimalDot;
     private final TextView tvCurrency;
+    private final Observer<Boolean> showCommentsObserver;
+    private final TextView tvTransactionComment;
     private NewTransactionModel.Item item;
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
@@ -99,6 +99,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         super(itemView);
         tvAccount = itemView.findViewById(R.id.account_row_acc_name);
         tvComment = itemView.findViewById(R.id.comment);
+        tvTransactionComment = itemView.findViewById(R.id.transaction_comment);
         new TextViewClearHelper().attachToTextView((EditText) tvComment);
         commentButton = itemView.findViewById(R.id.comment_button);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
@@ -108,7 +109,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         lHead = itemView.findViewById(R.id.ntr_data);
         lAccount = itemView.findViewById(R.id.ntr_account);
         lPadding = itemView.findViewById(R.id.ntr_padding);
-        View commentLayout = itemView.findViewById(R.id.comment_layout);
+        final View commentLayout = itemView.findViewById(R.id.comment_layout);
+        final View transactionCommentLayout =
+                itemView.findViewById(R.id.transaction_comment_layout);
 
         tvDescription.setNextFocusForwardId(View.NO_ID);
         tvAccount.setNextFocusForwardId(View.NO_ID);
@@ -116,10 +119,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         tvDate.setOnClickListener(v -> pickTransactionDate());
 
-        itemView.findViewById(R.id.comment_button)
+        commentButton.setOnClickListener(v -> {
+            tvComment.setVisibility(View.VISIBLE);
+            tvComment.requestFocus();
+        });
+
+        itemView.findViewById(R.id.transaction_comment_button)
                 .setOnClickListener(v -> {
-                    tvComment.setVisibility(View.VISIBLE);
-                    tvComment.requestFocus();
+                    tvTransactionComment.setVisibility(View.VISIBLE);
+                    tvTransactionComment.requestFocus();
                 });
 
         mProfile = Data.profile.getValue();
@@ -152,15 +160,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
 
             if (id == R.id.comment) {
-                commentLayout.setAlpha(hasFocus ? 1f : 0.5f);
-                tvComment.setTypeface(null, hasFocus ? Typeface.NORMAL : Typeface.ITALIC);
-                if (hasFocus)
-                    tvComment.setHint(R.string.transaction_account_comment_hint);
-                else
-                    tvComment.setHint("");
-
-                if (!hasFocus && Misc.isEmptyOrNull(tvComment.getText()))
-                    tvComment.setVisibility(View.INVISIBLE);
+                commentFocusChanged(commentLayout, tvComment, hasFocus);
+            }
+            else if ( id == R.id.transaction_comment) {
+                commentFocusChanged(transactionCommentLayout, tvTransactionComment, hasFocus);
             }
         };
 
@@ -387,6 +390,49 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     ((focusedView != tvComment) && Misc.isEmptyOrNull(comment)) ? View.INVISIBLE
                                                                                 : View.VISIBLE);
         };
+
+        showCommentsObserver = show -> {
+            final View amountLayout = itemView.findViewById(R.id.amount_layout);
+            ConstraintLayout.LayoutParams amountLayoutParams =
+                    (ConstraintLayout.LayoutParams) amountLayout.getLayoutParams();
+            ConstraintLayout.LayoutParams accountParams =
+                    (ConstraintLayout.LayoutParams) tvAccount.getLayoutParams();
+            if (show) {
+                commentLayout.setVisibility(View.VISIBLE);
+
+                accountParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+                accountParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
+
+                amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
+                amountLayoutParams.topToBottom = tvAccount.getId();
+            }
+            else {
+                commentLayout.setVisibility(View.GONE);
+
+                accountParams.endToStart = amountLayout.getId();
+                accountParams.endToEnd = ConstraintLayout.LayoutParams.UNSET;
+
+                amountLayoutParams.topToBottom = ConstraintLayout.LayoutParams.UNSET;
+                amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+
+            }
+
+            tvAccount.setLayoutParams(accountParams);
+            amountLayout.setLayoutParams(amountLayoutParams);
+
+            transactionCommentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+        };
+    }
+    private void commentFocusChanged(View layout, TextView textView, boolean hasFocus) {
+        layout.setAlpha(hasFocus ? 1f : 0.5f);
+        textView.setTypeface(null, hasFocus ? Typeface.NORMAL : Typeface.ITALIC);
+        if (hasFocus)
+            textView.setHint(R.string.transaction_account_comment_hint);
+        else
+            textView.setHint("");
+
+        if (!hasFocus && Misc.isEmptyOrNull(textView.getText()))
+            textView.setVisibility(View.INVISIBLE);
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
         ConstraintLayout.LayoutParams amountLP =
@@ -451,27 +497,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvDescription.setEnabled(editable);
         tvAccount.setEnabled(editable);
         tvAmount.setEnabled(editable);
-    }
-    private void setCommentVisible(@NotNull Boolean visible) {
-        if (visible) {
-            // showing; show the comment view and align the comment button to it
-            tvComment.setVisibility(View.VISIBLE);
-            tvComment.requestFocus();
-            ConstraintLayout.LayoutParams lp =
-                    (ConstraintLayout.LayoutParams) commentButton.getLayoutParams();
-            lp.bottomToBottom = R.id.comment;
-
-            commentButton.setLayoutParams(lp);
-        }
-        else {
-            // hiding; hide the comment view and align the comment bottom to the amount
-            tvComment.setVisibility(View.GONE);
-            ConstraintLayout.LayoutParams lp =
-                    (ConstraintLayout.LayoutParams) commentButton.getLayoutParams();
-            lp.bottomToBottom = R.id.amount_layout;   // R.id.parent doesn't work here
-
-            commentButton.setLayoutParams(lp);
-        }
     }
     private void beginUpdates() {
         if (inUpdate)
@@ -583,6 +608,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 this.item.stopObservingCurrency(currencyObserver);
                 this.item.getModel().showCurrency.removeObserver(showCurrencyObserver);
                 this.item.stopObservingComment(commentObserver);
+                this.item.getModel().showComments.removeObserver(showCommentsObserver);
 
                 this.item = null;
             }
@@ -630,6 +656,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     item.observeEditableFlag(activity, editableObserver);
                     item.getModel()
                         .observeFocusedItem(activity, focusedAccountObserver);
+                    item.getModel()
+                        .observeShowComments(activity, showCommentsObserver);
                 }
                 switch (item.getType()) {
                     case generalData:
