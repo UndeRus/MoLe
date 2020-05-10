@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -159,6 +160,21 @@ public class NewTransactionFragment extends Fragment {
         else {
             viewModel.setFocusedItem(focused);
         }
+
+        ProgressBar p = activity.findViewById(R.id.progressBar);
+        viewModel.observeBusyFlag(getViewLifecycleOwner(), isBusy -> {
+            if (isBusy) {
+//                Handler h = new Handler();
+//                h.postDelayed(() -> {
+//                    if (viewModel.getBusyFlag())
+//                        p.setVisibility(View.VISIBLE);
+//
+//                }, 10);
+                        p.setVisibility(View.VISIBLE);
+            }
+            else
+                p.setVisibility(View.INVISIBLE);
+        });
     }
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

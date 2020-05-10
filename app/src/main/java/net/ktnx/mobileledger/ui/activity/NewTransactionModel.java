@@ -59,7 +59,7 @@ public class NewTransactionModel extends ViewModel {
             profile -> showCurrency.postValue(profile.getShowCommodityByDefault());
     private final AtomicInteger busyCounter = new AtomicInteger(0);
     private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
-    void observeBusyFlag(LifecycleOwner owner, Observer<? super Boolean> observer) {
+    void observeBusyFlag(@NonNull LifecycleOwner owner, Observer<? super Boolean> observer) {
         busyFlag.observe(owner, observer);
     }
     void observeDataProfile(LifecycleOwner activity) {
@@ -203,6 +203,9 @@ public class NewTransactionModel extends ViewModel {
     void decrementBusyCounter() {
         int newValue = busyCounter.decrementAndGet();
         if (newValue == 0) busyFlag.postValue(false);
+    }
+    public boolean getBusyFlag() {
+        return busyFlag.getValue();
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 

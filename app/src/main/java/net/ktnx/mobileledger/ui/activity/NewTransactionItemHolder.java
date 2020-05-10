@@ -30,7 +30,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -92,7 +91,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Currency> currencyObserver;
     private Observer<Boolean> showCurrencyObserver;
     private Observer<String> commentObserver;
-    private Observer<Boolean> busyFlagObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
@@ -111,7 +109,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         lAccount = itemView.findViewById(R.id.ntr_account);
         lPadding = itemView.findViewById(R.id.ntr_padding);
         View commentLayout = itemView.findViewById(R.id.comment_layout);
-        ProgressBar p = itemView.findViewById(R.id.progressBar);
 
         tvDescription.setNextFocusForwardId(View.NO_ID);
         tvAccount.setNextFocusForwardId(View.NO_ID);
@@ -390,8 +387,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     ((focusedView != tvComment) && Misc.isEmptyOrNull(comment)) ? View.INVISIBLE
                                                                                 : View.VISIBLE);
         };
-
-        busyFlagObserver = isBusy -> {p.setVisibility(isBusy ? View.VISIBLE : View.INVISIBLE);};
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
         ConstraintLayout.LayoutParams amountLP =
@@ -588,7 +583,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 this.item.stopObservingCurrency(currencyObserver);
                 this.item.getModel().showCurrency.removeObserver(showCurrencyObserver);
                 this.item.stopObservingComment(commentObserver);
-                this.item.getModel().stopObservingBusyFlag(busyFlagObserver);
 
                 this.item = null;
             }
@@ -641,7 +635,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     case generalData:
                         item.observeDate(activity, dateObserver);
                         item.observeDescription(activity, descriptionObserver);
-                        item.getModel().observeBusyFlag(activity, busyFlagObserver);
                         break;
                     case transactionRow:
                         item.observeAmountHint(activity, hintObserver);
