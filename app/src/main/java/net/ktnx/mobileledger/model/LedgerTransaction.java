@@ -180,9 +180,9 @@ public class LedgerTransaction {
                 }
                 description = cTr.getString(1);
 
-                try (Cursor cAcc = db.rawQuery("SELECT account_name, amount, currency, comment FROM " +
-                                               "transaction_accounts WHERE " +
-                                               "profile=? AND transaction_id = ?",
+                try (Cursor cAcc = db.rawQuery(
+                        "SELECT account_name, amount, currency, comment FROM " +
+                        "transaction_accounts WHERE profile=? AND transaction_id = ?",
                         new String[]{profile, String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {

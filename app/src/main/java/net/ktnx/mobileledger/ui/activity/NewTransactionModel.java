@@ -49,17 +49,17 @@ public class NewTransactionModel extends ViewModel {
     final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     final ArrayList<Item> items = new ArrayList<>();
     final MutableLiveData<Boolean> isSubmittable = new MutableLiveData<>(false);
+    final MutableLiveData<Boolean> showComments = new MutableLiveData<>(true);
     private final Item header = new Item(this, null, "");
     private final Item trailer = new Item(this);
     private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
+    private final AtomicInteger busyCounter = new AtomicInteger(0);
+    private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
     private boolean observingDataProfile;
     private Observer<MobileLedgerProfile> profileObserver =
             profile -> showCurrency.postValue(profile.getShowCommodityByDefault());
-    private final AtomicInteger busyCounter = new AtomicInteger(0);
-    private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
-    final MutableLiveData<Boolean> showComments = new MutableLiveData<>(false);
     void observeShowComments(LifecycleOwner owner, Observer<? super Boolean> observer) {
         showComments.observe(owner, observer);
     }
@@ -206,11 +206,13 @@ public class NewTransactionModel extends ViewModel {
     }
     void incrementBusyCounter() {
         int newValue = busyCounter.incrementAndGet();
-        if (newValue == 1) busyFlag.postValue(true);
+        if (newValue == 1)
+            busyFlag.postValue(true);
     }
     void decrementBusyCounter() {
         int newValue = busyCounter.decrementAndGet();
-        if (newValue == 0) busyFlag.postValue(false);
+        if (newValue == 0)
+            busyFlag.postValue(false);
     }
     public boolean getBusyFlag() {
         return busyFlag.getValue();

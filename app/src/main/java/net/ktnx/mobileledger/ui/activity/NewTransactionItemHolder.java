@@ -169,7 +169,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             if (id == R.id.comment) {
                 commentFocusChanged(commentLayout, tvComment, hasFocus);
             }
-            else if ( id == R.id.transaction_comment) {
+            else if (id == R.id.transaction_comment) {
                 commentFocusChanged(transactionCommentLayout, tvTransactionComment, hasFocus);
             }
         };
