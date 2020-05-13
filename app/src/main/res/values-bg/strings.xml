@@ -146,4 +146,6 @@
     <string name="profile_default_commodity">Валута по подразбиране</string>
     <string name="ignoring_preferred_account">Липсват трансакции с предпочитаната сметка</string>
     <string name="show_comments_switch">Коментари</string>
+    <string name="show_comment_input_by_default">Показване по подразбиране на полетата за бележки</string>
+    <string name="icon">икона</string>
 </resources>
