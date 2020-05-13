@@ -46,7 +46,7 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
     }
     public static ParsedLedgerTransaction fromLedgerTransaction(LedgerTransaction tr) {
         ParsedLedgerTransaction result = new ParsedLedgerTransaction();
-        result.setTcomment("");
+        result.setTcomment(tr.getComment());
         result.setTprecedingcomment("");
 
         ArrayList<ParsedPosting> postings = new ArrayList<>();

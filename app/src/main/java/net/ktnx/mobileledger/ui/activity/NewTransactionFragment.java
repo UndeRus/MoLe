@@ -201,6 +201,7 @@ public class NewTransactionFragment extends Fragment {
             LedgerTransaction tr =
                     new LedgerTransaction(null, date, viewModel.getDescription(), mProfile);
 
+            tr.setComment(viewModel.getComment());
             LedgerTransactionAccount emptyAmountAccount = null;
             float emptyAmountAccountBalance = 0;
             for (int i = 0; i < viewModel.getAccountCount(); i++) {
