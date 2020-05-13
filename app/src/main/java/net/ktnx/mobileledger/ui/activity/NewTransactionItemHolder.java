@@ -81,6 +81,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Date date;
     private Observer<Date> dateObserver;
     private Observer<String> descriptionObserver;
+    private Observer<String> transactionCommentObserver;
     private Observer<String> hintObserver;
     private Observer<Integer> focusedAccountObserver;
     private Observer<Integer> accountCountObserver;
@@ -152,6 +153,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         case R.id.comment:
                             adapter.noteFocusIsOnComment(pos);
                             break;
+                        case R.id.transaction_comment:
+                            adapter.noteFocusIsOnTransactionComment(pos);
+                            break;
+                        case R.id.new_transaction_description:
+                            adapter.noteFocusIsOnDescription(pos);
+                            break;
                     }
                 }
                 finally {
@@ -171,6 +178,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvAccount.setOnFocusChangeListener(focusMonitor);
         tvAmount.setOnFocusChangeListener(focusMonitor);
         tvComment.setOnFocusChangeListener(focusMonitor);
+        tvTransactionComment.setOnFocusChangeListener(focusMonitor);
 
         MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
@@ -235,6 +243,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         tvDescription.addTextChangedListener(tw);
+        tvTransactionComment.addTextChangedListener(tw);
         tvAccount.addTextChangedListener(tw);
         tvComment.addTextChangedListener(tw);
         tvAmount.addTextChangedListener(amountWatcher);
@@ -276,6 +285,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 syncingData = false;
             }
         };
+        transactionCommentObserver = transactionComment -> {
+            final View focusedView = tvTransactionComment.findFocus();
+            tvTransactionComment.setTypeface(null,
+                    (focusedView == tvTransactionComment) ? Typeface.NORMAL : Typeface.ITALIC);
+            tvTransactionComment.setVisibility(((focusedView != tvTransactionComment) &&
+                                                Misc.isEmptyOrNull(transactionComment))
+                                               ? View.INVISIBLE : View.VISIBLE);
+
+        };
         hintObserver = hint -> {
             if (syncingData)
                 return;
@@ -292,41 +310,47 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         };
         editableObserver = this::setEditable;
         focusedAccountObserver = index -> {
-            if ((index != null) && index.equals(getAdapterPosition())) {
-                switch (item.getType()) {
-                    case generalData:
-                        // bad idea - double pop-up, and not really necessary.
-                        // the user can tap the input to get the calendar
-                        //if (!tvDate.hasFocus()) tvDate.requestFocus();
-                        boolean focused = tvDescription.requestFocus();
-                        tvDescription.dismissDropDown();
-                        if (focused)
-                            Misc.showSoftKeyboard(
-                                    (NewTransactionActivity) tvDescription.getContext());
-                        break;
-                    case transactionRow:
-                        // do nothing if a row element already has the focus
-                        if (!itemView.hasFocus()) {
-                            switch (item.getFocusedElement()) {
-                                case Amount:
-                                    tvAmount.requestFocus();
-                                    break;
-                                case Comment:
-                                    tvComment.setVisibility(View.VISIBLE);
-                                    tvComment.requestFocus();
-                                    break;
-                                case Account:
-                                    focused = tvAccount.requestFocus();
-                                    tvAccount.dismissDropDown();
-                                    if (focused)
-                                        Misc.showSoftKeyboard(
-                                                (NewTransactionActivity) tvAccount.getContext());
-                                    break;
-                            }
-                        }
+            if ((index == null) || !index.equals(getAdapterPosition()) || itemView.hasFocus())
+                return;
 
-                        break;
-                }
+            switch (item.getType()) {
+                case generalData:
+                    // bad idea - double pop-up, and not really necessary.
+                    // the user can tap the input to get the calendar
+                    //if (!tvDate.hasFocus()) tvDate.requestFocus();
+                    switch (item.getFocusedElement()) {
+                        case TransactionComment:
+                            tvTransactionComment.setVisibility(View.VISIBLE);
+                            tvTransactionComment.requestFocus();
+                            break;
+                        case Description:
+                            boolean focused = tvDescription.requestFocus();
+                            tvDescription.dismissDropDown();
+                            if (focused)
+                                Misc.showSoftKeyboard(
+                                        (NewTransactionActivity) tvDescription.getContext());
+                            break;
+                    }
+                    break;
+                case transactionRow:
+                    switch (item.getFocusedElement()) {
+                        case Amount:
+                            tvAmount.requestFocus();
+                            break;
+                        case Comment:
+                            tvComment.setVisibility(View.VISIBLE);
+                            tvComment.requestFocus();
+                            break;
+                        case Account:
+                            boolean focused = tvAccount.requestFocus();
+                            tvAccount.dismissDropDown();
+                            if (focused)
+                                Misc.showSoftKeyboard(
+                                        (NewTransactionActivity) tvAccount.getContext());
+                            break;
+                    }
+
+                    break;
             }
         };
         accountCountObserver = count -> {
@@ -537,6 +561,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 case generalData:
                     item.setDate(String.valueOf(tvDate.getText()));
                     item.setDescription(String.valueOf(tvDescription.getText()));
+                    item.setTransactionComment(String.valueOf(tvTransactionComment.getText()));
                     break;
                 case transactionRow:
                     final LedgerTransactionAccount account = item.getAccount();
@@ -602,6 +627,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             if (this.item != null && !this.item.equals(item)) {
                 this.item.stopObservingDate(dateObserver);
                 this.item.stopObservingDescription(descriptionObserver);
+                this.item.stopObservingTransactionComment(transactionCommentObserver);
                 this.item.stopObservingAmountHint(hintObserver);
                 this.item.stopObservingEditableFlag(editableObserver);
                 this.item.getModel()
@@ -623,6 +649,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 case generalData:
                     tvDate.setText(item.getFormattedDate());
                     tvDescription.setText(item.getDescription());
+                    tvTransactionComment.setText(item.getTransactionComment());
                     lHead.setVisibility(View.VISIBLE);
                     lAccount.setVisibility(View.GONE);
                     lPadding.setVisibility(View.GONE);
@@ -669,6 +696,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     case generalData:
                         item.observeDate(activity, dateObserver);
                         item.observeDescription(activity, descriptionObserver);
+                        item.observeTransactionComment(activity, transactionCommentObserver);
                         break;
                     case transactionRow:
                         item.observeAmountHint(activity, hintObserver);

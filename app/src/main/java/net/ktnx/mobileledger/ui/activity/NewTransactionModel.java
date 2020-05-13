@@ -93,12 +93,16 @@ public class NewTransactionModel extends ViewModel {
     public String getDescription() {
         return header.description.getValue();
     }
+    public String getComment() {
+        return header.comment.getValue();
+    }
     LiveData<Boolean> isSubmittable() {
         return this.isSubmittable;
     }
     void reset() {
         header.date.setValue(null);
         header.description.setValue(null);
+        header.comment.setValue(null);
         items.clear();
         items.add(new Item(this, new LedgerTransactionAccount("")));
         items.add(new Item(this, new LedgerTransactionAccount("")));
@@ -216,7 +220,7 @@ public class NewTransactionModel extends ViewModel {
     }
     enum ItemType {generalData, transactionRow, bottomFiller}
 
-    enum FocusedElement {Account, Comment, Amount}
+    enum FocusedElement {Account, Comment, Amount, Description, TransactionComment}
 
 
     //==========================================================================================
@@ -385,6 +389,23 @@ public class NewTransactionModel extends ViewModel {
         void stopObservingDescription(
                 @NonNull androidx.lifecycle.Observer<? super String> observer) {
             this.description.removeObserver(observer);
+        }
+        public String getTransactionComment() {
+            ensureType(ItemType.generalData);
+            return comment.getValue();
+        }
+        public void setTransactionComment(String transactionComment) {
+            ensureType(ItemType.generalData);
+            this.comment.setValue(transactionComment);
+        }
+        void observeTransactionComment(@NonNull @NotNull LifecycleOwner owner,
+                                       @NonNull Observer<? super String> observer) {
+            ensureType(ItemType.generalData);
+            this.comment.observe(owner, observer);
+        }
+        void stopObservingTransactionComment(@NonNull Observer<? super String> observer) {
+            ensureType(ItemType.generalData);
+            this.comment.removeObserver(observer);
         }
         public LedgerTransactionAccount getAccount() {
             ensureType(ItemType.transactionRow);
