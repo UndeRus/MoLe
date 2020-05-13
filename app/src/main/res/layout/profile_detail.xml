@@ -162,36 +162,42 @@
             android:textAppearance="?android:textAppearanceListItem" />
 
         <LinearLayout
-            android:id="@+id/default_commodity_layout"
-            android:orientation="vertical"
+            android:id="@+id/posting_sub_items"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_marginBottom="16dp">
+            android:orientation="vertical">
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/default_commodity_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/profile_default_commodity"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_default_commodity"
+                    android:textAppearance="?android:textAppearanceListItem" />
+
+                <TextView
+                    android:id="@+id/default_commodity_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btn_no_currency"
+                    android:textAppearance="?android:textAppearanceListItemSecondary"
+                    android:textColor="?attr/textColor" />
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/profile_show_commodity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/currency_input_by_default"
                 android:textAppearance="?android:textAppearanceListItem" />
-
-            <TextView
-                android:id="@+id/default_commodity_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceListItemSecondary"
-                android:textColor="?attr/textColor"
-                android:text="@string/btn_no_currency"/>
-        </LinearLayout>
-
-        <Switch
-            android:id="@+id/profile_show_commodity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/currency_input_by_default"
-            android:textAppearance="?android:textAppearanceListItem"/>
 
         <LinearLayout
             android:id="@+id/future_dates_layout"
@@ -200,38 +206,39 @@
             android:layout_marginBottom="16dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/future_dates_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_future_dates_label"
-                android:textAppearance="?android:textAppearanceListItem" />
+                <TextView
+                    android:id="@+id/future_dates_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_future_dates_label"
+                    android:textAppearance="?android:textAppearanceListItem" />
 
-            <TextView
-                android:id="@+id/future_dates_text"
+                <TextView
+                    android:id="@+id/future_dates_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:textAppearanceListItemSecondary"
+                    android:textColor="?attr/textColor" />
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/preferred_accounts_accounts_filter_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:textAppearanceListItemSecondary"
-                android:textColor="?attr/textColor" />
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/preferred_accounts_filter_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:fontFamily="monospace"
+                    android:hint="@string/pref_preferred_autocompletion_account_filter_hint"
+                    android:inputType="text"
+                    android:textColor="?attr/editTextColor" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/preferred_accounts_accounts_filter_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:orientation="vertical">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/preferred_accounts_filter_filter"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:fontFamily="monospace"
-                android:hint="@string/pref_preferred_autocompletion_account_filter_hint"
-                android:inputType="text"
-                android:textColor="?attr/editTextColor" />
-        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

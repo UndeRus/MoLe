@@ -256,13 +256,12 @@ public class ProfileDetailFragment extends Fragment {
                 (buttonView, isChecked) -> model.setShowCommodityByDefault(isChecked));
         model.observeShowCommodityByDefault(viewLifecycleOwner, showCommodityByDefault::setChecked);
 
+        View postingSubItems = context.findViewById(R.id.posting_sub_items);
+
         Switch postingPermitted = context.findViewById(R.id.profile_permit_posting);
         model.observePostingPermitted(viewLifecycleOwner, isChecked -> {
             postingPermitted.setChecked(isChecked);
-            defaultCommodityLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            showCommodityByDefault.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            preferredAccountsFilterLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            futureDatesLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            postingSubItems.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
         postingPermitted.setOnCheckedChangeListener(
                 ((buttonView, isChecked) -> model.setPostingPermitted(isChecked)));
