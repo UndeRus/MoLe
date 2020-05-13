@@ -97,17 +97,17 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     //TODO multiple amounts with different currencies per posting
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
         super(itemView);
-        tvAccount = itemView.findViewById(R.id.account_row_acc_name);
-        tvComment = itemView.findViewById(R.id.comment);
+        lAccount = itemView.findViewById(R.id.ntr_account);
+        tvAccount = lAccount.findViewById(R.id.account_row_acc_name);
+        tvComment = lAccount.findViewById(R.id.comment);
         tvTransactionComment = itemView.findViewById(R.id.transaction_comment);
         new TextViewClearHelper().attachToTextView((EditText) tvComment);
-        commentButton = itemView.findViewById(R.id.comment_button);
+        commentButton = lAccount.findViewById(R.id.comment_button);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
         tvCurrency = itemView.findViewById(R.id.currency);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
         tvDescription = itemView.findViewById(R.id.new_transaction_description);
         lHead = itemView.findViewById(R.id.ntr_data);
-        lAccount = itemView.findViewById(R.id.ntr_account);
         lPadding = itemView.findViewById(R.id.ntr_padding);
         final View commentLayout = itemView.findViewById(R.id.comment_layout);
         final View transactionCommentLayout =
@@ -124,7 +124,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             tvComment.requestFocus();
         });
 
-        itemView.findViewById(R.id.transaction_comment_button)
+        transactionCommentLayout.findViewById(R.id.comment_button)
                 .setOnClickListener(v -> {
                     tvTransactionComment.setVisibility(View.VISIBLE);
                     tvTransactionComment.requestFocus();
@@ -398,23 +398,22 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             ConstraintLayout.LayoutParams accountParams =
                     (ConstraintLayout.LayoutParams) tvAccount.getLayoutParams();
             if (show) {
-                commentLayout.setVisibility(View.VISIBLE);
-
                 accountParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
                 accountParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
 
                 amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
                 amountLayoutParams.topToBottom = tvAccount.getId();
+
+                commentLayout.setVisibility(View.VISIBLE);
             }
             else {
-                commentLayout.setVisibility(View.GONE);
-
                 accountParams.endToStart = amountLayout.getId();
                 accountParams.endToEnd = ConstraintLayout.LayoutParams.UNSET;
 
                 amountLayoutParams.topToBottom = ConstraintLayout.LayoutParams.UNSET;
                 amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
 
+                commentLayout.setVisibility(View.GONE);
             }
 
             tvAccount.setLayoutParams(accountParams);
@@ -424,15 +423,22 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         };
     }
     private void commentFocusChanged(View layout, TextView textView, boolean hasFocus) {
-        layout.setAlpha(hasFocus ? 1f : 0.5f);
-        textView.setTypeface(null, hasFocus ? Typeface.NORMAL : Typeface.ITALIC);
-        if (hasFocus)
+        int textColor;
+        if (hasFocus) {
+            textColor = Colors.defaultTextColor;
+            textView.setTypeface(null, Typeface.NORMAL);
             textView.setHint(R.string.transaction_account_comment_hint);
-        else
+        }
+        else {
+            textColor = Colors.defaultTextColorDisabled;
+            textView.setTypeface(null, Typeface.ITALIC);
             textView.setHint("");
+            if (Misc.isEmptyOrNull(textView.getText())) {
+                textView.setVisibility(View.INVISIBLE);
+            }
+        }
+        textView.setTextColor(textColor);
 
-        if (!hasFocus && Misc.isEmptyOrNull(textView.getText()))
-            textView.setVisibility(View.INVISIBLE);
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
         ConstraintLayout.LayoutParams amountLP =
