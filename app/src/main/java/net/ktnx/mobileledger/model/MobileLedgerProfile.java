@@ -43,9 +43,11 @@ import java.util.UUID;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class MobileLedgerProfile {
+    // N.B. when adding new fields, update the copy-constructor below
     private String uuid;
     private String name;
     private boolean permitPosting;
+    private boolean showCommentsByDefault;
     private boolean showCommodityByDefault;
     private String defaultCommodity;
     private String preferredAccountsFilter;
@@ -55,6 +57,7 @@ public final class MobileLedgerProfile {
     private String authPassword;
     private int themeHue;
     private int orderNo = -1;
+    // N.B. when adding new fields, update the copy-constructor below
     private FutureDates futureDates = FutureDates.None;
     private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
     public MobileLedgerProfile() {
@@ -67,6 +70,7 @@ public final class MobileLedgerProfile {
         uuid = origin.uuid;
         name = origin.name;
         permitPosting = origin.permitPosting;
+        showCommentsByDefault = origin.showCommentsByDefault;
         showCommodityByDefault = origin.showCommodityByDefault;
         preferredAccountsFilter = origin.preferredAccountsFilter;
         url = origin.url;
@@ -88,7 +92,8 @@ public final class MobileLedgerProfile {
         try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
                                          "preferred_accounts_filter, future_dates, api_version, " +
-                                         "show_commodity_by_default, default_commodity FROM " +
+                                         "show_commodity_by_default, default_commodity, " +
+                                         "show_comments_by_default FROM " +
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
@@ -106,6 +111,7 @@ public final class MobileLedgerProfile {
                 item.setApiVersion(cursor.getInt(11));
                 item.setShowCommodityByDefault(cursor.getInt(12) == 1);
                 item.setDefaultCommodity(cursor.getString(13));
+                item.setShowCommentsByDefault(cursor.getInt(14) == 1);
                 list.add(item);
                 if (item.getUuid()
                         .equals(currentProfileUUID))
@@ -131,6 +137,12 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public boolean getShowCommentsByDefault() {
+        return showCommentsByDefault;
+    }
+    public void setShowCommentsByDefault(boolean newValue) {
+        this.showCommentsByDefault = newValue;
     }
     public boolean getShowCommodityByDefault() {
         return showCommodityByDefault;
@@ -239,13 +251,13 @@ public final class MobileLedgerProfile {
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, auth_password, theme, order_no, " +
                        "preferred_accounts_filter, future_dates, api_version, " +
-                       "show_commodity_by_default, default_commodity) " +
-                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       "show_commodity_by_default, default_commodity, show_comments_by_default) " +
+                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeHue, orderNo,
                                  preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt(),
-                                 showCommodityByDefault, defaultCommodity
+                                 showCommodityByDefault, defaultCommodity, showCommentsByDefault
                     });
             db.setTransactionSuccessful();
         }

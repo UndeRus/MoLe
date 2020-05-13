@@ -1,0 +1,1 @@
+update profiles set show_comments_by_default = 1;

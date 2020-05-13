@@ -58,8 +58,10 @@ public class NewTransactionModel extends ViewModel {
     private final AtomicInteger busyCounter = new AtomicInteger(0);
     private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
     private boolean observingDataProfile;
-    private Observer<MobileLedgerProfile> profileObserver =
-            profile -> showCurrency.postValue(profile.getShowCommodityByDefault());
+    private Observer<MobileLedgerProfile> profileObserver = profile -> {
+        showCurrency.postValue(profile.getShowCommodityByDefault());
+        showComments.postValue(profile.getShowCommentsByDefault());
+    };
     void observeShowComments(LifecycleOwner owner, Observer<? super Boolean> observer) {
         showComments.observe(owner, observer);
     }

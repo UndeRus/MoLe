@@ -266,6 +266,13 @@ public class ProfileDetailFragment extends Fragment {
         postingPermitted.setOnCheckedChangeListener(
                 ((buttonView, isChecked) -> model.setPostingPermitted(isChecked)));
 
+        Switch showCommentsByDefault = context.findViewById(R.id.profile_show_comments);
+        model.observeShowCommentsByDefault(viewLifecycleOwner, isChecked -> {
+            showCommentsByDefault.setChecked(isChecked);
+        });
+        showCommentsByDefault.setOnCheckedChangeListener(
+                ((buttonView, isChecked) -> model.setShowCommentsByDefault(isChecked)));
+
         defaultCommodity = context.findViewById(R.id.default_commodity_text);
 
         futureDatesLayout = context.findViewById(R.id.future_dates_layout);

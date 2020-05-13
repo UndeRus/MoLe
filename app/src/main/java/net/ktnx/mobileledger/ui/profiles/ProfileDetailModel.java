@@ -35,6 +35,7 @@ public class ProfileDetailModel extends ViewModel {
     private final MutableLiveData<MobileLedgerProfile.FutureDates> futureDates =
             new MutableLiveData<>(MobileLedgerProfile.FutureDates.None);
     private final MutableLiveData<Boolean> showCommodityByDefault = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> showCommentsByDefault = new MutableLiveData<>(true);
     private final MutableLiveData<Boolean> useAuthentication = new MutableLiveData<>(false);
     private final MutableLiveData<SendTransactionTask.API> apiVersion =
             new MutableLiveData<>(SendTransactionTask.API.auto);
@@ -68,6 +69,13 @@ public class ProfileDetailModel extends ViewModel {
     }
     void observePostingPermitted(LifecycleOwner lfo, Observer<Boolean> o) {
         postingPermitted.observe(lfo, o);
+    }
+    public void setShowCommentsByDefault(boolean newValue) {
+        if (newValue != showCommentsByDefault.getValue())
+            showCommentsByDefault.setValue(newValue);
+    }
+    void observeShowCommentsByDefault(LifecycleOwner lfo, Observer<Boolean> o) {
+        showCommentsByDefault.observe(lfo, o);
     }
     MobileLedgerProfile.FutureDates getFutureDates() {
         return futureDates.getValue();
@@ -189,6 +197,7 @@ public class ProfileDetailModel extends ViewModel {
         if (mProfile != null) {
             profileName.setValue(mProfile.getName());
             postingPermitted.setValue(mProfile.isPostingPermitted());
+            showCommentsByDefault.setValue(mProfile.getShowCommentsByDefault());
             showCommodityByDefault.setValue(mProfile.getShowCommodityByDefault());
             {
                 String comm = mProfile.getDefaultCommodity();
@@ -210,6 +219,7 @@ public class ProfileDetailModel extends ViewModel {
             profileName.setValue(null);
             url.setValue(HTTPS_URL_START);
             postingPermitted.setValue(true);
+            showCommentsByDefault.setValue(true);
             showCommodityByDefault.setValue(false);
             setFutureDates(MobileLedgerProfile.FutureDates.None);
             setApiVersion(SendTransactionTask.API.auto);
@@ -226,6 +236,7 @@ public class ProfileDetailModel extends ViewModel {
         mProfile.setName(profileName.getValue());
         mProfile.setUrl(url.getValue());
         mProfile.setPostingPermitted(postingPermitted.getValue());
+        mProfile.setShowCommentsByDefault(showCommentsByDefault.getValue());
         Currency c = defaultCommodity.getValue();
         mProfile.setDefaultCommodity((c == null) ? null : c.getName());
         mProfile.setShowCommodityByDefault(showCommodityByDefault.getValue());
