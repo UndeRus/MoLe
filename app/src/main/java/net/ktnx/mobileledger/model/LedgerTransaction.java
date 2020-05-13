@@ -51,6 +51,7 @@ public class LedgerTransaction {
     private Integer id;
     private Date date;
     private String description;
+    private String comment;
     private ArrayList<LedgerTransactionAccount> accounts;
     private String dataHash;
     private boolean dataLoaded;
@@ -106,6 +107,12 @@ public class LedgerTransaction {
     public void setDescription(String description) {
         this.description = description;
         dataHash = null;
+    }
+    public String getComment() {
+        return comment;
+    }
+    public void setComment(String comment) {
+        this.comment = comment;
     }
     public int getId() {
         return id;
