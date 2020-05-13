@@ -54,7 +54,7 @@ public class Colors {
     @ColorInt
     public static int tableRowDarkBG;
     @ColorInt
-    public static int primary, defaultTextColor;
+    public static int primary, defaultTextColor, defaultTextColorDisabled;
     public static int profileThemeId = -1;
     public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
     private static int[] themeIDs =
@@ -105,6 +105,7 @@ public class Colors {
         primary = tv.data;
         theme.resolveAttribute(R.attr.textColor, tv, true);
         defaultTextColor = tv.data;
+        defaultTextColorDisabled = 0x7f000000 | 0x00ffffff & defaultTextColor;
         theme.resolveAttribute(R.attr.colorAccent, tv, true);
         accent = tv.data;
 
