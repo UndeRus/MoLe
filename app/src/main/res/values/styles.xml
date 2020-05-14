@@ -26,6 +26,7 @@
         <item name="table_row_dark_bg">#286c33d4</item>
         <item name="table_row_light_bg">#28ddcbff</item>
         <item name="textColor">@android:color/tab_indicator_text</item>
+        <item name="errorTextColor">@color/errorTextColor</item>
     </style>
 
     <style name="StretchedTextView" parent="Widget.AppCompat.TextView"></style>

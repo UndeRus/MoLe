@@ -57,6 +57,7 @@ public class Colors {
     public static int primary, defaultTextColor, defaultTextColorDisabled;
     public static int profileThemeId = -1;
     public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
+    public static int errorTextColor;
     private static int[] themeIDs =
             {R.style.AppTheme_NoActionBar_000, R.style.AppTheme_NoActionBar_005,
              R.style.AppTheme_NoActionBar_010, R.style.AppTheme_NoActionBar_015,
@@ -108,6 +109,8 @@ public class Colors {
         defaultTextColorDisabled = 0x7f000000 | 0x00ffffff & defaultTextColor;
         theme.resolveAttribute(R.attr.colorAccent, tv, true);
         accent = tv.data;
+        theme.resolveAttribute(R.attr.errorTextColor, tv, true);
+        errorTextColor = tv.data;
 
         // trigger theme observers
         themeWatch.postValue(themeWatch.getValue() + 1);
