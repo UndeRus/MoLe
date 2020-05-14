@@ -19,10 +19,8 @@ package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.method.DigitsKeyListener;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -186,9 +184,13 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
                 "name", true, this, mProfile);
 
-        // updated on locale changes by an observer below
         decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance()
                                                               .getMonetaryDecimalSeparator());
+        localeObserver = locale -> {
+            decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance(locale)
+                                                                  .getMonetaryDecimalSeparator());
+        };
+
         decimalDot = ".";
 
         final TextWatcher tw = new TextWatcher() {
@@ -358,14 +360,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
             else
                 tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-        };
-
-        localeObserver = locale -> {
-            decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance(locale)
-                                                                  .getMonetaryDecimalSeparator());
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                tvAmount.setKeyListener(DigitsKeyListener.getInstance(locale, true, true));
         };
 
         currencyObserver = currency -> {
