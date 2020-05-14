@@ -1,5 +1,9 @@
 # Changes
 
+## [0.13.1] - 2020-05-15
+
+* additional, universal fix for entering numbers
+
 ## [0.13.0] - 2020-05-14
 
 * NEW

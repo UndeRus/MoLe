@@ -1,0 +1,1 @@
+* Additional, universal fix for entering numbers
