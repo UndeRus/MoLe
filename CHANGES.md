@@ -1,5 +1,15 @@
 # Changes
 
+## [0.13.0] - 2020-05-14
+
+* NEW
+    + transaction-level comment entry
+    + ability to hide comment entry, per profile
+* FIXES:
+    + fixed crash when parsing posting flags with hledger-web before 1.14
+    + visual fixes
+    + fix numerical entry with some samsung keyboards
+
 ## [0.12.0] - 2020-05-06
 
 * NEW
