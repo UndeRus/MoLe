@@ -45,18 +45,12 @@
             android:label="@string/title_activity_new_transaction"
             android:parentActivityName=".ui.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activity.MainActivity" />
         </activity>
         <activity
             android:name=".ui.activity.ProfileDetailActivity"
             android:label="@string/title_profile_details"
             android:parentActivityName=".ui.activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activity.MainActivity" />
         </activity>
     </application>
 
