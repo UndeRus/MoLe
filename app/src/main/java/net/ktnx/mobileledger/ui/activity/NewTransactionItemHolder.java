@@ -63,11 +63,11 @@ import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
 
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
         implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
-    private final String decimalSeparator;
     private final String decimalDot;
     private final TextView tvCurrency;
     private final Observer<Boolean> showCommentsObserver;
     private final TextView tvTransactionComment;
+    private String decimalSeparator;
     private NewTransactionModel.Item item;
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
@@ -186,7 +186,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
                 "name", true, this, mProfile);
 
-        // FIXME: react on configuration (locale) changes
+        // updated on locale changes by an observer below
         decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance()
                                                               .getMonetaryDecimalSeparator());
         decimalDot = ".";
@@ -361,6 +361,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         };
 
         localeObserver = locale -> {
+            decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance(locale)
+                                                                  .getMonetaryDecimalSeparator());
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 tvAmount.setKeyListener(DigitsKeyListener.getInstance(locale, true, true));
         };
