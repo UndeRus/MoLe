@@ -408,7 +408,6 @@ public class NewTransactionModel extends ViewModel {
             this.comment.observe(owner, observer);
         }
         void stopObservingTransactionComment(@NonNull Observer<? super String> observer) {
-            ensureType(ItemType.generalData);
             this.comment.removeObserver(observer);
         }
         public LedgerTransactionAccount getAccount() {
