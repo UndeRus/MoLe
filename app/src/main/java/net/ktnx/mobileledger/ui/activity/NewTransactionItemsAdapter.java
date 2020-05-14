@@ -473,7 +473,12 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                     itemsWithAccountForCurrency.add(currName, item);
                 }
 
-                if (acc.isAmountSet()) {
+                if (!acc.isAmountValid()) {
+                    Logger.debug("submittable",
+                            String.format("Not submittable: row %d has an invalid amount", i + 1));
+                    submittable = false;
+                }
+                else if (acc.isAmountSet()) {
                     itemsWithAmountForCurrency.add(currName, item);
                     balance.add(currName, acc.getAmount());
                 }

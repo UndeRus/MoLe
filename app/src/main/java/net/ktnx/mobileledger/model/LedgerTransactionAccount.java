@@ -30,11 +30,13 @@ public class LedgerTransactionAccount {
     private boolean amountSet = false;
     private String currency;
     private String comment;
+    private boolean amountValid = true;
     public LedgerTransactionAccount(String accountName, float amount, String currency,
                                     String comment) {
         this.setAccountName(accountName);
         this.amount = amount;
         this.amountSet = true;
+        this.amountValid = true;
         this.currency = Misc.emptyIsNull(currency);
         this.comment = Misc.emptyIsNull(comment);
     }
@@ -51,6 +53,7 @@ public class LedgerTransactionAccount {
         setComment(origin.getComment());
         if (origin.isAmountSet())
             setAmount(origin.getAmount());
+        amountValid = origin.amountValid;
         currency = origin.getCurrency();
     }
     public String getComment() {
@@ -78,13 +81,19 @@ public class LedgerTransactionAccount {
     public void setAmount(float account_amount) {
         this.amount = account_amount;
         this.amountSet = true;
+        this.amountValid = true;
     }
     public void resetAmount() {
         this.amountSet = false;
+        this.amountValid = true;
+    }
+    public void invalidateAmount() {
+        this.amountValid = false;
     }
     public boolean isAmountSet() {
         return amountSet;
     }
+    public boolean isAmountValid() { return amountValid; }
     public String getCurrency() {
         return currency;
     }

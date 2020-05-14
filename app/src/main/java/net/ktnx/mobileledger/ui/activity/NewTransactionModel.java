@@ -241,6 +241,7 @@ public class NewTransactionModel extends ViewModel {
         private FocusedElement focusedElement = FocusedElement.Account;
         private MutableLiveData<String> comment = new MutableLiveData<>(null);
         private MutableLiveData<Currency> currency = new MutableLiveData<>(null);
+        private MutableLiveData<Boolean> amountValid = new MutableLiveData<>(true);
         private boolean amountHintIsSet = false;
         Item(NewTransactionModel model) {
             this.model = model;
@@ -488,6 +489,18 @@ public class NewTransactionModel extends ViewModel {
         }
         boolean isAmountHintSet() {
             return amountHintIsSet;
+        }
+        void validateAmount() {
+            amountValid.setValue(true);
+        }
+        void invalidateAmount() {
+            amountValid.setValue(false);
+        }
+        void observeAmountValidity(NewTransactionActivity activity, Observer<Boolean> observer) {
+            amountValid.observe(activity, observer);
+        }
+        void stopObservingAmountValidity(Observer<Boolean> observer) {
+            amountValid.removeObserver(observer);
         }
     }
 }

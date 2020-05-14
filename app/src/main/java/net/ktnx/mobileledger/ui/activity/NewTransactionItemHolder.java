@@ -92,6 +92,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Currency> currencyObserver;
     private Observer<Boolean> showCurrencyObserver;
     private Observer<String> commentObserver;
+    private Observer<Boolean> amountValidityObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     private View commentButton;
@@ -126,10 +127,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         });
 
         transactionCommentLayout.findViewById(R.id.comment_button)
-                .setOnClickListener(v -> {
-                    tvTransactionComment.setVisibility(View.VISIBLE);
-                    tvTransactionComment.requestFocus();
-                });
+                                .setOnClickListener(v -> {
+                                    tvTransactionComment.setVisibility(View.VISIBLE);
+                                    tvTransactionComment.requestFocus();
+                                });
 
         mProfile = Data.profile.getValue();
         if (mProfile == null)
@@ -224,19 +225,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                    // only one decimal separator is allowed
-                    // plus and minus are allowed only at the beginning
-                    String allowed = "0123456789";
-                    String val = s.toString();
-                    Logger.debug("input", val);
-                    if (val.isEmpty() || (tvAmount.getSelectionStart() == 0))
-                        allowed += "-";
-                    if (!val.contains(decimalSeparator) && !val.contains(decimalDot))
-                        allowed += decimalSeparator + decimalDot;
-
-                    tvAmount.setKeyListener(DigitsKeyListener.getInstance(allowed));
-                }
 
                 if (syncData())
                     adapter.checkTransactionSubmittable();
@@ -445,6 +433,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
             transactionCommentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
         };
+
+        amountValidityObserver = valid -> {
+            tvAmount.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    valid ? 0 : R.drawable.ic_error_outline_black_24dp, 0, 0, 0);
+            tvAmount.setMinEms(valid ? 4 : 5);
+        };
     }
     private void commentFocusChanged(View layout, TextView textView, boolean hasFocus) {
         int textColor;
@@ -574,18 +568,20 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     if (amount.isEmpty()) {
                         account.resetAmount();
-//                        account.setCurrency(null);
+                        item.validateAmount();
                     }
                     else {
                         try {
                             amount = amount.replace(decimalSeparator, decimalDot);
                             account.setAmount(Float.parseFloat(amount));
+                            item.validateAmount();
                         }
                         catch (NumberFormatException e) {
                             Logger.debug("new-trans", String.format(
                                     "assuming amount is not set due to number format exception. " +
                                     "input was '%s'", amount));
-                            account.resetAmount();
+                            account.invalidateAmount();
+                            item.invalidateAmount();
                         }
                         final String curr = String.valueOf(tvCurrency.getText());
                         if (curr.equals(tvCurrency.getContext()
@@ -641,6 +637,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 this.item.getModel().showCurrency.removeObserver(showCurrencyObserver);
                 this.item.stopObservingComment(commentObserver);
                 this.item.getModel().showComments.removeObserver(showCommentsObserver);
+                this.item.stopObservingAmountValidity(amountValidityObserver);
 
                 this.item = null;
             }
@@ -708,6 +705,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         item.observeComment(activity, commentObserver);
                         item.getModel()
                             .observeAccountCount(activity, accountCountObserver);
+                        item.observeAmountValidity(activity, amountValidityObserver);
                         break;
                 }
             }
