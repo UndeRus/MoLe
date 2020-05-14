@@ -244,13 +244,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             cpf.show(activity.getSupportFragmentManager(), "currency-selector");
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            tvAmount.setKeyListener(
-                    DigitsKeyListener.getInstance(Data.locale.getValue(), true, true));
-        else
-            tvAmount.setKeyListener(
-                    DigitsKeyListener.getInstance("0123456789+-" + decimalSeparator + decimalDot));
-
         dateObserver = date -> {
             if (syncingData)
                 return;

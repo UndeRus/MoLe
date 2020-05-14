@@ -172,7 +172,7 @@
                 android:gravity="bottom|end"
                 android:hint="@string/zero_amount"
                 android:imeOptions="actionNext"
-                android:inputType="numberSigned|numberDecimal|number"
+                android:inputType="number|numberSigned|numberDecimal"
                 android:minEms="4"
                 android:selectAllOnFocus="true"
                 android:textAlignment="viewEnd"
