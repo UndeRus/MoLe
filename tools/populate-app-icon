@@ -13,9 +13,8 @@ gen_icons() {
         DST_DIR="$RES_DIR/mipmap-$name"
         mkdir -p "$DST_DIR"
         DST="$DST_DIR/app_icon.png"
-        convert -background none "$ICON_ART" -scale ${size}x${size} \
-            -antialias -strip \
-            "$DST"
+        rsvg-convert --background-color none "$ICON_ART" -w $size -h $size \
+            -o "$DST"
         optipng "$DST"
     done
 }
