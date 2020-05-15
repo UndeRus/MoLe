@@ -10,8 +10,9 @@ ICON_ART="$ART_DIR/app-icon.svg"
 
 gen_icons() {
     while read size name; do
-        mkdir -p "$RES_DIR/drawable-$name"
-        DST="$RES_DIR/drawable-$name/app_icon.png"
+        DST_DIR="$RES_DIR/mipmap-$name"
+        mkdir -p "$DST_DIR"
+        DST="$DST_DIR/app_icon.png"
         convert -background none "$ICON_ART" -scale ${size}x${size} \
             -antialias -strip \
             "$DST"
