@@ -23,12 +23,16 @@ import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailModel;
 import net.ktnx.mobileledger.utils.Colors;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -44,6 +48,10 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class ProfileDetailActivity extends CrashReportingActivity {
     private MobileLedgerProfile profile = null;
     private ProfileDetailFragment mFragment;
+    @NotNull
+    private ProfileDetailModel getModel() {
+        return new ViewModelProvider(this).get(ProfileDetailModel.class);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         final int index = getIntent().getIntExtra(ProfileDetailFragment.ARG_ITEM_ID, -1);
@@ -70,9 +78,12 @@ public class ProfileDetailActivity extends CrashReportingActivity {
             themeHue = Colors.getNewProfileThemeHue(Data.profiles.getValue());
         }
         Colors.setupTheme(this, themeHue);
+        final ProfileDetailModel model = getModel();
+        model.initialThemeHue = themeHue;
         setContentView(R.layout.activity_profile_detail);
         Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();

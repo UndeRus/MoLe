@@ -63,9 +63,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Objects;
 
-import static net.ktnx.mobileledger.utils.Colors.profileThemeId;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /**
@@ -393,8 +391,8 @@ public class ProfileDetailFragment extends Fragment {
         });
 
         huePickerView.setOnClickListener(v -> {
-            HueRingDialog d = new HueRingDialog(
-                    Objects.requireNonNull(ProfileDetailFragment.this.getContext()), profileThemeId,
+            HueRingDialog d = new HueRingDialog(ProfileDetailFragment.this.requireContext(),
+                    model.initialThemeHue,
                     (Integer) v.getTag());
             d.show();
             d.setColorSelectedListener(model::setThemeId);
@@ -426,7 +424,7 @@ public class ProfileDetailFragment extends Fragment {
     }
     @NotNull
     private ProfileDetailModel getModel() {
-        return new ViewModelProvider(this).get(ProfileDetailModel.class);
+        return new ViewModelProvider(requireActivity()).get(ProfileDetailModel.class);
     }
     private void onSaveFabClicked() {
         if (!checkValidity())

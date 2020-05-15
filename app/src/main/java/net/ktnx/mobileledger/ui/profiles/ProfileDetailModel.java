@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel;
 import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Misc;
 
 public class ProfileDetailModel extends ViewModel {
@@ -44,6 +45,7 @@ public class ProfileDetailModel extends ViewModel {
     private final MutableLiveData<String> authPassword = new MutableLiveData<>(null);
     private final MutableLiveData<String> preferredAccountsFilter = new MutableLiveData<>(null);
     private final MutableLiveData<Integer> themeId = new MutableLiveData<>(-1);
+    public int initialThemeHue = Colors.DEFAULT_HUE_DEG;
     public ProfileDetailModel() {
     }
     String getProfileName() {
