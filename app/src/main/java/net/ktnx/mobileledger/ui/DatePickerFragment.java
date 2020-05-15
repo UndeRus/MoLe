@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.widget.CalendarView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDialogFragment;
@@ -39,6 +38,7 @@ public class DatePickerFragment extends AppCompatDialogFragment
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
+    private Calendar presentDate = GregorianCalendar.getInstance();
     private DatePickedListener onDatePickedListener;
     private MobileLedgerProfile.FutureDates futureDates = MobileLedgerProfile.FutureDates.None;
     public MobileLedgerProfile.FutureDates getFutureDates() {
@@ -47,17 +47,11 @@ public class DatePickerFragment extends AppCompatDialogFragment
     public void setFutureDates(MobileLedgerProfile.FutureDates futureDates) {
         this.futureDates = futureDates;
     }
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final Calendar c = GregorianCalendar.getInstance();
-        int year = c.get(GregorianCalendar.YEAR);
-        int month = c.get(GregorianCalendar.MONTH);
-        int day = c.get(GregorianCalendar.DAY_OF_MONTH);
-        TextView date = Objects.requireNonNull(getActivity())
-                               .findViewById(R.id.new_transaction_date);
-
-        CharSequence present = date.getText();
+    public void setCurrentDateFromText(CharSequence present) {
+        final Calendar now = GregorianCalendar.getInstance();
+        int year = now.get(GregorianCalendar.YEAR);
+        int month = now.get(GregorianCalendar.MONTH);
+        int day = now.get(GregorianCalendar.DAY_OF_MONTH);
 
         Matcher m = reYMD.matcher(present);
         if (m.matches()) {
@@ -79,14 +73,17 @@ public class DatePickerFragment extends AppCompatDialogFragment
             }
         }
 
-        c.set(year, month, day);
-
+        presentDate.set(year, month, day);
+    }
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
         Dialog dpd = new Dialog(Objects.requireNonNull(getActivity()));
         dpd.setContentView(R.layout.date_picker_view);
         dpd.setTitle(null);
         CalendarView cv = dpd.findViewById(R.id.calendarView);
-        cv.setDate(c.getTime()
-                    .getTime());
+        cv.setDate(presentDate.getTime()
+                              .getTime());
 
         if (futureDates == MobileLedgerProfile.FutureDates.All) {
             cv.setMaxDate(Long.MAX_VALUE);

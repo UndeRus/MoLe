@@ -598,6 +598,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         DatePickerFragment picker = new DatePickerFragment();
         picker.setFutureDates(mProfile.getFutureDates());
         picker.setOnDatePickedListener(this);
+        picker.setCurrentDateFromText(tvDate.getText());
         picker.show(((NewTransactionActivity) tvDate.getContext()).getSupportFragmentManager(),
                 "datePicker");
     }
