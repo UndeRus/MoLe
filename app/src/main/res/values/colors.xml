@@ -26,4 +26,6 @@
     <color name="header_border">#804a148c</color>
     <color name="error_background">#FFE1E2</color>
     <color name="errorTextColor">#CD1609</color>
+    <color name="backgroundColor">#EEEEEE</color>
+    <color name="backgroundColorTransparent">#00eeeeee</color>
 </resources>
