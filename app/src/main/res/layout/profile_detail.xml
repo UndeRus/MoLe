@@ -268,7 +268,7 @@
                 android:layout_weight="1"
                 android:background="?colorPrimary"
                 android:contentDescription="@string/btn_color_picker_button"
-                android:src="@drawable/ic_palette_black_24dp"
+                app:srcCompat="@drawable/ic_palette_black_24dp"
                 android:tint="?drawer_background" />
 
         </LinearLayout>
