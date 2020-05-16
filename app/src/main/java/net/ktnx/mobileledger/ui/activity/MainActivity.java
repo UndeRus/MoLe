@@ -478,21 +478,14 @@ public class MainActivity extends ProfileThemedActivity {
         scheduleDataRetrievalIfStale(newValue);
     }
     private void profileThemeChanged() {
-        Bundle bundle = new Bundle();
-        onSaveInstanceState(bundle);
-
         storeThemeIdInPrefs(profile.getThemeHue());
-
-        // restart activity to reflect theme change
-        finish();
 
         // un-hook all observed LiveData
         Data.profile.removeObservers(this);
         Data.profiles.removeObservers(this);
         Data.lastUpdateDate.removeObservers(this);
-        Intent intent = new Intent(this, this.getClass());
-        intent.putExtra(BUNDLE_SAVED_STATE, bundle);
-        startActivity(intent);
+
+        recreate();
     }
     private void storeThemeIdInPrefs(int themeId) {
         // store the new theme id in the preferences
