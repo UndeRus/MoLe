@@ -410,8 +410,6 @@ public class MainActivity extends ProfileThemedActivity {
      */
     private void onProfileChanged(MobileLedgerProfile profile) {
         boolean haveProfile = profile != null;
-        findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
-        findViewById(R.id.pager_layout).setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
         if (haveProfile)
             setTitle(profile.getName());
@@ -420,19 +418,22 @@ public class MainActivity extends ProfileThemedActivity {
 
         this.profile = profile;
 
-        mProfileListAdapter.notifyDataSetChanged();
-
         int newProfileTheme = haveProfile ? profile.getThemeHue() : -1;
         if (newProfileTheme != Colors.profileThemeId) {
             debug("profiles",
                     String.format(Locale.ENGLISH, "profile theme %d → %d", Colors.profileThemeId,
                             newProfileTheme));
-            MainActivity.this.profileThemeChanged();
             Colors.profileThemeId = newProfileTheme;
+            profileThemeChanged();
             // profileThemeChanged would restart the activity, so no need to reload the
             // data sets below
             return;
         }
+
+        findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
+        findViewById(R.id.pager_layout).setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
+
+        mProfileListAdapter.notifyDataSetChanged();
 
         drawer.closeDrawers();
 
