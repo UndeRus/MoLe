@@ -64,14 +64,13 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <View
                 android:id="@+id/transaction_row_header_border"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="2dp"
                 android:alpha="0.3"
                 android:background="@drawable/dashed_border_1dp"
-                android:minHeight="2dp"
-                android:orientation="horizontal"
+                android:height="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/transaction_row_head" />
