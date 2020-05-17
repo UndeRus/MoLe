@@ -18,7 +18,7 @@
 package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.content.Context;
-import android.database.MatrixCursor;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -125,8 +125,8 @@ public class TransactionListFragment extends MobileLedgerListFragment {
         MLDB.hookAutocompletionAdapter(mActivity, accNameFilter, "accounts", "name");
         accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
 //                debug("tmp", "direct onItemClick");
-            MatrixCursor mc = (MatrixCursor) parent.getItemAtPosition(position);
-            Data.accountFilter.setValue(mc.getString(1));
+            Cursor c = (Cursor) parent.getItemAtPosition(position);
+            Data.accountFilter.setValue(c.getString(1));
             Globals.hideSoftKeyboard(mActivity);
         });
 
