@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId "net.ktnx.mobileledger"
         minSdkVersion 22
-        targetSdkVersion 28
+        targetSdkVersion 29
         vectorDrawables.useSupportLibrary true
         versionCode 33
         versionName '0.13.1'
