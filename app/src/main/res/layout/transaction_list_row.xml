@@ -109,7 +109,7 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:text="---------"
-            android:textColor="@android:color/white"
+            android:textColor="?android:attr/colorBackground"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="HardcodedText" />
@@ -122,7 +122,7 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:text="--.--.----"
-            android:textColor="@android:color/white"
+            android:textColor="?android:attr/colorBackground"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="HardcodedText" />

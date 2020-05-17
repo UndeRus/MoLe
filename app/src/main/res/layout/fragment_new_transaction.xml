@@ -65,7 +65,7 @@
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
         android:padding="@dimen/fab_margin"
-        android:tint="@android:color/white"
+        android:tint="?android:attr/colorBackground"
         android:visibility="visible"
         app:backgroundTint="?colorAccent"
         app:layout_constraintBottom_toBottomOf="parent"
