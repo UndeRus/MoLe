@@ -36,6 +36,9 @@
             android:layout_height="wrap_content"
             android:text="another acc name"
             android:textAlignment="viewStart"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            android:textColor="@android:color/secondary_text_light"
+            android:textStyle="normal"
             tools:ignore="HardcodedText" />
 
         <TextView
@@ -46,6 +49,8 @@
             android:paddingStart="8dp"
             android:text="account comment"
             android:textAlignment="viewStart"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            android:textColor="@android:color/secondary_text_light"
             android:textStyle="italic"
             tools:ignore="HardcodedText,RtlSymmetry" />
     </LinearLayout>
