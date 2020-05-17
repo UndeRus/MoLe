@@ -59,7 +59,7 @@
         android:id="@+id/transaction_list_acc_row_acc_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
+        android:layout_gravity="top|end"
         android:layout_marginEnd="0dp"
         android:minWidth="60dp"
         android:text="---,--"
