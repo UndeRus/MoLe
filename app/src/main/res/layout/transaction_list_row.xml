@@ -17,9 +17,10 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.appcompat.widget.ContentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:measureAllChildren="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -157,4 +158,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.appcompat.widget.ContentFrameLayout>
+</FrameLayout>
