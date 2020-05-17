@@ -138,7 +138,7 @@ for (my $s = 0.50; $s < 0.90; $s += 0.001) {
 warn sprintf( 's%1.3f, l%1.3f -> %s',
 	@$best );
 
-my $baseTheme = "AppTheme.NoActionBar";
+my $baseTheme = "AppTheme";
 
 use constant STEP_DEGREES => 5;
 
@@ -152,7 +152,6 @@ use constant STEP_DEGREES => 5;
 #        		hsvHex($hue/360.0, 0.86, 0.55);
 # 	printf "  <item name=\"colorAccent\">#%s</item>\n",
 #        		hsvHex(($hue-4)/360.0, 0.72, 0.82);
-# 	printf "  <item name=\"drawer_background\">#ffffffff</item>\n";
 # 	printf "  <item name=\"table_row_dark_bg\">#28%s</item>\n",
 #        		hsvHex($hue/360.0, 0.65, 0.83);
 # 	printf "  <item name=\"table_row_light_bg\">#28%s</item>\n",
@@ -166,7 +165,6 @@ use constant STEP_DEGREES => 5;
 sub outputThemes {
 	my $out = shift;
 	my $baseIndent = shift;
-	$out->print(hslStyleForHue($baseColorHue, undef, $baseIndent));
 	for( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
 		$out->print("\n");
 		$out->print(hslStyleForHue($hue, $baseTheme, $baseIndent));
@@ -222,7 +220,6 @@ sub hslStyleForHue {
                 hslHex($hue, $S, $l1);
         $result .= sprintf "$indent<item name=\"colorAccent\">#%s</item>\n",
                 hslHex($hue, $S, $l2);
-        $result .= "$indent<item name=\"drawer_background\">#ffffffff</item>\n";
         $result .= sprintf "$indent<item name=\"table_row_dark_bg\">#%s</item>\n",
                 hslHex($hue, $S, $l3);
         $result .= sprintf "$indent<item name=\"table_row_light_bg\">#%s</item>\n",

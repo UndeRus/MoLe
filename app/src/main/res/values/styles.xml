@@ -17,678 +17,596 @@
 
 <resources>
 
+    <style name="StretchedTextView" parent="Widget.AppCompat.TextView"></style>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <!-- base hue: 261.2245° -->
+    <!-- target primary color: #935FF2 -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">#935FF2</item>
         <item name="colorAccent">#653BD0</item>
         <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#286c33d4</item>
         <item name="table_row_light_bg">#28ddcbff</item>
-        <item name="textColor">@android:color/tab_indicator_text</item>
-        <item name="errorTextColor">@color/errorTextColor</item>
-    </style>
-
-    <style name="StretchedTextView" parent="Widget.AppCompat.TextView"></style>
-    <!-- base hue: 261.2245° -->
-    <!-- target primary color: #935FF2 -->
-    <!-- theme list start -->
-    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="textColor">#757575</item>
-        <item name="colorPrimary">#9360f2</item>
-        <item name="colorPrimaryTransparent">#009360f2</item>
-        <item name="colorAccent">#6922ec</item>
-        <item name="drawer_background">#ffffffff</item>
-        <item name="table_row_dark_bg">#efe7fd</item>
-        <item name="table_row_light_bg">#f9f6fe</item>
+        <item name="errorTextColor">@color/errorTextColor</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.000" parent="AppTheme.NoActionBar">
+    <!-- theme list start -->
+
+    <style name="AppTheme.000" parent="AppTheme">
         <item name="colorPrimary">#d41212</item>
         <item name="colorPrimaryTransparent">#00d41212</item>
         <item name="colorAccent">#a90e0e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7e7</item>
         <item name="table_row_light_bg">#fef6f6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.005" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.005" parent="AppTheme">
         <item name="colorPrimary">#d22212</item>
         <item name="colorPrimaryTransparent">#00d22212</item>
         <item name="colorAccent">#a81b0e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde9e7</item>
         <item name="table_row_light_bg">#fef6f6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.010" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.010" parent="AppTheme">
         <item name="colorPrimary">#d03111</item>
         <item name="colorPrimaryTransparent">#00d03111</item>
         <item name="colorAccent">#a6270e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdebe7</item>
         <item name="table_row_light_bg">#fef7f6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.015" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.015" parent="AppTheme">
         <item name="colorPrimary">#ce4011</item>
         <item name="colorPrimaryTransparent">#00ce4011</item>
         <item name="colorAccent">#a5340e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdede7</item>
         <item name="table_row_light_bg">#fef8f6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.020" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.020" parent="AppTheme">
         <item name="colorPrimary">#cc4f11</item>
         <item name="colorPrimaryTransparent">#00cc4f11</item>
         <item name="colorAccent">#a3400e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdefe7</item>
         <item name="table_row_light_bg">#fef8f6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.025" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.025" parent="AppTheme">
         <item name="colorPrimary">#ca5e11</item>
         <item name="colorPrimaryTransparent">#00ca5e11</item>
         <item name="colorAccent">#a24b0e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf0e7</item>
         <item name="table_row_light_bg">#fef9f6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.030" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.030" parent="AppTheme">
         <item name="colorPrimary">#c86c11</item>
         <item name="colorPrimaryTransparent">#00c86c11</item>
         <item name="colorAccent">#a0570d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf2e7</item>
         <item name="table_row_light_bg">#fefaf6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.035" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.035" parent="AppTheme">
         <item name="colorPrimary">#c67a11</item>
         <item name="colorPrimaryTransparent">#00c67a11</item>
         <item name="colorAccent">#9e620d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf4e7</item>
         <item name="table_row_light_bg">#fefbf6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.040" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.040" parent="AppTheme">
         <item name="colorPrimary">#c48810</item>
         <item name="colorPrimaryTransparent">#00c48810</item>
         <item name="colorAccent">#9d6d0d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf6e7</item>
         <item name="table_row_light_bg">#fefbf6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.045" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.045" parent="AppTheme">
         <item name="colorPrimary">#c29610</item>
         <item name="colorPrimaryTransparent">#00c29610</item>
         <item name="colorAccent">#9b780d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf8e7</item>
         <item name="table_row_light_bg">#fefcf6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.050" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.050" parent="AppTheme">
         <item name="colorPrimary">#c0a310</item>
         <item name="colorPrimaryTransparent">#00c0a310</item>
         <item name="colorAccent">#9a820d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdf9e7</item>
         <item name="table_row_light_bg">#fefdf6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.055" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.055" parent="AppTheme">
         <item name="colorPrimary">#beb010</item>
         <item name="colorPrimaryTransparent">#00beb010</item>
         <item name="colorAccent">#988d0d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdfbe7</item>
         <item name="table_row_light_bg">#fefdf6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.060" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.060" parent="AppTheme">
         <item name="colorPrimary">#bcbc10</item>
         <item name="colorPrimaryTransparent">#00bcbc10</item>
         <item name="colorAccent">#97970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fdfde7</item>
         <item name="table_row_light_bg">#fefef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.065" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.065" parent="AppTheme">
         <item name="colorPrimary">#aebc10</item>
         <item name="colorPrimaryTransparent">#00aebc10</item>
         <item name="colorAccent">#8b970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fbfde7</item>
         <item name="table_row_light_bg">#fdfef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.070" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.070" parent="AppTheme">
         <item name="colorPrimary">#9fbc10</item>
         <item name="colorPrimaryTransparent">#009fbc10</item>
         <item name="colorAccent">#80970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f9fde7</item>
         <item name="table_row_light_bg">#fdfef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.075" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.075" parent="AppTheme">
         <item name="colorPrimary">#91bc10</item>
         <item name="colorPrimaryTransparent">#0091bc10</item>
         <item name="colorAccent">#74970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f8fde7</item>
         <item name="table_row_light_bg">#fcfef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.080" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.080" parent="AppTheme">
         <item name="colorPrimary">#83bc10</item>
         <item name="colorPrimaryTransparent">#0083bc10</item>
         <item name="colorAccent">#69970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f6fde7</item>
         <item name="table_row_light_bg">#fbfef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.085" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.085" parent="AppTheme">
         <item name="colorPrimary">#74bc10</item>
         <item name="colorPrimaryTransparent">#0074bc10</item>
         <item name="colorAccent">#5d970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f4fde7</item>
         <item name="table_row_light_bg">#fbfef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.090" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.090" parent="AppTheme">
         <item name="colorPrimary">#66bc10</item>
         <item name="colorPrimaryTransparent">#0066bc10</item>
         <item name="colorAccent">#52970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f2fde7</item>
         <item name="table_row_light_bg">#fafef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.095" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.095" parent="AppTheme">
         <item name="colorPrimary">#58bc10</item>
         <item name="colorPrimaryTransparent">#0058bc10</item>
         <item name="colorAccent">#46970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f0fde7</item>
         <item name="table_row_light_bg">#f9fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.100" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.100" parent="AppTheme">
         <item name="colorPrimary">#49bc10</item>
         <item name="colorPrimaryTransparent">#0049bc10</item>
         <item name="colorAccent">#3b970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#effde7</item>
         <item name="table_row_light_bg">#f8fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.105" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.105" parent="AppTheme">
         <item name="colorPrimary">#3bbc10</item>
         <item name="colorPrimaryTransparent">#003bbc10</item>
         <item name="colorAccent">#2f970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#edfde7</item>
         <item name="table_row_light_bg">#f8fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.110" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.110" parent="AppTheme">
         <item name="colorPrimary">#2dbc10</item>
         <item name="colorPrimaryTransparent">#002dbc10</item>
         <item name="colorAccent">#24970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#ebfde7</item>
         <item name="table_row_light_bg">#f7fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.115" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.115" parent="AppTheme">
         <item name="colorPrimary">#1ebc10</item>
         <item name="colorPrimaryTransparent">#001ebc10</item>
         <item name="colorAccent">#18970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e9fde7</item>
         <item name="table_row_light_bg">#f6fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.120" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.120" parent="AppTheme">
         <item name="colorPrimary">#10bc10</item>
         <item name="colorPrimaryTransparent">#0010bc10</item>
         <item name="colorAccent">#0d970d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fde7</item>
         <item name="table_row_light_bg">#f6fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.125" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.125" parent="AppTheme">
         <item name="colorPrimary">#10bc1e</item>
         <item name="colorPrimaryTransparent">#0010bc1e</item>
         <item name="colorAccent">#0d9718</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fde9</item>
         <item name="table_row_light_bg">#f6fef6</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.130" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.130" parent="AppTheme">
         <item name="colorPrimary">#10bc2d</item>
         <item name="colorPrimaryTransparent">#0010bc2d</item>
         <item name="colorAccent">#0d9724</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdeb</item>
         <item name="table_row_light_bg">#f6fef7</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.135" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.135" parent="AppTheme">
         <item name="colorPrimary">#10bc3b</item>
         <item name="colorPrimaryTransparent">#0010bc3b</item>
         <item name="colorAccent">#0d972f</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fded</item>
         <item name="table_row_light_bg">#f6fef8</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.140" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.140" parent="AppTheme">
         <item name="colorPrimary">#10bc49</item>
         <item name="colorPrimaryTransparent">#0010bc49</item>
         <item name="colorAccent">#0d973b</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdef</item>
         <item name="table_row_light_bg">#f6fef8</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.145" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.145" parent="AppTheme">
         <item name="colorPrimary">#10bc58</item>
         <item name="colorPrimaryTransparent">#0010bc58</item>
         <item name="colorAccent">#0d9746</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf0</item>
         <item name="table_row_light_bg">#f6fef9</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.150" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.150" parent="AppTheme">
         <item name="colorPrimary">#10bc66</item>
         <item name="colorPrimaryTransparent">#0010bc66</item>
         <item name="colorAccent">#0d9752</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf2</item>
         <item name="table_row_light_bg">#f6fefa</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.155" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.155" parent="AppTheme">
         <item name="colorPrimary">#10bc74</item>
         <item name="colorPrimaryTransparent">#0010bc74</item>
         <item name="colorAccent">#0d975d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf4</item>
         <item name="table_row_light_bg">#f6fefb</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.160" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.160" parent="AppTheme">
         <item name="colorPrimary">#10bc83</item>
         <item name="colorPrimaryTransparent">#0010bc83</item>
         <item name="colorAccent">#0d9769</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf6</item>
         <item name="table_row_light_bg">#f6fefb</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.165" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.165" parent="AppTheme">
         <item name="colorPrimary">#10bc91</item>
         <item name="colorPrimaryTransparent">#0010bc91</item>
         <item name="colorAccent">#0d9774</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf8</item>
         <item name="table_row_light_bg">#f6fefc</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.170" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.170" parent="AppTheme">
         <item name="colorPrimary">#10bc9f</item>
         <item name="colorPrimaryTransparent">#0010bc9f</item>
         <item name="colorAccent">#0d9780</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdf9</item>
         <item name="table_row_light_bg">#f6fefd</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.175" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.175" parent="AppTheme">
         <item name="colorPrimary">#10bcae</item>
         <item name="colorPrimaryTransparent">#0010bcae</item>
         <item name="colorAccent">#0d978b</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdfb</item>
         <item name="table_row_light_bg">#f6fefd</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.180" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.180" parent="AppTheme">
         <item name="colorPrimary">#10bcbc</item>
         <item name="colorPrimaryTransparent">#0010bcbc</item>
         <item name="colorAccent">#0d9797</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fdfd</item>
         <item name="table_row_light_bg">#f6fefe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.185" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.185" parent="AppTheme">
         <item name="colorPrimary">#11baca</item>
         <item name="colorPrimaryTransparent">#0011baca</item>
         <item name="colorAccent">#0e95a2</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7fbfd</item>
         <item name="table_row_light_bg">#f6fdfe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.190" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.190" parent="AppTheme">
         <item name="colorPrimary">#12b7d8</item>
         <item name="colorPrimaryTransparent">#0012b7d8</item>
         <item name="colorAccent">#0e92ad</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f9fd</item>
         <item name="table_row_light_bg">#f6fdfe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.195" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.195" parent="AppTheme">
         <item name="colorPrimary">#13b1e5</item>
         <item name="colorPrimaryTransparent">#0013b1e5</item>
         <item name="colorAccent">#0f8db7</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f8fd</item>
         <item name="table_row_light_bg">#f6fcfe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.200" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.200" parent="AppTheme">
         <item name="colorPrimary">#1ca6ec</item>
         <item name="colorPrimaryTransparent">#001ca6ec</item>
         <item name="colorAccent">#1087c2</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f6fd</item>
         <item name="table_row_light_bg">#f6fbfe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.205" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.205" parent="AppTheme">
         <item name="colorPrimary">#299bed</item>
         <item name="colorPrimaryTransparent">#00299bed</item>
         <item name="colorAccent">#117fcd</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f4fd</item>
         <item name="table_row_light_bg">#f6fbfe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.210" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.210" parent="AppTheme">
         <item name="colorPrimary">#3793ee</item>
         <item name="colorPrimaryTransparent">#003793ee</item>
         <item name="colorAccent">#1275d8</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f2fd</item>
         <item name="table_row_light_bg">#f6fafe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.215" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.215" parent="AppTheme">
         <item name="colorPrimary">#458cef</item>
         <item name="colorPrimaryTransparent">#00458cef</item>
         <item name="colorAccent">#136ae3</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7f0fd</item>
         <item name="table_row_light_bg">#f6f9fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.220" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.220" parent="AppTheme">
         <item name="colorPrimary">#5287f1</item>
         <item name="colorPrimaryTransparent">#005287f1</item>
         <item name="colorAccent">#175eec</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7effd</item>
         <item name="table_row_light_bg">#f6f8fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.225" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.225" parent="AppTheme">
         <item name="colorPrimary">#6085f2</item>
         <item name="colorPrimaryTransparent">#006085f2</item>
         <item name="colorAccent">#2255ec</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7edfd</item>
         <item name="table_row_light_bg">#f6f8fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.230" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.230" parent="AppTheme">
         <item name="colorPrimary">#6e84f3</item>
         <item name="colorPrimaryTransparent">#006e84f3</item>
         <item name="colorAccent">#2d4ded</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7ebfd</item>
         <item name="table_row_light_bg">#f6f7fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.235" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.235" parent="AppTheme">
         <item name="colorPrimary">#7c86f4</item>
         <item name="colorPrimaryTransparent">#007c86f4</item>
         <item name="colorAccent">#3847ee</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7e9fd</item>
         <item name="table_row_light_bg">#f6f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.240" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.240" parent="AppTheme">
         <item name="colorPrimary">#8989f5</item>
         <item name="colorPrimaryTransparent">#008989f5</item>
         <item name="colorAccent">#4343ef</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e7e7fd</item>
         <item name="table_row_light_bg">#f6f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.245" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.245" parent="AppTheme">
         <item name="colorPrimary">#8980f4</item>
         <item name="colorPrimaryTransparent">#008980f4</item>
         <item name="colorAccent">#4a3bef</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#e9e7fd</item>
         <item name="table_row_light_bg">#f6f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.250" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.250" parent="AppTheme">
         <item name="colorPrimary">#8b76f3</item>
         <item name="colorPrimaryTransparent">#008b76f3</item>
         <item name="colorAccent">#5233ee</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#ebe7fd</item>
         <item name="table_row_light_bg">#f7f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.255" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.255" parent="AppTheme">
         <item name="colorPrimary">#8e6cf3</item>
         <item name="colorPrimaryTransparent">#008e6cf3</item>
         <item name="colorAccent">#5c2bed</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#ede7fd</item>
         <item name="table_row_light_bg">#f8f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.260" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.260" parent="AppTheme">
         <item name="colorPrimary">#9262f2</item>
         <item name="colorPrimaryTransparent">#009262f2</item>
         <item name="colorAccent">#6623ed</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#efe7fd</item>
         <item name="table_row_light_bg">#f8f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.265" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.265" parent="AppTheme">
         <item name="colorPrimary">#9858f1</item>
         <item name="colorPrimaryTransparent">#009858f1</item>
         <item name="colorAccent">#721cec</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f0e7fd</item>
         <item name="table_row_light_bg">#f9f6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.270" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.270" parent="AppTheme">
         <item name="colorPrimary">#9f4ff0</item>
         <item name="colorPrimaryTransparent">#009f4ff0</item>
         <item name="colorAccent">#8014eb</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f2e7fd</item>
         <item name="table_row_light_bg">#faf6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.275" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.275" parent="AppTheme">
         <item name="colorPrimary">#a845ef</item>
         <item name="colorPrimaryTransparent">#00a845ef</item>
         <item name="colorAccent">#8d13e3</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f4e7fd</item>
         <item name="table_row_light_bg">#fbf6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.280" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.280" parent="AppTheme">
         <item name="colorPrimary">#b33bef</item>
         <item name="colorPrimaryTransparent">#00b33bef</item>
         <item name="colorAccent">#9912dc</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f6e7fd</item>
         <item name="table_row_light_bg">#fbf6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.285" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.285" parent="AppTheme">
         <item name="colorPrimary">#bf31ee</item>
         <item name="colorPrimaryTransparent">#00bf31ee</item>
         <item name="colorAccent">#a312d4</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f8e7fd</item>
         <item name="table_row_light_bg">#fcf6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.290" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.290" parent="AppTheme">
         <item name="colorPrimary">#cc27ed</item>
         <item name="colorPrimaryTransparent">#00cc27ed</item>
         <item name="colorAccent">#ad11cc</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#f9e7fd</item>
         <item name="table_row_light_bg">#fdf6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.295" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.295" parent="AppTheme">
         <item name="colorPrimary">#db1eec</item>
         <item name="colorPrimaryTransparent">#00db1eec</item>
         <item name="colorAccent">#b510c4</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fbe7fd</item>
         <item name="table_row_light_bg">#fdf6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.300" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.300" parent="AppTheme">
         <item name="colorPrimary">#eb14eb</item>
         <item name="colorPrimaryTransparent">#00eb14eb</item>
         <item name="colorAccent">#bc10bc</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7fd</item>
         <item name="table_row_light_bg">#fef6fe</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.305" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.305" parent="AppTheme">
         <item name="colorPrimary">#e914d7</item>
         <item name="colorPrimaryTransparent">#00e914d7</item>
         <item name="colorAccent">#bb10ac</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7fb</item>
         <item name="table_row_light_bg">#fef6fd</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.310" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.310" parent="AppTheme">
         <item name="colorPrimary">#e713c4</item>
         <item name="colorPrimaryTransparent">#00e713c4</item>
         <item name="colorAccent">#b9109d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f9</item>
         <item name="table_row_light_bg">#fef6fd</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.315" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.315" parent="AppTheme">
         <item name="colorPrimary">#e513b1</item>
         <item name="colorPrimaryTransparent">#00e513b1</item>
         <item name="colorAccent">#b70f8d</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f8</item>
         <item name="table_row_light_bg">#fef6fc</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.320" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.320" parent="AppTheme">
         <item name="colorPrimary">#e3139e</item>
         <item name="colorPrimaryTransparent">#00e3139e</item>
         <item name="colorAccent">#b60f7e</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f6</item>
         <item name="table_row_light_bg">#fef6fb</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.325" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.325" parent="AppTheme">
         <item name="colorPrimary">#e1138b</item>
         <item name="colorPrimaryTransparent">#00e1138b</item>
         <item name="colorAccent">#b40f70</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f4</item>
         <item name="table_row_light_bg">#fef6fb</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.330" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.330" parent="AppTheme">
         <item name="colorPrimary">#df1379</item>
         <item name="colorPrimaryTransparent">#00df1379</item>
         <item name="colorAccent">#b30f61</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f2</item>
         <item name="table_row_light_bg">#fef6fa</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.335" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.335" parent="AppTheme">
         <item name="colorPrimary">#de1367</item>
         <item name="colorPrimaryTransparent">#00de1367</item>
         <item name="colorAccent">#b10f53</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7f0</item>
         <item name="table_row_light_bg">#fef6f9</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.340" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.340" parent="AppTheme">
         <item name="colorPrimary">#dc1255</item>
         <item name="colorPrimaryTransparent">#00dc1255</item>
         <item name="colorAccent">#b00f44</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7ef</item>
         <item name="table_row_light_bg">#fef6f8</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.345" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.345" parent="AppTheme">
         <item name="colorPrimary">#da1244</item>
         <item name="colorPrimaryTransparent">#00da1244</item>
         <item name="colorAccent">#ae0f36</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7ed</item>
         <item name="table_row_light_bg">#fef6f8</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.350" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.350" parent="AppTheme">
         <item name="colorPrimary">#d81233</item>
         <item name="colorPrimaryTransparent">#00d81233</item>
         <item name="colorAccent">#ad0e29</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7eb</item>
         <item name="table_row_light_bg">#fef6f7</item>
     </style>
 
-    <style name="AppTheme.NoActionBar.355" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.355" parent="AppTheme">
         <item name="colorPrimary">#d61222</item>
         <item name="colorPrimaryTransparent">#00d61222</item>
         <item name="colorAccent">#ab0e1b</item>
-        <item name="drawer_background">#ffffffff</item>
         <item name="table_row_dark_bg">#fde7e9</item>
         <item name="table_row_light_bg">#fef6f6</item>
     </style>
