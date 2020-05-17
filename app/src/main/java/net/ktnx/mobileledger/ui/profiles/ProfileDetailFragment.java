@@ -23,12 +23,10 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Switch;
@@ -109,6 +107,7 @@ public class ProfileDetailFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public ProfileDetailFragment() {
+        super(R.layout.profile_detail);
     }
     @Override
     public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
@@ -459,12 +458,6 @@ public class ProfileDetailFragment extends Fragment {
         Activity activity = getActivity();
         if (activity != null)
             activity.finish();
-    }
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        return inflater.inflate(R.layout.profile_detail, container, false);
     }
     private boolean checkUrlValidity() {
         boolean valid = true;
