@@ -202,7 +202,7 @@ public class Colors {
         int themeId = -1;
         if (themeHue == 360)
             themeHue = 0;
-        if ((themeHue >= 0) && (themeHue < 360)) {
+        if ((themeHue >= 0) && (themeHue < 360) && (themeHue != DEFAULT_HUE_DEG)) {
             int index;
             if ((themeHue % HueRing.hueStepDegrees) != 0) {
                 Logger.warn("profiles",
@@ -237,12 +237,12 @@ public class Colors {
     }
     public static @NonNull
     ColorStateList getColorStateList(int hue) {
-        return new ColorStateList(EMPTY_STATES, getColors(hue));
+        return new ColorStateList(EMPTY_STATES, getSwipeCircleColors(hue));
     }
-    public static int[] getColors() {
-        return getColors(profileThemeId);
+    public static int[] getSwipeCircleColors() {
+        return getSwipeCircleColors(profileThemeId);
     }
-    public static int[] getColors(int hue) {
+    public static int[] getSwipeCircleColors(int hue) {
         int[] colors = new int[]{0, 0, 0, 0, 0, 0};
         for (int i = 0; i < 6; i++, hue = (hue + 60) % 360) {
             colors[i] = getPrimaryColorForHue(hue);
