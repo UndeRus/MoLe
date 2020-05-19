@@ -209,9 +209,9 @@ sub hslStyleForHue {
         else {
                 $result .= sprintf "$baseIndent<style name=\"%s\">\n",
                         $baseTheme;
-                $result .= "$indent<item name=\"windowActionBar\">false</item>\n";
-                $result .= "$indent<item name=\"windowNoTitle\">true</item>\n";
-                $result .= "$indent<item name=\"textColor\">#757575</item>\n";
+#                $result .= "$indent<item name=\"windowActionBar\">false</item>\n";
+#                $result .= "$indent<item name=\"windowNoTitle\">true</item>\n";
+#                $result .= "$indent<item name=\"textColor\">#757575</item>\n";
         }
         my $S = 0.845;
         $result .= sprintf "$indent<item name=\"colorPrimary\">#%s</item>\n",
@@ -219,6 +219,8 @@ sub hslStyleForHue {
         $result .= sprintf "$indent<item name=\"colorPrimaryTransparent\">#00%s</item>\n",
                 hslHex($hue, $S, $l1);
         $result .= sprintf "$indent<item name=\"colorAccent\">#%s</item>\n",
+                hslHex($hue, $S, $l2);
+        $result .= sprintf "$indent<item name=\"colorPrimaryDark\">#%s</item>\n",
                 hslHex($hue, $S, $l2);
         $result .= sprintf "$indent<item name=\"table_row_dark_bg\">#%s</item>\n",
                 hslHex($hue, $S, $l3);
