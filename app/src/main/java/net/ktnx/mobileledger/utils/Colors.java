@@ -58,6 +58,7 @@ public class Colors {
     public static int profileThemeId = -1;
     public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
     public static int errorTextColor;
+    private static int SWIPE_COLOR_COUNT = 6;
     private static int[] themeIDs =
             {R.style.AppTheme_000, R.style.AppTheme_005,
              R.style.AppTheme_010, R.style.AppTheme_015,
@@ -243,8 +244,8 @@ public class Colors {
         return getSwipeCircleColors(profileThemeId);
     }
     public static int[] getSwipeCircleColors(int hue) {
-        int[] colors = new int[]{0, 0, 0, 0, 0, 0};
-        for (int i = 0; i < 6; i++, hue = (hue + 60) % 360) {
+        int[] colors = new int[SWIPE_COLOR_COUNT];
+        for (int i = 0; i < SWIPE_COLOR_COUNT; i++, hue = (hue + 360 / SWIPE_COLOR_COUNT) % 360) {
             colors[i] = getPrimaryColorForHue(hue);
         }
         return colors;
