@@ -35,6 +35,7 @@
         <item name="textColor">#757575</item>
         <item name="errorTextColor">@color/errorTextColor</item>
         <item name="colorOnSecondary">?android:attr/colorBackground</item>
+        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense</item>
     </style>
 
     <!-- theme list start -->
