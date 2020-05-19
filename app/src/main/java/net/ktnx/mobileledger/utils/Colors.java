@@ -231,7 +231,6 @@ public class Colors {
 
         refreshColors(activity.getTheme());
     }
-
     public static @NonNull
     ColorStateList getColorStateList() {
         return getColorStateList(profileThemeId);
@@ -276,7 +275,7 @@ public class Colors {
                 for (int h : hues) {
                     if (huesSB.length() > 0)
                         huesSB.append(", ");
-                    huesSB.append(String.valueOf(h));
+                    huesSB.append(h);
                 }
                 debug("profiles", String.format("used hues: %s", huesSB.toString()));
             }
