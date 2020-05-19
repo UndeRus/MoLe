@@ -17,7 +17,7 @@
 
 <resources>
     <string-array name="acc_ctx_menu">
-        <item>Показване на трансакциите</item>
+        <item>Показване на транзакциите</item>
         <!--<item>Expand all</item>-->
         <!--<item>Collapse all</item>-->
     </string-array>
