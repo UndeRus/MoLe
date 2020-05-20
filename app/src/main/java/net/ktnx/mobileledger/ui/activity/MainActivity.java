@@ -647,6 +647,8 @@ public class MainActivity extends ProfileThemedActivity {
     public void fabShouldShow() {
         if ((profile != null) && profile.isPostingPermitted() && !drawer.isOpen())
             fab.show();
+        else
+            fabHide();
     }
     public void fabHide() {
         fab.hide();
