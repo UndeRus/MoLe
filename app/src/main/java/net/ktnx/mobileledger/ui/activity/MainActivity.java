@@ -326,7 +326,6 @@ public class MainActivity extends ProfileThemedActivity {
             };
             drawer.addDrawerListener(drawerListener);
         }
-        setupProfile();
     }
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
