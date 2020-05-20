@@ -17,14 +17,4 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#935FF2</color>
-    <color name="colorPrimaryDark">#3e148c</color>
-    <color name="colorAccent">#653BD0</color>
-    <color name="table_row_dark_bg">#286c33d4</color>
-    <color name="table_row_light_bg">#28ddcbff</color>
-    <color name="header_border">#804a148c</color>
-    <color name="error_background">#FFE1E2</color>
-    <color name="errorTextColor">#CD1609</color>
-    <color name="backgroundColor">#EEEEEE</color>
-    <color name="backgroundColorTransparent">#00eeeeee</color>
 </resources>

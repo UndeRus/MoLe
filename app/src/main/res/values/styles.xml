@@ -28,7 +28,7 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">#935FF2</item>
         <item name="colorPrimaryTransparent">#00935FF2</item>
-        <item name="colorOnPrimary">?android:attr/colorBackground</item>
+        <item name="colorOnPrimary">@android:color/white</item>
         <item name="colorPrimaryDark">#653BD0</item>
         <item name="colorAccent">#653BD0</item>
         <item name="drawer_background">?android:attr/popupBackground</item>
@@ -36,10 +36,11 @@
         <item name="table_row_light_bg">#28ddcbff</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="textColor">#757575</item>
-        <item name="errorTextColor">@color/errorTextColor</item>
-        <item name="colorOnSecondary">?android:attr/colorBackground</item>
+        <item name="textColor">#707070</item>
+        <item name="colorOnSecondary">@android:color/white</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense</item>
+        <item name="colorError">#FFE1E2</item>
+        <item name="colorOnError">#CD1609</item>
         <item name="floatingActionButtonStyle">@style/myFabStyle</item>
     </style>
 
