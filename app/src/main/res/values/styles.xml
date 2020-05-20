@@ -18,6 +18,10 @@
 <resources>
 
     <style name="StretchedTextView" parent="Widget.AppCompat.TextView"></style>
+
+    <style name="myFabStyle" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="tint" state="disabled">?android:attr/colorBackground</item>
+    </style>
     <!-- Base application theme. -->
     <!-- base hue: 261.2245° -->
     <!-- target primary color: #935FF2 -->
@@ -36,6 +40,7 @@
         <item name="errorTextColor">@color/errorTextColor</item>
         <item name="colorOnSecondary">?android:attr/colorBackground</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense</item>
+        <item name="floatingActionButtonStyle">@style/myFabStyle</item>
     </style>
 
     <!-- theme list start -->
