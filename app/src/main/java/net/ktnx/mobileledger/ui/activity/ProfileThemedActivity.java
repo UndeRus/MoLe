@@ -42,12 +42,6 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         initProfile();
         setupProfileColors();
         super.onCreate(savedInstanceState);
-
-
-        Data.profile.observe(this, mobileLedgerProfile -> {
-            mProfile = mobileLedgerProfile;
-            setupProfileColors();
-        });
     }
     protected void initProfile() {
         mProfile = Data.profile.getValue();
