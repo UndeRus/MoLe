@@ -39,7 +39,7 @@
             android:rotation="-45"
             android:text="@string/simulation_label"
             android:textAlignment="center"
-            android:textColor="@color/table_row_dark_bg"
+            android:textColor="?attr/table_row_dark_bg"
             android:textIsSelectable="false"
             android:textSize="36sp"
             android:textStyle="bold"
