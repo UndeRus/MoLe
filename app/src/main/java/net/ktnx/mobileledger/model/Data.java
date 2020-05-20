@@ -76,7 +76,7 @@ public final class Data {
     public static void setCurrentProfile(MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, (newProfile == null) ? null : newProfile.getUuid());
         stopTransactionsRetrieval();
-        profile.postValue(newProfile);
+        profile.setValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {
