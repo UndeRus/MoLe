@@ -66,8 +66,7 @@
 
         <TextView
             android:id="@+id/btn_add_new"
-            style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
-            android:textColor="@color/colorPrimary"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_button"
@@ -81,8 +80,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/btn_no_currency"
             android:text="@string/btn_no_currency"
-            style="@style/TextAppearance.AppCompat.Widget.Button.Colored"
-            android:textColor="@color/colorPrimary"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -105,7 +103,7 @@
 
         <TextView
             android:id="@+id/btn_add_currency"
-            style="@style/TextAppearance.AppCompat.Button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
