@@ -17,8 +17,6 @@
 
 <resources>
 
-    <style name="StretchedTextView" parent="Widget.AppCompat.TextView"></style>
-
     <style name="myFabStyle" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="tint" state="disabled">?android:attr/colorBackground</item>
     </style>

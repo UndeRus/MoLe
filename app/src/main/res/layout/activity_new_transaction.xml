@@ -29,7 +29,6 @@
 
         <TextView
             android:id="@+id/simulationLabel"
-            style="@style/StretchedTextView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_margin="@dimen/activity_horizontal_margin"
