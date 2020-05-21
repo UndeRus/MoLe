@@ -59,7 +59,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
                     android:text="---."
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textColor="?textColor"
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>

@@ -26,7 +26,6 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="@dimen/activity_vertical_margin"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
     app:layout_constraintTop_toTopOf="parent"
     tools:showIn="@layout/main_navigation">
 
@@ -44,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
+            android:textColor="?colorOnPrimary"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <TextView
@@ -51,6 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="dummy version"
+            android:textColor="?attr/colorOnPrimary"
             tools:ignore="HardcodedText" />
     </LinearLayout>
 

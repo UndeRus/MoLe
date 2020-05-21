@@ -47,7 +47,7 @@
         android:longClickable="true"
         android:paddingStart="8dp"
         android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/account_row_check"
         app:layout_constraintTop_toTopOf="parent"
