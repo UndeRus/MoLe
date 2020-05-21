@@ -111,7 +111,7 @@ public class AccountSummaryAdapter
             notifyItemChanged(position);
         }
     }
-    void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
+    private void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
         int i = parentPosition + 1;
         try (LockHolder lh = Data.accounts.lockForWriting()) {
             for (int j = 0; j < Data.accounts.size(); j++) {
@@ -126,8 +126,7 @@ public class AccountSummaryAdapter
         }
     }
 
-    class LedgerRowHolder extends RecyclerView.ViewHolder {
-        CheckBox selectionCb;
+    static class LedgerRowHolder extends RecyclerView.ViewHolder {
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
         View vTrailer;
