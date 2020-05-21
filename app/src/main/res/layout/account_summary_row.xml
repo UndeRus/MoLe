@@ -26,16 +26,6 @@
     android:longClickable="true"
     android:layout_height="wrap_content">
 
-    <CheckBox
-        android:id="@+id/account_row_check"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:button="@drawable/checkbox_star_black"
-        android:onClick="onAccountSummaryRowViewClicked"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/account_row_acc_name"
         style="@style/account_summary_account_name"
@@ -49,7 +39,7 @@
         android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/account_row_check"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
 
@@ -108,13 +98,6 @@
         app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
         app:layout_constraintBottom_toBottomOf="@id/account_row_acc_amounts"
         android:background="@drawable/fade_down_white">
-
-        <!--<ImageView-->
-        <!--android:layout_gravity="center_vertical|end"-->
-        <!--android:id="@+id/account_row_amounts_expander"-->
-        <!--android:layout_width="20dp"-->
-        <!--android:layout_height="20dp"-->
-        <!--android:background="@drawable/ic_expand_more_black_24dp" />-->
 
     </FrameLayout>
 

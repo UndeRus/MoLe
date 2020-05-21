@@ -24,7 +24,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,11 +42,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     public static final int AMOUNT_LIMIT = 3;
-    private boolean selectionActive;
 
-    AccountSummaryAdapter() {
-        this.selectionActive = false;
-    }
+    AccountSummaryAdapter() { }
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
         try (LockHolder lh = Data.accounts.lockForReading()) {
@@ -86,9 +82,6 @@ public class AccountSummaryAdapter
                     holder.tvAccountAmounts.setTypeface(null, Typeface.NORMAL);
                 }
 
-                holder.selectionCb.setVisibility(selectionActive ? View.VISIBLE : View.GONE);
-                holder.selectionCb.setChecked(!acc.isHiddenByStarToBe());
-
                 holder.row.setTag(R.id.POS, position);
             }
             else {
@@ -110,27 +103,6 @@ public class AccountSummaryAdapter
     public int getItemCount() {
         return Data.accounts.size();
     }
-    public void startSelection() {
-        try (LockHolder lh = Data.accounts.lockForWriting()) {
-            for (int i = 0; i < Data.accounts.size(); i++) {
-                LedgerAccount acc = Data.accounts.get(i);
-                acc.setHiddenByStarToBe(acc.isHiddenByStar());
-            }
-            this.selectionActive = true;
-            lh.downgrade();
-            notifyDataSetChanged();
-        }
-    }
-
-    public void stopSelection() {
-        this.selectionActive = false;
-        notifyDataSetChanged();
-    }
-
-    public boolean isSelectionActive() {
-        return selectionActive;
-    }
-
     public void selectItem(int position) {
         try (LockHolder lh = Data.accounts.lockForWriting()) {
             LedgerAccount acc = Data.accounts.get(position);
@@ -167,7 +139,6 @@ public class AccountSummaryAdapter
             this.row = itemView.findViewById(R.id.account_summary_row);
             this.tvAccountName = itemView.findViewById(R.id.account_row_acc_name);
             this.tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
-            this.selectionCb = itemView.findViewById(R.id.account_row_check);
             this.vTrailer = itemView.findViewById(R.id.account_summary_trailer);
             this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
             this.expander = itemView.findViewById(R.id.account_expander);
