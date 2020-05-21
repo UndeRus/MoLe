@@ -182,7 +182,7 @@ public class AccountSummaryAdapter
                     row = (View) v.getParent().getParent();
                     break;
                 default:
-                    Log.e("error", String.format("Don't know how to handle long click on id ", id));
+                    Log.e("error", String.format("Don't know how to handle long click on id %d", id));
                     return false;
             }
             LedgerAccount acc = (LedgerAccount) row.findViewById(R.id.account_summary_row).getTag();
