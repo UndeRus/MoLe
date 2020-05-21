@@ -586,7 +586,7 @@ public class ProfileDetailFragment extends Fragment {
     private void setDefaultCommodity(@NonNull @NotNull String name) {
         defaultCommoditySet = true;
         defaultCommodity.setText(name);
-        defaultCommodity.setTypeface(defaultCommodity.getTypeface(), Typeface.BOLD);
+        defaultCommodity.setTypeface(Typeface.DEFAULT);
     }
     interface TextChangeSyncProc {
         void onTextChanged(String text);
