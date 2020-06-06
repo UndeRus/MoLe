@@ -23,8 +23,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/account_summary_row"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:longClickable="true"
-    android:layout_height="wrap_content">
+    >
 
     <TextView
         android:id="@+id/account_row_acc_name"
@@ -33,15 +34,16 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:onClick="onAccountSummaryRowViewClicked"
         android:longClickable="true"
+        android:onClick="onAccountSummaryRowViewClicked"
         android:paddingStart="8dp"
         android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
         android:textAppearance="@android:style/TextAppearance.Material.Medium"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText"
+        />
 
     <FrameLayout
         android:id="@+id/account_expander_container"
@@ -52,7 +54,8 @@
         android:onClick="onAccountSummaryRowViewClicked"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/account_row_acc_name"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        >
 
         <ImageView
             android:id="@+id/account_expander"
@@ -61,7 +64,8 @@
             android:layout_margin="8dp"
             android:background="@drawable/ic_expand_less_black_24dp"
             android:clickable="true"
-            android:onClick="onAccountSummaryRowViewClicked" />
+            android:onClick="onAccountSummaryRowViewClicked"
+            />
     </FrameLayout>
 
     <TextView
@@ -71,7 +75,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/account_row_acc_amounts"
         app:layout_constraintStart_toEndOf="@id/account_expander_container"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
     <TextView
         android:id="@+id/account_row_acc_amounts"
@@ -88,16 +93,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        tools:ignore="HardcodedText"
+        />
 
     <FrameLayout
         android:id="@+id/account_row_amounts_expander_container"
         android:layout_width="0dp"
         android:layout_height="18sp"
-        app:layout_constraintStart_toStartOf="@id/account_row_acc_amounts"
-        app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
+        android:background="@drawable/fade_down_white"
         app:layout_constraintBottom_toBottomOf="@id/account_row_acc_amounts"
-        android:background="@drawable/fade_down_white">
+        app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
+        app:layout_constraintStart_toStartOf="@id/account_row_acc_amounts"
+        >
 
     </FrameLayout>
 
@@ -108,5 +115,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
