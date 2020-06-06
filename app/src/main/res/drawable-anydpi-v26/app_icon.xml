@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright © 2019 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
@@ -15,13 +15,7 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:contentDescription="@string/nav_header_desc"
-    android:visibility="visible"
-    android:id="@+id/app_icon"
-    app:srcCompat="@drawable/app_icon_transparent_bg"
-    tools:showIn="@layout/activity_main" />
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/app_icon_bg" />
+    <foreground android:drawable="@drawable/app_icon_transparent_bg" />
+</adaptive-icon>
