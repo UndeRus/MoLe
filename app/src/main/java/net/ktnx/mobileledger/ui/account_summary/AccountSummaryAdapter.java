@@ -84,6 +84,8 @@ public class AccountSummaryAdapter
                 holder.row.setTag(R.id.POS, position);
             }
             else {
+                // FIXME trailer's divider looks bad
+                // perhaps replace the trailer with bottom padding for the last item?
                 holder.vTrailer.setVisibility(View.VISIBLE);
                 holder.row.setVisibility(View.GONE);
             }
