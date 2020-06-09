@@ -709,17 +709,9 @@
     </style>
 
     <style name="account_summary_account_name">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">5</item>
     </style>
 
     <style name="account_summary_amounts">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginEnd">0dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:minWidth">60dp</item>
         <item name="android:textAlignment">viewEnd</item>
     </style>
 

@@ -17,104 +17,118 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/account_summary_row"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:longClickable="true"
     >
 
-    <TextView
-        android:id="@+id/account_row_acc_name"
-        style="@style/account_summary_account_name"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:longClickable="true"
-        android:onClick="onAccountSummaryRowViewClicked"
-        android:paddingStart="8dp"
-        android:text="Account name, a really long one. A very very very long one. It may even spawn on more than two lines -- three, four or more."
-        android:textAppearance="@android:style/TextAppearance.Material.Medium"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText"
-        />
-
-    <FrameLayout
-        android:id="@+id/account_expander_container"
-        android:layout_width="@dimen/thumb_row_height"
-        android:layout_height="@dimen/thumb_row_height"
-        android:foregroundGravity="center_vertical"
-        android:minHeight="@dimen/thumb_row_height"
-        android:onClick="onAccountSummaryRowViewClicked"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/account_row_acc_name"
-        app:layout_constraintTop_toTopOf="parent"
-        >
-
-        <ImageView
-            android:id="@+id/account_expander"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:background="@drawable/ic_expand_less_black_24dp"
-            android:clickable="true"
-            android:onClick="onAccountSummaryRowViewClicked"
-            />
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/account_row_filler1"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/account_row_acc_amounts"
-        app:layout_constraintStart_toEndOf="@id/account_expander_container"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <TextView
-        android:id="@+id/account_row_acc_amounts"
-        style="@style/account_summary_amounts"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/account_summary_row"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_weight="0"
-        android:gravity="center_vertical"
-        android:minWidth="@dimen/thumb_row_height"
-        android:onClick="onAccountSummaryRowViewClicked"
-        android:text="123,45\n678,90"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText"
-        />
-
-    <FrameLayout
-        android:id="@+id/account_row_amounts_expander_container"
-        android:layout_width="0dp"
-        android:layout_height="18sp"
-        android:background="@drawable/fade_down_white"
-        app:layout_constraintBottom_toBottomOf="@id/account_row_acc_amounts"
-        app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
-        app:layout_constraintStart_toStartOf="@id/account_row_acc_amounts"
+        android:longClickable="true"
+        android:minHeight="@dimen/thumb_row_height"
         >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/account_name_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/account_row_acc_amounts"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintHorizontal_weight="3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+            <TextView
+                android:id="@+id/account_row_acc_name"
+                style="@style/account_summary_account_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:gravity="center_vertical"
+                android:longClickable="true"
+                android:onClick="onAccountSummaryRowViewClicked"
+                android:paddingStart="8dp"
+                android:text="AccountNameALongOne"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/account_expander_container"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="wrap"
+                app:layout_constraintWidth_percent=".67"
+                tools:ignore="HardcodedText"
+                />
 
-    </FrameLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/account_expander_container"
+                android:layout_width="@dimen/thumb_row_height"
+                android:layout_height="@dimen/thumb_row_height"
+                android:foregroundGravity="center_vertical"
+                android:minHeight="@dimen/thumb_row_height"
+                android:onClick="onAccountSummaryRowViewClicked"
+                app:layout_constraintBottom_toBottomOf="@id/account_row_acc_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/account_row_acc_name"
+                app:layout_constraintTop_toTopOf="@id/account_row_acc_name"
+                >
 
+                <ImageView
+                    android:id="@+id/account_expander"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/ic_expand_less_black_24dp"
+                    android:clickable="true"
+                    android:onClick="onAccountSummaryRowViewClicked"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/account_row_acc_amounts"
+            style="@style/account_summary_amounts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:onClick="onAccountSummaryRowViewClicked"
+            android:text="USD 123,45\n678,90\nIRAUSD -17 000.00"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_weight="2"
+            app:layout_constraintStart_toEndOf="@id/account_name_layout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_min="90sp"
+            tools:ignore="HardcodedText"
+            />
+
+        <FrameLayout
+            android:id="@+id/account_row_amounts_expander_container"
+            android:layout_width="0dp"
+            android:layout_height="18sp"
+            android:background="@drawable/fade_down_white"
+            app:layout_constraintBottom_toBottomOf="@id/account_row_acc_amounts"
+            app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
+            app:layout_constraintStart_toStartOf="@id/account_row_acc_amounts"
+            >
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <View
         android:id="@+id/account_summary_trailer"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

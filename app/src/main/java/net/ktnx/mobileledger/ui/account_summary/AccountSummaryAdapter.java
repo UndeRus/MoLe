@@ -24,7 +24,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,9 +58,9 @@ public class AccountSummaryAdapter
                 ConstraintLayout.LayoutParams lp =
                         (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
                 lp.setMarginStart(
-                        acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 2);
+                        acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
                 holder.expanderContainer
-                        .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.INVISIBLE);
+                        .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.GONE);
                 holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
                 int amounts = acc.getAmountCount();
                 if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
@@ -101,7 +100,8 @@ public class AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return Data.accounts.size();
+        return Data.accounts.size() + (Data.profile.getValue()
+                                                   .isPostingPermitted() ? 1 : 0);
     }
     public void selectItem(int position) {
         try (LockHolder lh = Data.accounts.lockForWriting()) {
@@ -130,9 +130,9 @@ public class AccountSummaryAdapter
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
         View vTrailer;
-        FrameLayout expanderContainer;
+        View expanderContainer;
         ImageView expander;
-        FrameLayout accountExpanderContainer;
+        View accountExpanderContainer;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
             this.row = itemView.findViewById(R.id.account_summary_row);
@@ -160,6 +160,7 @@ public class AccountSummaryAdapter
             tvAccountAmounts.setOnLongClickListener(this::onItemLongClick);
             expanderContainer.setOnLongClickListener(this::onItemLongClick);
             expander.setOnLongClickListener(this::onItemLongClick);
+            row.setOnLongClickListener(this::onItemLongClick);
         }
         private boolean onItemLongClick(View v) {
             MainActivity activity = (MainActivity) v.getContext();
@@ -170,22 +171,26 @@ public class AccountSummaryAdapter
                 case R.id.account_summary_row:
                     row = v;
                     break;
-                case R.id.account_root:
-                    row = v.findViewById(R.id.account_summary_row);
-                    break;
-                case R.id.account_row_acc_name:
                 case R.id.account_row_acc_amounts:
-                case R.id.account_expander_container:
+                case R.id.account_row_amounts_expander_container:
                     row = (View) v.getParent();
                     break;
+                case R.id.account_row_acc_name:
+                case R.id.account_expander_container:
+                    row = (View) v.getParent()
+                                  .getParent();
+                    break;
                 case R.id.account_expander:
-                    row = (View) v.getParent().getParent();
+                    row = (View) v.getParent()
+                                  .getParent()
+                                  .getParent();
                     break;
                 default:
-                    Log.e("error", String.format("Don't know how to handle long click on id %d", id));
+                    Log.e("error",
+                            String.format("Don't know how to handle long click on id %d", id));
                     return false;
             }
-            LedgerAccount acc = (LedgerAccount) row.findViewById(R.id.account_summary_row).getTag();
+            LedgerAccount acc = (LedgerAccount) row.getTag();
             builder.setTitle(acc.getName());
             builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
                 switch (which) {

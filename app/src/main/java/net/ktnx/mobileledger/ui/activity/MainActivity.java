@@ -655,11 +655,21 @@ public class MainActivity extends ProfileThemedActivity {
     }
     public void onAccountSummaryRowViewClicked(View view) {
         ViewGroup row;
-        if (view.getId() == R.id.account_expander)
-            row = (ViewGroup) view.getParent()
-                                  .getParent();
-        else
-            row = (ViewGroup) view.getParent();
+        switch (view.getId()) {
+            case R.id.account_expander:
+                row = (ViewGroup) view.getParent()
+                                      .getParent()
+                                      .getParent();
+                break;
+            case R.id.account_expander_container:
+            case R.id.account_row_acc_name:
+                row = (ViewGroup) view.getParent()
+                                      .getParent();
+                break;
+            default:
+                row = (ViewGroup) view.getParent();
+                break;
+        }
 
         LedgerAccount acc = (LedgerAccount) row.getTag();
         switch (view.getId()) {
