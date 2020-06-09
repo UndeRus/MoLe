@@ -103,29 +103,6 @@ public class AccountSummaryAdapter
         return Data.accounts.size() + (Data.profile.getValue()
                                                    .isPostingPermitted() ? 1 : 0);
     }
-    public void selectItem(int position) {
-        try (LockHolder lh = Data.accounts.lockForWriting()) {
-            LedgerAccount acc = Data.accounts.get(position);
-            acc.toggleHiddenToBe();
-            toggleChildrenOf(acc, acc.isHiddenByStarToBe(), position);
-            notifyItemChanged(position);
-        }
-    }
-    private void toggleChildrenOf(LedgerAccount parent, boolean hiddenToBe, int parentPosition) {
-        int i = parentPosition + 1;
-        try (LockHolder lh = Data.accounts.lockForWriting()) {
-            for (int j = 0; j < Data.accounts.size(); j++) {
-                LedgerAccount acc = Data.accounts.get(j);
-                if (acc.getName().startsWith(parent.getName() + ":")) {
-                    acc.setHiddenByStarToBe(hiddenToBe);
-                    notifyItemChanged(i);
-                    toggleChildrenOf(acc, hiddenToBe, i);
-                    i++;
-                }
-            }
-        }
-    }
-
     static class LedgerRowHolder extends RecyclerView.ViewHolder {
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
