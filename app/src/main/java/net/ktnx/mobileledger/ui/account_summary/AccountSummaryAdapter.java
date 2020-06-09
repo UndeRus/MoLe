@@ -27,16 +27,16 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
+
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.LockHolder;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
@@ -59,8 +59,8 @@ public class AccountSummaryAdapter
                         (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
                 lp.setMarginStart(
                         acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
-                holder.expanderContainer
-                        .setVisibility(acc.hasSubAccounts() ? View.VISIBLE : View.GONE);
+                holder.expanderContainer.setVisibility(
+                        acc.hasSubAccounts() ? View.VISIBLE : View.GONE);
                 holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
                 int amounts = acc.getAmountCount();
                 if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
@@ -94,7 +94,7 @@ public class AccountSummaryAdapter
     @Override
     public LedgerRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View row = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.account_summary_row, parent, false);
+                                 .inflate(R.layout.account_summary_row, parent, false);
         return new LedgerRowHolder(row);
     }
 
