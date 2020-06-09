@@ -121,17 +121,6 @@ public class AccountSummaryAdapter
             this.accountExpanderContainer =
                     itemView.findViewById(R.id.account_row_amounts_expander_container);
 
-            expanderContainer.addOnLayoutChangeListener(
-                    (v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
-                        int w = right - left;
-                        int h = bottom - top;
-                        if (h > w) {
-                            int p = (h - w) / 2;
-                            v.setPadding(0, p, 0, p);
-                        }
-                        else v.setPadding(0, 0, 0, 0);
-                    });
-
             itemView.setOnLongClickListener(this::onItemLongClick);
             tvAccountName.setOnLongClickListener(this::onItemLongClick);
             tvAccountAmounts.setOnLongClickListener(this::onItemLongClick);
