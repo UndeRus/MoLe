@@ -48,7 +48,7 @@ public final class Data {
     public static ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
     public static MutableLiveData<Boolean> backgroundTasksRunning = new MutableLiveData<>(false);
     public static MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
-    public static MutableLiveData<MobileLedgerProfile> profile = new MutableLiveData<>();
+    public static MutableLiveData<MobileLedgerProfile> profile = new InertMutableLiveData<>();
     public static MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
     public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
