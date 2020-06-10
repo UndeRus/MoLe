@@ -185,24 +185,6 @@ public class MainActivity extends ProfileThemedActivity {
             drawer.addDrawerListener(barDrawerToggle);
         }
         barDrawerToggle.syncState();
-        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
-            @Override
-            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-                if (slideOffset > 0.2)
-                    fabHide();
-            }
-            @Override
-            public void onDrawerOpened(@NonNull View drawerView) {
-                fabHide();
-            }
-            @Override
-            public void onDrawerClosed(@NonNull View drawerView) {
-                fabShouldShow();
-            }
-            @Override
-            public void onDrawerStateChanged(int newState) {}
-        });
-
 
         try {
             PackageInfo pi = getApplicationContext().getPackageManager()
@@ -313,15 +295,24 @@ public class MainActivity extends ProfileThemedActivity {
         if (drawerListener == null) {
             drawerListener = new DrawerLayout.SimpleDrawerListener() {
                 @Override
+                public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                    if (slideOffset > 0.2)
+                        fabHide();
+                }
+                @Override
                 public void onDrawerClosed(View drawerView) {
                     super.onDrawerClosed(drawerView);
                     mProfileListAdapter.setAnimationsEnabled(false);
                     mProfileListAdapter.editingProfiles.setValue(false);
+                    Data.drawerOpen.setValue(false);
+                    fabShouldShow();
                 }
                 @Override
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
                     mProfileListAdapter.setAnimationsEnabled(true);
+                    Data.drawerOpen.setValue(true);
+                    fabHide();
                 }
             };
             drawer.addDrawerListener(drawerListener);
