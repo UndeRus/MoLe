@@ -43,23 +43,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class Data {
-    public static ObservableList<TransactionListItem> transactions =
+    public static final ObservableList<TransactionListItem> transactions =
             new ObservableList<>(new ArrayList<>());
-    public static ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
-    public static MutableLiveData<Boolean> backgroundTasksRunning = new MutableLiveData<>(false);
-    public static MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
-    public static MutableLiveData<MobileLedgerProfile> profile = new InertMutableLiveData<>();
-    public static MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
+    public static final ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
+    public static final MutableLiveData<Boolean> backgroundTasksRunning = new MutableLiveData<>(false);
+    public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
+    public static final MutableLiveData<MobileLedgerProfile> profile = new InertMutableLiveData<>();
+    public static final MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
-    public static MutableLiveData<String> accountFilter = new MutableLiveData<>();
-    public static MutableLiveData<Currency.Position> currencySymbolPosition =
+    public static final MutableLiveData<String> accountFilter = new MutableLiveData<>();
+    public static final MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
-    public static MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
-    public static MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
-    private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
-    private static Locker profilesLocker = new Locker();
+    public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
+    public static final MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
+    private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
+    private static final Locker profilesLocker = new Locker();
     private static RetrieveTransactionsTask retrieveTransactionsTask;
-    public static MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
+    public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
         debug("data",
