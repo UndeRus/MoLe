@@ -136,6 +136,8 @@ public class ProfilesRecyclerViewAdapter
         if (profile == null)
             throw new IllegalStateException("Profile row without associated profile");
         debug("profiles", "Setting profile to " + profile.getName());
+        if (Data.profile.getValue() != profile )
+            Data.drawerOpen.setValue(false);
         Data.setCurrentProfile(profile);
     }
     @NonNull

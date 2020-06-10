@@ -59,6 +59,7 @@ public final class Data {
     private static AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static Locker profilesLocker = new Locker();
     private static RetrieveTransactionsTask retrieveTransactionsTask;
+    public static MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
         debug("data",

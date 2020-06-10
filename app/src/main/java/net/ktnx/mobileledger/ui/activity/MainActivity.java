@@ -317,6 +317,13 @@ public class MainActivity extends ProfileThemedActivity {
             };
             drawer.addDrawerListener(drawerListener);
         }
+
+        Data.drawerOpen.observe(this, open -> {
+            if (open)
+                drawer.open();
+            else
+                drawer.close();
+        });
     }
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
@@ -424,8 +431,6 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.pager_layout).setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
         mProfileListAdapter.notifyDataSetChanged();
-
-        drawer.closeDrawers();
 
         Data.transactions.clear();
         debug("transactions", "requesting list reload");
