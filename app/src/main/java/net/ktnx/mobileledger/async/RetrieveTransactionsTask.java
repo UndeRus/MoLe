@@ -63,8 +63,9 @@ public class RetrieveTransactionsTask
         extends AsyncTask<Void, RetrieveTransactionsTask.Progress, String> {
     private static final int MATCHING_TRANSACTIONS_LIMIT = 150;
     private static final Pattern reComment = Pattern.compile("^\\s*;");
-    private static final Pattern reTransactionStart = Pattern.compile("<tr class=\"title\" " +
-                                                                      "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
+    private static final Pattern reTransactionStart = Pattern.compile(
+            "<tr class=\"title\" " + "id=\"transaction-(\\d+)" + "\"><td class=\"date" +
+            "\"[^\"]*>([\\d.-]+)</td>");
     private static final Pattern reTransactionDescription =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
     private static final Pattern reTransactionDetails = Pattern.compile(
@@ -118,28 +119,32 @@ public class RetrieveTransactionsTask
     protected void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
         MainActivity context = getContext();
-        if (context == null) return;
+        if (context == null)
+            return;
         context.onRetrieveProgress(values[0]);
     }
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         MainActivity context = getContext();
-        if (context == null) return;
+        if (context == null)
+            return;
         context.onRetrieveStart();
     }
     @Override
     protected void onPostExecute(String error) {
         super.onPostExecute(error);
         MainActivity context = getContext();
-        if (context == null) return;
+        if (context == null)
+            return;
         context.onRetrieveDone(error);
     }
     @Override
     protected void onCancelled() {
         super.onCancelled();
         MainActivity context = getContext();
-        if (context == null) return;
+        if (context == null)
+            return;
         context.onRetrieveDone(null);
     }
     private String retrieveTransactionListLegacy()
@@ -214,12 +219,15 @@ public class RetrieveTransactionsTask
 
                                 prevAccount = lastAccount;
                                 lastAccount = profile.tryLoadAccount(db, acct_name);
-                                if (lastAccount == null) lastAccount = new LedgerAccount(acct_name);
-                                else lastAccount.removeAmounts();
+                                if (lastAccount == null)
+                                    lastAccount = new LedgerAccount(acct_name);
+                                else
+                                    lastAccount.removeAmounts();
                                 profile.storeAccount(db, lastAccount);
 
-                                if (prevAccount != null) prevAccount
-                                        .setHasSubAccounts(prevAccount.isParentOf(lastAccount));
+                                if (prevAccount != null)
+                                    prevAccount.setHasSubAccounts(
+                                            prevAccount.isParentOf(lastAccount));
                                 // make sure the parent account(s) are present,
                                 // synthesising them if necessary
                                 // this happens when the (missing-in-HTML) parent account has
@@ -229,7 +237,8 @@ public class RetrieveTransactionsTask
                                 if (parentName != null) {
                                     Stack<String> toAppend = new Stack<>();
                                     while (parentName != null) {
-                                        if (accountNames.containsKey(parentName)) break;
+                                        if (accountNames.containsKey(parentName))
+                                            break;
                                         toAppend.push(parentName);
                                         parentName = new LedgerAccount(parentName).getParentName();
                                     }
@@ -244,7 +253,8 @@ public class RetrieveTransactionsTask
                                                             lastAccount.isExpanded());
                                         }
                                         acc.setHasSubAccounts(true);
-                                        acc.removeAmounts();    // filled below when amounts are parsed
+                                        acc.removeAmounts();    // filled below when amounts are
+                                        // parsed
                                         if (acc.isVisible(accountList))
                                             accountList.add(acc);
                                         L(String.format("gap-filling with %s", aName));
@@ -272,7 +282,8 @@ public class RetrieveTransactionsTask
                                 match_found = true;
                                 String value = m.group(1);
                                 String currency = m.group(2);
-                                if (currency == null) currency = "";
+                                if (currency == null)
+                                    currency = "";
 
                                 {
                                     Matcher tmpM = reDecimalComma.matcher(value);
@@ -308,7 +319,8 @@ public class RetrieveTransactionsTask
                             break;
 
                         case EXPECTING_TRANSACTION:
-                            if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                            if (!line.isEmpty() && (line.charAt(0) == ' '))
+                                continue;
                             m = reTransactionStart.matcher(line);
                             if (m.find()) {
                                 transactionId = Integer.valueOf(m.group(1));
@@ -332,16 +344,19 @@ public class RetrieveTransactionsTask
                             break;
 
                         case EXPECTING_TRANSACTION_DESCRIPTION:
-                            if (!line.isEmpty() && (line.charAt(0) == ' ')) continue;
+                            if (!line.isEmpty() && (line.charAt(0) == ' '))
+                                continue;
                             m = reTransactionDescription.matcher(line);
                             if (m.find()) {
-                                if (transactionId == 0) throw new TransactionParserException(
-                                        "Transaction Id is 0 while expecting " + "description");
+                                if (transactionId == 0)
+                                    throw new TransactionParserException(
+                                            "Transaction Id is 0 while expecting " + "description");
 
                                 String date = m.group(1);
                                 try {
                                     int equalsIndex = date.indexOf('=');
-                                    if (equalsIndex >= 0) date = date.substring(equalsIndex + 1);
+                                    if (equalsIndex >= 0)
+                                        date = date.substring(equalsIndex + 1);
                                     transaction =
                                             new LedgerTransaction(transactionId, date, m.group(2));
                                 }
@@ -385,7 +400,8 @@ public class RetrieveTransactionsTask
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
 // for example, when you add the initial seeding transaction after entering some others
 //                                            if (transactionId == 1) {
-//                                                L("This was the initial transaction. Terminating " +
+//                                                L("This was the initial transaction.
+//                                                Terminating " +
 //                                                  "parser");
 //                                                break LINES;
 //                                            }
@@ -398,9 +414,10 @@ public class RetrieveTransactionsTask
                                             transaction.getId(), lta.getAccountName(),
                                             lta.getAmount()));
                                 }
-                                else throw new IllegalStateException(
-                                        String.format("Can't parse transaction %d " + "details: %s",
-                                                transactionId, line));
+                                else
+                                    throw new IllegalStateException(
+                                            String.format("Can't parse transaction %d details: %s",
+                                                    transactionId, line));
                             }
                             break;
                         default:
@@ -462,19 +479,24 @@ public class RetrieveTransactionsTask
                 while (true) {
                     throwIfCancelled();
                     ParsedLedgerAccount parsedAccount = parser.nextAccount();
-                    if (parsedAccount == null) break;
+                    if (parsedAccount == null)
+                        break;
 
                     LedgerAccount acc = profile.tryLoadAccount(db, parsedAccount.getAname());
-                    if (acc == null) acc = new LedgerAccount(parsedAccount.getAname());
-                    else acc.removeAmounts();
+                    if (acc == null)
+                        acc = new LedgerAccount(parsedAccount.getAname());
+                    else
+                        acc.removeAmounts();
 
                     profile.storeAccount(db, acc);
                     String lastCurrency = null;
                     float lastCurrencyAmount = 0;
                     for (ParsedBalance b : parsedAccount.getAibalance()) {
                         final String currency = b.getAcommodity();
-                        final float amount = b.getAquantity().asFloat();
-                        if (currency.equals(lastCurrency)) lastCurrencyAmount += amount;
+                        final float amount = b.getAquantity()
+                                              .asFloat();
+                        if (currency.equals(lastCurrency))
+                            lastCurrencyAmount += amount;
                         else {
                             if (lastCurrency != null) {
                                 profile.storeAccountValue(db, acc.getName(), lastCurrency,
@@ -491,11 +513,12 @@ public class RetrieveTransactionsTask
                         acc.addAmount(lastCurrencyAmount, lastCurrency);
                     }
 
-                    if (acc.isVisible(accountList)) accountList.add(acc);
+                    if (acc.isVisible(accountList))
+                        accountList.add(acc);
 
                     if (prevAccount != null) {
-                        prevAccount.setHasSubAccounts(
-                                acc.getName().startsWith(prevAccount.getName() + ":"));
+                        prevAccount.setHasSubAccounts(acc.getName()
+                                                         .startsWith(prevAccount.getName() + ":"));
                     }
 
                     prevAccount = acc;
@@ -513,7 +536,8 @@ public class RetrieveTransactionsTask
         }
         // should not be set in the DB transaction, because of a possible deadlock
         // with the main and DbOpQueueRunner threads
-        if (listFilledOK) Data.accounts.setList(accountList);
+        if (listFilledOK)
+            Data.accounts.setList(accountList);
 
         return true;
     }
@@ -554,11 +578,14 @@ public class RetrieveTransactionsTask
                     throwIfCancelled();
                     ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
                     throwIfCancelled();
-                    if (parsedTransaction == null) break;
+                    if (parsedTransaction == null)
+                        break;
 
                     LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
-                    if (transaction.getId() > lastTransactionId) orderAccumulator++;
-                    else orderAccumulator--;
+                    if (transaction.getId() > lastTransactionId)
+                        orderAccumulator++;
+                    else
+                        orderAccumulator--;
                     lastTransactionId = transaction.getId();
                     if (transactionOrder == DetectedTransactionOrder.UNKNOWN) {
                         if (orderAccumulator > 30) {
@@ -571,8 +598,8 @@ public class RetrieveTransactionsTask
                         else if (orderAccumulator < -30) {
                             transactionOrder = DetectedTransactionOrder.REVERSE_CHRONOLOGICAL;
                             debug("rtt", String.format(Locale.ENGLISH,
-                                    "Detected reverse chronological order after %d transactions (factor %d)",
-                                    processedTransactionCount, orderAccumulator));
+                                    "Detected reverse chronological order after %d transactions " +
+                                    "(factor %d)", processedTransactionCount, orderAccumulator));
                         }
                     }
 
@@ -658,7 +685,8 @@ public class RetrieveTransactionsTask
         return contextRef.get();
     }
     private void throwIfCancelled() {
-        if (isCancelled()) throw new OperationCanceledException(null);
+        if (isCancelled())
+            throw new OperationCanceledException(null);
     }
     enum DetectedTransactionOrder {UNKNOWN, REVERSE_CHRONOLOGICAL, FILE}
 
