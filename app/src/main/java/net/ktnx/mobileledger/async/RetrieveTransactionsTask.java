@@ -67,8 +67,9 @@ public class RetrieveTransactionsTask
                                                                       "id=\"transaction-(\\d+)\"><td class=\"date\"[^\"]*>([\\d.-]+)</td>");
     private static final Pattern reTransactionDescription =
             Pattern.compile("<tr class=\"posting\" title=\"(\\S+)\\s(.+)");
-    private static final Pattern reTransactionDetails =
-            Pattern.compile("^\\s+([!*]\\s+)?(\\S[\\S\\s]+\\S)\\s\\s+([-+]?\\d[\\d,.]*)(?:\\s+(\\S+)$)?");
+    private static final Pattern reTransactionDetails = Pattern.compile(
+            "^\\s+" + "([!*]\\s+)?" + "(\\S[\\S\\s]+\\S)\\s\\s+" + "(?:([^\\d\\s+\\-]+)\\s*)?" +
+            "([-+]?\\d[\\d,.]*)" + "(?:\\s*([^\\d\\s+\\-]+)\\s*$)?");
     private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
     private static final Pattern reDecimalPoint = Pattern.compile("\\.\\d\\d?$");
     private static final Pattern reDecimalComma = Pattern.compile(",\\d\\d?$");
@@ -85,6 +86,33 @@ public class RetrieveTransactionsTask
     }
     private static void L(String msg) {
         //debug("transaction-parser", msg);
+    }
+    static LedgerTransactionAccount parseTransactionAccountLine(String line) {
+        Matcher m = reTransactionDetails.matcher(line);
+        if (m.find()) {
+            String postingStatus = m.group(1);
+            String acc_name = m.group(2);
+            String currencyPre = m.group(3);
+            String amount = m.group(4);
+            String currencyPost = m.group(5);
+
+            String currency = null;
+            if ((currencyPre != null) && (currencyPre.length() > 0)) {
+                if ((currencyPost != null) && (currencyPost.length() > 0))
+                    return null;
+                currency = currencyPre;
+            }
+            else if ((currencyPost != null) && (currencyPost.length() > 0)) {
+                currency = currencyPost;
+            }
+
+            amount = amount.replace(',', '.');
+
+            return new LedgerTransactionAccount(acc_name, Float.valueOf(amount), currency, null);
+        }
+        else {
+            return null;
+        }
     }
     @Override
     protected void onProgressUpdate(Progress... values) {
@@ -363,18 +391,12 @@ public class RetrieveTransactionsTask
 //                                            }
                             }
                             else {
-                                m = reTransactionDetails.matcher(line);
-                                if (m.find()) {
-                                    String postingStatus = m.group(1);
-                                    String acc_name = m.group(2);
-                                    String amount = m.group(3);
-                                    String currency = m.group(4);
-                                    if (currency == null) currency = "";
-                                    amount = amount.replace(',', '.');
-                                    transaction.addAccount(new LedgerTransactionAccount(acc_name,
-                                            Float.valueOf(amount), currency, null));
+                                LedgerTransactionAccount lta = parseTransactionAccountLine(line);
+                                if (lta != null) {
+                                    transaction.addAccount(lta);
                                     L(String.format(Locale.ENGLISH, "%d: %s = %s",
-                                            transaction.getId(), acc_name, amount));
+                                            transaction.getId(), lta.getAccountName(),
+                                            lta.getAmount()));
                                 }
                                 else throw new IllegalStateException(
                                         String.format("Can't parse transaction %d " + "details: %s",
