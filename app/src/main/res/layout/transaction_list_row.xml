@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -30,11 +30,9 @@
         style="@style/Widget.MaterialComponents.CardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
-        android:layout_marginVertical="1dp"
+        android:layout_margin="8dp"
         android:visibility="visible"
         app:cardCornerRadius="4dp"
-        app:cardElevation="2dp"
         app:cardUseCompatPadding="false"
         >
 
