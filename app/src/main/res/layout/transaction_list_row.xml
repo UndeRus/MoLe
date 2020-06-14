@@ -47,7 +47,7 @@
                 android:id="@+id/transaction_row_head"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -55,14 +55,21 @@
                 <TextView
                     android:id="@+id/transaction_row_description"
                     style="@style/account_summary_account_name"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="5"
                     android:text="---."
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                    android:textColor="?textColor"
-                    tools:ignore="HardcodedText" />
-
+                    tools:ignore="HardcodedText"
+                    />
+                <TextView
+                    android:id="@+id/transaction_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Comment text"
+                    android:textStyle="italic"
+                    tools:ignore="HardcodedText"
+                    />
             </LinearLayout>
 
             <View

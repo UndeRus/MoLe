@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 class TransactionRowHolder extends RecyclerView.ViewHolder {
     TextView tvDescription;
+    TextView tvComment;
     LinearLayout tableAccounts;
     ConstraintLayout row;
     ConstraintLayout vDelimiter;
@@ -40,6 +41,7 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
         super(itemView);
         this.row = itemView.findViewById(R.id.transaction_row);
         this.tvDescription = itemView.findViewById(R.id.transaction_row_description);
+        this.tvComment = itemView.findViewById(R.id.transaction_comment);
         this.tableAccounts = itemView.findViewById(R.id.transaction_row_acc_amounts);
         this.vDelimiter = itemView.findViewById(R.id.transaction_delimiter);
         this.vTransaction = itemView.findViewById(R.id.transaction_card_view);

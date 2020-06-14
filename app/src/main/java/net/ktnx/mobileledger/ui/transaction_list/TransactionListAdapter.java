@@ -42,6 +42,7 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -159,11 +160,19 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 case HEAD:
                     holder.tvDescription.setText(step.getTransaction()
                                                      .getDescription());
+                    String trComment = Misc.emptyIsNull(step.getTransaction()
+                                                            .getComment());
+                    if (trComment == null)
+                        holder.tvComment.setVisibility(View.GONE);
+                    else {
+                        holder.tvComment.setText(trComment);
+                        holder.tvComment.setVisibility(View.VISIBLE);
+                    }
 
-                    if (step.isOdd())
-                        holder.row.setBackgroundColor(Colors.tableRowDarkBG);
-                    else
-                        holder.row.setBackgroundColor(Colors.tableRowLightBG);
+//                    if (step.isOdd())
+//                        holder.row.setBackgroundColor(Colors.tableRowDarkBG);
+//                    else
+//                        holder.row.setBackgroundColor(Colors.tableRowLightBG);
 
                     break;
                 case ACCOUNTS:
