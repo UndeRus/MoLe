@@ -23,7 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import net.ktnx.mobileledger.utils.Digest;
 import net.ktnx.mobileledger.utils.Globals;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -42,6 +42,10 @@ public class LedgerTransaction {
                         return res;
                     res = o1.getCurrency()
                             .compareTo(o2.getCurrency());
+                    if (res != 0)
+                        return res;
+                    res = o1.getComment()
+                            .compareTo(o2.getComment());
                     if (res != 0)
                         return res;
                     return Float.compare(o1.getAmount(), o2.getAmount());
@@ -140,7 +144,7 @@ public class LedgerTransaction {
                 data.append(item.getComment());
             }
             sha.update(data.toString()
-                           .getBytes(Charset.forName("UTF-8")));
+                           .getBytes(StandardCharsets.UTF_8));
             dataHash = sha.digestToHexString();
         }
         catch (NoSuchAlgorithmException e) {
