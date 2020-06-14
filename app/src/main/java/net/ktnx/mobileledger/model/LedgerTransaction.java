@@ -170,7 +170,7 @@ public class LedgerTransaction {
             return;
 
         try (Cursor cTr = db.rawQuery(
-                "SELECT date, description from transactions WHERE profile=? AND id=?",
+                "SELECT date, description, comment from transactions WHERE profile=? AND id=?",
                 new String[]{profile, String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
@@ -185,6 +185,7 @@ public class LedgerTransaction {
                                     dateString, id));
                 }
                 description = cTr.getString(1);
+                comment = cTr.getString(2);
 
                 try (Cursor cAcc = db.rawQuery(
                         "SELECT account_name, amount, currency, comment FROM " +
