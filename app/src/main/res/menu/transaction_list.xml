@@ -23,7 +23,7 @@
     <item
         android:id="@+id/menu_transaction_list_filter"
         android:icon="@drawable/ic_filter_list_white_24dp"
-        android:title="Filter"
+        android:title="@string/filter_menu_title"
         app:showAsAction="always"
         tools:context="net.ktnx.mobileledger.ui.activity.MainActivity"
         />
