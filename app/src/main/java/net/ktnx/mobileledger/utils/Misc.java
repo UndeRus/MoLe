@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.view.WindowManager;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -76,5 +77,11 @@ public class Misc {
         if (text == null)
             return true;
         return text.length() == 0;
+    }
+    public static String trim(@Nullable String string) {
+        if (string == null)
+            return null;
+
+        return string.trim();
     }
 }

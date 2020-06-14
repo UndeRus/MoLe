@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -146,6 +147,7 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
     public LedgerTransaction asLedgerTransaction() throws ParseException {
         Date date = Globals.parseIsoDate(tdate);
         LedgerTransaction tr = new LedgerTransaction(tindex, date, tdescription);
+        tr.setComment(Misc.trim(Misc.emptyIsNull(tcomment)));
 
         List<ParsedPosting> postings = tpostings;
 
