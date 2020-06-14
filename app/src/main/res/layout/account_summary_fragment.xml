@@ -21,19 +21,22 @@
     android:id="@+id/account_summary_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.account_summary.AccountSummaryFragment">
+    tools:context=".ui.account_summary.AccountSummaryFragment"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/content_account_summary_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".ui.activity.MainActivity">
+        tools:context=".ui.activity.MainActivity"
+        >
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/account_swiper"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/account_root"
@@ -42,7 +45,8 @@
                 android:choiceMode="multipleChoice"
                 android:drawSelectorOnTop="true"
                 android:orientation="vertical"
-                android:scrollbars="vertical">
+                android:scrollbars="vertical"
+                >
 
             </androidx.recyclerview.widget.RecyclerView>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
