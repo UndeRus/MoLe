@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -161,4 +161,6 @@
     <string name="icon">icon</string>
     <string name="show_comments_switch">Comments</string>
     <string name="show_comment_input_by_default">Show comment fields by default</string>
+    <string name="filter_menu_title">Filter</string>
+    <string name="go_to_date_menu_title">Go to date</string>
 </resources>

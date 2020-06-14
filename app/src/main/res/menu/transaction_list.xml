@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright © 2019 Damyan Ivanov.
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -16,14 +15,16 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <item
-        tools:context="net.ktnx.mobileledger.ui.activity.MainActivity"
         android:id="@+id/menu_transaction_list_filter"
         android:icon="@drawable/ic_filter_list_white_24dp"
         android:title="Filter"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        tools:context="net.ktnx.mobileledger.ui.activity.MainActivity"
+        />
 </menu>
