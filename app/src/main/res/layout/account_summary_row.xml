@@ -126,9 +126,4 @@
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <View
-        android:id="@+id/account_summary_trailer"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        />
 </FrameLayout>

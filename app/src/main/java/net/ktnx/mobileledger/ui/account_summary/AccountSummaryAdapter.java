@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -46,14 +46,12 @@ public class AccountSummaryAdapter
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
         try (LockHolder lh = Data.accounts.lockForReading()) {
-            if (position < Data.accounts.size()) {
                 LedgerAccount acc = Data.accounts.get(position);
                 Context ctx = holder.row.getContext();
                 Resources rm = ctx.getResources();
 
                 holder.row.setTag(acc);
                 holder.row.setVisibility(View.VISIBLE);
-                holder.vTrailer.setVisibility(View.GONE);
                 holder.tvAccountName.setText(acc.getShortName());
                 ConstraintLayout.LayoutParams lp =
                         (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
@@ -82,13 +80,6 @@ public class AccountSummaryAdapter
                 }
 
                 holder.row.setTag(R.id.POS, position);
-            }
-            else {
-                // FIXME trailer's divider looks bad
-                // perhaps replace the trailer with bottom padding for the last item?
-                holder.vTrailer.setVisibility(View.VISIBLE);
-                holder.row.setVisibility(View.GONE);
-            }
         }
     }
 
@@ -102,13 +93,11 @@ public class AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return Data.accounts.size() + (Data.profile.getValue()
-                                                   .isPostingPermitted() ? 1 : 0);
+        return Data.accounts.size();
     }
     static class LedgerRowHolder extends RecyclerView.ViewHolder {
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
-        View vTrailer;
         View expanderContainer;
         ImageView expander;
         View accountExpanderContainer;
@@ -117,7 +106,6 @@ public class AccountSummaryAdapter
             this.row = itemView.findViewById(R.id.account_summary_row);
             this.tvAccountName = itemView.findViewById(R.id.account_row_acc_name);
             this.tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
-            this.vTrailer = itemView.findViewById(R.id.account_summary_trailer);
             this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
             this.expander = itemView.findViewById(R.id.account_expander);
             this.accountExpanderContainer =
