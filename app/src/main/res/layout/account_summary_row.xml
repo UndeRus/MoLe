@@ -2,7 +2,7 @@
 
 
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -17,42 +17,38 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/account_summary_row"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:longClickable="true"
+    android:minHeight="@dimen/thumb_row_height"
     >
-
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/account_summary_row"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/account_name_layout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:longClickable="true"
-        android:minHeight="@dimen/thumb_row_height"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/account_row_acc_amounts"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintHorizontal_weight="3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         >
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/account_name_layout"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/account_row_acc_name"
+            style="@style/account_summary_account_name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/account_row_acc_amounts"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintHorizontal_weight="3"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-            <TextView
-                android:id="@+id/account_row_acc_name"
-                style="@style/account_summary_account_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:gravity="center_vertical"
-                android:longClickable="true"
-                android:onClick="onAccountSummaryRowViewClicked"
-                android:paddingStart="8dp"
-                android:text="AccountNameALongOne"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:layout_marginStart="8dp"
+            android:gravity="center_vertical"
+            android:longClickable="true"
+            android:onClick="onAccountSummaryRowViewClicked"
+            android:paddingStart="8dp"
+            android:text="AccountNameALongOne"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
                 app:layout_constrainedWidth="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/account_expander_container"
@@ -126,4 +122,3 @@
         </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
