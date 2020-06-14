@@ -132,6 +132,8 @@ public class LedgerTransaction {
             data.append('\0');
             data.append(getDescription());
             data.append('\0');
+            data.append(getComment());
+            data.append('\0');
             data.append(Globals.formatLedgerDate(getDate()));
             data.append('\0');
             for (LedgerTransactionAccount item : accounts) {
