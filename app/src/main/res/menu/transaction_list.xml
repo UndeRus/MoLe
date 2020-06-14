@@ -24,7 +24,7 @@
         android:id="@+id/menu_transaction_list_filter"
         android:icon="@drawable/ic_filter_list_white_24dp"
         android:title="@string/filter_menu_title"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         tools:context="net.ktnx.mobileledger.ui.activity.MainActivity"
         />
 </menu>
