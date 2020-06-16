@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -46,10 +46,9 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -197,7 +196,7 @@ public class NewTransactionFragment extends Fragment {
         fab.setEnabled(false);
         Misc.hideSoftKeyboard(this);
         if (mListener != null) {
-            Date date = viewModel.getDate();
+            SimpleDate date = viewModel.getDate();
             LedgerTransaction tr =
                     new LedgerTransaction(null, date, viewModel.getDescription(), mProfile);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -293,11 +293,12 @@ public final class MobileLedgerProfile {
                 new Object[]{uuid, tr.getId()});
 
         db.execSQL(
-                "INSERT INTO transactions(profile, id, date, description, comment, data_hash, " +
-                "keep) " +
-                "values(?,?,?,?,?,?,1)",
-                new Object[]{uuid, tr.getId(), Globals.formatLedgerDate(tr.getDate()),
-                             tr.getDescription(), tr.getComment(), tr.getDataHash()
+                "INSERT INTO transactions(profile, id, year, month, day, description, "+
+                "comment, data_hash, keep) " +
+                "values(?,?,?,?,?,?,?,?,1)",
+                new Object[]{uuid, tr.getId(), tr.getDate().year, tr.getDate().month,
+                             tr.getDate().day, tr.getDescription(),
+                             tr.getComment(), tr.getDataHash()
                 });
 
         for (LedgerTransactionAccount item : tr.getAccounts()) {

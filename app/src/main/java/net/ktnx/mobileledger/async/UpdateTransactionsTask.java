@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -26,12 +26,9 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.model.TransactionListItem;
-import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -50,46 +47,44 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             String[] params;
 
             if (filterAccName[0] == null) {
-                sql = "SELECT id, date FROM transactions WHERE profile=? ORDER BY date desc, id " +
-                      "desc";
+                sql = "SELECT id, year, month, day FROM transactions WHERE profile=? ORDER BY " +
+                      "year desc, month desc, day desc, id desc";
                 params = new String[]{profile_uuid};
 
             }
             else {
-                sql = "SELECT distinct tr.id, tr.date from transactions tr JOIN " +
-                      "transaction_accounts ta " +
+                sql = "SELECT distinct tr.id, tr.year, tr.month, tr.day from transactions tr " +
+                      "JOIN " + "transaction_accounts ta " +
                       "ON ta.transaction_id=tr.id AND ta.profile=tr.profile WHERE tr.profile=? " +
                       "and ta.account_name LIKE ?||'%' AND ta" +
-                      ".amount <> 0 ORDER BY tr.date desc, tr.id desc";
+                      ".amount <> 0 ORDER BY tr.year desc, tr.month desc, tr.day desc, tr.id " +
+                      "desc";
                 params = new String[]{profile_uuid, filterAccName[0]};
             }
 
             debug("UTT", sql);
             SQLiteDatabase db = App.getDatabase();
-            String lastDateString = Globals.formatLedgerDate(new Date());
-            Calendar lastDate = Globals.parseLedgerDateAsCalendar(lastDateString);
             boolean odd = true;
+            SimpleDate lastDate = SimpleDate.today();
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
                     if (isCancelled())
                         return null;
 
                     int transaction_id = cursor.getInt(0);
-                    String dateString = cursor.getString(1);
-                    Calendar date = Globals.parseLedgerDateAsCalendar(dateString);
+                    SimpleDate date =
+                            new SimpleDate(cursor.getInt(1), cursor.getInt(2), cursor.getInt(3));
 
-                    if (!lastDateString.equals(dateString)) {
+                    if (!date.equals(lastDate)) {
                         boolean showMonth =
-                                (date.get(Calendar.MONTH) != lastDate.get(Calendar.MONTH)) ||
-                                (date.get(Calendar.YEAR) != lastDate.get(Calendar.YEAR));
-                        newList.add(new TransactionListItem(date.getTime(), showMonth));
+                                (date.month != lastDate.month) || (date.year != lastDate.year);
+                        newList.add(new TransactionListItem(date, showMonth));
                     }
                     newList.add(
                             new TransactionListItem(new LedgerTransaction(transaction_id), odd));
 //                    debug("UTT", String.format("got transaction %d", transaction_id));
 
                     lastDate = date;
-                    lastDateString = dateString;
                     odd = !odd;
                 }
                 Data.transactions.setList(newList);
@@ -97,9 +92,6 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             }
 
             return null;
-        }
-        catch (ParseException e) {
-            return String.format("Error parsing stored date '%s'", e.getMessage());
         }
         finally {
             Data.backgroundTaskFinished();

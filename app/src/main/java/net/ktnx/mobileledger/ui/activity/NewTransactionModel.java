@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -28,24 +28,20 @@ import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class NewTransactionModel extends ViewModel {
-    private static final Pattern reYMD =
-            Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
-    private static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
-    private static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
     final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     final ArrayList<Item> items = new ArrayList<>();
     final MutableLiveData<Boolean> isSubmittable = new MutableLiveData<>(false);
@@ -89,7 +85,7 @@ public class NewTransactionModel extends ViewModel {
     int getAccountCount() {
         return items.size();
     }
-    public Date getDate() {
+    public SimpleDate getDate() {
         return header.date.getValue();
     }
     public String getDescription() {
@@ -232,7 +228,7 @@ public class NewTransactionModel extends ViewModel {
 
     static class Item {
         private ItemType type;
-        private MutableLiveData<Date> date = new MutableLiveData<>();
+        private MutableLiveData<SimpleDate> date = new MutableLiveData<>();
         private MutableLiveData<String> description = new MutableLiveData<>();
         private LedgerTransactionAccount account;
         private MutableLiveData<String> amountHint = new MutableLiveData<>(null);
@@ -248,7 +244,7 @@ public class NewTransactionModel extends ViewModel {
             type = ItemType.bottomFiller;
             editable.setValue(false);
         }
-        Item(NewTransactionModel model, Date date, String description) {
+        Item(NewTransactionModel model, SimpleDate date, String description) {
             this.model = model;
             this.type = ItemType.generalData;
             this.date.setValue(date);
@@ -325,58 +321,30 @@ public class NewTransactionModel extends ViewModel {
                                 wantedType));
             }
         }
-        public Date getDate() {
+        public SimpleDate getDate() {
             ensureType(ItemType.generalData);
             return date.getValue();
         }
-        public void setDate(Date date) {
+        public void setDate(SimpleDate date) {
             ensureType(ItemType.generalData);
             this.date.setValue(date);
         }
-        public void setDate(String text) {
+        public void setDate(String text) throws ParseException {
             if ((text == null) || text.trim()
                                       .isEmpty())
             {
-                setDate((Date) null);
+                setDate((SimpleDate) null);
                 return;
             }
 
-            int year, month, day;
-            final Calendar c = GregorianCalendar.getInstance();
-            Matcher m = reYMD.matcher(text);
-            if (m.matches()) {
-                year = Integer.parseInt(m.group(1));
-                month = Integer.parseInt(m.group(2)) - 1;   // month is 0-based
-                day = Integer.parseInt(m.group(3));
-            }
-            else {
-                year = c.get(Calendar.YEAR);
-                m = reMD.matcher(text);
-                if (m.matches()) {
-                    month = Integer.parseInt(m.group(1)) - 1;
-                    day = Integer.parseInt(m.group(2));
-                }
-                else {
-                    month = c.get(Calendar.MONTH);
-                    m = reD.matcher(text);
-                    if (m.matches()) {
-                        day = Integer.parseInt(m.group(1));
-                    }
-                    else {
-                        day = c.get(Calendar.DAY_OF_MONTH);
-                    }
-                }
-            }
-
-            c.set(year, month, day);
-
-            this.setDate(c.getTime());
+            SimpleDate date = Globals.parseLedgerDate(text);
+            this.setDate(date);
         }
         void observeDate(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                         @NonNull androidx.lifecycle.Observer<? super Date> observer) {
+                         @NonNull androidx.lifecycle.Observer<? super SimpleDate> observer) {
             this.date.observe(owner, observer);
         }
-        void stopObservingDate(@NonNull androidx.lifecycle.Observer<? super Date> observer) {
+        void stopObservingDate(@NonNull androidx.lifecycle.Observer<? super SimpleDate> observer) {
             this.date.removeObserver(observer);
         }
         public String getDescription() {
@@ -426,27 +394,21 @@ public class NewTransactionModel extends ViewModel {
         String getFormattedDate() {
             if (date == null)
                 return null;
-            Date time = date.getValue();
-            if (time == null)
+            SimpleDate d = date.getValue();
+            if (d == null)
                 return null;
 
-            Calendar c = GregorianCalendar.getInstance();
-            c.setTime(time);
             Calendar today = GregorianCalendar.getInstance();
 
-            final int myYear = c.get(Calendar.YEAR);
-            final int myMonth = c.get(Calendar.MONTH);
-            final int myDay = c.get(Calendar.DAY_OF_MONTH);
-
-            if (today.get(Calendar.YEAR) != myYear) {
-                return String.format(Locale.US, "%d/%02d/%02d", myYear, myMonth + 1, myDay);
+            if (today.get(Calendar.YEAR) != d.year) {
+                return String.format(Locale.US, "%d/%02d/%02d", d.year, d.month, d.day);
             }
 
-            if (today.get(Calendar.MONTH) != myMonth) {
-                return String.format(Locale.US, "%d/%02d", myMonth + 1, myDay);
+            if (today.get(Calendar.MONTH) != d.month - 1) {
+                return String.format(Locale.US, "%d/%02d", d.month, d.day);
             }
 
-            return String.valueOf(myDay);
+            return String.valueOf(d.day);
         }
         void observeEditableFlag(NewTransactionActivity activity, Observer<Boolean> observer) {
             editable.observe(activity, observer);

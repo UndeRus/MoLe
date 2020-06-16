@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -23,11 +23,10 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Misc;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,9 +59,9 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
         }
 
         result.setTpostings(postings);
-        Date transactionDate = tr.getDate();
+        SimpleDate transactionDate = tr.getDate();
         if (transactionDate == null) {
-            transactionDate = new GregorianCalendar().getTime();
+            transactionDate = SimpleDate.today();
         }
         result.setTdate(Globals.formatIsoDate(transactionDate));
         result.setTdate2(null);
@@ -145,7 +144,7 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
         tpostings.add(posting);
     }
     public LedgerTransaction asLedgerTransaction() throws ParseException {
-        Date date = Globals.parseIsoDate(tdate);
+        SimpleDate date = Globals.parseIsoDate(tdate);
         LedgerTransaction tr = new LedgerTransaction(tindex, date, tdescription);
         tr.setComment(Misc.trim(Misc.emptyIsNull(tcomment)));
 

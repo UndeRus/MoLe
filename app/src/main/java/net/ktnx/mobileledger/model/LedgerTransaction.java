@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -22,13 +22,13 @@ import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.utils.Digest;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -53,7 +53,7 @@ public class LedgerTransaction {
             };
     private String profile;
     private Integer id;
-    private Date date;
+    private SimpleDate date;
     private String description;
     private String comment;
     private ArrayList<LedgerTransactionAccount> accounts;
@@ -63,7 +63,7 @@ public class LedgerTransaction {
             throws ParseException {
         this(id, Globals.parseLedgerDate(dateString), description);
     }
-    public LedgerTransaction(Integer id, Date date, String description,
+    public LedgerTransaction(Integer id, SimpleDate date, String description,
                              MobileLedgerProfile profile) {
         this.profile = profile.getUuid();
         this.id = id;
@@ -73,14 +73,14 @@ public class LedgerTransaction {
         this.dataHash = null;
         dataLoaded = false;
     }
-    public LedgerTransaction(Integer id, Date date, String description) {
+    public LedgerTransaction(Integer id, SimpleDate date, String description) {
         this(id, date, description, Data.profile.getValue());
     }
-    public LedgerTransaction(Date date, String description) {
+    public LedgerTransaction(SimpleDate date, String description) {
         this(null, date, description);
     }
     public LedgerTransaction(int id) {
-        this(id, (Date) null, null);
+        this(id, (SimpleDate) null, null);
     }
     public LedgerTransaction(int id, String profileUUID) {
         this.profile = profileUUID;
@@ -98,10 +98,10 @@ public class LedgerTransaction {
         accounts.add(item);
         dataHash = null;
     }
-    public Date getDate() {
+    public SimpleDate getDate() {
         return date;
     }
-    public void setDate(Date date) {
+    public void setDate(SimpleDate date) {
         this.date = date;
         dataHash = null;
     }
@@ -171,22 +171,13 @@ public class LedgerTransaction {
             return;
 
         try (Cursor cTr = db.rawQuery(
-                "SELECT date, description, comment from transactions WHERE profile=? AND id=?",
-                new String[]{profile, String.valueOf(id)}))
+                "SELECT year, month, day, description, comment from transactions WHERE profile=? " +
+                "AND id=?", new String[]{profile, String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
-                String dateString = cTr.getString(0);
-                try {
-                    date = Globals.parseLedgerDate(dateString);
-                }
-                catch (ParseException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(
-                            String.format("Error parsing date '%s' from " + "transaction %d",
-                                    dateString, id));
-                }
-                description = cTr.getString(1);
-                comment = cTr.getString(2);
+                date = new SimpleDate(cTr.getInt(0), cTr.getInt(1), cTr.getInt(2));
+                description = cTr.getString(3);
+                comment = cTr.getString(4);
 
                 accounts.clear();
 

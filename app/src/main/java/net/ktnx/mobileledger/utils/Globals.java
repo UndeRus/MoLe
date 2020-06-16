@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import android.view.inputmethod.InputMethodManager;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,43 +57,48 @@ public final class Globals {
             imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
         }
     }
-    public static Date parseLedgerDate(String dateString) throws ParseException {
+    public static SimpleDate parseLedgerDate(String dateString) throws ParseException {
         Matcher m = reLedgerDate.matcher(dateString);
         if (!m.matches()) throw new ParseException(
                 String.format("'%s' does not match expected pattern '%s'", dateString,
                         reLedgerDate.toString()), 0);
 
-        String year = m.group(1);
-        String month = m.group(2);
-        String day = m.group(3);
+        String yearStr = m.group(1);
+        String monthStr = m.group(2);
+        String dayStr = m.group(3);
+
+        int year, month, day;
 
         String toParse;
-        if (year == null) {
-            Calendar now = Calendar.getInstance();
-            int thisYear = now.get(Calendar.YEAR);
-            if (month == null) {
-                int thisMonth = now.get(Calendar.MONTH) + 1;
-                toParse = String.format(Locale.US, "%04d/%02d/%s", thisYear, thisMonth, dateString);
+        if (yearStr == null) {
+            SimpleDate today = SimpleDate.today();
+            year = today.year;
+            if (monthStr == null) {
+                month = today.month;
             }
-            else toParse = String.format(Locale.US, "%04d/%s", thisYear, dateString);
+            else month = Integer.parseInt(monthStr);
         }
-        else toParse = dateString;
+        else {
+            year = Integer.parseInt(yearStr);
+            assert monthStr != null;
+            month = Integer.parseInt(monthStr);
+        }
 
-        return dateFormatter.get().parse(toParse);
+        assert dayStr != null;
+        day = Integer.parseInt(dayStr);
+
+        return new SimpleDate(year, month, day);
     }
     public static Calendar parseLedgerDateAsCalendar(String dateString) throws ParseException {
-        Date date = parseLedgerDate(dateString);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar;
+        return parseLedgerDate(dateString).toCalendar();
     }
-    public static Date parseIsoDate(String dateString) throws ParseException {
-        return isoDateFormatter.get().parse(dateString);
+    public static SimpleDate parseIsoDate(String dateString) throws ParseException {
+        return SimpleDate.fromDate(isoDateFormatter.get().parse(dateString));
     }
-    public static String formatLedgerDate(Date date) {
-        return dateFormatter.get().format(date);
+    public static String formatLedgerDate(SimpleDate date) {
+        return dateFormatter.get().format(date.toDate());
     }
-    public static String formatIsoDate(Date date) {
-        return isoDateFormatter.get().format(date);
+    public static String formatIsoDate(SimpleDate date) {
+        return isoDateFormatter.get().format(date.toDate());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -22,14 +22,15 @@ import android.os.Bundle;
 import android.widget.CalendarView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,12 +41,54 @@ public class DatePickerFragment extends AppCompatDialogFragment
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
     private Calendar presentDate = GregorianCalendar.getInstance();
     private DatePickedListener onDatePickedListener;
-    private MobileLedgerProfile.FutureDates futureDates = MobileLedgerProfile.FutureDates.None;
-    public MobileLedgerProfile.FutureDates getFutureDates() {
-        return futureDates;
+    private long minDate = 0;
+    private long maxDate = Long.MAX_VALUE;
+    public void setDateRange(@Nullable SimpleDate minDate, @Nullable SimpleDate maxDate) {
+        if (minDate == null)
+            this.minDate = 0;
+        else
+            this.minDate = minDate.toDate().getTime();
+
+        if (maxDate == null)
+            this.maxDate = Long.MAX_VALUE;
+        else
+            this.maxDate = maxDate.toDate().getTime();
     }
     public void setFutureDates(MobileLedgerProfile.FutureDates futureDates) {
-        this.futureDates = futureDates;
+        if (futureDates == MobileLedgerProfile.FutureDates.All) {
+            maxDate = Long.MAX_VALUE;
+        }
+        else {
+            final Calendar dateLimit = GregorianCalendar.getInstance();
+            switch (futureDates) {
+                case None:
+                    // already there
+                    break;
+                case OneWeek:
+                    dateLimit.add(Calendar.DAY_OF_MONTH, 7);
+                    break;
+                case TwoWeeks:
+                    dateLimit.add(Calendar.DAY_OF_MONTH, 14);
+                    break;
+                case OneMonth:
+                    dateLimit.add(Calendar.MONTH, 1);
+                    break;
+                case TwoMonths:
+                    dateLimit.add(Calendar.MONTH, 2);
+                    break;
+                case ThreeMonths:
+                    dateLimit.add(Calendar.MONTH, 3);
+                    break;
+                case SixMonths:
+                    dateLimit.add(Calendar.MONTH, 6);
+                    break;
+                case OneYear:
+                    dateLimit.add(Calendar.YEAR, 1);
+                    break;
+            }
+            maxDate = dateLimit.getTime()
+                               .getTime();
+        }
     }
     public void setCurrentDateFromText(CharSequence present) {
         final Calendar now = GregorianCalendar.getInstance();
@@ -85,40 +128,8 @@ public class DatePickerFragment extends AppCompatDialogFragment
         cv.setDate(presentDate.getTime()
                               .getTime());
 
-        if (futureDates == MobileLedgerProfile.FutureDates.All) {
-            cv.setMaxDate(Long.MAX_VALUE);
-        }
-        else {
-            final Calendar dateLimit = GregorianCalendar.getInstance();
-            switch (futureDates) {
-                case None:
-                    // already there
-                    break;
-                case OneWeek:
-                    dateLimit.add(Calendar.DAY_OF_MONTH, 7);
-                    break;
-                case TwoWeeks:
-                    dateLimit.add(Calendar.DAY_OF_MONTH, 14);
-                    break;
-                case OneMonth:
-                    dateLimit.add(Calendar.MONTH, 1);
-                    break;
-                case TwoMonths:
-                    dateLimit.add(Calendar.MONTH, 2);
-                    break;
-                case ThreeMonths:
-                    dateLimit.add(Calendar.MONTH, 3);
-                    break;
-                case SixMonths:
-                    dateLimit.add(Calendar.MONTH, 6);
-                    break;
-                case OneYear:
-                    dateLimit.add(Calendar.YEAR, 1);
-                    break;
-            }
-            cv.setMaxDate(dateLimit.getTime()
-                                   .getTime());
-        }
+        cv.setMinDate(minDate);
+        cv.setMaxDate(maxDate);
 
         cv.setOnDateChangeListener(this);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
+import net.ktnx.mobileledger.utils.SimpleDate;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
 
 import java.io.BufferedReader;
@@ -41,8 +42,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -176,9 +175,9 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         if (token != null)
             params.addPair("_token", token);
 
-        Date transactionDate = ltr.getDate();
+        SimpleDate transactionDate = ltr.getDate();
         if (transactionDate == null) {
-            transactionDate = new GregorianCalendar().getTime();
+            transactionDate = SimpleDate.today();
         }
 
         params.addPair("date", Globals.formatLedgerDate(transactionDate));

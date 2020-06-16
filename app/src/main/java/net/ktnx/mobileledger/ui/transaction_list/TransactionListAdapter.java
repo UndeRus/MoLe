@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -43,9 +43,9 @@ import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Misc;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -84,14 +84,14 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 break;
             case DELIMITER:
-                Date date = item.getDate();
+                SimpleDate date = item.getDate();
                 holder.vTransaction.setVisibility(View.GONE);
                 holder.vDelimiter.setVisibility(View.VISIBLE);
                 holder.tvDelimiterDate.setText(DateFormat.getDateInstance()
-                                                         .format(date));
+                                                         .format(date.toDate()));
                 if (item.isMonthShown()) {
                     GregorianCalendar cal = new GregorianCalendar(TimeZone.getDefault());
-                    cal.setTime(date);
+                    cal.setTime(date.toDate());
                     holder.tvDelimiterMonth.setText(
                             Globals.monthNames[cal.get(GregorianCalendar.MONTH)]);
                     holder.tvDelimiterMonth.setVisibility(View.VISIBLE);

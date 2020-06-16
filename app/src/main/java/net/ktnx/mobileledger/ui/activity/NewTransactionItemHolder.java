@@ -50,11 +50,11 @@ import net.ktnx.mobileledger.utils.DimensionUtils;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.DecimalFormatSymbols;
-import java.util.Calendar;
+import java.text.ParseException;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
@@ -77,7 +77,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private FrameLayout lPadding;
     private MobileLedgerProfile mProfile;
     private Date date;
-    private Observer<Date> dateObserver;
+    private Observer<SimpleDate> dateObserver;
     private Observer<String> descriptionObserver;
     private Observer<String> transactionCommentObserver;
     private Observer<String> hintObserver;
@@ -590,6 +590,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
             return true;
         }
+        catch (ParseException e) {
+            throw new RuntimeException("Should not happen", e);
+        }
         finally {
             syncingData = false;
         }
@@ -707,9 +710,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     }
     @Override
     public void onDatePicked(int year, int month, int day) {
-        final Calendar c = GregorianCalendar.getInstance();
-        c.set(year, month, day);
-        item.setDate(c.getTime());
+        item.setDate(new SimpleDate(year, month+1, day));
         boolean focused = tvDescription.requestFocus();
         if (focused)
             Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());

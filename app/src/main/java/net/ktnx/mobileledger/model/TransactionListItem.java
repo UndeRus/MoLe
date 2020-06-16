@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,17 +17,17 @@
 
 package net.ktnx.mobileledger.model;
 
-import java.util.Date;
-
 import androidx.annotation.NonNull;
+
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 public class TransactionListItem {
     private Type type;
-    private Date date;
+    private SimpleDate date;
     private boolean monthShown;
     private LedgerTransaction transaction;
     private boolean odd;
-    public TransactionListItem(Date date, boolean monthShown) {
+    public TransactionListItem(SimpleDate date, boolean monthShown) {
         this.type = Type.DELIMITER;
         this.date = date;
         this.monthShown = monthShown;
@@ -41,7 +41,7 @@ public class TransactionListItem {
     public Type getType() {
         return type;
     }
-    public Date getDate() {
+    public SimpleDate getDate() {
         return date;
     }
     public boolean isMonthShown() {
