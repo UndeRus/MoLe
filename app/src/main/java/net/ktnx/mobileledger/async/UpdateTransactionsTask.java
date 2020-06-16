@@ -63,6 +63,7 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
             }
 
             debug("UTT", sql);
+            SimpleDate latestDate = null, earliestDate = null;
             SQLiteDatabase db = App.getDatabase();
             boolean odd = true;
             SimpleDate lastDate = SimpleDate.today();
@@ -74,6 +75,10 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                     int transaction_id = cursor.getInt(0);
                     SimpleDate date =
                             new SimpleDate(cursor.getInt(1), cursor.getInt(2), cursor.getInt(3));
+
+                    if (null == latestDate)
+                        latestDate = date;
+                    earliestDate = date;
 
                     if (!date.equals(lastDate)) {
                         boolean showMonth =
@@ -88,6 +93,8 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                     odd = !odd;
                 }
                 Data.transactions.setList(newList);
+                Data.latestTransactionDate.postValue(latestDate);
+                Data.earliestTransactionDate.postValue(earliestDate);
                 debug("UTT", "transaction list value updated");
             }
 

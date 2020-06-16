@@ -41,8 +41,9 @@ public class TransactionListItem {
     public Type getType() {
         return type;
     }
+    @NonNull
     public SimpleDate getDate() {
-        return date;
+        return (date != null) ? date : transaction.getDate();
     }
     public boolean isMonthShown() {
         return monthShown;

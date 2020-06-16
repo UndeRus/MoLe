@@ -121,7 +121,7 @@ public class DatePickerFragment extends AppCompatDialogFragment
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dpd = new Dialog(Objects.requireNonNull(getActivity()));
+        Dialog dpd = new Dialog(requireActivity());
         dpd.setContentView(R.layout.date_picker_view);
         dpd.setTitle(null);
         CalendarView cv = dpd.findViewById(R.id.calendarView);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,21 +38,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.TransactionDateFinder;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 // TODO: support transaction-level comment
 
-public class TransactionListFragment extends MobileLedgerListFragment {
+public class TransactionListFragment extends MobileLedgerListFragment
+        implements DatePickerFragment.DatePickedListener {
     private MenuItem menuTransactionListFilter;
     private View vAccountFilter;
     private AutoCompleteTextView accNameFilter;
@@ -153,6 +161,12 @@ public class TransactionListFragment extends MobileLedgerListFragment {
                      menuTransactionListFilter.setVisible(true);
                      Globals.hideSoftKeyboard(mActivity);
                  });
+
+        Data.foundTransactionItemIndex.observe(getViewLifecycleOwner(), pos -> {
+            Logger.debug("go-to-date", String.format(Locale.US, "Found pos %d", pos));
+            if (pos != null)
+                root.scrollToPosition(pos);
+        });
     }
     private void onAccountNameFilterChanged(String accName) {
         final String fieldText = accNameFilter.getText()
@@ -200,5 +214,22 @@ public class TransactionListFragment extends MobileLedgerListFragment {
 
             return true;
         });
+
+        menu.findItem(R.id.menu_go_to_date)
+            .setOnMenuItemClickListener(item -> {
+                DatePickerFragment picker = new DatePickerFragment();
+                picker.setOnDatePickedListener(this);
+                picker.setDateRange(Data.earliestTransactionDate.getValue(),
+                        Data.latestTransactionDate.getValue());
+                picker.show(requireActivity().getSupportFragmentManager(), null);
+                return true;
+            });
+    }
+    @Override
+    public void onDatePicked(int year, int month, int day) {
+        RecyclerView list = requireActivity().findViewById(R.id.transaction_root);
+        AsyncTask<SimpleDate, Void, Integer> finder = new TransactionDateFinder();
+
+        finder.execute(new SimpleDate(year, month + 1, day));
     }
 }

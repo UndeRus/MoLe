@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
 import java.util.Calendar;
 import java.util.Date;
 
-public class SimpleDate {
+public class SimpleDate implements Comparable<SimpleDate> {
     public int year;
     public int month;
     public int day;
@@ -56,14 +56,7 @@ public class SimpleDate {
         if (date == null)
             return false;
 
-        if (year != date.year)
-            return false;
-        if (month != date.month)
-            return false;
-        if (day != date.day)
-            return false;
-
-        return true;
+        return ((year == date.year) && (month == date.month) && (day == date.day));
     }
     public boolean earlierThan(@NonNull SimpleDate date) {
         if (year < date.year)
@@ -86,5 +79,16 @@ public class SimpleDate {
         if (month < date.month)
             return false;
         return (day > date.day);
+    }
+    public int compareTo(SimpleDate date) {
+        int res = Integer.compare(year, date.year);
+        if (res != 0)
+            return res;
+
+        res = Integer.compare(month, date.month);
+        if (res != 0)
+            return res;
+
+        return Integer.compare(day, date.day);
     }
 }

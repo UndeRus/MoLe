@@ -29,12 +29,11 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.async.SendTransactionTask;
-import net.ktnx.mobileledger.utils.Globals;
-import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -60,6 +59,8 @@ public final class MobileLedgerProfile {
     // N.B. when adding new fields, update the copy-constructor below
     private FutureDates futureDates = FutureDates.None;
     private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
+    private Calendar firstTransactionDate;
+    private Calendar lastTransactionDate;
     public MobileLedgerProfile() {
         this.uuid = String.valueOf(UUID.randomUUID());
     }
@@ -525,7 +526,7 @@ public final class MobileLedgerProfile {
             db.execSQL("delete from transactions where profile=?", pUuid);
             db.execSQL("delete from transaction_accounts where profile=?", pUuid);
             db.setTransactionSuccessful();
-            Logger.debug("wipe", String.format(Locale.ENGLISH, "Profile %s wiped out", pUuid[0]));
+            debug("wipe", String.format(Locale.ENGLISH, "Profile %s wiped out", pUuid[0]));
         }
         finally {
             db.endTransaction();
@@ -566,6 +567,12 @@ public final class MobileLedgerProfile {
             }
             return null;
         }
+    }
+    public Calendar getFirstTransactionDate() {
+        return firstTransactionDate;
+    }
+    public Calendar getLastTransactionDate() {
+        return lastTransactionDate;
     }
     public enum FutureDates {
         None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),

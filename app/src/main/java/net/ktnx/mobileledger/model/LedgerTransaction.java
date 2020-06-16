@@ -20,6 +20,9 @@ package net.ktnx.mobileledger.model;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import androidx.annotation.NonNull;
+
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.Digest;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -98,7 +101,11 @@ public class LedgerTransaction {
         accounts.add(item);
         dataHash = null;
     }
+    @NonNull
     public SimpleDate getDate() {
+        loadData(App.getDatabase());
+        if (date == null)
+            throw new IllegalStateException("Transaction has no date");
         return date;
     }
     public void setDate(SimpleDate date) {

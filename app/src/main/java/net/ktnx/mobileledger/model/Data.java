@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableList;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
@@ -45,8 +46,14 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public final class Data {
     public static final ObservableList<TransactionListItem> transactions =
             new ObservableList<>(new ArrayList<>());
-    public static final ObservableList<LedgerAccount> accounts = new ObservableList<>(new ArrayList<>());
-    public static final MutableLiveData<Boolean> backgroundTasksRunning = new MutableLiveData<>(false);
+    public static final MutableLiveData<SimpleDate> earliestTransactionDate =
+            new MutableLiveData<>(null);
+    public static final MutableLiveData<SimpleDate> latestTransactionDate =
+            new MutableLiveData<>(null);
+    public static final ObservableList<LedgerAccount> accounts =
+            new ObservableList<>(new ArrayList<>());
+    public static final MutableLiveData<Boolean> backgroundTasksRunning =
+            new MutableLiveData<>(false);
     public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
     public static final MutableLiveData<MobileLedgerProfile> profile = new InertMutableLiveData<>();
     public static final MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
@@ -58,6 +65,7 @@ public final class Data {
     public static final MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
+    public static MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
     private static RetrieveTransactionsTask retrieveTransactionsTask;
     public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     public static void backgroundTaskStarted() {
