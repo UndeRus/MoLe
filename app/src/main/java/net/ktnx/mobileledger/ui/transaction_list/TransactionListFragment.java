@@ -164,8 +164,11 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         Data.foundTransactionItemIndex.observe(getViewLifecycleOwner(), pos -> {
             Logger.debug("go-to-date", String.format(Locale.US, "Found pos %d", pos));
-            if (pos != null)
+            if (pos != null) {
                 root.scrollToPosition(pos);
+                // reset the value to avoid re-notification upon reconfiguration or app restart
+                Data.foundTransactionItemIndex.setValue(null);
+            }
         });
     }
     private void onAccountNameFilterChanged(String accName) {
