@@ -188,6 +188,8 @@ public class LedgerTransaction {
                 description = cTr.getString(1);
                 comment = cTr.getString(2);
 
+                accounts.clear();
+
                 try (Cursor cAcc = db.rawQuery(
                         "SELECT account_name, amount, currency, comment FROM " +
                         "transaction_accounts WHERE profile=? AND transaction_id = ?",
