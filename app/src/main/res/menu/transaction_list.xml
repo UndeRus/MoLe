@@ -22,7 +22,7 @@
 
     <item
         android:id="@+id/menu_go_to_date"
-        android:icon="@drawable/ic_baseline_calendar_today_24"
+        android:icon="@drawable/ic_event_black_24dp"
         android:title="@string/go_to_date_menu_title"
         app:showAsAction="ifRoom"
         />
