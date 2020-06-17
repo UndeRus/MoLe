@@ -208,6 +208,7 @@ public class LedgerTransaction {
 
     }
     public String getDataHash() {
+        fillDataHash();
         return dataHash;
     }
     public void finishLoading() {
