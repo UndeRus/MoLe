@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -21,6 +21,7 @@
     <attr name="table_row_dark_bg" format="reference|color"/>
     <attr name="table_row_light_bg" format="reference|color"/>
     <attr name="textColor" format="reference|color"/>
+    <attr name="commentColor" format="reference|color" />
     <attr name="colorPrimaryTransparent" format="reference|color" />
 
 </resources>

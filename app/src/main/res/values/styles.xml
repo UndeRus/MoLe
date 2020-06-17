@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -34,9 +34,12 @@
         <item name="table_row_light_bg">#28ddcbff</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="textColor">#707070</item>
+        <item name="textColor">#686868</item>
+        <item name="commentColor">#909090</item>
         <item name="colorOnSecondary">@android:color/white</item>
-        <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense</item>
+        <item name="textInputStyle">
+            @style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense
+        </item>
         <item name="colorError">#FFE1E2</item>
         <item name="colorOnError">#CD1609</item>
         <item name="floatingActionButtonStyle">@style/myFabStyle</item>

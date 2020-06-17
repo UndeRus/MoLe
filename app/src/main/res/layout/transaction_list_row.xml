@@ -32,8 +32,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:visibility="visible"
-        app:cardCornerRadius="4dp"
+        app:cardBackgroundColor="?table_row_light_bg"
         app:cardUseCompatPadding="false"
+        app:cardCornerRadius="0dp"
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,7 +43,6 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:minHeight="36dp"
-            android:orientation="horizontal"
             android:padding="8dp"
             >
 
@@ -58,20 +58,23 @@
 
                 <TextView
                     android:id="@+id/transaction_row_description"
-                    style="@style/account_summary_account_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="---."
+                    android:textColor="?textColor"
                     android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:textStyle="bold"
                     tools:ignore="HardcodedText"
                     />
                 <TextView
                     android:id="@+id/transaction_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
                     android:text="Comment text"
-                    android:textStyle="italic"
+                    android:textAppearance="@android:style/TextAppearance.Material.Small"
+                    android:textColor="?commentColor"
                     tools:ignore="HardcodedText"
                     />
             </LinearLayout>
@@ -81,7 +84,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:layout_weight="5"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

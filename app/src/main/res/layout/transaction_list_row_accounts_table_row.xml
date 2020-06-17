@@ -36,23 +36,24 @@
             android:layout_height="wrap_content"
             android:text="another acc name"
             android:textAlignment="viewStart"
-            android:textAppearance="@android:style/TextAppearance.Material.Small"
-            android:textColor="@android:color/secondary_text_light"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="?textColor"
             android:textStyle="normal"
-            tools:ignore="HardcodedText" />
+            tools:ignore="HardcodedText"
+            />
 
         <TextView
             android:id="@+id/transaction_list_acc_row_acc_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="0.75"
-            android:paddingStart="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="-4dp"
             android:text="account comment"
             android:textAlignment="viewStart"
             android:textAppearance="@android:style/TextAppearance.Material.Small"
-            android:textColor="@android:color/secondary_text_light"
-            android:textStyle="italic"
-            tools:ignore="HardcodedText,RtlSymmetry" />
+            android:textColor="?commentColor"
+            tools:ignore="HardcodedText,RtlSymmetry"
+            />
     </LinearLayout>
 
     <TextView
@@ -64,5 +65,6 @@
         android:minWidth="60dp"
         android:text="---,--"
         android:textAlignment="viewEnd"
+        android:textColor="?textColor"
         tools:ignore="HardcodedText" />
 </LinearLayout>
