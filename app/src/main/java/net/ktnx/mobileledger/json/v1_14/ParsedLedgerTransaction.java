@@ -59,7 +59,7 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
         }
 
         result.setTpostings(postings);
-        SimpleDate transactionDate = tr.getDate();
+        SimpleDate transactionDate = tr.getDateIfAny();
         if (transactionDate == null) {
             transactionDate = SimpleDate.today();
         }

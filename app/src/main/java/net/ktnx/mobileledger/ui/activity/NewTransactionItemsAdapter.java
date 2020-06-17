@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -209,7 +209,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             params.add(accFilter);
         }
 
-        sb.append(" ORDER BY t.date DESC LIMIT 1");
+        sb.append(" ORDER BY t.year desc, t.month desc, t.day desc LIMIT 1");
 
         final String sql = sb.toString();
         debug("descr", sql);
@@ -242,7 +242,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
 
                 final String broaderSql =
                         "select t.profile, t.id from transactions t where t.description=?" +
-                        " ORDER BY date desc LIMIT 1";
+                        " ORDER BY year desc, month desc, day desc LIMIT 1";
                 params.remove(1);
                 debug("descr", broaderSql);
                 debug("descr", description);

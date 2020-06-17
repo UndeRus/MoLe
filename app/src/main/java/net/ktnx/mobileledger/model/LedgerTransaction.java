@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.Digest;
@@ -100,6 +101,10 @@ public class LedgerTransaction {
     public void addAccount(LedgerTransactionAccount item) {
         accounts.add(item);
         dataHash = null;
+    }
+    @Nullable
+    public SimpleDate getDateIfAny() {
+        return date;
     }
     @NonNull
     public SimpleDate getDate() {
