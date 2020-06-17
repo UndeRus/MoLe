@@ -127,6 +127,7 @@ public class LedgerTransaction {
         try {
             Digest sha = new Digest(DIGEST_TYPE);
             StringBuilder data = new StringBuilder();
+            data.append("ver1");
             data.append(profile);
             data.append(getId());
             data.append('\0');
