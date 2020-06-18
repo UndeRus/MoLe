@@ -66,5 +66,6 @@
         android:text="---,--"
         android:textAlignment="viewEnd"
         android:textColor="?textColor"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
         tools:ignore="HardcodedText" />
 </LinearLayout>
