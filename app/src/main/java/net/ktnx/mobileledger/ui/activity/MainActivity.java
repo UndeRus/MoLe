@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -352,23 +352,16 @@ public class MainActivity extends ProfileThemedActivity {
             if (!p.isPostingPermitted())
                 continue;
 
-            ShortcutInfo si =
-                    new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid()).setShortLabel(
-                            p.getName())
-                                                                                    .setIcon(
-                                                                                            Icon.createWithResource(
-                                                                                                    this,
-                                                                                                    R.drawable.svg_thick_plus_white))
-                                                                                    .setIntent(
-                                                                                            new Intent(
-                                                                                                    Intent.ACTION_VIEW,
-                                                                                                    null,
-                                                                                                    this,
-                                                                                                    NewTransactionActivity.class).putExtra(
-                                                                                                    "profile_uuid",
-                                                                                                    p.getUuid()))
-                                                                                    .setRank(i)
-                                                                                    .build();
+            final ShortcutInfo.Builder builder =
+                    new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid());
+            ShortcutInfo si = builder.setShortLabel(p.getName())
+                                     .setIcon(Icon.createWithResource(this,
+                                             R.drawable.thick_plus_icon))
+                                     .setIntent(new Intent(Intent.ACTION_VIEW, null, this,
+                                             NewTransactionActivity.class).putExtra("profile_uuid",
+                                             p.getUuid()))
+                                     .setRank(i)
+                                     .build();
             shortcuts.add(si);
             i++;
         }
