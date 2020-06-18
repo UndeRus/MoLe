@@ -1,5 +1,19 @@
 # Changes
 
+## [0.14.0] - 2020-06-18
+
+* NEW
+    + show transaction-level comment in transaction list
+    + scroll to a specific date in the transaction list
+* IMPROVEMENTS
+    + better all-around theming; employ some material design recommendations
+    + follow system-wide font size settings
+* FIXES
+    + fix a crash upon profile theme change
+    + fix a crash when returning to the new transaction entry with the date
+      picker open
+    + various small fixes
+
 ## [0.13.1] - 2020-05-15
 
 * additional, universal fix for entering numbers
