@@ -4,7 +4,7 @@ MoLe is a front-end to [[https://hledger.org/hledger-web.html hledger-web]]
 
 ## Main software
 
-Copyright ⓒ 2018, 2019 Damyan Ivanov <dam+mole@ktnx.net>
+Copyright ⓒ 2018, 2019, 2020 Damyan Ivanov <dam+mole@ktnx.net>
 
 MoLe is free software: you can distribute it and/or modify it
 under the term of the GNU General Public License as published by
