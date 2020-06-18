@@ -1,0 +1,10 @@
+* NEW
+    + show transaction-level comment in transaction list
+    + scroll to a specific date in the transaction list
+* IMPROVEMENTS
+    + better all-around theming; employ some material design recommendations
+    + follow system-wide font size settings
+* FIXES
+    + fix a crash in legacy parser with amounts like '$123.45'
+    + fix a crash upon profile theme change
+    + various small fixes
