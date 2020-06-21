@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:text="another acc name"
             android:textAlignment="viewStart"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textAppearance="@android:style/TextAppearance.Material.Small"
             android:textColor="?textColor"
             android:textStyle="normal"
             tools:ignore="HardcodedText"
@@ -66,6 +66,6 @@
         android:text="---,--"
         android:textAlignment="viewEnd"
         android:textColor="?textColor"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textAppearance="@android:style/TextAppearance.Material.Small"
         tools:ignore="HardcodedText" />
 </LinearLayout>
