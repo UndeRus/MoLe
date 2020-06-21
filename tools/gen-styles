@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict; use warnings; use utf8;
+use strict; use warnings; use utf8::all;
 use autodie;
 use Math::Trig;
 use File::Basename qw(basename dirname);
@@ -237,6 +237,7 @@ if ($xml) {
 	my $start_marker = '<!-- theme list start -->';
 	my $end_marker = '<!-- theme list end -->';
 	my ($fh, $filename) = tempfile(basename($0).'.XXXXXXXX', DIR => dirname($xml));
+        $fh->binmode(':utf8');
 	open(my $in, '<', $xml);
 	my $base_indent = '';
 	my $state = 'waiting-for-start-marker';
