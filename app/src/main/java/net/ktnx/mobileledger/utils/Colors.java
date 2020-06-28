@@ -50,14 +50,9 @@ public class Colors {
     public static @ColorInt
     int accent;
     @ColorInt
-    public static int tableRowLightBG;
-    @ColorInt
     public static int tableRowDarkBG;
-    @ColorInt
-    public static int primary;
     public static int profileThemeId = -1;
     public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
-    public static int errorTextColor;
     private static int SWIPE_COLOR_COUNT = 6;
     private static int[] themeIDs =
             {R.style.AppTheme_000, R.style.AppTheme_005,
@@ -101,14 +96,8 @@ public class Colors {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
         tableRowDarkBG = tv.data;
-        theme.resolveAttribute(R.attr.table_row_light_bg, tv, true);
-        tableRowLightBG = tv.data;
-        theme.resolveAttribute(R.attr.colorPrimary, tv, true);
-        primary = tv.data;
         theme.resolveAttribute(R.attr.colorAccent, tv, true);
         accent = tv.data;
-        theme.resolveAttribute(R.attr.errorTextColor, tv, true);
-        errorTextColor = tv.data;
 
         // trigger theme observers
         themeWatch.postValue(themeWatch.getValue() + 1);
