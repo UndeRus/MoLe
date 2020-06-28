@@ -1,0 +1,4 @@
+* IMPROVEMENTS
+    + better theme support, especially in system-wide dark mode
+* FIXES
+    + restore f-droid listing icon

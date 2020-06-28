@@ -1,5 +1,12 @@
 # Changes
 
+## [0.14.1] - 2020-06-28
+
+* IMPROVEMENTS
+    + better theme support, especially in system-wide dark mode
+* FIXES
+    + restore f-droid listing icon
+
 ## [0.14.0] - 2020-06-18
 
 * NEW
