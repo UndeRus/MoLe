@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -214,7 +214,7 @@ public class Colors {
         }
 
         if (themeId < 0) {
-            themeId = R.style.AppTheme;
+            themeId = R.style.AppTheme_default;
             debug("profiles",
                     String.format(Locale.ENGLISH, "Theme hue %d not supported, using the default",
                             themeHue));
