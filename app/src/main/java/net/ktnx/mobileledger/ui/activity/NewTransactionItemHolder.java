@@ -46,7 +46,6 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.TextViewClearHelper;
-import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.DimensionUtils;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -502,13 +501,17 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         }
     }
     private void setCurrencyString(String currency) {
+        @ColorInt int textColor = tvDummy.getTextColors()
+                                         .getDefaultColor();
         if ((currency == null) || currency.isEmpty()) {
             tvCurrency.setText(R.string.currency_symbol);
-            tvCurrency.setTextColor(0x7f000000 + (0x00ffffff & Colors.defaultTextColor));
+            int alpha = (textColor >> 24) & 0xff;
+            alpha = alpha * 3 / 4;
+            tvCurrency.setTextColor((alpha << 24) | (0x00ffffff & textColor));
         }
         else {
             tvCurrency.setText(currency);
-            tvCurrency.setTextColor(Colors.defaultTextColor);
+            tvCurrency.setTextColor(textColor);
         }
     }
     private void setCurrency(Currency currency) {

@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -185,6 +186,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         // the accounts remain with their default text (set in the layout resource)
                         holder.tableAccounts.addView(row);
                     }
+                    TextView dummyText = row.findViewById(R.id.dummy_text);
                     TextView accName = row.findViewById(R.id.transaction_list_acc_row_acc_name);
                     TextView accComment =
                             row.findViewById(R.id.transaction_list_acc_row_acc_comment);
@@ -208,8 +210,10 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         accName.setText(ss);
                     }
                     else {
-                        accName.setTextColor(Colors.defaultTextColor);
-                        accAmount.setTextColor(Colors.defaultTextColor);
+                        @ColorInt int textColor = dummyText.getTextColors()
+                                                           .getDefaultColor();
+                        accName.setTextColor(textColor);
+                        accAmount.setTextColor(textColor);
                         accName.setText(acc.getAccountName());
                     }
 
