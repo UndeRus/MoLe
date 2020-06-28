@@ -44,8 +44,8 @@
     <style name="AppTheme.default" parent="AppTheme">
         <item name="colorPrimary">#935ff2</item>
         <item name="colorPrimaryTransparent">#00935ff2</item>
-        <item name="colorAccent">#a87ef4</item>
-        <item name="colorPrimaryDark">#a87ef4</item>
+        <item name="colorAccent">#6921ec</item>
+        <item name="colorPrimaryDark">#6921ec</item>
         <item name="table_row_dark_bg">#26085e</item>
         <item name="table_row_light_bg">#13042f</item>
     </style>
@@ -53,8 +53,8 @@
     <style name="AppTheme.000" parent="AppTheme">
         <item name="colorPrimary">#d41212</item>
         <item name="colorPrimaryTransparent">#00d41212</item>
-        <item name="colorAccent">#e91414</item>
-        <item name="colorPrimaryDark">#e91414</item>
+        <item name="colorAccent">#a90e0e</item>
+        <item name="colorPrimaryDark">#a90e0e</item>
         <item name="table_row_dark_bg">#5e0808</item>
         <item name="table_row_light_bg">#2f0404</item>
     </style>
@@ -62,8 +62,8 @@
     <style name="AppTheme.005" parent="AppTheme">
         <item name="colorPrimary">#d22212</item>
         <item name="colorPrimaryTransparent">#00d22212</item>
-        <item name="colorAccent">#e72513</item>
-        <item name="colorPrimaryDark">#e72513</item>
+        <item name="colorAccent">#a81b0e</item>
+        <item name="colorPrimaryDark">#a81b0e</item>
         <item name="table_row_dark_bg">#5e0f08</item>
         <item name="table_row_light_bg">#2f0804</item>
     </style>
@@ -71,8 +71,8 @@
     <style name="AppTheme.010" parent="AppTheme">
         <item name="colorPrimary">#d03111</item>
         <item name="colorPrimaryTransparent">#00d03111</item>
-        <item name="colorAccent">#e53613</item>
-        <item name="colorPrimaryDark">#e53613</item>
+        <item name="colorAccent">#a6270e</item>
+        <item name="colorPrimaryDark">#a6270e</item>
         <item name="table_row_dark_bg">#5e1608</item>
         <item name="table_row_light_bg">#2f0b04</item>
     </style>
@@ -80,8 +80,8 @@
     <style name="AppTheme.015" parent="AppTheme">
         <item name="colorPrimary">#ce4011</item>
         <item name="colorPrimaryTransparent">#00ce4011</item>
-        <item name="colorAccent">#e24713</item>
-        <item name="colorPrimaryDark">#e24713</item>
+        <item name="colorAccent">#a5340e</item>
+        <item name="colorPrimaryDark">#a5340e</item>
         <item name="table_row_dark_bg">#5e1d08</item>
         <item name="table_row_light_bg">#2f0f04</item>
     </style>
@@ -89,8 +89,8 @@
     <style name="AppTheme.020" parent="AppTheme">
         <item name="colorPrimary">#cc4f11</item>
         <item name="colorPrimaryTransparent">#00cc4f11</item>
-        <item name="colorAccent">#e05713</item>
-        <item name="colorPrimaryDark">#e05713</item>
+        <item name="colorAccent">#a3400e</item>
+        <item name="colorPrimaryDark">#a3400e</item>
         <item name="table_row_dark_bg">#5e2508</item>
         <item name="table_row_light_bg">#2f1204</item>
     </style>
@@ -98,8 +98,8 @@
     <style name="AppTheme.025" parent="AppTheme">
         <item name="colorPrimary">#ca5e11</item>
         <item name="colorPrimaryTransparent">#00ca5e11</item>
-        <item name="colorAccent">#de6713</item>
-        <item name="colorPrimaryDark">#de6713</item>
+        <item name="colorAccent">#a24b0e</item>
+        <item name="colorPrimaryDark">#a24b0e</item>
         <item name="table_row_dark_bg">#5e2c08</item>
         <item name="table_row_light_bg">#2f1604</item>
     </style>
@@ -107,8 +107,8 @@
     <style name="AppTheme.030" parent="AppTheme">
         <item name="colorPrimary">#c86c11</item>
         <item name="colorPrimaryTransparent">#00c86c11</item>
-        <item name="colorAccent">#dc7712</item>
-        <item name="colorPrimaryDark">#dc7712</item>
+        <item name="colorAccent">#a0570d</item>
+        <item name="colorPrimaryDark">#a0570d</item>
         <item name="table_row_dark_bg">#5e3308</item>
         <item name="table_row_light_bg">#2f1a04</item>
     </style>
@@ -116,8 +116,8 @@
     <style name="AppTheme.035" parent="AppTheme">
         <item name="colorPrimary">#c67a11</item>
         <item name="colorPrimaryTransparent">#00c67a11</item>
-        <item name="colorAccent">#da8712</item>
-        <item name="colorPrimaryDark">#da8712</item>
+        <item name="colorAccent">#9e620d</item>
+        <item name="colorPrimaryDark">#9e620d</item>
         <item name="table_row_dark_bg">#5e3a08</item>
         <item name="table_row_light_bg">#2f1d04</item>
     </style>
@@ -125,8 +125,8 @@
     <style name="AppTheme.040" parent="AppTheme">
         <item name="colorPrimary">#c48810</item>
         <item name="colorPrimaryTransparent">#00c48810</item>
-        <item name="colorAccent">#d89612</item>
-        <item name="colorPrimaryDark">#d89612</item>
+        <item name="colorAccent">#9d6d0d</item>
+        <item name="colorPrimaryDark">#9d6d0d</item>
         <item name="table_row_dark_bg">#5e4108</item>
         <item name="table_row_light_bg">#2f2104</item>
     </style>
@@ -134,8 +134,8 @@
     <style name="AppTheme.045" parent="AppTheme">
         <item name="colorPrimary">#c29610</item>
         <item name="colorPrimaryTransparent">#00c29610</item>
-        <item name="colorAccent">#d5a512</item>
-        <item name="colorPrimaryDark">#d5a512</item>
+        <item name="colorAccent">#9b780d</item>
+        <item name="colorPrimaryDark">#9b780d</item>
         <item name="table_row_dark_bg">#5e4908</item>
         <item name="table_row_light_bg">#2f2404</item>
     </style>
@@ -143,8 +143,8 @@
     <style name="AppTheme.050" parent="AppTheme">
         <item name="colorPrimary">#c0a310</item>
         <item name="colorPrimaryTransparent">#00c0a310</item>
-        <item name="colorAccent">#d3b312</item>
-        <item name="colorPrimaryDark">#d3b312</item>
+        <item name="colorAccent">#9a820d</item>
+        <item name="colorPrimaryDark">#9a820d</item>
         <item name="table_row_dark_bg">#5e5008</item>
         <item name="table_row_light_bg">#2f2804</item>
     </style>
@@ -152,8 +152,8 @@
     <style name="AppTheme.055" parent="AppTheme">
         <item name="colorPrimary">#beb010</item>
         <item name="colorPrimaryTransparent">#00beb010</item>
-        <item name="colorAccent">#d1c112</item>
-        <item name="colorPrimaryDark">#d1c112</item>
+        <item name="colorAccent">#988d0d</item>
+        <item name="colorPrimaryDark">#988d0d</item>
         <item name="table_row_dark_bg">#5e5708</item>
         <item name="table_row_light_bg">#2f2b04</item>
     </style>
@@ -161,8 +161,8 @@
     <style name="AppTheme.060" parent="AppTheme">
         <item name="colorPrimary">#bcbc10</item>
         <item name="colorPrimaryTransparent">#00bcbc10</item>
-        <item name="colorAccent">#cfcf11</item>
-        <item name="colorPrimaryDark">#cfcf11</item>
+        <item name="colorAccent">#97970d</item>
+        <item name="colorPrimaryDark">#97970d</item>
         <item name="table_row_dark_bg">#5e5e08</item>
         <item name="table_row_light_bg">#2f2f04</item>
     </style>
@@ -170,8 +170,8 @@
     <style name="AppTheme.065" parent="AppTheme">
         <item name="colorPrimary">#aebc10</item>
         <item name="colorPrimaryTransparent">#00aebc10</item>
-        <item name="colorAccent">#bfcf11</item>
-        <item name="colorPrimaryDark">#bfcf11</item>
+        <item name="colorAccent">#8b970d</item>
+        <item name="colorPrimaryDark">#8b970d</item>
         <item name="table_row_dark_bg">#575e08</item>
         <item name="table_row_light_bg">#2b2f04</item>
     </style>
@@ -179,8 +179,8 @@
     <style name="AppTheme.070" parent="AppTheme">
         <item name="colorPrimary">#9fbc10</item>
         <item name="colorPrimaryTransparent">#009fbc10</item>
-        <item name="colorAccent">#afcf11</item>
-        <item name="colorPrimaryDark">#afcf11</item>
+        <item name="colorAccent">#80970d</item>
+        <item name="colorPrimaryDark">#80970d</item>
         <item name="table_row_dark_bg">#505e08</item>
         <item name="table_row_light_bg">#282f04</item>
     </style>
@@ -188,8 +188,8 @@
     <style name="AppTheme.075" parent="AppTheme">
         <item name="colorPrimary">#91bc10</item>
         <item name="colorPrimaryTransparent">#0091bc10</item>
-        <item name="colorAccent">#a0cf11</item>
-        <item name="colorPrimaryDark">#a0cf11</item>
+        <item name="colorAccent">#74970d</item>
+        <item name="colorPrimaryDark">#74970d</item>
         <item name="table_row_dark_bg">#495e08</item>
         <item name="table_row_light_bg">#242f04</item>
     </style>
@@ -197,8 +197,8 @@
     <style name="AppTheme.080" parent="AppTheme">
         <item name="colorPrimary">#83bc10</item>
         <item name="colorPrimaryTransparent">#0083bc10</item>
-        <item name="colorAccent">#90cf11</item>
-        <item name="colorPrimaryDark">#90cf11</item>
+        <item name="colorAccent">#69970d</item>
+        <item name="colorPrimaryDark">#69970d</item>
         <item name="table_row_dark_bg">#415e08</item>
         <item name="table_row_light_bg">#212f04</item>
     </style>
@@ -206,8 +206,8 @@
     <style name="AppTheme.085" parent="AppTheme">
         <item name="colorPrimary">#74bc10</item>
         <item name="colorPrimaryTransparent">#0074bc10</item>
-        <item name="colorAccent">#80cf11</item>
-        <item name="colorPrimaryDark">#80cf11</item>
+        <item name="colorAccent">#5d970d</item>
+        <item name="colorPrimaryDark">#5d970d</item>
         <item name="table_row_dark_bg">#3a5e08</item>
         <item name="table_row_light_bg">#1d2f04</item>
     </style>
@@ -215,8 +215,8 @@
     <style name="AppTheme.090" parent="AppTheme">
         <item name="colorPrimary">#66bc10</item>
         <item name="colorPrimaryTransparent">#0066bc10</item>
-        <item name="colorAccent">#70cf11</item>
-        <item name="colorPrimaryDark">#70cf11</item>
+        <item name="colorAccent">#52970d</item>
+        <item name="colorPrimaryDark">#52970d</item>
         <item name="table_row_dark_bg">#335e08</item>
         <item name="table_row_light_bg">#1a2f04</item>
     </style>
@@ -224,8 +224,8 @@
     <style name="AppTheme.095" parent="AppTheme">
         <item name="colorPrimary">#58bc10</item>
         <item name="colorPrimaryTransparent">#0058bc10</item>
-        <item name="colorAccent">#60cf11</item>
-        <item name="colorPrimaryDark">#60cf11</item>
+        <item name="colorAccent">#46970d</item>
+        <item name="colorPrimaryDark">#46970d</item>
         <item name="table_row_dark_bg">#2c5e08</item>
         <item name="table_row_light_bg">#162f04</item>
     </style>
@@ -233,8 +233,8 @@
     <style name="AppTheme.100" parent="AppTheme">
         <item name="colorPrimary">#49bc10</item>
         <item name="colorPrimaryTransparent">#0049bc10</item>
-        <item name="colorAccent">#51cf11</item>
-        <item name="colorPrimaryDark">#51cf11</item>
+        <item name="colorAccent">#3b970d</item>
+        <item name="colorPrimaryDark">#3b970d</item>
         <item name="table_row_dark_bg">#255e08</item>
         <item name="table_row_light_bg">#122f04</item>
     </style>
@@ -242,8 +242,8 @@
     <style name="AppTheme.105" parent="AppTheme">
         <item name="colorPrimary">#3bbc10</item>
         <item name="colorPrimaryTransparent">#003bbc10</item>
-        <item name="colorAccent">#41cf11</item>
-        <item name="colorPrimaryDark">#41cf11</item>
+        <item name="colorAccent">#2f970d</item>
+        <item name="colorPrimaryDark">#2f970d</item>
         <item name="table_row_dark_bg">#1d5e08</item>
         <item name="table_row_light_bg">#0f2f04</item>
     </style>
@@ -251,8 +251,8 @@
     <style name="AppTheme.110" parent="AppTheme">
         <item name="colorPrimary">#2dbc10</item>
         <item name="colorPrimaryTransparent">#002dbc10</item>
-        <item name="colorAccent">#31cf11</item>
-        <item name="colorPrimaryDark">#31cf11</item>
+        <item name="colorAccent">#24970d</item>
+        <item name="colorPrimaryDark">#24970d</item>
         <item name="table_row_dark_bg">#165e08</item>
         <item name="table_row_light_bg">#0b2f04</item>
     </style>
@@ -260,8 +260,8 @@
     <style name="AppTheme.115" parent="AppTheme">
         <item name="colorPrimary">#1ebc10</item>
         <item name="colorPrimaryTransparent">#001ebc10</item>
-        <item name="colorAccent">#21cf11</item>
-        <item name="colorPrimaryDark">#21cf11</item>
+        <item name="colorAccent">#18970d</item>
+        <item name="colorPrimaryDark">#18970d</item>
         <item name="table_row_dark_bg">#0f5e08</item>
         <item name="table_row_light_bg">#082f04</item>
     </style>
@@ -269,8 +269,8 @@
     <style name="AppTheme.120" parent="AppTheme">
         <item name="colorPrimary">#10bc10</item>
         <item name="colorPrimaryTransparent">#0010bc10</item>
-        <item name="colorAccent">#11cf11</item>
-        <item name="colorPrimaryDark">#11cf11</item>
+        <item name="colorAccent">#0d970d</item>
+        <item name="colorPrimaryDark">#0d970d</item>
         <item name="table_row_dark_bg">#085e08</item>
         <item name="table_row_light_bg">#042f04</item>
     </style>
@@ -278,8 +278,8 @@
     <style name="AppTheme.125" parent="AppTheme">
         <item name="colorPrimary">#10bc1e</item>
         <item name="colorPrimaryTransparent">#0010bc1e</item>
-        <item name="colorAccent">#11cf21</item>
-        <item name="colorPrimaryDark">#11cf21</item>
+        <item name="colorAccent">#0d9618</item>
+        <item name="colorPrimaryDark">#0d9618</item>
         <item name="table_row_dark_bg">#085e0f</item>
         <item name="table_row_light_bg">#042f08</item>
     </style>
@@ -287,8 +287,8 @@
     <style name="AppTheme.130" parent="AppTheme">
         <item name="colorPrimary">#10bb2c</item>
         <item name="colorPrimaryTransparent">#0010bb2c</item>
-        <item name="colorAccent">#11ce31</item>
-        <item name="colorPrimaryDark">#11ce31</item>
+        <item name="colorAccent">#0d9623</item>
+        <item name="colorPrimaryDark">#0d9623</item>
         <item name="table_row_dark_bg">#085e16</item>
         <item name="table_row_light_bg">#042f0b</item>
     </style>
@@ -296,8 +296,8 @@
     <style name="AppTheme.135" parent="AppTheme">
         <item name="colorPrimary">#10bb3b</item>
         <item name="colorPrimaryTransparent">#0010bb3b</item>
-        <item name="colorAccent">#11ce40</item>
-        <item name="colorPrimaryDark">#11ce40</item>
+        <item name="colorAccent">#0d962f</item>
+        <item name="colorPrimaryDark">#0d962f</item>
         <item name="table_row_dark_bg">#085e1d</item>
         <item name="table_row_light_bg">#042f0f</item>
     </style>
@@ -305,8 +305,8 @@
     <style name="AppTheme.140" parent="AppTheme">
         <item name="colorPrimary">#10bb49</item>
         <item name="colorPrimaryTransparent">#0010bb49</item>
-        <item name="colorAccent">#11cd50</item>
-        <item name="colorPrimaryDark">#11cd50</item>
+        <item name="colorAccent">#0d953a</item>
+        <item name="colorPrimaryDark">#0d953a</item>
         <item name="table_row_dark_bg">#085e25</item>
         <item name="table_row_light_bg">#042f12</item>
     </style>
@@ -314,8 +314,8 @@
     <style name="AppTheme.145" parent="AppTheme">
         <item name="colorPrimary">#10ba57</item>
         <item name="colorPrimaryTransparent">#0010ba57</item>
-        <item name="colorAccent">#11cd5f</item>
-        <item name="colorPrimaryDark">#11cd5f</item>
+        <item name="colorAccent">#0d9545</item>
+        <item name="colorPrimaryDark">#0d9545</item>
         <item name="table_row_dark_bg">#085e2c</item>
         <item name="table_row_light_bg">#042f16</item>
     </style>
@@ -323,8 +323,8 @@
     <style name="AppTheme.150" parent="AppTheme">
         <item name="colorPrimary">#10ba65</item>
         <item name="colorPrimaryTransparent">#0010ba65</item>
-        <item name="colorAccent">#11cc6f</item>
-        <item name="colorPrimaryDark">#11cc6f</item>
+        <item name="colorAccent">#0c9551</item>
+        <item name="colorPrimaryDark">#0c9551</item>
         <item name="table_row_dark_bg">#085e33</item>
         <item name="table_row_light_bg">#042f1a</item>
     </style>
@@ -332,8 +332,8 @@
     <style name="AppTheme.155" parent="AppTheme">
         <item name="colorPrimary">#10b973</item>
         <item name="colorPrimaryTransparent">#0010b973</item>
-        <item name="colorAccent">#11cc7e</item>
-        <item name="colorPrimaryDark">#11cc7e</item>
+        <item name="colorAccent">#0c945c</item>
+        <item name="colorPrimaryDark">#0c945c</item>
         <item name="table_row_dark_bg">#085e3a</item>
         <item name="table_row_light_bg">#042f1d</item>
     </style>
@@ -341,8 +341,8 @@
     <style name="AppTheme.160" parent="AppTheme">
         <item name="colorPrimary">#10b981</item>
         <item name="colorPrimaryTransparent">#0010b981</item>
-        <item name="colorAccent">#11cc8d</item>
-        <item name="colorPrimaryDark">#11cc8d</item>
+        <item name="colorAccent">#0c9467</item>
+        <item name="colorPrimaryDark">#0c9467</item>
         <item name="table_row_dark_bg">#085e41</item>
         <item name="table_row_light_bg">#042f21</item>
     </style>
@@ -350,8 +350,8 @@
     <style name="AppTheme.165" parent="AppTheme">
         <item name="colorPrimary">#10b98e</item>
         <item name="colorPrimaryTransparent">#0010b98e</item>
-        <item name="colorAccent">#11cb9d</item>
-        <item name="colorPrimaryDark">#11cb9d</item>
+        <item name="colorAccent">#0c9472</item>
+        <item name="colorPrimaryDark">#0c9472</item>
         <item name="table_row_dark_bg">#085e49</item>
         <item name="table_row_light_bg">#042f24</item>
     </style>
@@ -359,8 +359,8 @@
     <style name="AppTheme.170" parent="AppTheme">
         <item name="colorPrimary">#0fb89c</item>
         <item name="colorPrimaryTransparent">#000fb89c</item>
-        <item name="colorAccent">#11cbac</item>
-        <item name="colorPrimaryDark">#11cbac</item>
+        <item name="colorAccent">#0c937d</item>
+        <item name="colorPrimaryDark">#0c937d</item>
         <item name="table_row_dark_bg">#085e50</item>
         <item name="table_row_light_bg">#042f28</item>
     </style>
@@ -368,8 +368,8 @@
     <style name="AppTheme.175" parent="AppTheme">
         <item name="colorPrimary">#0fb8aa</item>
         <item name="colorPrimaryTransparent">#000fb8aa</item>
-        <item name="colorAccent">#11cabb</item>
-        <item name="colorPrimaryDark">#11cabb</item>
+        <item name="colorAccent">#0c9388</item>
+        <item name="colorPrimaryDark">#0c9388</item>
         <item name="table_row_dark_bg">#085e57</item>
         <item name="table_row_light_bg">#042f2b</item>
     </style>
@@ -377,8 +377,8 @@
     <style name="AppTheme.180" parent="AppTheme">
         <item name="colorPrimary">#0fb7b7</item>
         <item name="colorPrimaryTransparent">#000fb7b7</item>
-        <item name="colorAccent">#11caca</item>
-        <item name="colorPrimaryDark">#11caca</item>
+        <item name="colorAccent">#0c9393</item>
+        <item name="colorPrimaryDark">#0c9393</item>
         <item name="table_row_dark_bg">#085e5e</item>
         <item name="table_row_light_bg">#042f2f</item>
     </style>
@@ -386,8 +386,8 @@
     <style name="AppTheme.185" parent="AppTheme">
         <item name="colorPrimary">#11b6c5</item>
         <item name="colorPrimaryTransparent">#0011b6c5</item>
-        <item name="colorAccent">#12c9d9</item>
-        <item name="colorPrimaryDark">#12c9d9</item>
+        <item name="colorAccent">#0d929e</item>
+        <item name="colorPrimaryDark">#0d929e</item>
         <item name="table_row_dark_bg">#08575e</item>
         <item name="table_row_light_bg">#042b2f</item>
     </style>
@@ -395,8 +395,8 @@
     <style name="AppTheme.190" parent="AppTheme">
         <item name="colorPrimary">#12b3d3</item>
         <item name="colorPrimaryTransparent">#0012b3d3</item>
-        <item name="colorAccent">#14c5e8</item>
-        <item name="colorPrimaryDark">#14c5e8</item>
+        <item name="colorAccent">#0e8fa9</item>
+        <item name="colorPrimaryDark">#0e8fa9</item>
         <item name="table_row_dark_bg">#08505e</item>
         <item name="table_row_light_bg">#04282f</item>
     </style>
@@ -404,8 +404,8 @@
     <style name="AppTheme.195" parent="AppTheme">
         <item name="colorPrimary">#13aee1</item>
         <item name="colorPrimaryTransparent">#0013aee1</item>
-        <item name="colorAccent">#20b9ec</item>
-        <item name="colorPrimaryDark">#20b9ec</item>
+        <item name="colorAccent">#0f8bb4</item>
+        <item name="colorPrimaryDark">#0f8bb4</item>
         <item name="table_row_dark_bg">#08495e</item>
         <item name="table_row_light_bg">#04242f</item>
     </style>
@@ -413,8 +413,8 @@
     <style name="AppTheme.200" parent="AppTheme">
         <item name="colorPrimary">#18a5ec</item>
         <item name="colorPrimaryTransparent">#0018a5ec</item>
-        <item name="colorAccent">#30aeee</item>
-        <item name="colorPrimaryDark">#30aeee</item>
+        <item name="colorAccent">#1085bf</item>
+        <item name="colorPrimaryDark">#1085bf</item>
         <item name="table_row_dark_bg">#08415e</item>
         <item name="table_row_light_bg">#04212f</item>
     </style>
@@ -422,8 +422,8 @@
     <style name="AppTheme.205" parent="AppTheme">
         <item name="colorPrimary">#269aed</item>
         <item name="colorPrimaryTransparent">#00269aed</item>
-        <item name="colorAccent">#3fa6ef</item>
-        <item name="colorPrimaryDark">#3fa6ef</item>
+        <item name="colorAccent">#117dca</item>
+        <item name="colorPrimaryDark">#117dca</item>
         <item name="table_row_dark_bg">#083a5e</item>
         <item name="table_row_light_bg">#041d2f</item>
     </style>
@@ -431,8 +431,8 @@
     <style name="AppTheme.210" parent="AppTheme">
         <item name="colorPrimary">#3491ee</item>
         <item name="colorPrimaryTransparent">#003491ee</item>
-        <item name="colorAccent">#4e9ff0</item>
-        <item name="colorPrimaryDark">#4e9ff0</item>
+        <item name="colorAccent">#1274d6</item>
+        <item name="colorPrimaryDark">#1274d6</item>
         <item name="table_row_dark_bg">#08335e</item>
         <item name="table_row_light_bg">#041a2f</item>
     </style>
@@ -440,8 +440,8 @@
     <style name="AppTheme.215" parent="AppTheme">
         <item name="colorPrimary">#418aef</item>
         <item name="colorPrimaryTransparent">#00418aef</item>
-        <item name="colorAccent">#5e9bf1</item>
-        <item name="colorPrimaryDark">#5e9bf1</item>
+        <item name="colorAccent">#1369e1</item>
+        <item name="colorPrimaryDark">#1369e1</item>
         <item name="table_row_dark_bg">#082c5e</item>
         <item name="table_row_light_bg">#04162f</item>
     </style>
@@ -449,8 +449,8 @@
     <style name="AppTheme.220" parent="AppTheme">
         <item name="colorPrimary">#4f85f0</item>
         <item name="colorPrimaryTransparent">#004f85f0</item>
-        <item name="colorAccent">#6d99f3</item>
-        <item name="colorPrimaryDark">#6d99f3</item>
+        <item name="colorAccent">#145ceb</item>
+        <item name="colorPrimaryDark">#145ceb</item>
         <item name="table_row_dark_bg">#08255e</item>
         <item name="table_row_light_bg">#04122f</item>
     </style>
@@ -458,8 +458,8 @@
     <style name="AppTheme.225" parent="AppTheme">
         <item name="colorPrimary">#5d82f1</item>
         <item name="colorPrimaryTransparent">#005d82f1</item>
-        <item name="colorAccent">#7c9af4</item>
-        <item name="colorPrimaryDark">#7c9af4</item>
+        <item name="colorAccent">#2053ec</item>
+        <item name="colorPrimaryDark">#2053ec</item>
         <item name="table_row_dark_bg">#081d5e</item>
         <item name="table_row_light_bg">#040f2f</item>
     </style>
@@ -467,8 +467,8 @@
     <style name="AppTheme.230" parent="AppTheme">
         <item name="colorPrimary">#6b82f3</item>
         <item name="colorPrimaryTransparent">#006b82f3</item>
-        <item name="colorAccent">#8b9df5</item>
-        <item name="colorPrimaryDark">#8b9df5</item>
+        <item name="colorAccent">#2b4bed</item>
+        <item name="colorPrimaryDark">#2b4bed</item>
         <item name="table_row_dark_bg">#08165e</item>
         <item name="table_row_light_bg">#040b2f</item>
     </style>
@@ -476,8 +476,8 @@
     <style name="AppTheme.235" parent="AppTheme">
         <item name="colorPrimary">#7983f4</item>
         <item name="colorPrimaryTransparent">#007983f4</item>
-        <item name="colorAccent">#9ba2f7</item>
-        <item name="colorPrimaryDark">#9ba2f7</item>
+        <item name="colorAccent">#3645ee</item>
+        <item name="colorPrimaryDark">#3645ee</item>
         <item name="table_row_dark_bg">#080f5e</item>
         <item name="table_row_light_bg">#04082f</item>
     </style>
@@ -485,8 +485,8 @@
     <style name="AppTheme.240" parent="AppTheme">
         <item name="colorPrimary">#8787f5</item>
         <item name="colorPrimaryTransparent">#008787f5</item>
-        <item name="colorAccent">#aaaaf8</item>
-        <item name="colorPrimaryDark">#aaaaf8</item>
+        <item name="colorAccent">#4141ef</item>
+        <item name="colorPrimaryDark">#4141ef</item>
         <item name="table_row_dark_bg">#08085e</item>
         <item name="table_row_light_bg">#04042f</item>
     </style>
@@ -494,8 +494,8 @@
     <style name="AppTheme.245" parent="AppTheme">
         <item name="colorPrimary">#877ef4</item>
         <item name="colorPrimaryTransparent">#00877ef4</item>
-        <item name="colorAccent">#a7a0f7</item>
-        <item name="colorPrimaryDark">#a7a0f7</item>
+        <item name="colorAccent">#4839ee</item>
+        <item name="colorPrimaryDark">#4839ee</item>
         <item name="table_row_dark_bg">#0f085e</item>
         <item name="table_row_light_bg">#08042f</item>
     </style>
@@ -503,8 +503,8 @@
     <style name="AppTheme.250" parent="AppTheme">
         <item name="colorPrimary">#8974f3</item>
         <item name="colorPrimaryTransparent">#008974f3</item>
-        <item name="colorAccent">#a695f6</item>
-        <item name="colorPrimaryDark">#a695f6</item>
+        <item name="colorAccent">#5132ee</item>
+        <item name="colorPrimaryDark">#5132ee</item>
         <item name="table_row_dark_bg">#16085e</item>
         <item name="table_row_light_bg">#0b042f</item>
     </style>
@@ -512,8 +512,8 @@
     <style name="AppTheme.255" parent="AppTheme">
         <item name="colorPrimary">#8d6bf3</item>
         <item name="colorPrimaryTransparent">#008d6bf3</item>
-        <item name="colorAccent">#a68bf5</item>
-        <item name="colorPrimaryDark">#a68bf5</item>
+        <item name="colorAccent">#5b2aed</item>
+        <item name="colorPrimaryDark">#5b2aed</item>
         <item name="table_row_dark_bg">#1d085e</item>
         <item name="table_row_light_bg">#0f042f</item>
     </style>
@@ -521,8 +521,8 @@
     <style name="AppTheme.260" parent="AppTheme">
         <item name="colorPrimary">#9261f2</item>
         <item name="colorPrimaryTransparent">#009261f2</item>
-        <item name="colorAccent">#a781f4</item>
-        <item name="colorPrimaryDark">#a781f4</item>
+        <item name="colorAccent">#6623ed</item>
+        <item name="colorPrimaryDark">#6623ed</item>
         <item name="table_row_dark_bg">#25085e</item>
         <item name="table_row_light_bg">#12042f</item>
     </style>
@@ -530,8 +530,8 @@
     <style name="AppTheme.265" parent="AppTheme">
         <item name="colorPrimary">#9858f1</item>
         <item name="colorPrimaryTransparent">#009858f1</item>
-        <item name="colorAccent">#aa76f4</item>
-        <item name="colorPrimaryDark">#aa76f4</item>
+        <item name="colorAccent">#721bec</item>
+        <item name="colorPrimaryDark">#721bec</item>
         <item name="table_row_dark_bg">#2c085e</item>
         <item name="table_row_light_bg">#16042f</item>
     </style>
@@ -539,8 +539,8 @@
     <style name="AppTheme.270" parent="AppTheme">
         <item name="colorPrimary">#9f4ff0</item>
         <item name="colorPrimaryTransparent">#009f4ff0</item>
-        <item name="colorAccent">#af6cf3</item>
-        <item name="colorPrimaryDark">#af6cf3</item>
+        <item name="colorAccent">#8014eb</item>
+        <item name="colorPrimaryDark">#8014eb</item>
         <item name="table_row_dark_bg">#33085e</item>
         <item name="table_row_light_bg">#1a042f</item>
     </style>
@@ -548,8 +548,8 @@
     <style name="AppTheme.275" parent="AppTheme">
         <item name="colorPrimary">#a845ef</item>
         <item name="colorPrimaryTransparent">#00a845ef</item>
-        <item name="colorAccent">#b662f2</item>
-        <item name="colorPrimaryDark">#b662f2</item>
+        <item name="colorAccent">#8d13e4</item>
+        <item name="colorPrimaryDark">#8d13e4</item>
         <item name="table_row_dark_bg">#3a085e</item>
         <item name="table_row_light_bg">#1d042f</item>
     </style>
@@ -557,8 +557,8 @@
     <style name="AppTheme.280" parent="AppTheme">
         <item name="colorPrimary">#b33cef</item>
         <item name="colorPrimaryTransparent">#00b33cef</item>
-        <item name="colorAccent">#be57f1</item>
-        <item name="colorPrimaryDark">#be57f1</item>
+        <item name="colorAccent">#9912dc</item>
+        <item name="colorPrimaryDark">#9912dc</item>
         <item name="table_row_dark_bg">#41085e</item>
         <item name="table_row_light_bg">#21042f</item>
     </style>
@@ -566,8 +566,8 @@
     <style name="AppTheme.285" parent="AppTheme">
         <item name="colorPrimary">#bf32ee</item>
         <item name="colorPrimaryTransparent">#00bf32ee</item>
-        <item name="colorAccent">#c74df0</item>
-        <item name="colorPrimaryDark">#c74df0</item>
+        <item name="colorAccent">#a412d5</item>
+        <item name="colorPrimaryDark">#a412d5</item>
         <item name="table_row_dark_bg">#49085e</item>
         <item name="table_row_light_bg">#24042f</item>
     </style>
@@ -575,8 +575,8 @@
     <style name="AppTheme.290" parent="AppTheme">
         <item name="colorPrimary">#cc29ed</item>
         <item name="colorPrimaryTransparent">#00cc29ed</item>
-        <item name="colorAccent">#d243ef</item>
-        <item name="colorPrimaryDark">#d243ef</item>
+        <item name="colorAccent">#ae11cd</item>
+        <item name="colorPrimaryDark">#ae11cd</item>
         <item name="table_row_dark_bg">#50085e</item>
         <item name="table_row_light_bg">#28042f</item>
     </style>
@@ -584,8 +584,8 @@
     <style name="AppTheme.295" parent="AppTheme">
         <item name="colorPrimary">#db20ec</item>
         <item name="colorPrimaryTransparent">#00db20ec</item>
-        <item name="colorAccent">#df38ee</item>
-        <item name="colorPrimaryDark">#df38ee</item>
+        <item name="colorAccent">#b711c6</item>
+        <item name="colorPrimaryDark">#b711c6</item>
         <item name="table_row_dark_bg">#57085e</item>
         <item name="table_row_light_bg">#2b042f</item>
     </style>
@@ -593,8 +593,8 @@
     <style name="AppTheme.300" parent="AppTheme">
         <item name="colorPrimary">#eb16eb</item>
         <item name="colorPrimaryTransparent">#00eb16eb</item>
-        <item name="colorAccent">#ed2eed</item>
-        <item name="colorPrimaryDark">#ed2eed</item>
+        <item name="colorAccent">#be10be</item>
+        <item name="colorPrimaryDark">#be10be</item>
         <item name="table_row_dark_bg">#5e085e</item>
         <item name="table_row_light_bg">#2f042f</item>
     </style>
@@ -602,8 +602,8 @@
     <style name="AppTheme.305" parent="AppTheme">
         <item name="colorPrimary">#eb14d9</item>
         <item name="colorPrimaryTransparent">#00eb14d9</item>
-        <item name="colorAccent">#ed2cdd</item>
-        <item name="colorPrimaryDark">#ed2cdd</item>
+        <item name="colorAccent">#bc10ae</item>
+        <item name="colorPrimaryDark">#bc10ae</item>
         <item name="table_row_dark_bg">#5e0857</item>
         <item name="table_row_light_bg">#2f042b</item>
     </style>
@@ -611,8 +611,8 @@
     <style name="AppTheme.310" parent="AppTheme">
         <item name="colorPrimary">#e914c6</item>
         <item name="colorPrimaryTransparent">#00e914c6</item>
-        <item name="colorAccent">#ed29cc</item>
-        <item name="colorPrimaryDark">#ed29cc</item>
+        <item name="colorAccent">#bb109e</item>
+        <item name="colorPrimaryDark">#bb109e</item>
         <item name="table_row_dark_bg">#5e0850</item>
         <item name="table_row_light_bg">#2f0428</item>
     </style>
@@ -620,8 +620,8 @@
     <style name="AppTheme.315" parent="AppTheme">
         <item name="colorPrimary">#e713b2</item>
         <item name="colorPrimaryTransparent">#00e713b2</item>
-        <item name="colorAccent">#ed27bb</item>
-        <item name="colorPrimaryDark">#ed27bb</item>
+        <item name="colorAccent">#b9108f</item>
+        <item name="colorPrimaryDark">#b9108f</item>
         <item name="table_row_dark_bg">#5e0849</item>
         <item name="table_row_light_bg">#2f0424</item>
     </style>
@@ -629,8 +629,8 @@
     <style name="AppTheme.320" parent="AppTheme">
         <item name="colorPrimary">#e5139f</item>
         <item name="colorPrimaryTransparent">#00e5139f</item>
-        <item name="colorAccent">#ed24aa</item>
-        <item name="colorPrimaryDark">#ed24aa</item>
+        <item name="colorAccent">#b70f7f</item>
+        <item name="colorPrimaryDark">#b70f7f</item>
         <item name="table_row_dark_bg">#5e0841</item>
         <item name="table_row_light_bg">#2f0421</item>
     </style>
@@ -638,8 +638,8 @@
     <style name="AppTheme.325" parent="AppTheme">
         <item name="colorPrimary">#e3138c</item>
         <item name="colorPrimaryTransparent">#00e3138c</item>
-        <item name="colorAccent">#ec2298</item>
-        <item name="colorPrimaryDark">#ec2298</item>
+        <item name="colorAccent">#b50f70</item>
+        <item name="colorPrimaryDark">#b50f70</item>
         <item name="table_row_dark_bg">#5e083a</item>
         <item name="table_row_light_bg">#2f041d</item>
     </style>
@@ -647,8 +647,8 @@
     <style name="AppTheme.330" parent="AppTheme">
         <item name="colorPrimary">#e1137a</item>
         <item name="colorPrimaryTransparent">#00e1137a</item>
-        <item name="colorAccent">#ec2086</item>
-        <item name="colorPrimaryDark">#ec2086</item>
+        <item name="colorAccent">#b40f61</item>
+        <item name="colorPrimaryDark">#b40f61</item>
         <item name="table_row_dark_bg">#5e0833</item>
         <item name="table_row_light_bg">#2f041a</item>
     </style>
@@ -656,8 +656,8 @@
     <style name="AppTheme.335" parent="AppTheme">
         <item name="colorPrimary">#de1368</item>
         <item name="colorPrimaryTransparent">#00de1368</item>
-        <item name="colorAccent">#ec1d73</item>
-        <item name="colorPrimaryDark">#ec1d73</item>
+        <item name="colorAccent">#b20f53</item>
+        <item name="colorPrimaryDark">#b20f53</item>
         <item name="table_row_dark_bg">#5e082c</item>
         <item name="table_row_light_bg">#2f0416</item>
     </style>
@@ -665,8 +665,8 @@
     <style name="AppTheme.340" parent="AppTheme">
         <item name="colorPrimary">#dc1356</item>
         <item name="colorPrimaryTransparent">#00dc1356</item>
-        <item name="colorAccent">#ec1b61</item>
-        <item name="colorPrimaryDark">#ec1b61</item>
+        <item name="colorAccent">#b00f45</item>
+        <item name="colorPrimaryDark">#b00f45</item>
         <item name="table_row_dark_bg">#5e0825</item>
         <item name="table_row_light_bg">#2f0412</item>
     </style>
@@ -674,8 +674,8 @@
     <style name="AppTheme.345" parent="AppTheme">
         <item name="colorPrimary">#da1244</item>
         <item name="colorPrimaryTransparent">#00da1244</item>
-        <item name="colorAccent">#ec194d</item>
-        <item name="colorPrimaryDark">#ec194d</item>
+        <item name="colorAccent">#af0f37</item>
+        <item name="colorPrimaryDark">#af0f37</item>
         <item name="table_row_dark_bg">#5e081d</item>
         <item name="table_row_light_bg">#2f040f</item>
     </style>
@@ -683,8 +683,8 @@
     <style name="AppTheme.350" parent="AppTheme">
         <item name="colorPrimary">#d81233</item>
         <item name="colorPrimaryTransparent">#00d81233</item>
-        <item name="colorAccent">#eb163a</item>
-        <item name="colorPrimaryDark">#eb163a</item>
+        <item name="colorAccent">#ad0f29</item>
+        <item name="colorPrimaryDark">#ad0f29</item>
         <item name="table_row_dark_bg">#5e0816</item>
         <item name="table_row_light_bg">#2f040b</item>
     </style>
@@ -692,8 +692,8 @@
     <style name="AppTheme.355" parent="AppTheme">
         <item name="colorPrimary">#d61222</item>
         <item name="colorPrimaryTransparent">#00d61222</item>
-        <item name="colorAccent">#eb1426</item>
-        <item name="colorPrimaryDark">#eb1426</item>
+        <item name="colorAccent">#ab0e1b</item>
+        <item name="colorPrimaryDark">#ab0e1b</item>
         <item name="table_row_dark_bg">#5e080f</item>
         <item name="table_row_light_bg">#2f0408</item>
     </style>
