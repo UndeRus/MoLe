@@ -84,16 +84,15 @@
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"
                         android:text="@string/transactions_last_update_label"
-                        android:textColor="@android:color/tertiary_text_light" />
+                        />
 
                     <TextView
                         android:id="@+id/transactions_last_update"
-                        style="@android:style/Widget.DeviceDefault.Light.TextView"
+                        android:textAppearance="@android:style/TextAppearance.Material.Small"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="\?"
-                        android:textColor="@android:color/tertiary_text_light"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
