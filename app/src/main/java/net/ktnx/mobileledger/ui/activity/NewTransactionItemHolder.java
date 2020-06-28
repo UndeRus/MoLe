@@ -30,6 +30,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -69,6 +70,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private NewTransactionModel.Item item;
     private TextView tvDate;
     private AutoCompleteTextView tvDescription;
+    private TextView tvDummy;
     private AutoCompleteTextView tvAccount;
     private TextView tvComment;
     private EditText tvAmount;
@@ -107,6 +109,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvCurrency = itemView.findViewById(R.id.currency);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
         tvDescription = itemView.findViewById(R.id.new_transaction_description);
+        tvDummy = itemView.findViewById(R.id.dummy_text);
         lHead = itemView.findViewById(R.id.ntr_data);
         lPadding = itemView.findViewById(R.id.ntr_padding);
         final View commentLayout = itemView.findViewById(R.id.comment_layout);
@@ -166,10 +169,10 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
 
             if (id == R.id.comment) {
-                commentFocusChanged(commentLayout, tvComment, hasFocus);
+                commentFocusChanged(tvComment, hasFocus);
             }
             else if (id == R.id.transaction_comment) {
-                commentFocusChanged(transactionCommentLayout, tvTransactionComment, hasFocus);
+                commentFocusChanged(tvTransactionComment, hasFocus);
             }
         };
 
@@ -292,6 +295,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
         };
         editableObserver = this::setEditable;
+        commentFocusChanged(tvTransactionComment, false);
+        commentFocusChanged(tvComment, false);
         focusedAccountObserver = index -> {
             if ((index == null) || !index.equals(getAdapterPosition()) || itemView.hasFocus())
                 return;
@@ -430,15 +435,18 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             tvAmount.setMinEms(valid ? 4 : 5);
         };
     }
-    private void commentFocusChanged(View layout, TextView textView, boolean hasFocus) {
-        int textColor;
+    private void commentFocusChanged(TextView textView, boolean hasFocus) {
+        @ColorInt int textColor;
+        textColor = tvDummy.getTextColors()
+                           .getDefaultColor();
         if (hasFocus) {
-            textColor = Colors.defaultTextColor;
             textView.setTypeface(null, Typeface.NORMAL);
             textView.setHint(R.string.transaction_account_comment_hint);
         }
         else {
-            textColor = Colors.defaultTextColorDisabled;
+            int alpha = (textColor >> 24 & 0xff);
+            alpha = 3 * alpha / 4;
+            textColor = (alpha << 24) | (0x00ffffff & textColor);
             textView.setTypeface(null, Typeface.ITALIC);
             textView.setHint("");
             if (Misc.isEmptyOrNull(textView.getText())) {
