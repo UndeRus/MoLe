@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:visibility="visible"
-        app:cardBackgroundColor="?table_row_light_bg"
+        app:cardElevation="2dp"
         app:cardUseCompatPadding="false"
         app:cardCornerRadius="0dp"
         >
