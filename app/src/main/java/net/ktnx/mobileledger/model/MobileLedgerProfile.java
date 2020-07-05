@@ -86,7 +86,7 @@ public final class MobileLedgerProfile {
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
-    public static MobileLedgerProfile loadAllFromDB(String currentProfileUUID) {
+    public static MobileLedgerProfile loadAllFromDB(@Nullable String currentProfileUUID) {
         MobileLedgerProfile result = null;
         ArrayList<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = App.getDatabase();

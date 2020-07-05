@@ -163,4 +163,5 @@
     <string name="show_comment_input_by_default">Show comment fields by default</string>
     <string name="filter_menu_title">Filter</string>
     <string name="go_to_date_menu_title">Go to date</string>
+    <string name="splash_icon_description">Main app icon</string>
 </resources>

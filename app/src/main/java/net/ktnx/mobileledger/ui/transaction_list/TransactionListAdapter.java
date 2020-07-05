@@ -93,6 +93,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 if (item.isMonthShown()) {
                     GregorianCalendar cal = new GregorianCalendar(TimeZone.getDefault());
                     cal.setTime(date.toDate());
+                    App.prepareMonthNames();
                     holder.tvDelimiterMonth.setText(
                             Globals.monthNames[cal.get(GregorianCalendar.MONTH)]);
                     holder.tvDelimiterMonth.setVisibility(View.VISIBLE);

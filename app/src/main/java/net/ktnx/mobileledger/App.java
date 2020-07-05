@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import java.util.Locale;
 public class App extends Application {
     public static App instance;
     private MobileLedgerDatabase dbHelper;
+    private boolean monthNamesPrepared = false;
     public static SQLiteDatabase getDatabase() {
         if (instance == null) throw new RuntimeException("Application not created yet");
 
@@ -48,7 +49,6 @@ public class App extends Application {
         Logger.debug("flow", "App onCreate()");
         instance = this;
         super.onCreate();
-        updateMonthNames();
         Data.refreshCurrencyData(Locale.getDefault());
         Authenticator.setDefault(new Authenticator() {
             @Override
@@ -75,20 +75,27 @@ public class App extends Application {
             }
         });
     }
-    private void updateMonthNames() {
+    public static void prepareMonthNames() {
+        instance.prepareMonthNames(false);
+    }
+    private void prepareMonthNames(boolean force) {
+        if (force || monthNamesPrepared)
+            return;
         Resources rm = getResources();
         Globals.monthNames = rm.getStringArray(R.array.month_names);
+        monthNamesPrepared = true;
     }
     @Override
     public void onTerminate() {
         Logger.debug("flow", "App onTerminate()");
-        if (dbHelper != null) dbHelper.close();
+        if (dbHelper != null)
+            dbHelper.close();
         super.onTerminate();
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        updateMonthNames();
+        prepareMonthNames(true);
         Data.refreshCurrencyData(Locale.getDefault());
         Data.locale.setValue(Locale.getDefault());
     }

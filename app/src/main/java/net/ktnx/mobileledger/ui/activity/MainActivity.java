@@ -69,6 +69,7 @@ import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.GetOptCallback;
 import net.ktnx.mobileledger.utils.LockHolder;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
@@ -108,6 +109,8 @@ public class MainActivity extends ProfileThemedActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        Logger.debug("MainActivity", "onStart()");
 
         mViewPager.setCurrentItem(mCurrentPage, false);
     }
@@ -152,8 +155,9 @@ public class MainActivity extends ProfileThemedActivity {
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        debug("MainActivity", "onCreate()/entry");
         super.onCreate(savedInstanceState);
-        debug("flow", "MainActivity.onCreate()");
+        debug("MainActivity", "onCreate()/after super");
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.btn_add_transaction);
