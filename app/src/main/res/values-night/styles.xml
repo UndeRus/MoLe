@@ -17,9 +17,6 @@
 
 <resources>
 
-    <style name="myFabStyle" parent="Widget.MaterialComponents.FloatingActionButton">
-        <item name="tint" state="disabled">?android:attr/colorBackground</item>
-    </style>
     <!-- Base application theme. -->
     <!-- base hue: 261.2245° -->
     <!-- target primary color: #935FF2 -->
@@ -30,13 +27,12 @@
         <item name="windowNoTitle">true</item>
         <item name="textColor">#ffffff</item>
         <item name="commentColor">#909090</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorOnSecondary">#dddddd</item>
         <item name="textInputStyle">
             @style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense
         </item>
         <item name="colorError">#FFE1E2</item>
         <item name="colorOnError">#CD1609</item>
-        <item name="floatingActionButtonStyle">@style/myFabStyle</item>
     </style>
 
     <!-- theme list start -->
