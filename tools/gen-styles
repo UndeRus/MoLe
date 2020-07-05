@@ -208,7 +208,7 @@ sub hslStyleForHue {
 	my $l1 = $y0 + 1.0 * ( $hue - $x0 ) * ( $y1 - $y0 ) / ( $x1 - $x0 );
 
 	my $l2 = $l1 * 0.80;
-	my $l3 = $opt_night ? 0.200 : 0.950;
+	my $l3 = $opt_night ? 0.150 : 0.950;
 	my $l4 = $opt_night ? 0.100 : 0.980;
 
 	my $result = "";
@@ -230,6 +230,8 @@ sub hslStyleForHue {
             'colorPrimary', hslHex( $hue, $S, $l1 );
         $result .= sprintf "$indent<item name=\"%s\">#00%s</item>\n",
             'colorPrimaryTransparent', hslHex( $hue, $S, $l1 );
+        $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
+            'colorSecondary', hslHex( $hue, $S, $l2 );
         $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
             'colorAccent', hslHex( $hue, $S, $l2 );
         $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
