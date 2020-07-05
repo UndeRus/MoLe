@@ -18,8 +18,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/loading" />
-
     <include
         layout="@layout/no_profiles"
         android:visibility="gone" />
