@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -48,9 +48,6 @@ public class CommitAccountsTask
                         db.execSQL("UPDATE accounts SET hidden=? WHERE profile=? AND name=?",
                                 new Object[]{acc.isHiddenByStarToBe() ? 1 : 0, profile, acc.getName()
                                 });
-
-                        acc.setHiddenByStar(acc.isHiddenByStarToBe());
-                        if (!params[0].showOnlyStarred || !acc.isHiddenByStar()) newList.add(acc);
                     }
                     db.setTransactionSuccessful();
                 }

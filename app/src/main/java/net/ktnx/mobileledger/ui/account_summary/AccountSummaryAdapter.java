@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,15 +67,6 @@ public class AccountSummaryAdapter
                 else {
                     holder.tvAccountAmounts.setText(acc.getAmountsString());
                     holder.accountExpanderContainer.setVisibility(View.GONE);
-                }
-
-                if (acc.isHiddenByStar()) {
-                    holder.tvAccountName.setTypeface(null, Typeface.ITALIC);
-                    holder.tvAccountAmounts.setTypeface(null, Typeface.ITALIC);
-                }
-                else {
-                    holder.tvAccountName.setTypeface(null, Typeface.NORMAL);
-                    holder.tvAccountAmounts.setTypeface(null, Typeface.NORMAL);
                 }
 
                 holder.row.setTag(R.id.POS, position);

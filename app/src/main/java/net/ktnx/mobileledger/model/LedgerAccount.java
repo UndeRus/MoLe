@@ -31,7 +31,6 @@ public class LedgerAccount {
     private String shortName;
     private int level;
     private String parentName;
-    private boolean hiddenByStar;
     private boolean hiddenByStarToBe;
     private boolean expanded;
     private List<LedgerAmount> amounts;
@@ -40,12 +39,10 @@ public class LedgerAccount {
 
     public LedgerAccount(String name) {
         this.setName(name);
-        hiddenByStar = false;
     }
 
     public LedgerAccount(String name, float amount) {
         this.setName(name);
-        this.hiddenByStar = false;
         this.expanded = true;
         this.amounts = new ArrayList<LedgerAmount>();
         this.addAmount(amount);
@@ -65,8 +62,6 @@ public class LedgerAccount {
     //  - it is starred (not hidden by a star)
     //  - and it has an expanded parent or is a top account
     public boolean isVisible() {
-        if (hiddenByStar) return false;
-
         if (level == 0) return true;
 
         return isVisible(Data.accounts);
@@ -81,12 +76,6 @@ public class LedgerAccount {
     }
     public boolean isParentOf(LedgerAccount potentialChild) {
         return potentialChild.getName().startsWith(name + ":");
-    }
-    public boolean isHiddenByStar() {
-        return hiddenByStar;
-    }
-    public void setHiddenByStar(boolean hiddenByStar) {
-        this.hiddenByStar = hiddenByStar;
     }
     private void stripName() {
         level = 0;
@@ -159,10 +148,6 @@ public class LedgerAccount {
     public String getParentName() {
         return parentName;
     }
-    public void togglehidden() {
-        hiddenByStar = !hiddenByStar;
-    }
-
     public boolean isHiddenByStarToBe() {
         return hiddenByStarToBe;
     }

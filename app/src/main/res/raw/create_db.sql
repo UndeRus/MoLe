@@ -12,7 +12,7 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
-create table accounts(profile varchar not null, name varchar not null, name_upper varchar not null, hidden boolean not null default 0, keep boolean not null default 0, level integer not null, parent_name varchar, expanded default 1, amounts_expanded boolean default 0);
+create table accounts(profile varchar not null, name varchar not null, name_upper varchar not null, keep boolean not null default 0, level integer not null, parent_name varchar, expanded default 1, amounts_expanded boolean default 0);
 create unique index un_accounts on accounts(profile, name);
 create table options(profile varchar not null, name varchar not null, value varchar);
 create unique index un_options on options(profile,name);
@@ -26,4 +26,4 @@ create unique index un_transactions_data_hash on transactions(profile,data_hash)
 create index idx_transaction_description on transactions(description);
 create table transaction_accounts(profile varchar not null, transaction_id integer not null, account_name varchar not null, currency varchar not null default '', amount decimal not null, comment varchar, constraint fk_transaction_accounts_acc foreign key(profile,account_name) references accounts(profile,account_name), constraint fk_transaction_accounts_trn foreign key(profile, transaction_id) references transactions(profile,id));
 create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap boolean not null);
--- updated to revision 34
+-- updated to revision 35

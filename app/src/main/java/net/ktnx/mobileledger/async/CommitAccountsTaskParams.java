@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -22,9 +22,7 @@ import net.ktnx.mobileledger.utils.ObservableList;
 
 public class CommitAccountsTaskParams {
     ObservableList<LedgerAccount> accountList;
-    boolean showOnlyStarred;
     public CommitAccountsTaskParams(ObservableList<LedgerAccount> accountList, boolean showOnlyStarred) {
         this.accountList = accountList;
-        this.showOnlyStarred = showOnlyStarred;
     }
 }

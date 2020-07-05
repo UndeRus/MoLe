@@ -269,15 +269,14 @@ public final class MobileLedgerProfile {
     public void storeAccount(SQLiteDatabase db, LedgerAccount acc) {
         // replace into is a bad idea because it would reset hidden to its default value
         // we like the default, but for new accounts only
-        db.execSQL("update accounts set level = ?, keep = 1, hidden=?, expanded=? " +
+        db.execSQL("update accounts set level = ?, keep = 1, expanded=? " +
                    "where profile=? and name = ?",
-                new Object[]{acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded(), uuid,
-                             acc.getName()
+                new Object[]{acc.getLevel(), acc.isExpanded(), uuid, acc.getName()
                 });
-        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, hidden, " +
-                   "expanded, keep) " + "select ?,?,?,?,?,?,?,1 where (select changes() = 0)",
+        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, " +
+                   "expanded, keep) " + "select ?,?,?,?,?,?,1 where (select changes() = 0)",
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
-                             acc.getLevel(), acc.isHiddenByStar(), acc.isExpanded()
+                             acc.getLevel(), acc.isExpanded()
                 });
 //        debug("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
@@ -403,16 +402,15 @@ public final class MobileLedgerProfile {
     }
     @Nullable
     public LedgerAccount tryLoadAccount(SQLiteDatabase db, String accName) {
-        try (Cursor cursor = db.rawQuery(
-                "SELECT a.hidden, a.expanded, (select 1 from accounts a2 " +
-                "where a2.profile = a.profile and a2.name like a.name||':%' limit 1) " +
-                "FROM accounts a WHERE a.profile = ? and a.name=?", new String[]{uuid, accName}))
+        try (Cursor cursor = db.rawQuery("SELECT a.expanded, (select 1 from accounts a2 " +
+                                         "where a2.profile = a.profile and a2.name like a" +
+                                         ".name||':%' limit 1) " +
+                                         "FROM accounts a WHERE a.profile = ? and a.name=?", new String[]{uuid, accName}))
         {
             if (cursor.moveToFirst()) {
                 LedgerAccount acc = new LedgerAccount(accName);
-                acc.setHiddenByStar(cursor.getInt(0) == 1);
-                acc.setExpanded(cursor.getInt(1) == 1);
-                acc.setHasSubAccounts(cursor.getInt(2) == 1);
+                acc.setExpanded(cursor.getInt(0) == 1);
+                acc.setHasSubAccounts(cursor.getInt(1) == 1);
 
                 try (Cursor c2 = db.rawQuery(
                         "SELECT value, currency FROM account_values WHERE profile = ? " +
