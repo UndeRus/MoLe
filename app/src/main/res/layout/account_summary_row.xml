@@ -79,6 +79,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:background="@drawable/ic_expand_less_black_24dp"
+                android:backgroundTint="?colorPrimary"
                 android:clickable="true"
                 android:focusable="true"
                 android:onClick="onAccountSummaryRowViewClicked"
