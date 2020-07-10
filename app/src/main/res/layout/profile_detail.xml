@@ -36,7 +36,6 @@
             android:id="@+id/profile_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:hint="@string/profile_name_label"
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -52,7 +51,6 @@
             android:id="@+id/url"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:hint="@string/url_label"
             android:inputType="textUri"
             android:text="@string/pref_default_backend_url" />
@@ -109,7 +107,6 @@
                     android:id="@+id/auth_user_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="@string/pref_title_backend_auth_user"
                     android:inputType="textPersonName" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -125,7 +122,6 @@
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="@string/pref_title_backend_auth_password"
                     android:inputType="textWebPassword" />
 
@@ -241,7 +237,6 @@
                     android:id="@+id/preferred_accounts_filter_filter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:fontFamily="monospace"
                     android:hint="@string/pref_preferred_autocompletion_account_filter_hint"
                     android:inputType="text"
