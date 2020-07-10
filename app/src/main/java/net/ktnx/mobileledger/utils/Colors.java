@@ -125,17 +125,17 @@ public class Colors {
     public static float baseHueLightness(int baseHueDegrees) {
         switch (baseHueDegrees % 360) {
             case 0:
-                return 0.450f;   // red
+                return 0.550f;   // red
             case 60:
-                return 0.400f;  // yellow
+                return 0.250f;  // yellow
             case 120:
-                return 0.400f;  // green
+                return 0.290f;  // green
             case 180:
-                return 0.400f;  // cyan
+                return 0.300f;  // cyan
             case 240:
-                return 0.750f;  // blue
+                return 0.710f;  // blue
             case 300:
-                return 0.500f;   // magenta
+                return 0.450f;   // magenta
             default:
                 throw new IllegalStateException(
                         String.format(Locale.US, "baseHueLightness called with invalid value %d",
