@@ -80,6 +80,7 @@
                 android:layout_height="32dp"
                 android:background="@drawable/ic_expand_less_black_24dp"
                 android:clickable="true"
+                android:focusable="true"
                 android:onClick="onAccountSummaryRowViewClicked"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
