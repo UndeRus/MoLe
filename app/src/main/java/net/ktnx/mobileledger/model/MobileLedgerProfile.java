@@ -83,6 +83,8 @@ public final class MobileLedgerProfile {
         futureDates = origin.futureDates;
         apiVersion = origin.apiVersion;
         defaultCommodity = origin.defaultCommodity;
+        firstTransactionDate = origin.firstTransactionDate;
+        lastTransactionDate = origin.lastTransactionDate;
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
