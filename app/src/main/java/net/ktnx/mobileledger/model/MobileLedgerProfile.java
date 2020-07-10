@@ -294,13 +294,11 @@ public final class MobileLedgerProfile {
         db.execSQL("DELETE from transaction_accounts WHERE profile = ? and transaction_id=?",
                 new Object[]{uuid, tr.getId()});
 
-        db.execSQL(
-                "INSERT INTO transactions(profile, id, year, month, day, description, "+
-                "comment, data_hash, keep) " +
-                "values(?,?,?,?,?,?,?,?,1)",
+        db.execSQL("INSERT INTO transactions(profile, id, year, month, day, description, " +
+                   "comment, data_hash, keep) values(?,?,?,?,?,?,?,?,1)",
                 new Object[]{uuid, tr.getId(), tr.getDate().year, tr.getDate().month,
-                             tr.getDate().day, tr.getDescription(),
-                             tr.getComment(), tr.getDataHash()
+                             tr.getDate().day, tr.getDescription(), tr.getComment(),
+                             tr.getDataHash()
                 });
 
         for (LedgerTransactionAccount item : tr.getAccounts()) {
@@ -407,7 +405,8 @@ public final class MobileLedgerProfile {
         try (Cursor cursor = db.rawQuery("SELECT a.expanded, (select 1 from accounts a2 " +
                                          "where a2.profile = a.profile and a2.name like a" +
                                          ".name||':%' limit 1) " +
-                                         "FROM accounts a WHERE a.profile = ? and a.name=?", new String[]{uuid, accName}))
+                                         "FROM accounts a WHERE a.profile = ? and a.name=?",
+                new String[]{uuid, accName}))
         {
             if (cursor.moveToFirst()) {
                 LedgerAccount acc = new LedgerAccount(accName);
