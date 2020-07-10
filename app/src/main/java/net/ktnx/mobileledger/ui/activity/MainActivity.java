@@ -91,7 +91,6 @@ public class MainActivity extends ProfileThemedActivity {
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
     private static final String PREF_THEME_ID = "themeId";
-    public AccountSummaryFragment mAccountSummaryFragment;
     DrawerLayout drawer;
     private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
     private View bTransactionListCancelDownload;
@@ -757,7 +756,7 @@ public class MainActivity extends ProfileThemedActivity {
             switch (position) {
                 case 0:
 //                    debug("flow", "Creating account summary fragment");
-                    return mAccountSummaryFragment = new AccountSummaryFragment();
+                    return new AccountSummaryFragment();
                 case 1:
                     return new TransactionListFragment();
                 default:
