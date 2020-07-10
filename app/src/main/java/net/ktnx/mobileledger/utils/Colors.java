@@ -48,7 +48,7 @@ public class Colors {
     private static final float yellowLightness = 0.350f;
     private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
     public static @ColorInt
-    int accent;
+    int secondary;
     @ColorInt
     public static int tableRowDarkBG;
     public static int profileThemeId = -1;
@@ -78,8 +78,8 @@ public class Colors {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
         tableRowDarkBG = tv.data;
-        theme.resolveAttribute(R.attr.colorAccent, tv, true);
-        accent = tv.data;
+        theme.resolveAttribute(R.attr.colorSecondary, tv, true);
+        secondary = tv.data;
 
         // trigger theme observers
         themeWatch.postValue(themeWatch.getValue() + 1);

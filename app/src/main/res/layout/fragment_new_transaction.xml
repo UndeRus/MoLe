@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -67,7 +67,7 @@
         android:padding="@dimen/fab_margin"
         android:tint="?android:attr/colorBackground"
         android:visibility="visible"
-        app:backgroundTint="?colorAccent"
+        app:backgroundTint="?colorSecondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_save_white_24dp" />

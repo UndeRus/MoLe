@@ -40,7 +40,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        android:progressTint="?attr/colorAccent"
+        android:progressTint="?attr/colorPrimary"
         app:layout_constraintBottom_toTopOf="@id/textView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

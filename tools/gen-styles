@@ -2,6 +2,151 @@
 
 use strict; use warnings; use utf8::all;
 use autodie;
+use Carp;
+
+use Type::Tiny;
+use Types::Standard qw(StrictNum);
+my $colorValue = Type::Tiny->new(
+    parent     => StrictNum,
+    constraint => '($_ >= 0) and ($_ <= 1)'
+);
+
+package Color::HSL;
+use Moo;
+use namespace::clean;
+
+has h => ( is => 'ro', isa => $colorValue );
+has s => ( is => 'ro', isa => $colorValue );
+has l => ( is => 'ro', isa => $colorValue );
+
+package Color::sRGB;
+use Moo;
+use Types::Standard qw(StrictNum);
+use List::MoreUtils qw(minmax);
+
+use namespace::clean;
+
+use overload '""' => 'hexTuple';
+
+has r => ( is => 'ro', isa => $colorValue );
+has g => ( is => 'ro', isa => $colorValue );
+has b => ( is => 'ro', isa => $colorValue );
+
+sub hexTuple {
+    my $self = shift;
+    return sprintf( '%02x%02x%02x',
+        int( $self->r * 255 + 0.5 ),
+        int( $self->g * 255 + 0.5 ),
+        int( $self->b * 255 + 0.5 ) );
+}
+
+# https://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+sub _norm {
+    return $_[0] / 12.92 if $_[0] <= 0.03928;
+    return ( ( $_[0] + 0.055 ) / 1.055 )**2.4;
+}
+
+sub relativeLuminance {
+    my $self = shift;
+
+    return 0.2126 * _norm( $self->r ) + 0.7152 * _norm( $self->g )
+        + 0.0722 * _norm( $self->b );
+}
+
+sub BLACK {
+    shift->new( r => 0, g => 0, b => 0 );
+}
+
+sub WHITE {
+    shift->new( r => 1, g => 1, b => 1 );
+}
+
+my @hexDigit = split //, '0123456789abcdef';
+my %hexValue =
+    map( ( lc( $hexDigit[$_] ) => $_, uc( $hexDigit[$_] ) => $_ ), 0 .. 15 );
+
+sub fromHexTriplet {
+    my ( $class, $triplet ) = @_;
+
+    my @d = $triplet =~ /^#?(.)(.)(.)(.)(.)(.)$/
+        or die "'$triplet' is not a valid colour triplet";
+
+    return $class->new(
+        r => ( 16 * $hexValue{ $d[0] } + $hexValue{ $d[1] } ) / 255.0,
+        g => ( 16 * $hexValue{ $d[2] } + $hexValue{ $d[3] } ) / 255.0,
+        b => ( 16 * $hexValue{ $d[4] } + $hexValue{ $d[5] } ) / 255.0
+    );
+}
+
+# https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+sub fromHSL {
+    my ( $class, $hsl ) = @_;
+    my $hue = $hsl->h;
+    my $sat = $hsl->s;
+    my $lig = $hsl->l;
+
+    my $h       = ( $hue * 6.0 );
+    my $c       = ( 1 - abs( 2.0 * $lig - 1 ) ) * $sat;
+    my $h_mod_2 = $h - 2.0 * int( $h / 2 );
+    my $x       = $c * ( 1 - abs( $h_mod_2 - 1 ) );
+    my ( $r, $g, $b );
+    my $m = $lig - $c / 2.0;
+
+    return $class->new( r => $c + $m, g => $x + $m, b => 0 + $m )
+        if $h < 1 or $h == 6;
+    return $class->new( r => $x + $m, g => $c + $m, b => 0 + $m )  if $h < 2;
+    return $class->new( r => 0 + $m,  g => $c + $m, b => $x + $m ) if $h < 3;
+    return $class->new( r => 0 + $m,  g => $x + $m, b => $c + $m ) if $h < 4;
+    return $class->new( r => $x + $m, g => 0 + $m,  b => $c + $m ) if $h < 5;
+    return $class->new( r => $c + $m, g => 0 + $m,  b => $x + $m ) if $h < 6;
+
+    die $h;
+}
+
+sub toHSL {
+    my $self = shift;
+
+    my ( $m, $M ) = minmax( $self->r, $self->g, $self->b );
+
+    my $C = $M - $m;
+
+    my $h;
+    if ( $C == 0 ) {
+        $h = 0;
+    }
+    elsif ( $self->r == $M ) {
+        $h = ( $self->g - $self->b ) / $C;
+        $h -= 6 * int( $h / 6.0 );
+    }
+    elsif ( $self->g == $M ) {
+        $h = ( $self->b - $self->r ) / $C + 2;
+    }
+    elsif ( $self->b == $M ) {
+        $h = ( $self->r - $self->g ) / $C + 4;
+    }
+    else { die "$C, $M, $self"; }
+
+    my $H = 60 * $h;
+    my $L = ( $M + $m ) / 2;
+
+    my $S = ( $L <= 0.5 ) ? $C / ( 2 * $L ) : $C / ( 2 - 2 * $L );
+
+    return Color::HSL->new( h => $H/360.0, s => $S, l => $L );
+}
+
+sub contrastWith {
+    my ( $self, $ref ) = @_;
+
+    my $myL = $self->relativeLuminance;
+    my $refL = $ref->relativeLuminance;
+
+    my $ratio = ( $myL + 0.05 ) / ( $refL + 0.05 );
+    $ratio = 1 / $ratio if $ratio < 1;
+    return $ratio;
+}
+
+package MAIN;
+
 use Math::Trig;
 use File::Basename qw(basename dirname);
 use File::Temp qw(tempfile);
@@ -37,149 +182,96 @@ sub hsvHex {
 	die $h;
 }
 
-# https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
 sub hslHex {
-	my ($hue, $sat, $lig ) = @_;
-	$hue = $hue / 360.0;
-	my $h = ($hue * 6.0);
-	my $c = (1 - abs(2.0*$lig - 1)) * $sat;
-	my $h_mod_2 = $h - 2.0*int($h/2);
-	my $x = $c * (1 - abs($h_mod_2 - 1));
-	my ($r, $g, $b);
-	my $m = $lig - $c / 2.0;
-
-	return hexTuple($c + $m, $x + $m,  0 + $m) if $h < 1 or $h == 6;
-	return hexTuple($x + $m, $c + $m,  0 + $m) if $h < 2;
-	return hexTuple( 0 + $m, $c + $m, $x + $m) if $h < 3;
-	return hexTuple( 0 + $m, $x + $m, $c + $m) if $h < 4;
-	return hexTuple($x + $m,  0 + $m, $c + $m) if $h < 5;
-	return hexTuple($c + $m,  0 + $m, $x + $m) if $h < 6;
-
-	die $h;
+    my ( $h, $s, $l ) = @_;
+    return Color::sRGB->fromHSL(
+        Color::HSL->new( { h => $h / 360.0, s => $s, l => $l } ) )->hexTuple;
 }
 
-my @hexDigit = split //, '0123456789abcdef';
-my %hexValue = map(
-       	(lc($hexDigit[$_]) => $_, uc($hexDigit[$_]) => $_ ),
-       	0..15 );
-
-sub min {
-	my $min = shift;
-
-	for (@_) { $min = $_ if $_ < $min }
-
-	return $min;
-}
-
-sub max {
-	my $max = shift;
-
-	for (@_) { $max = $_ if $_ > $max }
-
-	return $max;
-}
-
-sub hexToRGB {
-	my $hexTriplet = shift;
-
-	my @d = $hexTriplet =~ /^#?(.)(.)(.)(.)(.)(.)/;
-
-	return (16 * $hexValue{$d[0]} + $hexValue{$d[1]},
-		16 * $hexValue{$d[2]} + $hexValue{$d[3]},
-		16 * $hexValue{$d[4]} + $hexValue{$d[5]});
-}
-
-sub hexToHSL {
-	my $hexTriplet = shift;
-
-	my ($r,$g,$b) = hexToRGB($hexTriplet);
-        #warn "$hexTriplet -> $r:$g:$b";
-
-	for ($r, $g, $b ) { $_ = $_ / 255.0 }
-
-	my $M = max($r, $g, $b);
-	my $m = min($r, $g, $b);
-	my $C = $M - $m;
-
-	my $h;
-	if ($C == 0) {
-		$h = 0;
-	}
-	elsif ( $r == $M ) {
-		$h = ($g-$b)/$C;
-		$h -= 6*int($h/6.0);
-	}
-	elsif ( $g == $M ) {
-		$h = ($b-$r)/$C + 2;
-	}
-	elsif ( $b == $M ) {
-		$h = ($r-$g)/$C + 4;
-	}
-	else { die "$C, $M, $r, $g, $b"; }
-
-	my $H = 60 * $h;
-	my $L = ($M + $m) / 2;
-
-	my $S = ( $L <= 0.5 ) ? $C/(2*$L) : $C / (2-2*$L);
-
-	return( $H, $S, $L );
-}
+warn sprintf("%s: %2.1f\n", 'white', Color::sRGB->WHITE->relativeLuminance);
+warn sprintf("%s: %2.1f\n", 'black', Color::sRGB->BLACK->relativeLuminance);
+warn sprintf( "%s: %2.1f\n",
+    '50% gray',
+    Color::sRGB->new( r => 0.5, g => 0.5, b => 0.5 )->relativeLuminance );
 
 my $baseColor = '#935ff2';
-my $baseColorHSV = [ hexToHSL($baseColor) ];
-my $baseColorHue = $baseColorHSV->[0];
-warn sprintf( '%s → H:%1.4f S:%1.4f V:%1.4f', $baseColor, @$baseColorHSV );
-my @target = hexToRGB($baseColor);
-my ($best, $min_dist);
-for (my $s = 0.50; $s < 0.90; $s += 0.001) {
-	for ( my $l = 0.50; $l <= 0.80; $l += 0.001 ) {
-		my $hexColor = hslHex($baseColorHue, $s, $l);
-		my ($r,$g,$b) = hexToRGB( $hexColor );
-		my $dist = abs($r-$target[0])
-		         + abs($g-$target[1])
-			 + abs($b-$target[2]);
-		if (not defined($best) or $dist < $min_dist) {
-			$best = [ $s, $l, $hexColor ];
-			$min_dist = $dist;
-		}
-	}
-}
-warn sprintf( 's%1.3f, l%1.3f → %s',
-	@$best );
+my $baseColorRGB = Color::sRGB->fromHexTriplet($baseColor);
+my $baseColorHSL = $baseColorRGB->toHSL;
+my $baseColorHue = $baseColorHSL->h;
+warn sprintf(
+    '%s → H:%1.4f S:%1.4f L:%1.4f (luminance: %1.4f; cW: %1.4f, cB: %1.4f)',
+    $baseColor,
+    360 * $baseColorHSL->h,
+    $baseColorHSL->s,
+    $baseColorHSL->l,
+    $baseColorRGB->relativeLuminance,
+    $baseColorRGB->contrastWith( Color::sRGB->WHITE ),
+    $baseColorRGB->contrastWith( Color::sRGB->BLACK ),
+);
+# # find best saturation/lightness for the desired color
+# # test if the above is correct
+# my ($best, $min_dist);
+# for (my $s = 0.50; $s < 0.90; $s += 0.001) {
+#     for ( my $l = 0.50; $l <= 0.80; $l += 0.001 ) {
+#         my $color = Color::sRGB->fromHSL(
+#             Color::HSL->new( h => $baseColorHue, s => $s, l => $l ) );
+#         my $dist =
+#               abs( $color->r - $baseColorRGB->r )
+#             + abs( $color->g - $baseColorRGB->g )
+#             + abs( $color->b - $baseColorRGB->b );
+#         if ( not defined($best) or $dist < $min_dist ) {
+#             $best     = [ $s, $l, $color ];
+#             $min_dist = $dist;
+#         }
+#     }
+# }
+# warn sprintf( 's%1.3f, l%1.3f → %s', @$best );
 
 my $baseTheme = "AppTheme";
 
 use constant STEP_DEGREES => 5;
 
-# # hsb
-# for( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
-# 	printf "<style name=\"%s.%03d\" parent=\"%s\">\n",
-# 		$baseTheme, $hue, $baseTheme;
-# 	printf "  <item name=\"colorPrimary\">#%s</item>\n",
-#        		hsvHex($hue/360.0, 0.61, 0.95);
-# 	printf "  <item name=\"colorPrimaryDark\">#%s</item>\n",
-#        		hsvHex($hue/360.0, 0.86, 0.55);
-# 	printf "  <item name=\"colorAccent\">#%s</item>\n",
-#        		hsvHex(($hue-4)/360.0, 0.72, 0.82);
-# 	printf "  <item name=\"table_row_dark_bg\">#28%s</item>\n",
-#        		hsvHex($hue/360.0, 0.65, 0.83);
-# 	printf "  <item name=\"table_row_light_bg\">#28%s</item>\n",
-#        		hsvHex($hue/360.0, 0.20, 1.00);
-# 	printf "  <item name=\"header_border\">#80%s</item>\n",
-#        		hsvHex(($hue+6)/360.0, 0.86, 0.55);
-# 	printf "</style>\n";
-# }
-
-# HSL
 sub outputThemes {
-	my $out = shift;
-	my $baseIndent = shift;
+    my $out        = shift;
+    my $baseIndent = shift;
+    $out->print("\n");
+    $out->print(
+        hslStyleForHue( $DEFAULT_HUE, $baseTheme, $baseIndent, 'default' ) );
+    for ( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
         $out->print("\n");
-        $out->print(hslStyleForHue($DEFAULT_HUE, $baseTheme, $baseIndent, 'default'));
-	for( my $hue = 0; $hue < 360; $hue += STEP_DEGREES ) {
-		$out->print("\n");
-		$out->print(hslStyleForHue($hue, $baseTheme, $baseIndent));
-	}
+        $out->print( hslStyleForHue( $hue, $baseTheme, $baseIndent ) );
+    }
+}
+
+sub bestLightnessForHue {
+    my ( $h, $s ) = @_;
+    my $targetContrast = 4.07;
+    my $white = Color::sRGB->WHITE;
+    my $bestLightness;
+    my $bestContrast;
+    for ( my $l = 0; $l < 1; $l += 0.002 ) {
+        my $contrast = Color::sRGB->fromHSL(
+            Color::HSL->new( { h => $h, s => $s, l => $l } ) )
+            ->contrastWith($white);
+
+        if ( defined $bestLightness ) {
+            if (abs( $contrast - $targetContrast ) <
+                abs( $bestContrast - $targetContrast ) )
+            {
+                $bestLightness = $l;
+                $bestContrast  = $contrast;
+            }
+        }
+        else {
+            $bestLightness = $l;
+            $bestContrast = $contrast;
+        }
+    }
+
+    warn sprintf(
+        "Found best lightness for hue %1.4f: %1.4f (contrast %1.4f)\n",
+        360 * $h, $bestLightness, $bestContrast );
+    return $bestLightness;
 }
 
 sub hslStyleForHue {
@@ -189,12 +281,12 @@ sub hslStyleForHue {
         my $subTheme = shift // sprintf('%03d', $hue);
 
 	my %lQ = (
-		0   => 0.450,	# red
-		60  => 0.400,	# yellow
-		120 => 0.400,	# green
-		180 => 0.390,	# cyan
-		240 => 0.745,	# blue
-		300 => 0.505,	# magenta
+		0   => 0.550,	# red
+		60  => 0.250,	# yellow
+		120 => 0.290,	# green
+		180 => 0.300,	# cyan
+		240 => 0.680,	# blue
+		300 => 0.450,	# magenta
 	);
 	$lQ{360} = $lQ{0};
 
@@ -204,8 +296,11 @@ sub hslStyleForHue {
 	$y0 = $lQ{$x0};
 	$y1 = $lQ{$x1};
 
+        my $S = 0.8497;
+
 	# linear interpolation
-	my $l1 = $y0 + 1.0 * ( $hue - $x0 ) * ( $y1 - $y0 ) / ( $x1 - $x0 );
+        #my $l1 = $y0 + 1.0 * ( $hue - $x0 ) * ( $y1 - $y0 ) / ( $x1 - $x0 );
+        my $l1 = bestLightnessForHue( $hue / 360.0, $S );
 
 	my $l2 = $l1 * 0.80;
 	my $l3 = $opt_night ? 0.150 : 0.950;
@@ -225,15 +320,15 @@ sub hslStyleForHue {
 #                $result .= "$indent<item name=\"windowNoTitle\">true</item>\n";
 #                $result .= "$indent<item name=\"textColor\">#757575</item>\n";
         }
-        my $S = 0.845;
+
+        $result .= sprintf "$indent<!-- h: %1.4f s:%1.4f l:%1.4f -->\n", $hue,
+            $S, $l1 if 0;
         $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
             'colorPrimary', hslHex( $hue, $S, $l1 );
         $result .= sprintf "$indent<item name=\"%s\">#00%s</item>\n",
             'colorPrimaryTransparent', hslHex( $hue, $S, $l1 );
         $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
             'colorSecondary', hslHex( $hue, $S, $l2 );
-        $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
-            'colorAccent', hslHex( $hue, $S, $l2 );
         $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",
             'colorPrimaryDark', hslHex( $hue, $S, $l2 );
         $result .= sprintf "$indent<item name=\"%s\">#%s</item>\n",

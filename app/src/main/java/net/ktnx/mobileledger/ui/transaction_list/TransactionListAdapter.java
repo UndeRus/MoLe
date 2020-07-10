@@ -202,8 +202,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     if ((boldAccountName != null) && acc.getAccountName()
                                                         .startsWith(boldAccountName))
                     {
-                        accName.setTextColor(Colors.accent);
-                        accAmount.setTextColor(Colors.accent);
+                        accName.setTextColor(Colors.secondary);
+                        accAmount.setTextColor(Colors.secondary);
 
                         SpannableString ss = new SpannableString(acc.getAccountName());
                         ss.setSpan(new StyleSpan(Typeface.BOLD), 0, boldAccountName.length(),

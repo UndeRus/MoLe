@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="?colorAccent"
+        app:backgroundTint="?colorSecondary"
         app:layout_anchor="@+id/profile_detail_container"
         app:layout_anchorGravity="top|end"
         app:srcCompat="@drawable/ic_save_white_24dp" />
