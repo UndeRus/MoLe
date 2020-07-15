@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -20,11 +20,16 @@ package net.ktnx.mobileledger.async;
 class DbOpItem {
     String sql;
     Object[] params;
-    public DbOpItem(String sql, Object[] params) {
+    Runnable onReady;
+    public DbOpItem(String sql, Object[] params, Runnable onReady) {
         this.sql = sql;
         this.params = params;
+        this.onReady = onReady;
+    }
+    public DbOpItem(String sql, Object[] params) {
+        this(sql, params, null);
     }
     public DbOpItem(String sql) {
-        this(sql, null);
+        this(sql, null, null);
     }
 }

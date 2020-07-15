@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -35,10 +35,14 @@ class DbOpRunner extends Thread {
         while (!interrupted()) {
             try {
                 DbOpItem item = queue.take();
-                debug("opQrunner", "Got "+item.sql);
-                SQLiteDatabase db = App.getDatabase();
-                debug("opQrunner", "Executing "+item.sql);
-                db.execSQL(item.sql, item.params);
+                debug("opQrunner", "Got " + item.sql);
+                {
+                    SQLiteDatabase db = App.getDatabase();
+                    debug("opQrunner", "Executing " + item.sql);
+                    db.execSQL(item.sql, item.params);
+                }
+                if (item.onReady != null)
+                    item.onReady.run();
             }
             catch (InterruptedException e) {
                 break;

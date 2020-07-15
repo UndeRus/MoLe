@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -26,7 +26,8 @@ public class DbOpQueue {
     static private final BlockingQueue<DbOpItem> queue = new LinkedBlockingQueue<>();
     static private DbOpRunner runner;
     synchronized static public void init() {
-        if (runner != null) return;
+        if (runner != null)
+            return;
         debug("opQueue", "Starting runner thread");
         runner = new DbOpRunner(queue);
         runner.start();
@@ -34,10 +35,11 @@ public class DbOpQueue {
     static public void done() {
         runner.interrupt();
     }
-    public static void add(String sql, Object[] params) {
+    public static void add(String sql, Object[] params) {add(sql, params, null);}
+    public static void add(String sql, Object[] params, Runnable onReady) {
         init();
         debug("opQueue", "Adding " + sql);
-        queue.add(new DbOpItem(sql, params));
+        queue.add(new DbOpItem(sql, params, onReady));
     }
     static void add(String sql) {
         queue.add(new DbOpItem(sql));
