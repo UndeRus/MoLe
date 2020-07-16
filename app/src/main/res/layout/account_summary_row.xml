@@ -61,7 +61,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/account_expander_container"
-            android:layout_width="@dimen/default_account_row_height"
+            android:layout_width="@dimen/thumb_row_height"
             android:layout_height="@dimen/default_account_row_height"
             android:foregroundGravity="center_vertical"
             android:minHeight="@dimen/default_account_row_height"
