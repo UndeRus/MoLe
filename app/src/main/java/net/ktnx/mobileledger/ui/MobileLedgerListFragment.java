@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -32,20 +32,24 @@ import net.ktnx.mobileledger.utils.DimensionUtils;
 public class MobileLedgerListFragment extends Fragment {
     public SwipeRefreshLayout swiper;
     public TransactionListAdapter modelAdapter;
-    protected MainActivity mActivity;
     protected RecyclerView root;
+    @NonNull
+    public MainActivity getMainActivity() {
+        return (MainActivity) requireActivity();
+    }
     protected void themeChanged(Integer counter) {
         swiper.setColorSchemeColors(Colors.getSwipeCircleColors());
     }
     public void onBackgroundTaskRunningChanged(Boolean isRunning) {
-        if (mActivity == null)
+        if (getActivity() == null)
             return;
         if (swiper == null)
             return;
         swiper.setRefreshing(isRunning);
     }
     protected void manageFabOnScroll() {
-        int triggerPixels = DimensionUtils.dp2px(mActivity, 30f);
+        final MainActivity mainActivity = getMainActivity();
+        int triggerPixels = DimensionUtils.dp2px(mainActivity, 30f);
         root.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             private float upAnchor = -1;
             private float downAnchor = -1;
@@ -62,14 +66,14 @@ public class MobileLedgerListFragment extends Fragment {
                             // swipe down
                             upAnchor = lastY;
 
-                            mActivity.fabShouldShow();
+                            mainActivity.fabShouldShow();
                         }
                         else {
                             // swipe up
                             downAnchor = lastY;
 
                             if (currentY < upAnchor - triggerPixels)
-                                mActivity.fabHide();
+                                mainActivity.fabHide();
                         }
 
                         lastY = currentY;

@@ -50,7 +50,6 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     public void onAttach(@NotNull Context context) {
         super.onAttach(context);
         debug("flow", "AccountSummaryFragment.onAttach()");
-        mActivity = (MainActivity) context;
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -69,28 +68,29 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
                 this::onBackgroundTaskRunningChanged);
 
         modelAdapter = new AccountSummaryAdapter();
+        MainActivity mainActivity = getMainActivity();
 
-        root = mActivity.findViewById(R.id.account_root);
-        LinearLayoutManager llm = new LinearLayoutManager(mActivity);
+        root = mainActivity.findViewById(R.id.account_root);
+        LinearLayoutManager llm = new LinearLayoutManager(mainActivity);
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
         root.setAdapter(modelAdapter);
         DividerItemDecoration did =
-                new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL);
+                new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL);
         root.addItemDecoration(did);
 
-        mActivity.fabShouldShow();
+        mainActivity.fabShouldShow();
 
         manageFabOnScroll();
 
-        swiper = mActivity.findViewById(R.id.account_swiper);
+        swiper = mainActivity.findViewById(R.id.account_swiper);
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
         swiper.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");
-            Data.scheduleTransactionListRetrieval(mActivity);
+            Data.scheduleTransactionListRetrieval(mainActivity);
         });
 
         Data.accounts.addObserver(
-                (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
+                (o, arg) -> mainActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
     }
 }

@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -68,11 +67,6 @@ public class TransactionListFragment extends MobileLedgerListFragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
-    @Override
-    public void onAttach(@NotNull Context context) {
-        super.onAttach(context);
-        mActivity = (MainActivity) context;
-    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -102,40 +96,42 @@ public class TransactionListFragment extends MobileLedgerListFragment
         Data.backgroundTasksRunning.observe(getViewLifecycleOwner(),
                 this::onBackgroundTaskRunningChanged);
 
-        swiper = mActivity.findViewById(R.id.transaction_swipe);
+        MainActivity mainActivity = getMainActivity();
+
+        swiper = mainActivity.findViewById(R.id.transaction_swipe);
         if (swiper == null)
             throw new RuntimeException("Can't get hold on the swipe layout");
-        root = mActivity.findViewById(R.id.transaction_root);
+        root = mainActivity.findViewById(R.id.transaction_root);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
         modelAdapter = new TransactionListAdapter();
         root.setAdapter(modelAdapter);
 
-        mActivity.fabShouldShow();
+        mainActivity.fabShouldShow();
 
         manageFabOnScroll();
 
-        LinearLayoutManager llm = new LinearLayoutManager(mActivity);
+        LinearLayoutManager llm = new LinearLayoutManager(mainActivity);
 
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
 
         swiper.setOnRefreshListener(() -> {
             debug("ui", "refreshing transactions via swipe");
-            Data.scheduleTransactionListRetrieval(mActivity);
+            Data.scheduleTransactionListRetrieval(mainActivity);
         });
 
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
 
-        vAccountFilter = mActivity.findViewById(R.id.transaction_list_account_name_filter);
-        accNameFilter = mActivity.findViewById(R.id.transaction_filter_account_name);
+        vAccountFilter = mainActivity.findViewById(R.id.transaction_list_account_name_filter);
+        accNameFilter = mainActivity.findViewById(R.id.transaction_filter_account_name);
 
-        MLDB.hookAutocompletionAdapter(mActivity, accNameFilter, "accounts", "name");
+        MLDB.hookAutocompletionAdapter(mainActivity, accNameFilter, "accounts", "name");
         accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
 //                debug("tmp", "direct onItemClick");
             Cursor c = (Cursor) parent.getItemAtPosition(position);
             Data.accountFilter.setValue(c.getString(1));
-            Globals.hideSoftKeyboard(mActivity);
+            Globals.hideSoftKeyboard(mainActivity);
         });
 
         Data.accountFilter.observe(getViewLifecycleOwner(), this::onAccountNameFilterChanged);
@@ -152,15 +148,15 @@ public class TransactionListFragment extends MobileLedgerListFragment
             TransactionListViewModel.updateError.set(null);
         });
         Data.transactions.addObserver(
-                (o, arg) -> mActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
+                (o, arg) -> mainActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
 
-        mActivity.findViewById(R.id.clearAccountNameFilter)
-                 .setOnClickListener(v -> {
-                     Data.accountFilter.setValue(null);
-                     vAccountFilter.setVisibility(View.GONE);
-                     menuTransactionListFilter.setVisible(true);
-                     Globals.hideSoftKeyboard(mActivity);
-                 });
+        mainActivity.findViewById(R.id.clearAccountNameFilter)
+                    .setOnClickListener(v -> {
+                        Data.accountFilter.setValue(null);
+                        vAccountFilter.setVisibility(View.GONE);
+                        menuTransactionListFilter.setVisible(true);
+                        Globals.hideSoftKeyboard(mainActivity);
+                    });
 
         Data.foundTransactionItemIndex.observe(getViewLifecycleOwner(), pos -> {
             Logger.debug("go-to-date", String.format(Locale.US, "Found pos %d", pos));
@@ -212,7 +208,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
                 menuTransactionListFilter.setVisible(false);
             accNameFilter.requestFocus();
             InputMethodManager imm =
-                    (InputMethodManager) mActivity.getSystemService(INPUT_METHOD_SERVICE);
+                    (InputMethodManager) getMainActivity().getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(accNameFilter, 0);
 
             return true;
