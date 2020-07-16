@@ -48,7 +48,7 @@ public class LedgerAccount {
         this.profileWeakReference = new WeakReference<>(profile);
         this.setName(name);
         this.expanded = true;
-        this.amounts = new ArrayList<LedgerAmount>();
+        this.amounts = new ArrayList<>();
         this.addAmount(amount);
     }
     public @Nullable MobileLedgerProfile getProfile() {
@@ -60,23 +60,26 @@ public class LedgerAccount {
     }
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj == null) return false;
+        if (obj == null)
+            return false;
 
-        return obj.getClass().equals(this.getClass()) &&
-               name.equals(((LedgerAccount) obj).getName());
+        return obj.getClass()
+                  .equals(this.getClass()) && name.equals(((LedgerAccount) obj).getName());
     }
     // an account is visible if:
     //  - it has an expanded parent or is a top account
     public boolean isVisible(List<LedgerAccount> list) {
         for (LedgerAccount acc : list) {
             if (acc.isParentOf(this)) {
-                if (!acc.isExpanded()) return false;
+                if (!acc.isExpanded())
+                    return false;
             }
         }
         return true;
     }
     public boolean isParentOf(LedgerAccount potentialChild) {
-        return potentialChild.getName().startsWith(name + ":");
+        return potentialChild.getName()
+                             .startsWith(name + ":");
     }
     private void stripName() {
         level = 0;
@@ -89,11 +92,13 @@ public class LedgerAccount {
                 parentBuilder.append(m.group(0));
                 shortName = m.replaceFirst("");
             }
-            else break;
+            else
+                break;
         }
         if (parentBuilder.length() > 0)
             parentName = parentBuilder.substring(0, parentBuilder.length() - 1);
-        else parentName = null;
+        else
+            parentName = null;
     }
     public String getName() {
         return name;
@@ -102,37 +107,43 @@ public class LedgerAccount {
         this.name = name;
         stripName();
     }
-    public void addAmount(float amount, String currency) {
-        if (amounts == null) amounts = new ArrayList<>();
+    public void addAmount(float amount, @NonNull String currency) {
+        if (amounts == null)
+            amounts = new ArrayList<>();
         amounts.add(new LedgerAmount(amount, currency));
     }
     public void addAmount(float amount) {
-        this.addAmount(amount, null);
+        this.addAmount(amount, "");
     }
     public int getAmountCount() { return (amounts != null) ? amounts.size() : 0; }
     public String getAmountsString() {
-        if ((amounts == null) || amounts.isEmpty()) return "";
+        if ((amounts == null) || amounts.isEmpty())
+            return "";
 
         StringBuilder builder = new StringBuilder();
         for (LedgerAmount amount : amounts) {
             String amt = amount.toString();
-            if (builder.length() > 0) builder.append('\n');
+            if (builder.length() > 0)
+                builder.append('\n');
             builder.append(amt);
         }
 
         return builder.toString();
     }
     public String getAmountsString(int limit) {
-        if ((amounts == null) || amounts.isEmpty()) return "";
+        if ((amounts == null) || amounts.isEmpty())
+            return "";
 
         int included = 0;
         StringBuilder builder = new StringBuilder();
         for (LedgerAmount amount : amounts) {
             String amt = amount.toString();
-            if (builder.length() > 0) builder.append('\n');
+            if (builder.length() > 0)
+                builder.append('\n');
             builder.append(amt);
             included++;
-            if (included == limit) break;
+            if (included == limit)
+                break;
         }
 
         return builder.toString();
@@ -174,7 +185,8 @@ public class LedgerAccount {
         expanded = !expanded;
     }
     public void removeAmounts() {
-        if (amounts != null) amounts.clear();
+        if (amounts != null)
+            amounts.clear();
     }
     public boolean amountsExpanded() { return amountsExpanded; }
     public void setAmountsExpanded(boolean flag) { amountsExpanded = flag; }
