@@ -92,7 +92,7 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        Context context = Objects.requireNonNull(getContext());
+        Context context = requireContext();
         Dialog csd = new Dialog(context);
         csd.setContentView(R.layout.fragment_currency_selector_list);
         csd.setTitle(R.string.choose_currency_label);
