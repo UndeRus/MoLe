@@ -409,7 +409,7 @@ public final class MobileLedgerProfile {
                 new String[]{uuid, accName}))
         {
             if (cursor.moveToFirst()) {
-                LedgerAccount acc = new LedgerAccount(accName);
+                LedgerAccount acc = new LedgerAccount(this, accName);
                 acc.setExpanded(cursor.getInt(0) == 1);
                 acc.setHasSubAccounts(cursor.getInt(1) == 1);
 

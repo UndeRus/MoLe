@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -36,16 +37,22 @@ public class LedgerAccount {
     private List<LedgerAmount> amounts;
     private boolean hasSubAccounts;
     private boolean amountsExpanded;
+    private WeakReference<MobileLedgerProfile> profileWeakReference;
 
-    public LedgerAccount(String name) {
+    public LedgerAccount(MobileLedgerProfile profile, String name) {
+        this.profileWeakReference = new WeakReference<>(profile);
         this.setName(name);
     }
 
-    public LedgerAccount(String name, float amount) {
+    public LedgerAccount(MobileLedgerProfile profile, String name, float amount) {
+        this.profileWeakReference = new WeakReference<>(profile);
         this.setName(name);
         this.expanded = true;
         this.amounts = new ArrayList<LedgerAmount>();
         this.addAmount(amount);
+    }
+    public @Nullable MobileLedgerProfile getProfile() {
+        return profileWeakReference.get();
     }
     @Override
     public int hashCode() {

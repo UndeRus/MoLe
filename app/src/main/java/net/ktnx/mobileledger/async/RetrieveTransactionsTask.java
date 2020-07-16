@@ -220,7 +220,7 @@ public class RetrieveTransactionsTask
                                 prevAccount = lastAccount;
                                 lastAccount = profile.tryLoadAccount(db, acct_name);
                                 if (lastAccount == null)
-                                    lastAccount = new LedgerAccount(acct_name);
+                                    lastAccount = new LedgerAccount(profile, acct_name);
                                 else
                                     lastAccount.removeAmounts();
                                 profile.storeAccount(db, lastAccount);
@@ -240,14 +240,14 @@ public class RetrieveTransactionsTask
                                         if (accountNames.containsKey(parentName))
                                             break;
                                         toAppend.push(parentName);
-                                        parentName = new LedgerAccount(parentName).getParentName();
+                                        parentName = new LedgerAccount(profile, parentName).getParentName();
                                     }
                                     syntheticAccounts.clear();
                                     while (!toAppend.isEmpty()) {
                                         String aName = toAppend.pop();
                                         LedgerAccount acc = profile.tryLoadAccount(db, aName);
                                         if (acc == null) {
-                                            acc = new LedgerAccount(aName);
+                                            acc = new LedgerAccount(profile, aName);
                                             acc.setExpanded(!lastAccount.hasSubAccounts() ||
                                                             lastAccount.isExpanded());
                                         }
@@ -483,7 +483,7 @@ public class RetrieveTransactionsTask
 
                     LedgerAccount acc = profile.tryLoadAccount(db, parsedAccount.getAname());
                     if (acc == null)
-                        acc = new LedgerAccount(parsedAccount.getAname());
+                        acc = new LedgerAccount(profile, parsedAccount.getAname());
                     else
                         acc.removeAmounts();
 
