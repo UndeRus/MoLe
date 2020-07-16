@@ -62,7 +62,8 @@ public class AccountSummaryAdapter
             public boolean areContentsTheSame(@NotNull LedgerAccount oldItem,
                                               @NotNull LedgerAccount newItem) {
                 return (oldItem.isExpanded() == newItem.isExpanded()) &&
-                       (oldItem.amountsExpanded() == newItem.amountsExpanded());
+                       (oldItem.amountsExpanded() == newItem.amountsExpanded() &&
+                        TextUtils.equals(oldItem.getAmountsString(), newItem.getAmountsString()));
             }
         });
     }
