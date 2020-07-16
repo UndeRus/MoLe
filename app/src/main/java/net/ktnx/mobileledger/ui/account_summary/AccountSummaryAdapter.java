@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,48 +30,45 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
-import net.ktnx.mobileledger.utils.LockHolder;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     public static final int AMOUNT_LIMIT = 3;
-
-    AccountSummaryAdapter() { }
+    private MobileLedgerProfile profile;
+    private AsyncListDiffer<LedgerAccount> listDiffer;
+    AccountSummaryAdapter() {
+        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<LedgerAccount>() {
+            @Override
+            public boolean areItemsTheSame(@NotNull LedgerAccount oldItem,
+                                           @NotNull LedgerAccount newItem) {
+                return TextUtils.equals(oldItem.getName(), newItem.getName());
+            }
+            @Override
+            public boolean areContentsTheSame(@NotNull LedgerAccount oldItem,
+                                              @NotNull LedgerAccount newItem) {
+                return (oldItem.isExpanded() == newItem.isExpanded()) &&
+                       (oldItem.amountsExpanded() == newItem.amountsExpanded());
+            }
+        });
+    }
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
-        try (LockHolder lh = Data.accounts.lockForReading()) {
-                LedgerAccount acc = Data.accounts.get(position);
-                Context ctx = holder.row.getContext();
-                Resources rm = ctx.getResources();
-
-                holder.row.setTag(acc);
-                holder.row.setVisibility(View.VISIBLE);
-                holder.tvAccountName.setText(acc.getShortName());
-                ConstraintLayout.LayoutParams lp =
-                        (ConstraintLayout.LayoutParams) holder.tvAccountName.getLayoutParams();
-                lp.setMarginStart(
-                        acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
-                holder.expanderContainer.setVisibility(
-                        acc.hasSubAccounts() ? View.VISIBLE : View.GONE);
-                holder.expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
-                int amounts = acc.getAmountCount();
-                if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
-                    holder.tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
-                    holder.accountExpanderContainer.setVisibility(View.VISIBLE);
-                }
-                else {
-                    holder.tvAccountAmounts.setText(acc.getAmountsString());
-                    holder.accountExpanderContainer.setVisibility(View.GONE);
-                }
-
-                holder.row.setTag(R.id.POS, position);
-        }
+        holder.bindToAccount(listDiffer.getCurrentList().get(position));
     }
 
     @NonNull
@@ -83,9 +81,13 @@ public class AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return Data.accounts.size();
+        return listDiffer.getCurrentList().size();
     }
-    static class LedgerRowHolder extends RecyclerView.ViewHolder {
+    public void setAccounts(MobileLedgerProfile profile, ArrayList<LedgerAccount> newList) {
+        this.profile = profile;
+        listDiffer.submitList(newList);
+    }
+    class LedgerRowHolder extends RecyclerView.ViewHolder {
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
         View expanderContainer;
@@ -93,12 +95,12 @@ public class AccountSummaryAdapter
         View accountExpanderContainer;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
-            this.row = itemView.findViewById(R.id.account_summary_row);
-            this.tvAccountName = itemView.findViewById(R.id.account_row_acc_name);
-            this.tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
-            this.expanderContainer = itemView.findViewById(R.id.account_expander_container);
-            this.expander = itemView.findViewById(R.id.account_expander);
-            this.accountExpanderContainer =
+            row = itemView.findViewById(R.id.account_summary_row);
+            tvAccountName = itemView.findViewById(R.id.account_row_acc_name);
+            tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
+            expanderContainer = itemView.findViewById(R.id.account_expander_container);
+            expander = itemView.findViewById(R.id.account_expander);
+            accountExpanderContainer =
                     itemView.findViewById(R.id.account_row_amounts_expander_container);
 
             itemView.setOnLongClickListener(this::onItemLongClick);
@@ -107,6 +109,63 @@ public class AccountSummaryAdapter
             expanderContainer.setOnLongClickListener(this::onItemLongClick);
             expander.setOnLongClickListener(this::onItemLongClick);
             row.setOnLongClickListener(this::onItemLongClick);
+
+            tvAccountName.setOnClickListener(v -> toggleAccountExpanded());
+            expanderContainer.setOnClickListener(v -> toggleAccountExpanded());
+            expander.setOnClickListener(v -> toggleAccountExpanded());
+            tvAccountAmounts.setOnClickListener(v -> toggleAmountsExpanded());
+        }
+        private @NonNull
+        LedgerAccount getAccount() {
+            final ArrayList<LedgerAccount> accountList = profile.getAccounts()
+                                                                .getValue();
+            if (accountList == null)
+                throw new IllegalStateException("No account list");
+
+            return accountList.get(getAdapterPosition());
+        }
+        private void toggleAccountExpanded() {
+            LedgerAccount acc = getAccount();
+            if (!acc.hasSubAccounts())
+                return;
+            debug("accounts", "Account expander clicked");
+
+            acc.toggleExpanded();
+            expanderContainer.animate()
+                             .rotation(acc.isExpanded() ? 0 : 180);
+
+            MobileLedgerProfile profile = acc.getProfile();
+            if (profile == null)
+                return;
+
+            DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
+                    new Object[]{acc.isExpanded(), acc.getName(), profile.getUuid()
+                    }, profile::scheduleAccountListReload);
+
+        }
+        private void toggleAmountsExpanded() {
+            LedgerAccount acc = getAccount();
+            if (acc.getAmountCount() <= AMOUNT_LIMIT)
+                return;
+
+            acc.toggleAmountsExpanded();
+            if (acc.amountsExpanded()) {
+                tvAccountAmounts.setText(acc.getAmountsString());
+                accountExpanderContainer.setVisibility(View.GONE);
+            }
+            else {
+                tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
+                accountExpanderContainer.setVisibility(View.VISIBLE);
+            }
+
+            MobileLedgerProfile profile = acc.getProfile();
+            if (profile == null)
+                return;
+
+            DbOpQueue.add("update accounts set amounts_expanded=? where name=? and profile=?",
+                    new Object[]{acc.amountsExpanded(), acc.getName(), profile.getUuid()
+                    });
+
         }
         private boolean onItemLongClick(View v) {
             MainActivity activity = (MainActivity) v.getContext();
@@ -136,19 +195,50 @@ public class AccountSummaryAdapter
                             String.format("Don't know how to handle long click on id %d", id));
                     return false;
             }
-            LedgerAccount acc = (LedgerAccount) row.getTag();
+            LedgerAccount acc = getAccount();
             builder.setTitle(acc.getName());
             builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
                 switch (which) {
                     case 0:
                         // show transactions
-                        activity.showAccountTransactions(acc);
+                        activity.showAccountTransactions(acc.getName());
                         break;
                 }
                 dialog.dismiss();
             });
             builder.show();
             return true;
+        }
+        public void bindToAccount(LedgerAccount acc) {
+            Context ctx = row.getContext();
+            Resources rm = ctx.getResources();
+
+            row.setTag(acc);
+
+            tvAccountName.setText(acc.getShortName());
+
+            ConstraintLayout.LayoutParams lp =
+                    (ConstraintLayout.LayoutParams) tvAccountName.getLayoutParams();
+            lp.setMarginStart(
+                    acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
+
+            if (acc.hasSubAccounts()) {
+                expanderContainer.setVisibility(View.VISIBLE);
+                expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
+            }
+            else {
+                expanderContainer.setVisibility(View.GONE);
+            }
+
+            int amounts = acc.getAmountCount();
+            if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
+                tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
+                accountExpanderContainer.setVisibility(View.VISIBLE);
+            }
+            else {
+                tvAccountAmounts.setText(acc.getAmountsString());
+                accountExpanderContainer.setVisibility(View.GONE);
+            }
         }
     }
 }

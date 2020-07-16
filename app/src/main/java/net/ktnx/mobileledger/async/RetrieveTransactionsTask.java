@@ -206,7 +206,7 @@ public class RetrieveTransactionsTask
                                 // state of the database
                                 db.setTransactionSuccessful();
                                 db.endTransaction();
-                                Data.accounts.setList(accountList);
+                                profile.setAccounts(accountList);
                                 db.beginTransaction();
                                 continue;
                             }
@@ -527,16 +527,13 @@ public class RetrieveTransactionsTask
                 profile.deleteNotPresentAccounts(db);
                 throwIfCancelled();
                 db.setTransactionSuccessful();
-                listFilledOK = true;
             }
             finally {
                 db.endTransaction();
             }
         }
-        // should not be set in the DB transaction, because of a possible deadlock
-        // with the main and DbOpQueueRunner threads
-        if (listFilledOK)
-            Data.accounts.setList(accountList);
+
+        profile.setAccounts(accountList);
 
         return true;
     }

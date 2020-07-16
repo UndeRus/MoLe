@@ -66,13 +66,7 @@ public class LedgerAccount {
                name.equals(((LedgerAccount) obj).getName());
     }
     // an account is visible if:
-    //  - it is starred (not hidden by a star)
-    //  - and it has an expanded parent or is a top account
-    public boolean isVisible() {
-        if (level == 0) return true;
-
-        return isVisible(Data.accounts);
-    }
+    //  - it has an expanded parent or is a top account
     public boolean isVisible(List<LedgerAccount> list) {
         for (LedgerAccount acc : list) {
             if (acc.isParentOf(this)) {

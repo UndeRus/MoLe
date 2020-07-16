@@ -31,11 +31,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.LedgerAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -90,7 +95,15 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             Data.scheduleTransactionListRetrieval(mainActivity);
         });
 
-        Data.accounts.addObserver(
-                (o, arg) -> mainActivity.runOnUiThread(() -> modelAdapter.notifyDataSetChanged()));
+        Data.profile.observe(getViewLifecycleOwner(), profile -> profile.getAccounts()
+                                                                        .observe(
+                                                                                getViewLifecycleOwner(),
+                                                                                (accounts) -> onAccountsChanged(
+                                                                                        profile,
+                                                                                        accounts)));
+    }
+    private void onAccountsChanged(MobileLedgerProfile profile, ArrayList<LedgerAccount> accounts) {
+        Logger.debug("async-acc", "fragment: got new account list");
+        modelAdapter.setAccounts(profile, accounts);
     }
 }

@@ -31,7 +31,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -53,22 +52,18 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.account_summary.AccountSummaryAdapter;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
-import net.ktnx.mobileledger.ui.account_summary.AccountSummaryViewModel;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.GetOptCallback;
-import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -399,6 +394,10 @@ public class MainActivity extends ProfileThemedActivity {
         else
             setTitle(R.string.app_name);
 
+        if (this.profile != null)
+            this.profile.getAccounts()
+                        .removeObservers(this);
+
         this.profile = profile;
 
         int newProfileTheme = haveProfile ? profile.getThemeHue() : -1;
@@ -422,10 +421,9 @@ public class MainActivity extends ProfileThemedActivity {
         debug("transactions", "requesting list reload");
         TransactionListViewModel.scheduleTransactionListReload();
 
-        Data.accounts.clear();
-        AccountSummaryViewModel.scheduleAccountListReload();
-
         if (haveProfile) {
+            profile.scheduleAccountListReload();
+
             if (profile.isPostingPermitted()) {
                 mToolbar.setSubtitle(null);
                 fab.show();
@@ -529,16 +527,13 @@ public class MainActivity extends ProfileThemedActivity {
 
         showTransactionsFragment((String) null);
     }
-    private void showTransactionsFragment(String accName) {
+    public void showTransactionsFragment(String accName) {
         Data.accountFilter.setValue(accName);
         mViewPager.setCurrentItem(1, true);
     }
-    private void showTransactionsFragment(LedgerAccount account) {
-        showTransactionsFragment((account == null) ? null : account.getName());
-    }
-    public void showAccountTransactions(LedgerAccount account) {
+    public void showAccountTransactions(String accountName) {
         mBackMeansToAccountList = true;
-        showTransactionsFragment(account);
+        showTransactionsFragment(accountName);
     }
     @Override
     public void onBackPressed() {
@@ -658,87 +653,8 @@ public class MainActivity extends ProfileThemedActivity {
             case R.id.account_row_acc_name:
             case R.id.account_expander:
             case R.id.account_expander_container:
-                debug("accounts", "Account expander clicked");
-                if (!acc.hasSubAccounts())
-                    return;
-
-                boolean wasExpanded = acc.isExpanded();
-
-                View arrow = row.findViewById(R.id.account_expander_container);
-
-                arrow.clearAnimation();
-                ViewPropertyAnimator animator = arrow.animate();
-
-                acc.toggleExpanded();
-                DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
-                        new Object[]{acc.isExpanded(), acc.getName(), profile.getUuid()
-                        });
-
-                if (wasExpanded) {
-                    debug("accounts", String.format("Collapsing account '%s'", acc.getName()));
-                    arrow.setRotation(0);
-                    animator.rotationBy(180);
-
-                    // removing all child accounts from the view
-                    int start = -1, count = 0;
-                    try (LockHolder ignored = Data.accounts.lockForWriting()) {
-                        for (int i = 0; i < Data.accounts.size(); i++) {
-                            if (acc.isParentOf(Data.accounts.get(i))) {
-//                                debug("accounts", String.format("Found a child '%s' at position
-//                                %d",
-//                                        Data.accounts.get(i).getName(), i));
-                                if (start == -1) {
-                                    start = i;
-                                }
-                                count++;
-                            }
-                            else {
-                                if (start != -1) {
-//                                    debug("accounts",
-//                                            String.format("Found a non-child '%s' at position %d",
-//                                                    Data.accounts.get(i).getName(), i));
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (start != -1) {
-                            for (int j = 0; j < count; j++) {
-//                                debug("accounts", String.format("Removing item %d: %s", start + j,
-//                                        Data.accounts.get(start).getName()));
-                                Data.accounts.removeQuietly(start);
-                            }
-
-                            mAccountSummaryFragment.modelAdapter.notifyItemRangeRemoved(start,
-                                    count);
-                        }
-                    }
-                }
-                else {
-                    debug("accounts", String.format("Expanding account '%s'", acc.getName()));
-                    arrow.setRotation(180);
-                    animator.rotationBy(-180);
-                    List<LedgerAccount> children = profile.loadVisibleChildAccountsOf(acc);
-                    try (LockHolder ignored = Data.accounts.lockForWriting()) {
-                        int parentPos = Data.accounts.indexOf(acc);
-                        if (parentPos != -1) {
-                            // may have disappeared in a concurrent refresh operation
-                            Data.accounts.addAllQuietly(parentPos + 1, children);
-                            mAccountSummaryFragment.modelAdapter.notifyItemRangeInserted(
-                                    parentPos + 1, children.size());
-                        }
-                    }
-                }
                 break;
             case R.id.account_row_acc_amounts:
-                if (acc.getAmountCount() > AccountSummaryAdapter.AMOUNT_LIMIT) {
-                    acc.toggleAmountsExpanded();
-                    DbOpQueue.add(
-                            "update accounts set amounts_expanded=? where name=? and profile=?",
-                            new Object[]{acc.amountsExpanded(), acc.getName(), profile.getUuid()
-                            });
-                    Data.accounts.triggerItemChangedNotification(acc);
-                }
                 break;
         }
     }

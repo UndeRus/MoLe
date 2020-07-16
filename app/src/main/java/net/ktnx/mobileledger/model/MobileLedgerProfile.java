@@ -24,11 +24,14 @@ import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
@@ -61,6 +64,9 @@ public final class MobileLedgerProfile {
     private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
     private Calendar firstTransactionDate;
     private Calendar lastTransactionDate;
+    private MutableLiveData<ArrayList<LedgerAccount>> accounts =
+            new MutableLiveData<>(new ArrayList<>());
+    private AccountListLoader loader = null;
     public MobileLedgerProfile() {
         this.uuid = String.valueOf(UUID.randomUUID());
     }
@@ -140,6 +146,26 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public LiveData<ArrayList<LedgerAccount>> getAccounts() {
+        return accounts;
+    }
+    synchronized public void scheduleAccountListReload() {
+        Logger.debug("async-acc", "scheduleAccountListReload() enter");
+        if ((loader != null) && loader.isAlive()) {
+            Logger.debug("async-acc", "returning early - loader already active");
+            return;
+        }
+
+        Logger.debug("async-acc", "Starting AccountListLoader");
+        loader = new AccountListLoader(this);
+        loader.start();
+    }
+    synchronized public void abortAccountListReload() {
+        if (loader == null)
+            return;
+        loader.interrupt();
+        loader = null;
     }
     public boolean getShowCommentsByDefault() {
         return showCommentsByDefault;
@@ -402,7 +428,7 @@ public final class MobileLedgerProfile {
     }
     @Nullable
     public LedgerAccount tryLoadAccount(SQLiteDatabase db, String accName) {
-        try (Cursor cursor = db.rawQuery("SELECT a.expanded, (select 1 from accounts a2 " +
+        try (Cursor cursor = db.rawQuery("SELECT a.expanded, a.amounts_expanded, (select 1 from accounts a2 " +
                                          "where a2.profile = a.profile and a2.name like a" +
                                          ".name||':%' limit 1) " +
                                          "FROM accounts a WHERE a.profile = ? and a.name=?",
@@ -411,7 +437,8 @@ public final class MobileLedgerProfile {
             if (cursor.moveToFirst()) {
                 LedgerAccount acc = new LedgerAccount(this, accName);
                 acc.setExpanded(cursor.getInt(0) == 1);
-                acc.setHasSubAccounts(cursor.getInt(1) == 1);
+                acc.setAmountsExpanded(cursor.getInt(1) == 1);
+                acc.setHasSubAccounts(cursor.getInt(2) == 1);
 
                 try (Cursor c2 = db.rawQuery(
                         "SELECT value, currency FROM account_values WHERE profile = ? " +
@@ -573,6 +600,9 @@ public final class MobileLedgerProfile {
     public Calendar getLastTransactionDate() {
         return lastTransactionDate;
     }
+    public void setAccounts(ArrayList<LedgerAccount> list) {
+        accounts.postValue(list);
+    }
     public enum FutureDates {
         None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),
         SixMonths(180), OneYear(365), All(-1);
@@ -615,6 +645,44 @@ public final class MobileLedgerProfile {
                 default:
                     return resources.getString(R.string.future_dates_none);
             }
+        }
+    }
+
+    static class AccountListLoader extends Thread {
+        MobileLedgerProfile profile;
+        AccountListLoader(MobileLedgerProfile profile) {
+            this.profile = profile;
+        }
+        @Override
+        public void run() {
+            Logger.debug("async-acc", "AccountListLoader::run() entered");
+            String profileUUID = profile.getUuid();
+            ArrayList<LedgerAccount> newList = new ArrayList<>();
+
+            String sql = "SELECT a.name from accounts a WHERE a.profile = ?";
+            sql += " ORDER BY a.name";
+
+            SQLiteDatabase db = App.getDatabase();
+            try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
+                while (cursor.moveToNext()) {
+                    if (isInterrupted())
+                        return;
+
+                    final String accName = cursor.getString(0);
+//                    debug("accounts",
+//                            String.format("Read account '%s' from DB [%s]", accName,
+//                            profileUUID));
+                    LedgerAccount acc = profile.loadAccount(db, accName);
+                    if (acc.isVisible(newList))
+                        newList.add(acc);
+                }
+            }
+
+            if (isInterrupted())
+                return;
+
+            Logger.debug("async-acc", "AccountListLoader::run() posting new list");
+            profile.accounts.postValue(newList);
         }
     }
 }

@@ -50,8 +50,6 @@ public final class Data {
             new MutableLiveData<>(null);
     public static final MutableLiveData<SimpleDate> latestTransactionDate =
             new MutableLiveData<>(null);
-    public static final ObservableList<LedgerAccount> accounts =
-            new ObservableList<>(new ArrayList<>());
     public static final MutableLiveData<Boolean> backgroundTasksRunning =
             new MutableLiveData<>(false);
     public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
