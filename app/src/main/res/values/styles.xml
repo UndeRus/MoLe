@@ -726,4 +726,7 @@
     </style>
 
     <dimen name="thumb_row_height">48dp</dimen>
+    <!-- px=rows×73+12-->
+    <!-- sp=px÷3.5 -->
+    <dimen name="default_account_row_height">64.2857sp</dimen>
 </resources>
