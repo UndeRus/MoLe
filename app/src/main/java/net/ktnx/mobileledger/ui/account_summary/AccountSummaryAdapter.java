@@ -69,7 +69,8 @@ public class AccountSummaryAdapter
     }
 
     public void onBindViewHolder(@NonNull LedgerRowHolder holder, int position) {
-        holder.bindToAccount(listDiffer.getCurrentList().get(position));
+        holder.bindToAccount(listDiffer.getCurrentList()
+                                       .get(position));
     }
 
     @NonNull
@@ -82,7 +83,8 @@ public class AccountSummaryAdapter
 
     @Override
     public int getItemCount() {
-        return listDiffer.getCurrentList().size();
+        return listDiffer.getCurrentList()
+                         .size();
     }
     public void setAccounts(MobileLedgerProfile profile, ArrayList<LedgerAccount> newList) {
         this.profile = profile;
