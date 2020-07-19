@@ -29,6 +29,8 @@ import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
@@ -93,14 +95,15 @@ public class App extends Application {
         super.onTerminate();
     }
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         prepareMonthNames(true);
         Data.refreshCurrencyData(Locale.getDefault());
         Data.locale.setValue(Locale.getDefault());
     }
     public SQLiteDatabase getDB() {
-        if (dbHelper == null) initDb();
+        if (dbHelper == null)
+            initDb();
 
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.execSQL("pragma case_sensitive_like=ON;");
