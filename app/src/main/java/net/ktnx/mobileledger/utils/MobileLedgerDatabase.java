@@ -55,7 +55,13 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         debug("db", "onUpgrade called");
-        for (int i = oldVersion + 1; i <= newVersion; i++) applyRevision(db, i);
+        for (int i = oldVersion + 1; i <= newVersion; i++)
+            applyRevision(db, i);
+    }
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        db.execSQL("pragma case_sensitive_like=ON;");
     }
 
     private void applyRevision(SQLiteDatabase db, int rev_no) {

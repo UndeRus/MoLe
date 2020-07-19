@@ -106,7 +106,6 @@ public class App extends Application {
             initDb();
 
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.execSQL("pragma case_sensitive_like=ON;");
 
         return db;
     }
