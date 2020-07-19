@@ -164,4 +164,5 @@
     <string name="filter_menu_title">Filter</string>
     <string name="go_to_date_menu_title">Go to date</string>
     <string name="splash_icon_description">Main app icon</string>
+    <string name="sub_accounts_expand_collapse_trigger_description">Sub-accounts expand/collapse trigger</string>
 </resources>
