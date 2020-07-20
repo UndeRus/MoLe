@@ -32,7 +32,6 @@ public class LedgerAccount {
     private String shortName;
     private int level;
     private String parentName;
-    private boolean hiddenByStarToBe;
     private boolean expanded;
     private List<LedgerAmount> amounts;
     private boolean hasSubAccounts;
@@ -159,15 +158,6 @@ public class LedgerAccount {
 
     public String getParentName() {
         return parentName;
-    }
-    public boolean isHiddenByStarToBe() {
-        return hiddenByStarToBe;
-    }
-    public void setHiddenByStarToBe(boolean hiddenByStarToBe) {
-        this.hiddenByStarToBe = hiddenByStarToBe;
-    }
-    public void toggleHiddenToBe() {
-        setHiddenByStarToBe(!hiddenByStarToBe);
     }
     public boolean hasSubAccounts() {
         return hasSubAccounts;
