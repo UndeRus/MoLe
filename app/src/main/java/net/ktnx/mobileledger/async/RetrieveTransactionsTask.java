@@ -159,12 +159,8 @@ public class RetrieveTransactionsTask
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "journal");
         http.setAllowUserInteraction(false);
         publishProgress(progress);
-        switch (http.getResponseCode()) {
-            case 200:
-                break;
-            default:
-                throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
-        }
+        if (http.getResponseCode() != 200)
+            throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
 
         SQLiteDatabase db = App.getDatabase();
         try (InputStream resp = http.getInputStream()) {
