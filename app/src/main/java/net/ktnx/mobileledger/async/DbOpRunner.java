@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.async;
 import android.database.sqlite.SQLiteDatabase;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.BuildConfig;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -38,7 +39,23 @@ class DbOpRunner extends Thread {
                 debug("opQrunner", "Got " + item.sql);
                 {
                     SQLiteDatabase db = App.getDatabase();
-                    debug("opQrunner", "Executing " + item.sql);
+                    if (BuildConfig.DEBUG) {
+                        StringBuilder b = new StringBuilder("Executing ");
+                        b.append(item.sql);
+                        if (item.params.length > 0) {
+                            boolean first = true;
+                            b.append(" [");
+                            for (Object p : item.params) {
+                                if (first)
+                                    first = false;
+                                else
+                                    b.append(", ");
+                                b.append(p.toString());
+                            }
+                            b.append("]");
+                        }
+                        debug("opQrunner", b.toString());
+                    }
                     db.execSQL(item.sql, item.params);
                 }
                 if (item.onReady != null)
