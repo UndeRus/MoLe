@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import net.ktnx.mobileledger.App;
-import net.ktnx.mobileledger.model.Data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
         debug("descriptions", "Starting refresh");
         SQLiteDatabase db = App.getDatabase();
 
-        Data.backgroundTaskStarted();
+//        Data.backgroundTaskStarted();
         try {
             db.beginTransactionNonExclusive();
             try {
@@ -65,7 +64,7 @@ public class RefreshDescriptionsTask extends AsyncTask<Void, Void, Void> {
             }
         }
         finally {
-            Data.backgroundTaskFinished();
+//            Data.backgroundTaskFinished();
             debug("descriptions", "Refresh done");
         }
 
