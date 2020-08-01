@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -41,7 +41,7 @@ public class ObservableValue<T> {
     public void notifyObservers() {
         impl.notifyObservers();
     }
-    public void notifyObservers(Object arg) {
+    public void notifyObservers(T arg) {
         impl.notifyObservers(arg);
     }
     public void deleteObservers() {

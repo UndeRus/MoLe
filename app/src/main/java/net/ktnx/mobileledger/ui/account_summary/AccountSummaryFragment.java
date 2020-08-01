@@ -40,7 +40,8 @@ import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -95,15 +96,17 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             Data.scheduleTransactionListRetrieval(mainActivity);
         });
 
-        Data.profile.observe(getViewLifecycleOwner(), profile -> profile.getAccounts()
-                                                                        .observe(
-                                                                                getViewLifecycleOwner(),
-                                                                                (accounts) -> onAccountsChanged(
-                                                                                        profile,
-                                                                                        accounts)));
+        MobileLedgerProfile profile = Data.profile.getValue();
+        if (profile != null) {
+            profile.getDisplayedAccounts()
+                   .observe(getViewLifecycleOwner(),
+                           (accounts) -> onAccountsChanged(profile, accounts));
+        }
     }
-    private void onAccountsChanged(MobileLedgerProfile profile, ArrayList<LedgerAccount> accounts) {
-        Logger.debug("async-acc", "fragment: got new account list");
+    private void onAccountsChanged(MobileLedgerProfile profile, List<LedgerAccount> accounts) {
+        Logger.debug("async-acc",
+                String.format(Locale.US, "fragment: got new account list (%d items)",
+                        accounts.size()));
         modelAdapter.setAccounts(profile, accounts);
     }
 }

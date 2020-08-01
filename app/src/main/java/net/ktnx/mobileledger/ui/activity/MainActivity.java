@@ -30,7 +30,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -55,7 +54,6 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
@@ -387,6 +385,15 @@ public class MainActivity extends ProfileThemedActivity {
      * called when the current profile has changed
      */
     private void onProfileChanged(MobileLedgerProfile profile) {
+        if (this.profile == null) {
+            if (profile == null)
+                return;
+        }
+        else {
+            if (this.profile.equals(profile))
+                return;
+        }
+
         boolean haveProfile = profile != null;
 
         if (haveProfile)
@@ -395,7 +402,7 @@ public class MainActivity extends ProfileThemedActivity {
             setTitle(R.string.app_name);
 
         if (this.profile != null)
-            this.profile.getAccounts()
+            this.profile.getDisplayedAccounts()
                         .removeObservers(this);
 
         this.profile = profile;
@@ -525,7 +532,7 @@ public class MainActivity extends ProfileThemedActivity {
     public void onLatestTransactionsClicked(View view) {
         drawer.closeDrawers();
 
-        showTransactionsFragment((String) null);
+        showTransactionsFragment(null);
     }
     public void showTransactionsFragment(String accName) {
         Data.accountFilter.setValue(accName);
@@ -630,36 +637,8 @@ public class MainActivity extends ProfileThemedActivity {
     public void fabHide() {
         fab.hide();
     }
-    public void onAccountSummaryRowViewClicked(View view) {
-        ViewGroup row;
-        switch (view.getId()) {
-            case R.id.account_expander:
-                row = (ViewGroup) view.getParent()
-                                      .getParent()
-                                      .getParent();
-                break;
-            case R.id.account_expander_container:
-            case R.id.account_row_acc_name:
-                row = (ViewGroup) view.getParent()
-                                      .getParent();
-                break;
-            default:
-                row = (ViewGroup) view.getParent();
-                break;
-        }
 
-        LedgerAccount acc = (LedgerAccount) row.getTag();
-        switch (view.getId()) {
-            case R.id.account_row_acc_name:
-            case R.id.account_expander:
-            case R.id.account_expander_container:
-                break;
-            case R.id.account_row_acc_amounts:
-                break;
-        }
-    }
-
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
             super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);

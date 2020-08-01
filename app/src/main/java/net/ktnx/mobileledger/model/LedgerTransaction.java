@@ -219,4 +219,27 @@ public class LedgerTransaction {
     public void finishLoading() {
         dataLoaded = true;
     }
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null)
+            return false;
+        if (!obj.getClass()
+                .equals(this.getClass()))
+            return false;
+
+        return ((LedgerTransaction) obj).getDataHash()
+                                        .equals(getDataHash());
+    }
+
+    public boolean hasAccountNamedLike(String name) {
+        name = name.toUpperCase();
+        for (LedgerTransactionAccount acc : accounts) {
+            if (acc.getAccountName()
+                   .toUpperCase()
+                   .contains(name))
+                return true;
+        }
+
+        return false;
+    }
 }

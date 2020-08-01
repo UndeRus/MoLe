@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,10 +38,11 @@ import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
+import net.ktnx.mobileledger.utils.Locker;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -61,9 +61,7 @@ public class AccountSummaryAdapter
             @Override
             public boolean areContentsTheSame(@NotNull LedgerAccount oldItem,
                                               @NotNull LedgerAccount newItem) {
-                return (oldItem.isExpanded() == newItem.isExpanded()) &&
-                       (oldItem.amountsExpanded() == newItem.amountsExpanded() &&
-                        TextUtils.equals(oldItem.getAmountsString(), newItem.getAmountsString()));
+                return oldItem.equals(newItem);
             }
         });
     }
@@ -86,18 +84,20 @@ public class AccountSummaryAdapter
         return listDiffer.getCurrentList()
                          .size();
     }
-    public void setAccounts(MobileLedgerProfile profile, ArrayList<LedgerAccount> newList) {
+    public void setAccounts(MobileLedgerProfile profile, List<LedgerAccount> newList) {
         this.profile = profile;
         listDiffer.submitList(newList);
     }
-    class LedgerRowHolder extends RecyclerView.ViewHolder {
+    static class LedgerRowHolder extends RecyclerView.ViewHolder {
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
         View expanderContainer;
         ImageView expander;
         View accountExpanderContainer;
+        LedgerAccount mAccount;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
+
             row = itemView.findViewById(R.id.account_summary_row);
             tvAccountName = itemView.findViewById(R.id.account_row_acc_name);
             tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
@@ -118,94 +118,70 @@ public class AccountSummaryAdapter
             expander.setOnClickListener(v -> toggleAccountExpanded());
             tvAccountAmounts.setOnClickListener(v -> toggleAmountsExpanded());
         }
-        private @NonNull
-        LedgerAccount getAccount() {
-            final ArrayList<LedgerAccount> accountList = profile.getAccounts()
-                                                                .getValue();
-            if (accountList == null)
-                throw new IllegalStateException("No account list");
-
-            return accountList.get(getAdapterPosition());
-        }
         private void toggleAccountExpanded() {
-            LedgerAccount acc = getAccount();
-            if (!acc.hasSubAccounts())
+            if (!mAccount.hasSubAccounts())
                 return;
             debug("accounts", "Account expander clicked");
 
-            acc.toggleExpanded();
-            expanderContainer.animate()
-                             .rotation(acc.isExpanded() ? 0 : 180);
-
-            MobileLedgerProfile profile = acc.getProfile();
-            if (profile == null)
+            // make sure we use the same object as the one in the allAccounts list
+            MobileLedgerProfile profile = mAccount.getProfile();
+            if (profile == null) {
                 return;
+            }
+            try (Locker ignored = profile.lockAccountsForWriting()) {
+                LedgerAccount realAccount = profile.locateAccount(mAccount.getName());
+                if (realAccount == null)
+                    return;
+
+                mAccount = realAccount;
+                mAccount.toggleExpanded();
+            }
+            expanderContainer.animate()
+                             .rotation(mAccount.isExpanded() ? 0 : 180);
+            profile.updateDisplayedAccounts();
 
             DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
-                    new Object[]{acc.isExpanded(), acc.getName(), profile.getUuid()
-                    }, profile::scheduleAccountListReload);
+                    new Object[]{mAccount.isExpanded(), mAccount.getName(), profile.getUuid()
+                    });
 
         }
         private void toggleAmountsExpanded() {
-            LedgerAccount acc = getAccount();
-            if (acc.getAmountCount() <= AMOUNT_LIMIT)
+            if (mAccount.getAmountCount() <= AMOUNT_LIMIT)
                 return;
 
-            acc.toggleAmountsExpanded();
-            if (acc.amountsExpanded()) {
-                tvAccountAmounts.setText(acc.getAmountsString());
+            mAccount.toggleAmountsExpanded();
+            if (mAccount.amountsExpanded()) {
+                tvAccountAmounts.setText(mAccount.getAmountsString());
                 accountExpanderContainer.setVisibility(View.GONE);
             }
             else {
-                tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
+                tvAccountAmounts.setText(mAccount.getAmountsString(AMOUNT_LIMIT));
                 accountExpanderContainer.setVisibility(View.VISIBLE);
             }
 
-            MobileLedgerProfile profile = acc.getProfile();
+            MobileLedgerProfile profile = mAccount.getProfile();
             if (profile == null)
                 return;
 
             DbOpQueue.add("update accounts set amounts_expanded=? where name=? and profile=?",
-                    new Object[]{acc.amountsExpanded(), acc.getName(), profile.getUuid()
+                    new Object[]{mAccount.amountsExpanded(), mAccount.getName(), profile.getUuid()
                     });
 
         }
         private boolean onItemLongClick(View v) {
             MainActivity activity = (MainActivity) v.getContext();
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-            View row;
-            int id = v.getId();
-            switch (id) {
-                case R.id.account_summary_row:
-                    row = v;
-                    break;
-                case R.id.account_row_acc_amounts:
-                case R.id.account_row_amounts_expander_container:
-                    row = (View) v.getParent();
-                    break;
-                case R.id.account_row_acc_name:
-                case R.id.account_expander_container:
-                    row = (View) v.getParent()
-                                  .getParent();
-                    break;
-                case R.id.account_expander:
-                    row = (View) v.getParent()
-                                  .getParent()
-                                  .getParent();
-                    break;
-                default:
-                    Log.e("error",
-                            String.format("Don't know how to handle long click on id %d", id));
-                    return false;
-            }
-            LedgerAccount acc = getAccount();
-            builder.setTitle(acc.getName());
+            final String accountName = mAccount.getName();
+            builder.setTitle(accountName);
             builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
                 switch (which) {
                     case 0:
                         // show transactions
-                        activity.showAccountTransactions(acc.getName());
+                        activity.showAccountTransactions(accountName);
                         break;
+                    default:
+                        throw new RuntimeException(
+                                String.format("Unknown menu item id (%d)", which));
                 }
                 dialog.dismiss();
             });
@@ -215,6 +191,7 @@ public class AccountSummaryAdapter
         public void bindToAccount(LedgerAccount acc) {
             Context ctx = row.getContext();
             Resources rm = ctx.getResources();
+            mAccount = acc;
 
             row.setTag(acc);
 

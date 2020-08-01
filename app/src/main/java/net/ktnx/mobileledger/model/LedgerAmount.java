@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import android.annotation.SuppressLint;
+
 import androidx.annotation.NonNull;
 
 public class LedgerAmount {
@@ -30,8 +31,7 @@ public class LedgerAmount {
         this.amount = amount;
     }
 
-    public
-    LedgerAmount(float amount) {
+    public LedgerAmount(float amount) {
         this.amount = amount;
         this.currency = null;
     }
@@ -39,7 +39,21 @@ public class LedgerAmount {
     @SuppressLint("DefaultLocale")
     @NonNull
     public String toString() {
-        if (currency == null) return String.format("%,1.2f", amount);
-        else return String.format("%s %,1.2f", currency, amount);
+        if (currency == null)
+            return String.format("%,1.2f", amount);
+        else
+            return String.format("%s %,1.2f", currency, amount);
+    }
+    public void propagateToAccount(@NonNull LedgerAccount acc) {
+        if (currency != null)
+            acc.addAmount(amount, currency);
+        else
+            acc.addAmount(amount);
+    }
+    public String getCurrency() {
+        return currency;
+    }
+    public float getAmount() {
+        return amount;
     }
 }

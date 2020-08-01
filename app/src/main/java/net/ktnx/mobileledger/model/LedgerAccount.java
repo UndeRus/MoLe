@@ -23,7 +23,6 @@ import androidx.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LedgerAccount {
@@ -31,26 +30,32 @@ public class LedgerAccount {
     private String name;
     private String shortName;
     private int level;
-    private String parentName;
+    private LedgerAccount parent;
     private boolean expanded;
     private List<LedgerAmount> amounts;
     private boolean hasSubAccounts;
     private boolean amountsExpanded;
     private WeakReference<MobileLedgerProfile> profileWeakReference;
 
-    public LedgerAccount(MobileLedgerProfile profile, String name) {
+    public LedgerAccount(MobileLedgerProfile profile, String name, @Nullable LedgerAccount parent) {
         this.profileWeakReference = new WeakReference<>(profile);
+        this.parent = parent;
+        if (parent != null && !name.startsWith(parent.getName() + ":"))
+            throw new IllegalStateException(
+                    String.format("Account name '%s' doesn't match parent account '%s'", name,
+                            parent.getName()));
         this.setName(name);
     }
-
-    public LedgerAccount(MobileLedgerProfile profile, String name, float amount) {
-        this.profileWeakReference = new WeakReference<>(profile);
-        this.setName(name);
-        this.expanded = true;
-        this.amounts = new ArrayList<>();
-        this.addAmount(amount);
+    @Nullable
+    public static String extractParentName(@NonNull String accName) {
+        int colonPos = accName.lastIndexOf(':');
+        if (colonPos < 0)
+            return null;    // no parent account -- this is a top-level account
+        else
+            return accName.substring(0, colonPos);
     }
-    public @Nullable MobileLedgerProfile getProfile() {
+    public @Nullable
+    MobileLedgerProfile getProfile() {
         return profileWeakReference.get();
     }
     @Override
@@ -62,42 +67,40 @@ public class LedgerAccount {
         if (obj == null)
             return false;
 
-        return obj.getClass()
-                  .equals(this.getClass()) && name.equals(((LedgerAccount) obj).getName());
+        if (!(obj instanceof LedgerAccount))
+            return false;
+
+        LedgerAccount acc = (LedgerAccount) obj;
+        if (!name.equals(acc.name))
+            return false;
+
+        if (!getAmountsString().equals(acc.getAmountsString()))
+            return false;
+
+        return expanded == acc.expanded && amountsExpanded == acc.amountsExpanded;
     }
     // an account is visible if:
-    //  - it has an expanded parent or is a top account
-    public boolean isVisible(List<LedgerAccount> list) {
-        for (LedgerAccount acc : list) {
-            if (acc.isParentOf(this)) {
-                if (!acc.isExpanded())
-                    return false;
-            }
-        }
-        return true;
+    //  - it has an expanded visible parent or is a top account
+    public boolean isVisible() {
+        if (parent == null)
+            return true;
+
+        return (parent.isExpanded() && parent.isVisible());
     }
     public boolean isParentOf(LedgerAccount potentialChild) {
         return potentialChild.getName()
                              .startsWith(name + ":");
     }
     private void stripName() {
-        level = 0;
-        shortName = name;
-        StringBuilder parentBuilder = new StringBuilder();
-        while (true) {
-            Matcher m = reHigherAccount.matcher(shortName);
-            if (m.find()) {
-                level++;
-                parentBuilder.append(m.group(0));
-                shortName = m.replaceFirst("");
-            }
-            else
-                break;
+        if (parent == null) {
+            level = 0;
+            shortName = name;
         }
-        if (parentBuilder.length() > 0)
-            parentName = parentBuilder.substring(0, parentBuilder.length() - 1);
-        else
-            parentName = null;
+        else {
+            level = parent.level + 1;
+            shortName = name.substring(parent.getName()
+                                             .length() + 1);
+        }
     }
     public String getName() {
         return name;
@@ -157,7 +160,7 @@ public class LedgerAccount {
     }
 
     public String getParentName() {
-        return parentName;
+        return (parent == null) ? null : parent.getName();
     }
     public boolean hasSubAccounts() {
         return hasSubAccounts;
@@ -182,4 +185,11 @@ public class LedgerAccount {
     public void setAmountsExpanded(boolean flag) { amountsExpanded = flag; }
     public void toggleAmountsExpanded() { amountsExpanded = !amountsExpanded; }
 
+    public void propagateAmountsTo(LedgerAccount acc) {
+        for (LedgerAmount a : amounts)
+            a.propagateToAccount(acc);
+    }
+    public List<LedgerAmount> getAmounts() {
+        return amounts;
+    }
 }

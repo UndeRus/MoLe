@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -61,6 +61,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -391,8 +392,7 @@ public class ProfileDetailFragment extends Fragment {
 
         huePickerView.setOnClickListener(v -> {
             HueRingDialog d = new HueRingDialog(ProfileDetailFragment.this.requireContext(),
-                    model.initialThemeHue,
-                    (Integer) v.getTag());
+                    model.initialThemeHue, (Integer) v.getTag());
             d.show();
             d.setColorSelectedListener(model::setThemeId);
         });
@@ -439,7 +439,7 @@ public class ProfileDetailFragment extends Fragment {
             triggerProfileChange();
         }
         else {
-            mProfile = new MobileLedgerProfile();
+            mProfile = new MobileLedgerProfile(String.valueOf(UUID.randomUUID()));
             model.updateProfile(mProfile);
             mProfile.storeInDB();
             final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();

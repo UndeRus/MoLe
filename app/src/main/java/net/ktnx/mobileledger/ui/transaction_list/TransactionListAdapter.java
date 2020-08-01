@@ -33,6 +33,8 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.App;
@@ -40,6 +42,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
@@ -48,9 +51,53 @@ import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.DateFormat;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowHolder> {
+    private MobileLedgerProfile profile;
+    private AsyncListDiffer<TransactionListItem> listDiffer;
+    public TransactionListAdapter() {
+        super();
+        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<TransactionListItem>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull TransactionListItem oldItem,
+                                           @NonNull TransactionListItem newItem) {
+                if (oldItem.getType() != newItem.getType())
+                    return false;
+                switch (oldItem.getType()) {
+                    case DELIMITER:
+                        return (oldItem.getDate()
+                                       .equals(newItem.getDate()));
+                    case TRANSACTION:
+                        return oldItem.getTransaction()
+                                      .getId() == newItem.getTransaction()
+                                                         .getId();
+                    default:
+                        throw new IllegalStateException(
+                                String.format(Locale.US, "Unexpected transaction item type %s",
+                                        oldItem.getType()));
+                }
+            }
+            @Override
+            public boolean areContentsTheSame(@NonNull TransactionListItem oldItem,
+                                              @NonNull TransactionListItem newItem) {
+                switch (oldItem.getType()) {
+                    case DELIMITER:
+                        // Delimiters items are "same" for same dates and the contents are the date
+                        return true;
+                    case TRANSACTION:
+                        return oldItem.getTransaction()
+                                      .equals(newItem.getTransaction());
+                    default:
+                        throw new IllegalStateException(
+                                String.format(Locale.US, "Unexpected transaction item type %s",
+                                        oldItem.getType()));
+
+                }
+            }
+        });
+    }
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
         TransactionListItem item = TransactionListViewModel.getTransactionListItem(position);
 

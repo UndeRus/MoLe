@@ -20,9 +20,10 @@ package net.ktnx.mobileledger.model;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -31,22 +32,34 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.utils.LockHolder;
+import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
+import org.jetbrains.annotations.Contract;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Objects;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class MobileLedgerProfile {
+    private final MutableLiveData<List<LedgerAccount>> displayedAccounts;
+    private final MutableLiveData<List<LedgerTransaction>> allTransactions;
+    private final MutableLiveData<List<LedgerTransaction>> displayedTransactions;
     // N.B. when adding new fields, update the copy-constructor below
-    private String uuid;
+    private final String uuid;
+    private final Locker accountsLocker = new Locker();
+    private List<LedgerAccount> allAccounts;
     private String name;
     private boolean permitPosting;
     private boolean showCommentsByDefault;
@@ -59,19 +72,25 @@ public final class MobileLedgerProfile {
     private String authPassword;
     private int themeHue;
     private int orderNo = -1;
-    // N.B. when adding new fields, update the copy-constructor below
-    private FutureDates futureDates = FutureDates.None;
     private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
     private Calendar firstTransactionDate;
     private Calendar lastTransactionDate;
-    private MutableLiveData<ArrayList<LedgerAccount>> accounts =
-            new MutableLiveData<>(new ArrayList<>());
-    private AccountListLoader loader = null;
-    public MobileLedgerProfile() {
-        this.uuid = String.valueOf(UUID.randomUUID());
-    }
+    private FutureDates futureDates = FutureDates.None;
+    private boolean accountsLoaded;
+    private boolean transactionsLoaded;
+    // N.B. when adding new fields, update the copy-constructor below
+    transient private AccountListLoader loader = null;
+    transient private Thread displayedAccountsUpdater;
+    transient private AccountListSaver accountListSaver;
+    transient private TransactionListSaver transactionListSaver;
+    transient private AccountAndTransactionListSaver accountAndTransactionListSaver;
+    private Map<String, LedgerAccount> accountMap = new HashMap<>();
     public MobileLedgerProfile(String uuid) {
         this.uuid = uuid;
+        allAccounts = new ArrayList<>();
+        displayedAccounts = new MutableLiveData<>();
+        allTransactions = new MutableLiveData<>(new ArrayList<>());
+        displayedTransactions = new MutableLiveData<>(new ArrayList<>());
     }
     public MobileLedgerProfile(MobileLedgerProfile origin) {
         uuid = origin.uuid;
@@ -91,6 +110,13 @@ public final class MobileLedgerProfile {
         defaultCommodity = origin.defaultCommodity;
         firstTransactionDate = origin.firstTransactionDate;
         lastTransactionDate = origin.lastTransactionDate;
+        displayedAccounts = origin.displayedAccounts;
+        allAccounts = origin.allAccounts;
+        accountMap = origin.accountMap;
+        displayedTransactions = origin.displayedTransactions;
+        allTransactions = origin.allTransactions;
+        accountsLoaded = origin.accountsLoaded;
+        transactionsLoaded = origin.transactionsLoaded;
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
@@ -147,8 +173,107 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public LiveData<ArrayList<LedgerAccount>> getAccounts() {
-        return accounts;
+    public static ArrayList<LedgerAccount> mergeAccountLists(List<LedgerAccount> oldList,
+                                                             List<LedgerAccount> newList) {
+        LedgerAccount oldAcc, newAcc;
+        ArrayList<LedgerAccount> merged = new ArrayList<>();
+
+        Iterator<LedgerAccount> oldIterator = oldList.iterator();
+        Iterator<LedgerAccount> newIterator = newList.iterator();
+
+        while (true) {
+            if (!oldIterator.hasNext()) {
+                // the rest of the incoming are new
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    newIterator.forEachRemaining(merged::add);
+                }
+                else {
+                    while (newIterator.hasNext())
+                        merged.add(newIterator.next());
+                }
+                break;
+            }
+            oldAcc = oldIterator.next();
+
+            if (!newIterator.hasNext()) {
+                // no more incoming accounts. ignore the rest of the old
+                break;
+            }
+            newAcc = newIterator.next();
+
+            // ignore now missing old items
+            if (oldAcc.getName()
+                      .compareTo(newAcc.getName()) < 0)
+                continue;
+
+            // add newly found items
+            if (oldAcc.getName()
+                      .compareTo(newAcc.getName()) > 0)
+            {
+                merged.add(newAcc);
+                continue;
+            }
+
+            // two items with same account names; merge UI-controlled fields
+            oldAcc.setExpanded(newAcc.isExpanded());
+            oldAcc.setAmountsExpanded(newAcc.amountsExpanded());
+            merged.add(oldAcc);
+        }
+
+        return merged;
+    }
+    public void mergeAccountList(List<LedgerAccount> newList) {
+
+        try (LockHolder l = accountsLocker.lockForWriting()) {
+            allAccounts = mergeAccountLists(allAccounts, newList);
+            updateAccountsMap(allAccounts);
+        }
+    }
+    public LiveData<List<LedgerAccount>> getDisplayedAccounts() {
+        return displayedAccounts;
+    }
+    @Contract(value = "null -> false", pure = true)
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null)
+            return false;
+        if (obj == this)
+            return true;
+        if (obj.getClass() != this.getClass())
+            return false;
+
+        MobileLedgerProfile p = (MobileLedgerProfile) obj;
+        if (!uuid.equals(p.uuid))
+            return false;
+        if (!name.equals(p.name))
+            return false;
+        if (permitPosting != p.permitPosting)
+            return false;
+        if (showCommentsByDefault != p.showCommentsByDefault)
+            return false;
+        if (showCommodityByDefault != p.showCommodityByDefault)
+            return false;
+        if (!Objects.equals(defaultCommodity, p.defaultCommodity))
+            return false;
+        if (!Objects.equals(preferredAccountsFilter, p.preferredAccountsFilter))
+            return false;
+        if (!Objects.equals(url, p.url))
+            return false;
+        if (authEnabled != p.authEnabled)
+            return false;
+        if (!Objects.equals(authUserName, p.authUserName))
+            return false;
+        if (!Objects.equals(authPassword, p.authPassword))
+            return false;
+        if (themeHue != p.themeHue)
+            return false;
+        if (apiVersion != p.apiVersion)
+            return false;
+        if (!Objects.equals(firstTransactionDate, p.firstTransactionDate))
+            return false;
+        if (!Objects.equals(lastTransactionDate, p.lastTransactionDate))
+            return false;
+        return futureDates == p.futureDates;
     }
     synchronized public void scheduleAccountListReload() {
         Logger.debug("async-acc", "scheduleAccountListReload() enter");
@@ -294,17 +419,24 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public void storeAccount(SQLiteDatabase db, LedgerAccount acc) {
+    public void storeAccount(SQLiteDatabase db, LedgerAccount acc, boolean storeUiFields) {
         // replace into is a bad idea because it would reset hidden to its default value
         // we like the default, but for new accounts only
-        db.execSQL("update accounts set level = ?, keep = 1, expanded=? " +
-                   "where profile=? and name = ?",
-                new Object[]{acc.getLevel(), acc.isExpanded(), uuid, acc.getName()
-                });
+        String sql = "update accounts set keep = 1";
+        List<Object> params = new ArrayList<>();
+        if (storeUiFields) {
+            sql += ", expanded=?";
+            params.add(acc.isExpanded() ? 1 : 0);
+        }
+        sql += " where profile=? and name=?";
+        params.add(uuid);
+        params.add(acc.getName());
+        db.execSQL(sql, params.toArray());
+
         db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, " +
-                   "expanded, keep) " + "select ?,?,?,?,?,?,1 where (select changes() = 0)",
+                   "expanded, keep) " + "select ?,?,?,?,?,0,1 where (select changes() = 0)",
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
-                             acc.getLevel(), acc.isExpanded()
+                             acc.getLevel()
                 });
 //        debug("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
@@ -407,53 +539,6 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    @NonNull
-    public LedgerAccount loadAccount(String name) {
-        SQLiteDatabase db = App.getDatabase();
-        return loadAccount(db, name);
-    }
-    @Nullable
-    public LedgerAccount tryLoadAccount(String acct_name) {
-        SQLiteDatabase db = App.getDatabase();
-        return tryLoadAccount(db, acct_name);
-    }
-    @NonNull
-    public LedgerAccount loadAccount(SQLiteDatabase db, String accName) {
-        LedgerAccount acc = tryLoadAccount(db, accName);
-
-        if (acc == null)
-            throw new RuntimeException("Unable to load account with name " + accName);
-
-        return acc;
-    }
-    @Nullable
-    public LedgerAccount tryLoadAccount(SQLiteDatabase db, String accName) {
-        try (Cursor cursor = db.rawQuery("SELECT a.expanded, a.amounts_expanded, (select 1 from accounts a2 " +
-                                         "where a2.profile = a.profile and a2.name like a" +
-                                         ".name||':%' limit 1) " +
-                                         "FROM accounts a WHERE a.profile = ? and a.name=?",
-                new String[]{uuid, accName}))
-        {
-            if (cursor.moveToFirst()) {
-                LedgerAccount acc = new LedgerAccount(this, accName);
-                acc.setExpanded(cursor.getInt(0) == 1);
-                acc.setAmountsExpanded(cursor.getInt(1) == 1);
-                acc.setHasSubAccounts(cursor.getInt(2) == 1);
-
-                try (Cursor c2 = db.rawQuery(
-                        "SELECT value, currency FROM account_values WHERE profile = ? " +
-                        "AND account = ?", new String[]{uuid, accName}))
-                {
-                    while (c2.moveToNext()) {
-                        acc.addAmount(c2.getFloat(0), c2.getString(1));
-                    }
-                }
-
-                return acc;
-            }
-            return null;
-        }
-    }
     public LedgerTransaction loadTransaction(int transactionId) {
         LedgerTransaction tr = new LedgerTransaction(transactionId, this.uuid);
         tr.loadData(App.getDatabase());
@@ -475,71 +560,35 @@ public final class MobileLedgerProfile {
         db.execSQL("UPDATE transactions set keep=0 where profile=?", new String[]{uuid});
 
     }
-    public void markAccountsAsNotPresent(SQLiteDatabase db) {
+    private void markAccountsAsNotPresent(SQLiteDatabase db) {
         db.execSQL("update account_values set keep=0 where profile=?;", new String[]{uuid});
         db.execSQL("update accounts set keep=0 where profile=?;", new String[]{uuid});
 
     }
-    public void deleteNotPresentAccounts(SQLiteDatabase db) {
+    private void deleteNotPresentAccounts(SQLiteDatabase db) {
         db.execSQL("delete from account_values where keep=0 and profile=?", new String[]{uuid});
         db.execSQL("delete from accounts where keep=0 and profile=?", new String[]{uuid});
     }
-    public void markTransactionAsPresent(SQLiteDatabase db, LedgerTransaction transaction) {
+    private void markTransactionAsPresent(SQLiteDatabase db, LedgerTransaction transaction) {
         db.execSQL("UPDATE transactions SET keep = 1 WHERE profile = ? and id=?",
                 new Object[]{uuid, transaction.getId()
                 });
     }
-    public void markTransactionsBeforeTransactionAsPresent(SQLiteDatabase db,
-                                                           LedgerTransaction transaction) {
+    private void markTransactionsBeforeTransactionAsPresent(SQLiteDatabase db,
+                                                            LedgerTransaction transaction) {
         db.execSQL("UPDATE transactions SET keep=1 WHERE profile = ? and id < ?",
                 new Object[]{uuid, transaction.getId()
                 });
 
     }
-    public void deleteNotPresentTransactions(SQLiteDatabase db) {
+    private void deleteNotPresentTransactions(SQLiteDatabase db) {
         db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0", new String[]{uuid});
     }
-    public void setLastUpdateStamp() {
+    private void setLastUpdateStamp() {
         debug("db", "Updating transaction value stamp");
         Date now = new Date();
         setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
         Data.lastUpdateDate.postValue(now);
-    }
-    public List<LedgerAccount> loadChildAccountsOf(LedgerAccount acc) {
-        List<LedgerAccount> result = new ArrayList<>();
-        SQLiteDatabase db = App.getDatabase();
-        try (Cursor c = db.rawQuery(
-                "SELECT a.name FROM accounts a WHERE a.profile = ? and a.name like ?||':%'",
-                new String[]{uuid, acc.getName()}))
-        {
-            while (c.moveToNext()) {
-                LedgerAccount a = loadAccount(db, c.getString(0));
-                result.add(a);
-            }
-        }
-
-        return result;
-    }
-    public List<LedgerAccount> loadVisibleChildAccountsOf(LedgerAccount acc) {
-        List<LedgerAccount> result = new ArrayList<>();
-        ArrayList<LedgerAccount> visibleList = new ArrayList<>();
-        visibleList.add(acc);
-
-        SQLiteDatabase db = App.getDatabase();
-        try (Cursor c = db.rawQuery(
-                "SELECT a.name FROM accounts a WHERE a.profile = ? and a.name like ?||':%'",
-                new String[]{uuid, acc.getName()}))
-        {
-            while (c.moveToNext()) {
-                LedgerAccount a = loadAccount(db, c.getString(0));
-                if (a.isVisible(visibleList)) {
-                    result.add(a);
-                    visibleList.add(a);
-                }
-            }
-        }
-
-        return result;
     }
     public void wipeAllData() {
         SQLiteDatabase db = App.getDatabase();
@@ -600,9 +649,119 @@ public final class MobileLedgerProfile {
     public Calendar getLastTransactionDate() {
         return lastTransactionDate;
     }
-    public void setAccounts(ArrayList<LedgerAccount> list) {
-        accounts.postValue(list);
+    private void applyTransactionFilter(List<LedgerTransaction> list) {
+        final String accFilter = Data.accountFilter.getValue();
+        if (TextUtils.isEmpty(accFilter)) {
+            displayedTransactions.postValue(list);
+        }
+        else {
+            ArrayList<LedgerTransaction> newList = new ArrayList<>();
+            for (LedgerTransaction tr : list) {
+                if (tr.hasAccountNamedLike(accFilter))
+                    newList.add(tr);
+            }
+            displayedTransactions.postValue(newList);
+        }
     }
+    synchronized public void storeAccountListAsync(List<LedgerAccount> list,
+                                                   boolean storeUiFields) {
+        if (accountListSaver != null)
+            accountListSaver.interrupt();
+        accountListSaver = new AccountListSaver(this, list, storeUiFields);
+        accountListSaver.start();
+    }
+    public void setAndStoreAccountListFromWeb(ArrayList<LedgerAccount> list) {
+        SQLiteDatabase db = App.getDatabase();
+        db.beginTransactionNonExclusive();
+        try {
+            markAccountsAsNotPresent(db);
+            for (LedgerAccount acc : list) {
+                storeAccount(db, acc, false);
+                for (LedgerAmount amt : acc.getAmounts()) {
+                    storeAccountValue(db, acc.getName(), amt.getCurrency(), amt.getAmount());
+                }
+            }
+            deleteNotPresentAccounts(db);
+            setLastUpdateStamp();
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
+
+        mergeAccountList(list);
+        updateDisplayedAccounts();
+    }
+    public synchronized Locker lockAccountsForWriting() {
+        accountsLocker.lockForWriting();
+        return accountsLocker;
+    }
+    public void setAndStoreTransactionList(ArrayList<LedgerTransaction> list) {
+        storeTransactionListAsync(this, list);
+        SQLiteDatabase db = App.getDatabase();
+        db.beginTransactionNonExclusive();
+        try {
+            markTransactionsAsNotPresent(db);
+            for (LedgerTransaction tr : list)
+                storeTransaction(db, tr);
+            deleteNotPresentTransactions(db);
+            setLastUpdateStamp();
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
+
+        allTransactions.postValue(list);
+    }
+    private void storeTransactionListAsync(MobileLedgerProfile mobileLedgerProfile,
+                                           List<LedgerTransaction> list) {
+        if (transactionListSaver != null)
+            transactionListSaver.interrupt();
+
+        transactionListSaver = new TransactionListSaver(this, list);
+        transactionListSaver.start();
+    }
+    public void setAndStoreAccountAndTransactionListFromWeb(List<LedgerAccount> accounts,
+                                                            List<LedgerTransaction> transactions) {
+        storeAccountAndTransactionListAsync(accounts, transactions, false);
+
+        mergeAccountList(accounts);
+        updateDisplayedAccounts();
+
+        allTransactions.postValue(transactions);
+    }
+    private void storeAccountAndTransactionListAsync(List<LedgerAccount> accounts,
+                                                     List<LedgerTransaction> transactions,
+                                                     boolean storeAccUiFields) {
+        if (accountAndTransactionListSaver != null)
+            accountAndTransactionListSaver.interrupt();
+
+        accountAndTransactionListSaver =
+                new AccountAndTransactionListSaver(this, accounts, transactions, storeAccUiFields);
+        accountAndTransactionListSaver.start();
+    }
+    synchronized public void updateDisplayedAccounts() {
+        if (displayedAccountsUpdater != null) {
+            displayedAccountsUpdater.interrupt();
+        }
+        displayedAccountsUpdater = new AccountListDisplayedFilter(this, allAccounts);
+        displayedAccountsUpdater.start();
+    }
+    public List<LedgerAccount> getAllAccounts() {
+        return allAccounts;
+    }
+    private void updateAccountsMap(List<LedgerAccount> newAccounts) {
+        accountMap.clear();
+        for (LedgerAccount acc : newAccounts) {
+            accountMap.put(acc.getName(), acc);
+        }
+    }
+    @Nullable
+    public LedgerAccount locateAccount(String name) {
+        return accountMap.get(name);
+    }
+
     public enum FutureDates {
         None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),
         SixMonths(180), OneYear(365), All(-1);
@@ -657,13 +816,17 @@ public final class MobileLedgerProfile {
         public void run() {
             Logger.debug("async-acc", "AccountListLoader::run() entered");
             String profileUUID = profile.getUuid();
-            ArrayList<LedgerAccount> newList = new ArrayList<>();
+            ArrayList<LedgerAccount> list = new ArrayList<>();
+            HashMap<String, LedgerAccount> map = new HashMap<>();
 
-            String sql = "SELECT a.name from accounts a WHERE a.profile = ?";
+            String sql = "SELECT a.name, a.expanded, a.amounts_expanded";
+            sql += " from accounts a WHERE a.profile = ?";
             sql += " ORDER BY a.name";
 
             SQLiteDatabase db = App.getDatabase();
+            Logger.debug("async-acc", "AccountListLoader::run() connected to DB");
             try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
+                Logger.debug("async-acc", "AccountListLoader::run() executed query");
                 while (cursor.moveToNext()) {
                     if (isInterrupted())
                         return;
@@ -672,17 +835,200 @@ public final class MobileLedgerProfile {
 //                    debug("accounts",
 //                            String.format("Read account '%s' from DB [%s]", accName,
 //                            profileUUID));
-                    LedgerAccount acc = profile.loadAccount(db, accName);
-                    if (acc.isVisible(newList))
-                        newList.add(acc);
+                    String parentName = LedgerAccount.extractParentName(accName);
+                    LedgerAccount parent;
+                    if (parentName != null) {
+                        parent = map.get(parentName);
+                        if (parent == null)
+                            throw new IllegalStateException(
+                                    String.format("Can't load account '%s': parent '%s' not loaded",
+                                            accName, parentName));
+                        parent.setHasSubAccounts(true);
+                    }
+                    else
+                        parent = null;
+
+                    LedgerAccount acc = new LedgerAccount(profile, accName, parent);
+                    acc.setExpanded(cursor.getInt(1) == 1);
+                    acc.setAmountsExpanded(cursor.getInt(2) == 1);
+                    acc.setHasSubAccounts(false);
+
+                    try (Cursor c2 = db.rawQuery(
+                            "SELECT value, currency FROM account_values WHERE profile = ?" + " " +
+                            "AND account = ?", new String[]{profileUUID, accName}))
+                    {
+                        while (c2.moveToNext()) {
+                            acc.addAmount(c2.getFloat(0), c2.getString(1));
+                        }
+                    }
+
+                    list.add(acc);
+                    map.put(accName, acc);
                 }
+                Logger.debug("async-acc", "AccountListLoader::run() query execution done");
             }
 
             if (isInterrupted())
                 return;
 
             Logger.debug("async-acc", "AccountListLoader::run() posting new list");
-            profile.accounts.postValue(newList);
+            profile.allAccounts = list;
+            profile.updateAccountsMap(list);
+            profile.updateDisplayedAccounts();
+        }
+    }
+
+    static class AccountListDisplayedFilter extends Thread {
+        private final MobileLedgerProfile profile;
+        private final List<LedgerAccount> list;
+        AccountListDisplayedFilter(MobileLedgerProfile profile, List<LedgerAccount> list) {
+            this.profile = profile;
+            this.list = list;
+        }
+        @Override
+        public void run() {
+            List<LedgerAccount> newDisplayed = new ArrayList<>();
+            Logger.debug("dFilter", "waiting for synchronized block");
+            Logger.debug("dFilter", String.format(Locale.US,
+                    "entered synchronized block (about to examine %d accounts)", list.size()));
+            for (LedgerAccount a : list) {
+                if (isInterrupted()) {
+                    return;
+                }
+
+                if (a.isVisible()) {
+                    newDisplayed.add(a);
+                }
+            }
+            if (!isInterrupted()) {
+                profile.displayedAccounts.postValue(newDisplayed);
+            }
+            Logger.debug("dFilter", "left synchronized block");
+        }
+    }
+
+    private static class AccountListSaver extends Thread {
+        private final MobileLedgerProfile profile;
+        private final List<LedgerAccount> list;
+        private final boolean storeUiFields;
+        AccountListSaver(MobileLedgerProfile profile, List<LedgerAccount> list,
+                         boolean storeUiFields) {
+            this.list = list;
+            this.profile = profile;
+            this.storeUiFields = storeUiFields;
+        }
+        @Override
+        public void run() {
+            SQLiteDatabase db = App.getDatabase();
+            db.beginTransactionNonExclusive();
+            try {
+                profile.markAccountsAsNotPresent(db);
+                if (isInterrupted())
+                    return;
+                for (LedgerAccount acc : list) {
+                    profile.storeAccount(db, acc, storeUiFields);
+                    if (isInterrupted())
+                        return;
+                }
+                profile.deleteNotPresentAccounts(db);
+                if (isInterrupted())
+                    return;
+                profile.setLastUpdateStamp();
+                db.setTransactionSuccessful();
+            }
+            finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    private static class TransactionListSaver extends Thread {
+        private final MobileLedgerProfile profile;
+        private final List<LedgerTransaction> list;
+        TransactionListSaver(MobileLedgerProfile profile, List<LedgerTransaction> list) {
+            this.list = list;
+            this.profile = profile;
+        }
+        @Override
+        public void run() {
+            SQLiteDatabase db = App.getDatabase();
+            db.beginTransactionNonExclusive();
+            try {
+                profile.markTransactionsAsNotPresent(db);
+                if (isInterrupted())
+                    return;
+                for (LedgerTransaction tr : list) {
+                    profile.storeTransaction(db, tr);
+                    if (isInterrupted())
+                        return;
+                }
+                profile.deleteNotPresentTransactions(db);
+                if (isInterrupted())
+                    return;
+                profile.setLastUpdateStamp();
+                db.setTransactionSuccessful();
+            }
+            finally {
+                db.endTransaction();
+            }
+        }
+    }
+
+    private static class AccountAndTransactionListSaver extends Thread {
+        private final MobileLedgerProfile profile;
+        private final List<LedgerAccount> accounts;
+        private final List<LedgerTransaction> transactions;
+        private final boolean storeAccUiFields;
+        AccountAndTransactionListSaver(MobileLedgerProfile profile, List<LedgerAccount> accounts,
+                                       List<LedgerTransaction> transactions,
+                                       boolean storeAccUiFields) {
+            this.accounts = accounts;
+            this.transactions = transactions;
+            this.profile = profile;
+            this.storeAccUiFields = storeAccUiFields;
+        }
+        @Override
+        public void run() {
+            SQLiteDatabase db = App.getDatabase();
+            db.beginTransactionNonExclusive();
+            try {
+                profile.markAccountsAsNotPresent(db);
+                if (isInterrupted())
+                    return;
+
+                profile.markTransactionsAsNotPresent(db);
+                if (isInterrupted()) {
+                    return;
+                }
+
+                for (LedgerAccount acc : accounts) {
+                    profile.storeAccount(db, acc, storeAccUiFields);
+                    if (isInterrupted())
+                        return;
+                }
+
+                for (LedgerTransaction tr : transactions) {
+                    profile.storeTransaction(db, tr);
+                    if (isInterrupted()) {
+                        return;
+                    }
+                }
+
+                profile.deleteNotPresentAccounts(db);
+                if (isInterrupted()) {
+                    return;
+                }
+                profile.deleteNotPresentTransactions(db);
+                if (isInterrupted())
+                    return;
+
+                profile.setLastUpdateStamp();
+
+                db.setTransactionSuccessful();
+            }
+            finally {
+                db.endTransaction();
+            }
         }
     }
 }
