@@ -19,7 +19,7 @@ package net.ktnx.mobileledger.utils;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class Locker {
+public class Locker implements AutoCloseable {
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     public LockHolder lockForWriting() {
         ReentrantReadWriteLock.WriteLock wLock = lock.writeLock();
@@ -34,5 +34,10 @@ public class Locker {
         ReentrantReadWriteLock.ReadLock rLock = lock.readLock();
         rLock.lock();
         return new LockHolder(rLock);
+    }
+    @Override
+    public void close() {
+        lock.readLock().unlock();
+        lock.writeLock().unlock();
     }
 }
