@@ -55,8 +55,8 @@ public class App extends Application {
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                MobileLedgerProfile p = Data.profile.getValue();
-                if ((p != null) && p.isAuthEnabled()) {
+                MobileLedgerProfile p = Data.getProfile();
+                if (p.isAuthEnabled()) {
                     try {
                         final URL url = new URL(p.getUrl());
                         final String requestingHost = getRequestingHost();

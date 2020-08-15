@@ -79,9 +79,7 @@ public class ProfileDetailFragment extends Fragment {
     public static final String ARG_HUE = "hue";
     @NonNls
 
-    /**
-     * The content this fragment is presenting.
-     */ private MobileLedgerProfile mProfile;
+    private MobileLedgerProfile mProfile;
     private TextView url;
     private TextView defaultCommodity;
     private View defaultCommodityLayout;
@@ -130,7 +128,7 @@ public class ProfileDetailFragment extends Fragment {
                 ArrayList<MobileLedgerProfile> newList = new ArrayList<>(oldList);
                 newList.remove(mProfile);
                 Data.profiles.setValue(newList);
-                if (mProfile.equals(Data.profile.getValue())) {
+                if (mProfile.equals(Data.getProfile())) {
                     debug("profiles", "[fragment] setting current profile to 0");
                     Data.setCurrentProfile(newList.get(0));
                 }
@@ -155,7 +153,7 @@ public class ProfileDetailFragment extends Fragment {
     private boolean onWipeDataMenuClicked() {
         // this is a development option, so no confirmation
         mProfile.wipeAllData();
-        if (mProfile.equals(Data.profile.getValue()))
+        if (mProfile.equals(Data.getProfile()))
             triggerProfileChange();
         return true;
     }
@@ -171,8 +169,8 @@ public class ProfileDetailFragment extends Fragment {
         if (viewAdapter != null)
             viewAdapter.notifyItemChanged(index);
 
-        if (mProfile.equals(Data.profile.getValue()))
-            Data.profile.setValue(newProfile);
+        if (mProfile.equals(Data.getProfile()))
+            Data.setCurrentProfile(newProfile);
     }
     private void hookTextChangeSyncRoutine(TextView view, TextChangeSyncProc syncRoutine) {
         view.addTextChangedListener(new TextWatcher() {
@@ -452,7 +450,7 @@ public class ProfileDetailFragment extends Fragment {
 
             // first profile ever?
             if (newList.size() == 1)
-                Data.profile.setValue(mProfile);
+                Data.setCurrentProfile(mProfile);
         }
 
         Activity activity = getActivity();

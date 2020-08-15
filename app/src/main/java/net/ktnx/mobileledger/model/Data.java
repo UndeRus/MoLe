@@ -53,7 +53,6 @@ public final class Data {
     public static final MutableLiveData<Boolean> backgroundTasksRunning =
             new MutableLiveData<>(false);
     public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
-    public static final MutableLiveData<MobileLedgerProfile> profile = new InertMutableLiveData<>();
     public static final MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
     public static final MutableLiveData<String> accountFilter = new MutableLiveData<>();
@@ -61,10 +60,16 @@ public final class Data {
             new MutableLiveData<>();
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
     public static final MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
+    private static final MutableLiveData<MobileLedgerProfile> profile =
+            new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
     public static MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
     private static RetrieveTransactionsTask retrieveTransactionsTask;
+    @NonNull
+    public static MobileLedgerProfile getProfile() {
+        return Objects.requireNonNull(profile.getValue());
+    }
     public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
@@ -80,8 +85,8 @@ public final class Data {
                         cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
-    public static void setCurrentProfile(MobileLedgerProfile newProfile) {
-        MLDB.setOption(MLDB.OPT_PROFILE_UUID, (newProfile == null) ? null : newProfile.getUuid());
+    public static void setCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
+        MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
         stopTransactionsRetrieval();
         profile.setValue(newProfile);
     }
@@ -130,6 +135,7 @@ public final class Data {
 
         return -1;
     }
+    @Nullable
     public static MobileLedgerProfile getProfile(String profileUUID) {
         MobileLedgerProfile profile;
         try (LockHolder readLock = profilesLocker.lockForReading()) {
@@ -201,4 +207,23 @@ public final class Data {
             currencySymbolPosition.setValue(Currency.Position.none);
     }
 
+    public static void observeProfile(LifecycleOwner lifecycleOwner,
+                                      Observer<MobileLedgerProfile> observer) {
+        profile.observe(lifecycleOwner, observer);
+    }
+    public synchronized static MobileLedgerProfile initProfile() {
+        MobileLedgerProfile currentProfile = profile.getValue();
+        if (currentProfile != null)
+            return currentProfile;
+
+        String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
+        MobileLedgerProfile startupProfile = getProfile(profileUUID);
+        if (startupProfile != null)
+            setCurrentProfile(startupProfile);
+        return startupProfile;
+    }
+
+    public static void removeProfileObservers(LifecycleOwner owner) {
+        profile.removeObservers(owner);
+    }
 }

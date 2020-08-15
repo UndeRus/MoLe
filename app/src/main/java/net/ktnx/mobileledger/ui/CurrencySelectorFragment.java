@@ -108,7 +108,7 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         model = new ViewModelProvider(this).get(CurrencySelectorModel.class);
         if (onCurrencySelectedListener != null)
             model.setOnCurrencySelectedListener(onCurrencySelectedListener);
-        MobileLedgerProfile profile = Objects.requireNonNull(Data.profile.getValue());
+        MobileLedgerProfile profile = Objects.requireNonNull(Data.getProfile());
 
         model.currencies.setValue(new CopyOnWriteArrayList<>(profile.getCurrencies()));
         CurrencySelectorRecyclerViewAdapter adapter = new CurrencySelectorRecyclerViewAdapter();

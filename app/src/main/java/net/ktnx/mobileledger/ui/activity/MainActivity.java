@@ -171,7 +171,7 @@ public class MainActivity extends ProfileThemedActivity {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        Data.profile.observe(this, this::onProfileChanged);
+        Data.observeProfile(this, this::onProfileChanged);
 
         Data.profiles.observe(this, this::onProfileListChanged);
 
@@ -468,7 +468,7 @@ public class MainActivity extends ProfileThemedActivity {
         storeThemeIdInPrefs(profile.getThemeHue());
 
         // un-hook all observed LiveData
-        Data.profile.removeObservers(this);
+        Data.removeProfileObservers(this);
         Data.profiles.removeObservers(this);
         Data.lastUpdateDate.removeObservers(this);
 

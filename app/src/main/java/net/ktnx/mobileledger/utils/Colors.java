@@ -160,10 +160,10 @@ public class Colors {
         return result;
     }
     public static void setupTheme(Activity activity) {
-        MobileLedgerProfile profile = Data.profile.getValue();
+        MobileLedgerProfile profile = Data.getProfile();
         setupTheme(activity, profile);
     }
-    public static void setupTheme(Activity activity, MobileLedgerProfile profile) {
+    public static void setupTheme(Activity activity, @Nullable MobileLedgerProfile profile) {
         final int themeHue = (profile == null) ? -1 : profile.getThemeHue();
         setupTheme(activity, themeHue);
     }

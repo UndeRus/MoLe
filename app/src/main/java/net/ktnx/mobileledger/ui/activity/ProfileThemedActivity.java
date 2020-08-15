@@ -25,7 +25,6 @@ import androidx.annotation.Nullable;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
-import net.ktnx.mobileledger.utils.MLDB;
 
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
@@ -44,15 +43,6 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         super.onCreate(savedInstanceState);
     }
     protected void initProfile() {
-        mProfile = Data.profile.getValue();
-        if (mProfile == null) {
-            String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-            MobileLedgerProfile startupProfile;
-
-
-            startupProfile = Data.getProfile(profileUUID);
-            Data.setCurrentProfile(startupProfile);
-            mProfile = startupProfile;
-        }
+        mProfile = Data.initProfile();
     }
 }

@@ -50,7 +50,7 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         setContentView(R.layout.activity_new_transaction);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Data.profile.observe(this,
+        Data.observeProfile(this,
                 mobileLedgerProfile -> toolbar.setSubtitle(mobileLedgerProfile.getName()));
 
         navController = Navigation.findNavController(this, R.id.new_transaction_nav);

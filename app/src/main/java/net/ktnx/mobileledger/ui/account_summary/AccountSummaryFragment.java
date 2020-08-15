@@ -96,12 +96,10 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             Data.scheduleTransactionListRetrieval(mainActivity);
         });
 
-        MobileLedgerProfile profile = Data.profile.getValue();
-        if (profile != null) {
-            profile.getDisplayedAccounts()
-                   .observe(getViewLifecycleOwner(),
-                           (accounts) -> onAccountsChanged(profile, accounts));
-        }
+        MobileLedgerProfile profile = Data.getProfile();
+        profile.getDisplayedAccounts()
+               .observe(getViewLifecycleOwner(),
+                       (accounts) -> onAccountsChanged(profile, accounts));
     }
     private void onAccountsChanged(MobileLedgerProfile profile, List<LedgerAccount> accounts) {
         Logger.debug("async-acc",

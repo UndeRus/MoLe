@@ -132,9 +132,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                     tvTransactionComment.requestFocus();
                                 });
 
-        mProfile = Data.profile.getValue();
-        if (mProfile == null)
-            throw new AssertionError();
+        mProfile = Data.getProfile();
 
         View.OnFocusChangeListener focusMonitor = (v, hasFocus) -> {
             final int id = v.getId();

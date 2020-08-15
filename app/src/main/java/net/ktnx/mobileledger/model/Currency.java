@@ -81,7 +81,7 @@ public class Currency {
         this.hasGap = hasGap;
     }
     public static Currency loadByName(String name) {
-        MobileLedgerProfile profile = Data.profile.getValue();
+        MobileLedgerProfile profile = Data.getProfile();
         return profile.loadCurrencyByName(name);
     }
     public int getId() {

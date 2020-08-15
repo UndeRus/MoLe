@@ -116,11 +116,12 @@ public class NewTransactionFragment extends Fragment {
 
         viewModel = new ViewModelProvider(activity).get(NewTransactionModel.class);
         viewModel.observeDataProfile(this);
-        mProfile = Data.profile.getValue();
+        mProfile = Data.getProfile();
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(activity));
-        Data.profile.observe(getViewLifecycleOwner(), profile -> {
+
+        Data.observeProfile(getViewLifecycleOwner(), profile -> {
             mProfile = profile;
             listAdapter.setProfile(profile);
         });

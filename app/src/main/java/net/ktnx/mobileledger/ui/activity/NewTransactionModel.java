@@ -66,7 +66,7 @@ public class NewTransactionModel extends ViewModel {
     }
     void observeDataProfile(LifecycleOwner activity) {
         if (!observingDataProfile)
-            Data.profile.observe(activity, profileObserver);
+            Data.observeProfile(activity, profileObserver);
         observingDataProfile = true;
     }
     boolean getSimulateSave() {

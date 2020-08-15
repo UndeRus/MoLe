@@ -165,9 +165,7 @@ public final class MLDB {
             String sql;
             String[] params;
             if (profileSpecific) {
-                MobileLedgerProfile p = (profile == null) ? Data.profile.getValue() : profile;
-                if (p == null)
-                    throw new AssertionError();
+                MobileLedgerProfile p = (profile == null) ? Data.getProfile() : profile;
                 sql = String.format(
                         "SELECT rowid as _id, %s, CASE WHEN %s_upper LIKE ?||'%%' THEN 1 " +
                         "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +

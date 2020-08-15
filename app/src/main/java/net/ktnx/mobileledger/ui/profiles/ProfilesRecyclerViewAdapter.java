@@ -136,7 +136,7 @@ public class ProfilesRecyclerViewAdapter
         if (profile == null)
             throw new IllegalStateException("Profile row without associated profile");
         debug("profiles", "Setting profile to " + profile.getName());
-        if (Data.profile.getValue() != profile )
+        if (Data.getProfile() != profile)
             Data.drawerOpen.setValue(false);
         Data.setCurrentProfile(profile);
     }
@@ -177,9 +177,9 @@ public class ProfilesRecyclerViewAdapter
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
         if (profiles == null) throw new AssertionError();
         final MobileLedgerProfile profile = profiles.get(position);
-        final MobileLedgerProfile currentProfile = Data.profile.getValue();
+        final MobileLedgerProfile currentProfile = Data.getProfile();
         debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
-                profile.getUuid(), (currentProfile == null) ? "<NULL>" : currentProfile.getUuid()));
+                profile.getUuid(), currentProfile.getUuid()));
         holder.itemView.setTag(profile);
 
         int hue = profile.getThemeHue();
@@ -192,7 +192,7 @@ public class ProfilesRecyclerViewAdapter
 
         holder.mEditButton.setOnClickListener(mOnClickListener);
 
-        final boolean sameProfile = (currentProfile != null) && currentProfile.equals(profile);
+        final boolean sameProfile = currentProfile.equals(profile);
         holder.itemView
                 .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles.getValue()) {

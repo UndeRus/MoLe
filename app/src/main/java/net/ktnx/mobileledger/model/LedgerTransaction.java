@@ -78,7 +78,7 @@ public class LedgerTransaction {
         dataLoaded = false;
     }
     public LedgerTransaction(Integer id, SimpleDate date, String description) {
-        this(id, date, description, Data.profile.getValue());
+        this(id, date, description, Data.getProfile());
     }
     public LedgerTransaction(SimpleDate date, String description) {
         this(null, date, description);
