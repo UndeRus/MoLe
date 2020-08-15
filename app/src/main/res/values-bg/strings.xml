@@ -148,4 +148,10 @@
     <string name="show_comment_input_by_default">Показване по подразбиране на полетата за бележки</string>
     <string name="icon">икона</string>
     <string name="splash_icon_description">Икона на приложението</string>
+    <string name="sub_accounts_expand_collapse_trigger_description">Превключвател за разширяване/свиване на под-сметките</string>
+    <string name="go_to_date_menu_title">Към дата</string>
+    <string name="filter_menu_title">Филтър</string>
+    <string name="navigation_drawer_open">Отваряне на страничния панел</string>
+    <string name="navigation_drawer_close">Затваряне на страничния панел</string>
+    <string name="nav_header_desc">Заглавна част на страничния панел</string>
 </resources>
