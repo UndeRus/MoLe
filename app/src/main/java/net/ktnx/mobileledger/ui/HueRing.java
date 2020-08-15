@@ -207,6 +207,10 @@ public class HueRing extends View {
         centerRect.set(-centerR, -centerR, centerR, centerR);
     }
     @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -233,8 +237,10 @@ public class HueRing extends View {
                         hue));
                 setHue(hue);
                 break;
+            case MotionEvent.ACTION_UP:
+                performClick();
+                break;
         }
-
         return true;
     }
     public void setInitialHue(int initialHue) {
