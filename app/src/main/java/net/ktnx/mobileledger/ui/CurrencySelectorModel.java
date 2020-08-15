@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.model.Currency;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencySelectorModel extends ViewModel {
@@ -31,7 +32,7 @@ public class CurrencySelectorModel extends ViewModel {
     private final MutableLiveData<Boolean> positionAndPaddingVisible = new MutableLiveData<>(true);
     private OnCurrencySelectedListener selectionListener;
     public CurrencySelectorModel() {
-        this.currencies = new MutableLiveData<>();
+        this.currencies = new MutableLiveData<>(new ArrayList<>());
     }
     public void showPositionAndPadding() {
         positionAndPaddingVisible.postValue(true);
