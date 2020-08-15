@@ -60,21 +60,13 @@ public class Currency {
     }
     public Currency(MobileLedgerProfile profile, String name, Position position, boolean hasGap) {
         SQLiteDatabase db = App.getDatabase();
-        int attempts = 0;
-        while (true) {
-            if (++attempts > 10)
-                throw new RuntimeException("Giving up getting next ID after 10 attempts");
 
-            try (Cursor c = db.rawQuery("select max(rowid) from currencies", null)) {
-                c.moveToNext();
-                int nextId = c.getInt(0) + 1;
-                db.execSQL("insert into currencies(id, name, position, has_gap) values(?, ?, ?, ?)",
-                        new Object[]{nextId, name, position.toString(), hasGap});
-
-                this.id = nextId;
-                break;
-            }
+        try (Cursor c = db.rawQuery("select max(rowid) from currencies", null)) {
+            c.moveToNext();
+            this.id = c.getInt(0) + 1;
         }
+        db.execSQL("insert into currencies(id, name, position, has_gap) values(?, ?, ?, ?)",
+                new Object[]{this.id, name, position.toString(), hasGap});
 
         this.name = name;
         this.position = position;
