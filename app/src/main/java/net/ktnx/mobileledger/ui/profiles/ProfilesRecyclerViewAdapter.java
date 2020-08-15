@@ -235,7 +235,7 @@ public class ProfilesRecyclerViewAdapter
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
         return profiles != null ? profiles.size() : 0;
     }
-    class ProfileListViewHolder extends RecyclerView.ViewHolder {
+    static class ProfileListViewHolder extends RecyclerView.ViewHolder {
         final TextView mEditButton;
         final TextView mTitle, mColorTag;
         final LinearLayout tagAndHandleLayout;

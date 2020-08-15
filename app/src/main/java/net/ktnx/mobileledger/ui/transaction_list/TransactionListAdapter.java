@@ -289,7 +289,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         }
     }
 
-    private class TransactionLoaderParams {
+    private static class TransactionLoaderParams {
         LedgerTransaction transaction;
         TransactionRowHolder holder;
         int position;
