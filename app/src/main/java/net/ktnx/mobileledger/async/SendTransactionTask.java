@@ -137,8 +137,8 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             req.write(bodyBytes);
 
             final int responseCode = http.getResponseCode();
-            debug("network",
-                    String.format("Response: %d %s", responseCode, http.getResponseMessage()));
+            debug("network", String.format(Locale.US, "Response: %d %s", responseCode,
+                    http.getResponseMessage()));
 
             try (InputStream resp = http.getErrorStream()) {
 

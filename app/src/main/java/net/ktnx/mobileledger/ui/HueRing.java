@@ -230,9 +230,9 @@ public class HueRing extends View {
                 float hue = (float) (angleRad / (2 * Math.PI));
                 if (hue < 0)
                     hue += 1;
-                debug("TMP",
-                        String.format("x=%1.3f, y=%1.3f, angle=%1.3frad, hueDegrees=%1.3f", x, y,
-                                angleRad, hue));
+                debug("TMP", String.format(Locale.US,
+                        "x=%1.3f, y=%1.3f, angle=%1.3f rad, hueDegrees=%1.3f", x, y, angleRad,
+                        hue));
                 setHue(hue);
                 break;
         }
