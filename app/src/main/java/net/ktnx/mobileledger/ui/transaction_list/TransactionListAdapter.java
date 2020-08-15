@@ -227,11 +227,10 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     Context ctx = holder.row.getContext();
                     LinearLayout row = (LinearLayout) holder.tableAccounts.getChildAt(rowIndex);
                     if (row == null) {
+                        row = new LinearLayout(ctx);
                         LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
-                        row = (LinearLayout) inflater.inflate(
-                                R.layout.transaction_list_row_accounts_table_row, null);
-                        // if the rootView above is given (and the line below is spared)
-                        // the accounts remain with their default text (set in the layout resource)
+                        inflater.inflate(
+                                R.layout.transaction_list_row_accounts_table_row, row);
                         holder.tableAccounts.addView(row);
                     }
                     TextView dummyText = row.findViewById(R.id.dummy_text);
