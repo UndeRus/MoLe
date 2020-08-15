@@ -26,15 +26,15 @@ import java.io.InputStream;
 
 public class TransactionListParser {
 
-    private final MappingIterator<ParsedLedgerTransaction> iter;
+    private final MappingIterator<ParsedLedgerTransaction> iterator;
 
     public TransactionListParser(InputStream input) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader reader = mapper.readerFor(ParsedLedgerTransaction.class);
-        iter = reader.readValues(input);
+        iterator = reader.readValues(input);
     }
     public ParsedLedgerTransaction nextTransaction() {
-        return iter.hasNext() ? iter.next() : null;
+        return iterator.hasNext() ? iterator.next() : null;
     }
 }

@@ -28,18 +28,18 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountListParser {
 
-    private final MappingIterator<ParsedLedgerAccount> iter;
+    private final MappingIterator<ParsedLedgerAccount> iterator;
 
     public AccountListParser(InputStream input) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         ObjectReader reader = mapper.readerFor(ParsedLedgerAccount.class);
 
-        iter = reader.readValues(input);
+        iterator = reader.readValues(input);
     }
     public ParsedLedgerAccount nextAccount() {
-        if (!iter.hasNext()) return null;
+        if (!iterator.hasNext()) return null;
 
-        ParsedLedgerAccount next = iter.next();
+        ParsedLedgerAccount next = iterator.next();
 
         if (next.getAname().equalsIgnoreCase("root")) return nextAccount();
 
