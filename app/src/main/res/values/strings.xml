@@ -50,7 +50,6 @@
     <string name="err_http_error">HTTP error</string>
     <string name="err_net_error">Network error</string>
     <string name="progress_connecting">Connecting…</string>
-    <string name="progress_N_accounts_loaded">%d accounts loaded</string>
     <string name="new_transaction_description_hint">Description</string>
     <string name="account_summary_title">Accounts</string>
     <string name="menu_acc_summary_refresh_title">Refresh</string>
