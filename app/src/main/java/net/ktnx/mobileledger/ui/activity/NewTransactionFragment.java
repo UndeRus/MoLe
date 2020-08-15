@@ -63,7 +63,6 @@ import org.jetbrains.annotations.NotNull;
 public class NewTransactionFragment extends Fragment {
     private NewTransactionItemsAdapter listAdapter;
     private NewTransactionModel viewModel;
-    private RecyclerView list;
     private FloatingActionButton fab;
     private OnNewTransactionFragmentInteractionListener mListener;
     private MobileLedgerProfile mProfile;
@@ -118,6 +117,8 @@ public class NewTransactionFragment extends Fragment {
         viewModel.observeDataProfile(this);
         mProfile = Data.getProfile();
         listAdapter = new NewTransactionItemsAdapter(viewModel, mProfile);
+
+        RecyclerView list = activity.findViewById(R.id.new_transaction_accounts);
         list.setAdapter(listAdapter);
         list.setLayoutManager(new LinearLayoutManager(activity));
 

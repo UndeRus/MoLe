@@ -94,7 +94,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private Observer<Boolean> amountValidityObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
-    private View commentButton;
     //TODO multiple amounts with different currencies per posting
     NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
         super(itemView);
@@ -103,7 +102,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvComment = lAccount.findViewById(R.id.comment);
         tvTransactionComment = itemView.findViewById(R.id.transaction_comment);
         new TextViewClearHelper().attachToTextView((EditText) tvComment);
-        commentButton = lAccount.findViewById(R.id.comment_button);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
         tvCurrency = itemView.findViewById(R.id.currency);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
@@ -121,10 +119,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         tvDate.setOnClickListener(v -> pickTransactionDate());
 
-        commentButton.setOnClickListener(v -> {
-            tvComment.setVisibility(View.VISIBLE);
-            tvComment.requestFocus();
-        });
+        lAccount.findViewById(R.id.comment_button)
+                .setOnClickListener(v -> {
+                    tvComment.setVisibility(View.VISIBLE);
+                    tvComment.requestFocus();
+                });
 
         transactionCommentLayout.findViewById(R.id.comment_button)
                                 .setOnClickListener(v -> {

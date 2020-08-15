@@ -82,7 +82,6 @@ public class ProfileDetailFragment extends Fragment {
     private MobileLedgerProfile mProfile;
     private TextView url;
     private TextView defaultCommodity;
-    private View defaultCommodityLayout;
     private boolean defaultCommoditySet;
     private TextInputLayout urlLayout;
     private LinearLayout authParams;
@@ -94,11 +93,9 @@ public class ProfileDetailFragment extends Fragment {
     private TextView profileName;
     private TextInputLayout profileNameLayout;
     private TextView preferredAccountsFilter;
-    private TextInputLayout preferredAccountsFilterLayout;
     private View huePickerView;
     private View insecureWarningText;
     private TextView futureDatesText;
-    private View futureDatesLayout;
     private TextView apiVersionText;
     private boolean syncingModelFromUI = false;
     /**
@@ -238,14 +235,14 @@ public class ProfileDetailFragment extends Fragment {
 
         urlLayout = context.findViewById(R.id.url_layout);
 
-        defaultCommodityLayout = context.findViewById(R.id.default_commodity_layout);
-        defaultCommodityLayout.setOnClickListener(v -> {
-            CurrencySelectorFragment cpf = CurrencySelectorFragment.newInstance(
-                    CurrencySelectorFragment.DEFAULT_COLUMN_COUNT, false);
-            cpf.setOnCurrencySelectedListener(model::setDefaultCommodity);
-            final AppCompatActivity activity = (AppCompatActivity) v.getContext();
-            cpf.show(activity.getSupportFragmentManager(), "currency-selector");
-        });
+        context.findViewById(R.id.default_commodity_layout)
+               .setOnClickListener(v -> {
+                   CurrencySelectorFragment cpf = CurrencySelectorFragment.newInstance(
+                           CurrencySelectorFragment.DEFAULT_COLUMN_COUNT, false);
+                   cpf.setOnCurrencySelectedListener(model::setDefaultCommodity);
+                   final AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                   cpf.show(activity.getSupportFragmentManager(), "currency-selector");
+               });
 
         Switch showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
         showCommodityByDefault.setOnCheckedChangeListener(
@@ -269,7 +266,6 @@ public class ProfileDetailFragment extends Fragment {
 
         defaultCommodity = context.findViewById(R.id.default_commodity_text);
 
-        futureDatesLayout = context.findViewById(R.id.future_dates_layout);
         futureDatesText = context.findViewById(R.id.future_dates_text);
         context.findViewById(R.id.future_dates_layout)
                .setOnClickListener(v -> {
@@ -359,8 +355,6 @@ public class ProfileDetailFragment extends Fragment {
                 preferredAccountsFilter.setText(text);
         });
         hookTextChangeSyncRoutine(preferredAccountsFilter, model::setPreferredAccountsFilter);
-        preferredAccountsFilterLayout =
-                context.findViewById(R.id.preferred_accounts_accounts_filter_layout);
 
         insecureWarningText = context.findViewById(R.id.insecure_scheme_text);
 

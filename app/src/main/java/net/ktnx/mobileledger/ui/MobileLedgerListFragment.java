@@ -52,13 +52,12 @@ public class MobileLedgerListFragment extends Fragment {
         int triggerPixels = DimensionUtils.dp2px(mainActivity, 30f);
         root.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             private float upAnchor = -1;
-            private float downAnchor = -1;
             private float lastY;
             @Override
             public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
                 switch (e.getActionMasked()) {
                     case MotionEvent.ACTION_DOWN:
-                        lastY = upAnchor = downAnchor = e.getAxisValue(MotionEvent.AXIS_Y);
+                        lastY = upAnchor = e.getAxisValue(MotionEvent.AXIS_Y);
                         break;
                     case MotionEvent.ACTION_MOVE:
                         final float currentY = e.getAxisValue(MotionEvent.AXIS_Y);
@@ -70,8 +69,6 @@ public class MobileLedgerListFragment extends Fragment {
                         }
                         else {
                             // swipe up
-                            downAnchor = lastY;
-
                             if (currentY < upAnchor - triggerPixels)
                                 mainActivity.fabHide();
                         }
