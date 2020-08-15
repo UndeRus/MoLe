@@ -47,13 +47,13 @@ public class Colors {
     private static final float blueLightness = 0.665f;
     private static final float yellowLightness = 0.350f;
     private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
+    private static final int SWIPE_COLOR_COUNT = 6;
     public static @ColorInt
     int secondary;
     @ColorInt
     public static int tableRowDarkBG;
     public static int profileThemeId = -1;
     public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
-    private static int SWIPE_COLOR_COUNT = 6;
     private static int[] themeIDs =
             {R.style.AppTheme_000, R.style.AppTheme_005, R.style.AppTheme_010, R.style.AppTheme_015,
              R.style.AppTheme_020, R.style.AppTheme_025, R.style.AppTheme_030, R.style.AppTheme_035,
