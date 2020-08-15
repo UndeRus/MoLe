@@ -36,25 +36,21 @@ import java.util.Comparator;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
-    public final Comparator<LedgerTransactionAccount> comparator =
-            new Comparator<LedgerTransactionAccount>() {
-                @Override
-                public int compare(LedgerTransactionAccount o1, LedgerTransactionAccount o2) {
-                    int res = o1.getAccountName()
-                                .compareTo(o2.getAccountName());
-                    if (res != 0)
-                        return res;
-                    res = o1.getCurrency()
-                            .compareTo(o2.getCurrency());
-                    if (res != 0)
-                        return res;
-                    res = o1.getComment()
-                            .compareTo(o2.getComment());
-                    if (res != 0)
-                        return res;
-                    return Float.compare(o1.getAmount(), o2.getAmount());
-                }
-            };
+    public final Comparator<LedgerTransactionAccount> comparator = (o1, o2) -> {
+        int res = o1.getAccountName()
+                    .compareTo(o2.getAccountName());
+        if (res != 0)
+            return res;
+        res = o1.getCurrency()
+                .compareTo(o2.getCurrency());
+        if (res != 0)
+            return res;
+        res = o1.getComment()
+                .compareTo(o2.getComment());
+        if (res != 0)
+            return res;
+        return Float.compare(o1.getAmount(), o2.getAmount());
+    };
     private String profile;
     private Integer id;
     private SimpleDate date;

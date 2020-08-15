@@ -84,27 +84,6 @@ public class Currency {
         MobileLedgerProfile profile = Data.getProfile();
         return profile.loadCurrencyByName(name);
     }
-    public int getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Position getPosition() {
-        return position;
-    }
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-    public boolean hasGap() {
-        return hasGap;
-    }
-    public void setHasGap(boolean hasGap) {
-        this.hasGap = hasGap;
-    }
     static public boolean equal(Currency left, Currency right) {
         if (left == null) {
             return right == null;
@@ -125,6 +104,27 @@ public class Currency {
             else
                 return leftName.equals(right);
         }
+    }
+    public int getId() {
+        return id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public Position getPosition() {
+        return position;
+    }
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+    public boolean hasGap() {
+        return hasGap;
+    }
+    public void setHasGap(boolean hasGap) {
+        this.hasGap = hasGap;
     }
     public enum Position {
         before(-1), after(1), unknown(0), none(-2);

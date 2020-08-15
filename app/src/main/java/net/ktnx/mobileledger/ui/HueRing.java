@@ -28,10 +28,11 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.DimensionUtils;
 
-import androidx.annotation.Nullable;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -114,13 +115,16 @@ public class HueRing extends View {
         return hueDegrees;
     }
     public void setHue(int hueDegrees) {
-        if (hueDegrees == -1) hueDegrees = Colors.DEFAULT_HUE_DEG;
+        if (hueDegrees == -1)
+            hueDegrees = Colors.DEFAULT_HUE_DEG;
 
         if (hueDegrees != Colors.DEFAULT_HUE_DEG) {
             // round to 15 degrees
             int rem = hueDegrees % hueStepDegrees;
-            if (rem < (hueStepDegrees / 2)) hueDegrees -= rem;
-            else hueDegrees += hueStepDegrees - rem;
+            if (rem < (hueStepDegrees / 2))
+                hueDegrees -= rem;
+            else
+                hueDegrees += hueStepDegrees - rem;
         }
 
         this.hueDegrees = hueDegrees;
@@ -161,8 +165,8 @@ public class HueRing extends View {
 //        p.arcTo(-innerEdge, -innerEdge, innerEdge, innerEdge, -hueStepDegrees / 2f,
 //                hueStepDegrees, true);
 //        p.lineTo(outerEdge * cr, outerEdge * sr);
-        p.arcTo(-outerEdge, -outerEdge, outerEdge, outerEdge, hueStepDegrees / 2f,
-                -hueStepDegrees, false);
+        p.arcTo(-outerEdge, -outerEdge, outerEdge, outerEdge, hueStepDegrees / 2f, -hueStepDegrees,
+                false);
 //        p.close();
         canvas.save();
         canvas.translate(center, center);
@@ -224,7 +228,8 @@ public class HueRing extends View {
                 float angleRad = (float) Math.atan2(y, x);
                 // angleRad is [-𝜋; +𝜋]
                 float hue = (float) (angleRad / (2 * Math.PI));
-                if (hue < 0) hue += 1;
+                if (hue < 0)
+                    hue += 1;
                 debug("TMP",
                         String.format("x=%1.3f, y=%1.3f, angle=%1.3frad, hueDegrees=%1.3f", x, y,
                                 angleRad, hue));
@@ -235,7 +240,8 @@ public class HueRing extends View {
         return true;
     }
     public void setInitialHue(int initialHue) {
-        if (initialHue == -1) initialHue = Colors.DEFAULT_HUE_DEG;
+        if (initialHue == -1)
+            initialHue = Colors.DEFAULT_HUE_DEG;
         this.initialHueDegrees = initialHue;
         this.initialPaint.setColor(Colors.getPrimaryColorForHue(initialHue));
         invalidate();

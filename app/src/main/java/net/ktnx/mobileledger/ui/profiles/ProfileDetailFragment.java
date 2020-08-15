@@ -263,9 +263,7 @@ public class ProfileDetailFragment extends Fragment {
                 ((buttonView, isChecked) -> model.setPostingPermitted(isChecked)));
 
         Switch showCommentsByDefault = context.findViewById(R.id.profile_show_comments);
-        model.observeShowCommentsByDefault(viewLifecycleOwner, isChecked -> {
-            showCommentsByDefault.setChecked(isChecked);
-        });
+        model.observeShowCommentsByDefault(viewLifecycleOwner, showCommentsByDefault::setChecked);
         showCommentsByDefault.setOnCheckedChangeListener(
                 ((buttonView, isChecked) -> model.setShowCommentsByDefault(isChecked)));
 
@@ -288,9 +286,8 @@ public class ProfileDetailFragment extends Fragment {
                 v -> futureDatesText.setText(v.getText(getResources())));
 
         apiVersionText = context.findViewById(R.id.api_version_text);
-        model.observeApiVersion(viewLifecycleOwner, apiVer -> {
-            apiVersionText.setText(apiVer.getDescription(getResources()));
-        });
+        model.observeApiVersion(viewLifecycleOwner,
+                apiVer -> apiVersionText.setText(apiVer.getDescription(getResources())));
         context.findViewById(R.id.api_version_layout)
                .setOnClickListener(v -> {
                    MenuInflater mi = new MenuInflater(context);

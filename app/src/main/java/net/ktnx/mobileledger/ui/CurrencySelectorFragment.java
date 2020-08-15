@@ -112,7 +112,7 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
 
         model.currencies.setValue(new CopyOnWriteArrayList<>(profile.getCurrencies()));
         CurrencySelectorRecyclerViewAdapter adapter = new CurrencySelectorRecyclerViewAdapter();
-        model.currencies.observe(this, list -> adapter.submitList(list));
+        model.currencies.observe(this, adapter::submitList);
 
         recyclerView.setAdapter(adapter);
         adapter.setCurrencySelectedListener(this);
@@ -184,14 +184,12 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
 
         gap.setChecked(Data.currencyGap.getValue());
 
-        gap.setOnCheckedChangeListener((v, checked) -> {
-            Data.currencyGap.setValue(checked);
-        });
+        gap.setOnCheckedChangeListener((v, checked) -> Data.currencyGap.setValue(checked));
 
-        model.observePositionAndPaddingVisible(this, visible -> {
-            csd.findViewById(R.id.params_panel)
-               .setVisibility(visible ? View.VISIBLE : View.GONE);
-        });
+        model.observePositionAndPaddingVisible(this, visible -> csd.findViewById(R.id.params_panel)
+                                                                   .setVisibility(
+                                                                           visible ? View.VISIBLE
+                                                                                   : View.GONE));
 
         if ((savedInstanceState != null) ? savedInstanceState.getBoolean(ARG_SHOW_PARAMS,
                 DEFAULT_SHOW_PARAMS) : DEFAULT_SHOW_PARAMS)

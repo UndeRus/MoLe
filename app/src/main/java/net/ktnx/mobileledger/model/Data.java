@@ -60,6 +60,7 @@ public final class Data {
             new MutableLiveData<>();
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
     public static final MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
+    public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     private static final MutableLiveData<MobileLedgerProfile> profile =
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
@@ -70,7 +71,6 @@ public final class Data {
     public static MobileLedgerProfile getProfile() {
         return Objects.requireNonNull(profile.getValue());
     }
-    public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
         debug("data",

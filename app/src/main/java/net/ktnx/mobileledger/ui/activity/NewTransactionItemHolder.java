@@ -186,10 +186,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance()
                                                               .getMonetaryDecimalSeparator());
-        localeObserver = locale -> {
-            decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance(locale)
-                                                                  .getMonetaryDecimalSeparator());
-        };
+        localeObserver = locale -> decimalSeparator = String.valueOf(
+                DecimalFormatSymbols.getInstance(locale)
+                                    .getMonetaryDecimalSeparator());
 
         decimalDot = ".";
 
@@ -719,7 +718,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     }
     @Override
     public void onDatePicked(int year, int month, int day) {
-        item.setDate(new SimpleDate(year, month+1, day));
+        item.setDate(new SimpleDate(year, month + 1, day));
         boolean focused = tvDescription.requestFocus();
         if (focused)
             Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());

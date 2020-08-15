@@ -42,9 +42,13 @@ public class App extends Application {
     private MobileLedgerDatabase dbHelper;
     private boolean monthNamesPrepared = false;
     public static SQLiteDatabase getDatabase() {
-        if (instance == null) throw new RuntimeException("Application not created yet");
+        if (instance == null)
+            throw new RuntimeException("Application not created yet");
 
         return instance.getDB();
+    }
+    public static void prepareMonthNames() {
+        instance.prepareMonthNames(false);
     }
     @Override
     public void onCreate() {
@@ -63,10 +67,12 @@ public class App extends Application {
                         final String expectedHost = url.getHost();
                         if (requestingHost.equalsIgnoreCase(expectedHost))
                             return new PasswordAuthentication(p.getAuthUserName(),
-                                    p.getAuthPassword().toCharArray());
-                        else Log.w("http-auth",
-                                String.format("Requesting host [%s] differs from expected [%s]",
-                                        requestingHost, expectedHost));
+                                    p.getAuthPassword()
+                                     .toCharArray());
+                        else
+                            Log.w("http-auth",
+                                    String.format("Requesting host [%s] differs from expected [%s]",
+                                            requestingHost, expectedHost));
                     }
                     catch (MalformedURLException e) {
                         e.printStackTrace();
@@ -76,9 +82,6 @@ public class App extends Application {
                 return super.getPasswordAuthentication();
             }
         });
-    }
-    public static void prepareMonthNames() {
-        instance.prepareMonthNames(false);
     }
     private void prepareMonthNames(boolean force) {
         if (force || monthNamesPrepared)
@@ -105,12 +108,11 @@ public class App extends Application {
         if (dbHelper == null)
             initDb();
 
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        return db;
+        return dbHelper.getWritableDatabase();
     }
     private synchronized void initDb() {
-        if (dbHelper != null) return;
+        if (dbHelper != null)
+            return;
 
         dbHelper = new MobileLedgerDatabase(this);
     }

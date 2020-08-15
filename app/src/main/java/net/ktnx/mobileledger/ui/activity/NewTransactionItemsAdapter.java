@@ -247,11 +247,10 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 debug("description", broaderSql);
                 debug("description", description);
 
-                activity.runOnUiThread(() -> {
-                    Snackbar.make(recyclerView, R.string.ignoring_preferred_account,
-                            Snackbar.LENGTH_LONG)
-                            .show();
-                });
+                activity.runOnUiThread(
+                        () -> Snackbar.make(recyclerView, R.string.ignoring_preferred_account,
+                                Snackbar.LENGTH_LONG)
+                                      .show());
 
                 MLDB.queryInBackground(broaderSql, new String[]{description},
                         new MLDB.CallbackHelper() {

@@ -64,7 +64,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     private String session;
     private LedgerTransaction transaction;
     private MobileLedgerProfile mProfile;
-    private boolean simulate = false;
+    private boolean simulate;
 
     public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile,
                                boolean simulate) {

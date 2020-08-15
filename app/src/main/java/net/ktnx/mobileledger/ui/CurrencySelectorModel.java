@@ -39,7 +39,8 @@ public class CurrencySelectorModel extends ViewModel {
     public void hidePositionAndPadding() {
         positionAndPaddingVisible.postValue(false);
     }
-    public void observePositionAndPaddingVisible(LifecycleOwner activity, Observer<Boolean> observer) {
+    public void observePositionAndPaddingVisible(LifecycleOwner activity,
+                                                 Observer<Boolean> observer) {
         positionAndPaddingVisible.observe(activity, observer);
     }
     void setOnCurrencySelectedListener(OnCurrencySelectedListener listener) {

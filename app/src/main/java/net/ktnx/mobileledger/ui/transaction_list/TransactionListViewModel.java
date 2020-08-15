@@ -19,20 +19,19 @@ package net.ktnx.mobileledger.ui.transaction_list;
 
 import android.os.AsyncTask;
 
+import androidx.lifecycle.ViewModel;
+
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
-import androidx.lifecycle.ViewModel;
-
 public class TransactionListViewModel extends ViewModel {
     public static ObservableValue<Boolean> updating = new ObservableValue<>();
     public static ObservableValue<String> updateError = new ObservableValue<>();
 
     public static void scheduleTransactionListReload() {
-
         String filter = Data.accountFilter.getValue();
         AsyncTask<String, Void, String> task = new UTT();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, filter);

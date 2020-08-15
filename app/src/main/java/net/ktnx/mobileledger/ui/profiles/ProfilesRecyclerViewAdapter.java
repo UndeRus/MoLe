@@ -75,7 +75,8 @@ public class ProfilesRecyclerViewAdapter
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
                 final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-                if (profiles == null) throw new AssertionError();
+                if (profiles == null)
+                    throw new AssertionError();
                 Collections.swap(profiles, viewHolder.getAdapterPosition(),
                         target.getAdapterPosition());
                 MobileLedgerProfile.storeProfilesOrder();
@@ -105,33 +106,40 @@ public class ProfilesRecyclerViewAdapter
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
-        if (editingProfiles.getValue()) rearrangeHelper.attachToRecyclerView(recyclerView);
+        if (editingProfiles.getValue())
+            rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void startEditingProfiles() {
-        if (editingProfiles.getValue()) return;
+        if (editingProfiles.getValue())
+            return;
         this.editingProfiles.setValue(true);
         rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void stopEditingProfiles() {
-        if (!editingProfiles.getValue()) return;
+        if (!editingProfiles.getValue())
+            return;
         this.editingProfiles.setValue(false);
         rearrangeHelper.attachToRecyclerView(null);
     }
     public void flipEditingProfiles() {
-        if (editingProfiles.getValue()) stopEditingProfiles();
-        else startEditingProfiles();
+        if (editingProfiles.getValue())
+            stopEditingProfiles();
+        else
+            startEditingProfiles();
     }
     private void editProfile(View view, MobileLedgerProfile profile) {
         int index = Data.getProfileIndex(profile);
         Context context = view.getContext();
         Intent intent = new Intent(context, ProfileDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION);
-        if (index != -1) intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
+        if (index != -1)
+            intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
 
         context.startActivity(intent);
     }
     private void onProfileRowClicked(View v) {
-        if (editingProfiles.getValue()) return;
+        if (editingProfiles.getValue())
+            return;
         MobileLedgerProfile profile = (MobileLedgerProfile) v.getTag();
         if (profile == null)
             throw new IllegalStateException("Profile row without associated profile");
@@ -144,7 +152,7 @@ public class ProfilesRecyclerViewAdapter
     @Override
     public ProfileListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.profile_list_content, parent, false);
+                                  .inflate(R.layout.profile_list_content, parent, false);
         ProfileListViewHolder holder = new ProfileListViewHolder(view);
 
         holder.mRow.setOnClickListener(this::onProfileRowClicked);
@@ -153,7 +161,8 @@ public class ProfilesRecyclerViewAdapter
             onProfileRowClicked(row);
         });
         holder.mColorTag.setOnClickListener(v -> {
-            View row = (View) v.getParent().getParent();
+            View row = (View) v.getParent()
+                               .getParent();
             onProfileRowClicked(row);
         });
         holder.mTitle.setOnLongClickListener(v -> {
@@ -175,7 +184,8 @@ public class ProfilesRecyclerViewAdapter
     @Override
     public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        if (profiles == null) throw new AssertionError();
+        if (profiles == null)
+            throw new AssertionError();
         final MobileLedgerProfile profile = profiles.get(position);
         final MobileLedgerProfile currentProfile = Data.getProfile();
         debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
@@ -183,9 +193,11 @@ public class ProfilesRecyclerViewAdapter
         holder.itemView.setTag(profile);
 
         int hue = profile.getThemeHue();
-        if (hue == -1) holder.mColorTag
-                .setBackgroundColor(Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
-        else holder.mColorTag.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
+        if (hue == -1)
+            holder.mColorTag.setBackgroundColor(
+                    Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
+        else
+            holder.mColorTag.setBackgroundColor(Colors.getPrimaryColorForHue(hue));
 
         holder.mTitle.setText(profile.getName());
 //            holder.mSubTitle.setText(profile.getUrl());
@@ -193,15 +205,15 @@ public class ProfilesRecyclerViewAdapter
         holder.mEditButton.setOnClickListener(mOnClickListener);
 
         final boolean sameProfile = currentProfile.equals(profile);
-        holder.itemView
-                .setBackground(sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
+        holder.itemView.setBackground(
+                sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles.getValue()) {
             boolean wasHidden = holder.mEditButton.getVisibility() == View.GONE;
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
             if (wasHidden && animationsEnabled) {
-                Animation a = AnimationUtils
-                        .loadAnimation(holder.mRearrangeHandle.getContext(), R.anim.fade_in);
+                Animation a = AnimationUtils.loadAnimation(holder.mRearrangeHandle.getContext(),
+                        R.anim.fade_in);
                 holder.mRearrangeHandle.startAnimation(a);
                 holder.mEditButton.startAnimation(a);
             }
@@ -211,8 +223,8 @@ public class ProfilesRecyclerViewAdapter
             holder.mRearrangeHandle.setVisibility(View.INVISIBLE);
             holder.mEditButton.setVisibility(View.GONE);
             if (wasShown && animationsEnabled) {
-                Animation a = AnimationUtils
-                        .loadAnimation(holder.mRearrangeHandle.getContext(), R.anim.fade_out);
+                Animation a = AnimationUtils.loadAnimation(holder.mRearrangeHandle.getContext(),
+                        R.anim.fade_out);
                 holder.mRearrangeHandle.startAnimation(a);
                 holder.mEditButton.startAnimation(a);
             }
