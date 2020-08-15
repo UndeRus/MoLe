@@ -178,9 +178,6 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             params.addPair("_token", token);
 
         SimpleDate transactionDate = transaction.getDate();
-        if (transactionDate == null) {
-            transactionDate = SimpleDate.today();
-        }
 
         params.addPair("date", Globals.formatLedgerDate(transactionDate));
         params.addPair("description", transaction.getDescription());
