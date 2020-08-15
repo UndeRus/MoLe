@@ -61,7 +61,6 @@ import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
-import net.ktnx.mobileledger.utils.GetOptCallback;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 
@@ -174,6 +173,7 @@ public class MainActivity extends ProfileThemedActivity {
         Data.observeProfile(this, this::onProfileChanged);
 
         Data.profiles.observe(this, this::onProfileListChanged);
+        Data.backgroundTaskProgress.observe(this, this::onRetrieveProgress);
 
         if (barDrawerToggle == null) {
             barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar,
@@ -492,17 +492,6 @@ public class MainActivity extends ProfileThemedActivity {
         intent.putExtras(args);
         startActivity(intent, args);
     }
-    private void setupProfile() {
-        MLDB.getOption(MLDB.OPT_PROFILE_UUID, null, new GetOptCallback() {
-            @Override
-            protected void onResult(String profileUUID) {
-                MobileLedgerProfile startupProfile;
-
-                startupProfile = Data.getProfile(profileUUID);
-                Data.setCurrentProfile(startupProfile);
-            }
-        });
-    }
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);
@@ -581,20 +570,6 @@ public class MainActivity extends ProfileThemedActivity {
         Data.stopTransactionsRetrieval();
         bTransactionListCancelDownload.setEnabled(false);
     }
-    public void onRetrieveDone(String error) {
-        Data.transactionRetrievalDone();
-        findViewById(R.id.transaction_progress_layout).setVisibility(View.GONE);
-
-        if (error == null) {
-            updateLastUpdateTextFromDB();
-
-            new RefreshDescriptionsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            TransactionListViewModel.scheduleTransactionListReload();
-        }
-        else
-            Snackbar.make(mViewPager, error, Snackbar.LENGTH_LONG)
-                    .show();
-    }
     public void onRetrieveStart() {
         ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
         bTransactionListCancelDownload.setEnabled(true);
@@ -610,9 +585,38 @@ public class MainActivity extends ProfileThemedActivity {
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
         ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
-        if ((progress.getTotal() == RetrieveTransactionsTask.Progress.INDETERMINATE) ||
-            (progress.getTotal() == 0))
-        {
+
+        if (progress.getState() == RetrieveTransactionsTask.ProgressState.FINISHED) {
+            findViewById(R.id.transaction_progress_layout).setVisibility(View.GONE);
+
+            Data.transactionRetrievalDone();
+
+            if (progress.getError() != null) {
+                Snackbar.make(mViewPager, progress.getError(), Snackbar.LENGTH_LONG)
+                        .show();
+                return;
+            }
+
+            updateLastUpdateTextFromDB();
+
+            new RefreshDescriptionsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            TransactionListViewModel.scheduleTransactionListReload();
+
+            return;
+        }
+
+
+        bTransactionListCancelDownload.setEnabled(true);
+        ColorStateList csl = Colors.getColorStateList();
+        progressBar.setIndeterminateTintList(csl);
+        progressBar.setProgressTintList(csl);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            progressBar.setProgress(0, false);
+        else
+            progressBar.setProgress(0);
+        findViewById(R.id.transaction_progress_layout).setVisibility(View.VISIBLE);
+
+        if (progress.isIndeterminate() || (progress.getTotal() == 0)) {
             progressBar.setIndeterminate(true);
         }
         else {

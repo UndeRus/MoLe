@@ -116,10 +116,7 @@ public class RetrieveTransactionsTask
     @Override
     protected void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
-        MainActivity context = getContext();
-        if (context == null)
-            return;
-        context.onRetrieveProgress(values[0]);
+        Data.backgroundTaskProgress.postValue(values[0]);
     }
     @Override
     protected void onPreExecute() {
@@ -132,22 +129,22 @@ public class RetrieveTransactionsTask
     @Override
     protected void onPostExecute(String error) {
         super.onPostExecute(error);
-        MainActivity context = getContext();
-        if (context == null)
-            return;
-        context.onRetrieveDone(error);
+        Progress progress = new Progress();
+        progress.setState(ProgressState.FINISHED);
+        progress.setError(error);
+        onProgressUpdate(progress);
     }
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        MainActivity context = getContext();
-        if (context == null)
-            return;
-        context.onRetrieveDone(null);
+        Progress progress = new Progress();
+        progress.setState(ProgressState.FINISHED);
+        onProgressUpdate(progress);
     }
     private String retrieveTransactionListLegacy() throws IOException, HTTPException {
-        Progress progress = new Progress();
-        int maxTransactionId = Progress.INDETERMINATE;
+        Progress progress = Progress.indeterminate();
+        progress.setState(ProgressState.RUNNING);
+        int maxTransactionId = -1;
         ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
         ArrayList<LedgerAccount> displayed = new ArrayList<>();
@@ -279,8 +276,7 @@ public class RetrieveTransactionsTask
                             progress.setProgress(++processedTransactionCount);
                             if (maxTransactionId < transactionId)
                                 maxTransactionId = transactionId;
-                            if ((progress.getTotal() == Progress.INDETERMINATE) ||
-                                (progress.getTotal() < transactionId))
+                            if ((progress.isIndeterminate()) || (progress.getTotal() < transactionId))
                                 progress.setTotal(transactionId);
                             publishProgress(progress);
                         }
@@ -387,8 +383,6 @@ public class RetrieveTransactionsTask
         return acc;
     }
     private boolean retrieveAccountList() throws IOException, HTTPException {
-        Progress progress = new Progress();
-
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
         http.setAllowUserInteraction(false);
         switch (http.getResponseCode()) {
@@ -399,7 +393,7 @@ public class RetrieveTransactionsTask
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
-        publishProgress(progress);
+        publishProgress(Progress.indeterminate());
         SQLiteDatabase db = App.getDatabase();
         ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
@@ -566,28 +560,71 @@ public class RetrieveTransactionsTask
         EXPECTING_TRANSACTION_DESCRIPTION, EXPECTING_TRANSACTION_DETAILS
     }
 
+    public enum ProgressState {STARTING, RUNNING, FINISHED}
+
     public static class Progress {
-        public static final int INDETERMINATE = -1;
         private int progress;
         private int total;
+        private ProgressState state = ProgressState.RUNNING;
+        private String error = null;
+        private boolean indeterminate;
         Progress() {
-            this(INDETERMINATE, INDETERMINATE);
+            indeterminate = true;
         }
         Progress(int progress, int total) {
+            this.indeterminate = false;
             this.progress = progress;
             this.total = total;
         }
+        public static Progress indeterminate() {
+            return new Progress();
+        }
+        public static Progress finished(String error) {
+            Progress p = new Progress();
+            p.setState(ProgressState.FINISHED);
+            p.setError(error);
+            return p;
+        }
         public int getProgress() {
+            ensureState(ProgressState.RUNNING);
             return progress;
         }
         protected void setProgress(int progress) {
             this.progress = progress;
+            this.state = ProgressState.RUNNING;
         }
         public int getTotal() {
+            ensureState(ProgressState.RUNNING);
             return total;
         }
         protected void setTotal(int total) {
             this.total = total;
+            state = ProgressState.RUNNING;
+        }
+        private void ensureState(ProgressState wanted) {
+            if (state != wanted)
+                throw new IllegalStateException(
+                        String.format("Bad state: %s, expected %s", state, wanted));
+        }
+        public ProgressState getState() {
+            return state;
+        }
+        public void setState(ProgressState state) {
+            this.state = state;
+        }
+        public String getError() {
+            ensureState(ProgressState.FINISHED);
+            return error;
+        }
+        public void setError(String error) {
+            this.error = error;
+            state = ProgressState.FINISHED;
+        }
+        public boolean isIndeterminate() {
+            return indeterminate;
+        }
+        public void setIndeterminate(boolean indeterminate) {
+            this.indeterminate = indeterminate;
         }
     }
 

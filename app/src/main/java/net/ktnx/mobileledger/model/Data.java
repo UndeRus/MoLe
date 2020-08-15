@@ -21,7 +21,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
@@ -39,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -52,6 +57,8 @@ public final class Data {
             new MutableLiveData<>(null);
     public static final MutableLiveData<Boolean> backgroundTasksRunning =
             new MutableLiveData<>(false);
+    public static final MutableLiveData<RetrieveTransactionsTask.Progress> backgroundTaskProgress =
+            new MutableLiveData<>();
     public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
     public static final MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
