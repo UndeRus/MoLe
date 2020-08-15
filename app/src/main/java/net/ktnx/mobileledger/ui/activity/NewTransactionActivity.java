@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import android.view.View;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
@@ -53,7 +53,9 @@ public class NewTransactionActivity extends ProfileThemedActivity implements Tas
         Data.observeProfile(this,
                 mobileLedgerProfile -> toolbar.setSubtitle(mobileLedgerProfile.getName()));
 
-        navController = Navigation.findNavController(this, R.id.new_transaction_nav);
+        NavHostFragment navHostFragment = (NavHostFragment) Objects.requireNonNull(
+                getSupportFragmentManager().findFragmentById(R.id.new_transaction_nav));
+        navController = navHostFragment.getNavController();
 
         Objects.requireNonNull(getSupportActionBar())
                .setDisplayHomeAsUpEnabled(true);
