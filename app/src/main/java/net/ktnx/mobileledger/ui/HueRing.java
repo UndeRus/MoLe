@@ -33,25 +33,23 @@ import androidx.annotation.Nullable;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.DimensionUtils;
 
+import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class HueRing extends View {
     public static final int hueStepDegrees = 5;
     private Paint ringPaint, initialPaint, currentPaint, markerPaint;
-    private int centerX, centerY;
-    private int diameter;
+    private int center;
     private int padding;
     private int initialHueDegrees;
     private int color, hueDegrees;
     private float outerR;
     private float innerR;
     private float bandWidth;
-    private float ringR;
-    private float innerDiameter;
     private float centerR;
-    private RectF centerRect;
-    private RectF ringRect;
+    private RectF centerRect = new RectF();
+    private RectF ringRect = new RectF();
     private int markerOverflow;
     private int markerStrokeWidth;
     public HueRing(Context context, @Nullable AttributeSet attrs) {
@@ -181,6 +179,7 @@ public class HueRing extends View {
         int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
         int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
 
+        int diameter;
         if ((widthMode == MeasureSpec.AT_MOST) && (heightMode == MeasureSpec.AT_MOST)) {
             diameter = Math.min(widthSize, heightSize);
         }
@@ -195,26 +194,25 @@ public class HueRing extends View {
 //                getContext().getResources().getDimension(R.dimen.activity_horizontal_margin)) / 2;
         diameter -= 2 * padding;
         outerR = diameter / 2f;
-        centerX = padding + (int) outerR;
-        centerY = centerX;
+        center = padding + (int) outerR;
 
         bandWidth = diameter / 3.5f;
-        ringR = outerR - bandWidth / 2f;
+        float ringR = outerR - bandWidth / 2f;
         innerR = outerR - bandWidth;
 
-        ringRect = new RectF(-ringR, -ringR, ringR, ringR);
+        ringRect.set(-ringR, -ringR, ringR, ringR);
 
-        innerDiameter = diameter - 2 * bandWidth;
+        float innerDiameter = diameter - 2 * bandWidth;
         centerR = innerDiameter * 0.5f;
-        centerRect = new RectF(-centerR, -centerR, centerR, centerR);
+        centerRect.set(-centerR, -centerR, centerR, centerR);
     }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
-                float x = event.getX() - centerX;
-                float y = event.getY() - centerY;
+                float x = event.getX() - center;
+                float y = event.getY() - center;
 
                 float dist = (float) Math.hypot(x, y);
 
