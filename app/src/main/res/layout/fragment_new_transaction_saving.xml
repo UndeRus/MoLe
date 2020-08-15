@@ -33,6 +33,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/app_icon_transparent_bg"
+        android:contentDescription="@string/splash_icon_description"
         />
     <ProgressBar
         android:id="@+id/progressBar"
