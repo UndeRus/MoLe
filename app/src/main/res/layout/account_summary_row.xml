@@ -96,7 +96,6 @@
         android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:minHeight="@dimen/default_account_row_height"
-        android:onClick="onAccountSummaryRowViewClicked"
         android:text="USD 123,45\n678,90\nIRAUSD -17 000.00"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constrainedWidth="true"
