@@ -172,7 +172,7 @@ public class ProfileDetailFragment extends Fragment {
         if (mProfile.equals(Data.getProfile()))
             Data.setCurrentProfile(newProfile);
     }
-    private void hookTextChangeSyncRoutine(TextView view, TextChangeSyncProc syncRoutine) {
+    private void hookTextChangeSyncRoutine(TextView view, TextChangeSyncRoutine syncRoutine) {
         view.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -586,7 +586,7 @@ public class ProfileDetailFragment extends Fragment {
         defaultCommodity.setText(name);
         defaultCommodity.setTypeface(Typeface.DEFAULT);
     }
-    interface TextChangeSyncProc {
+    interface TextChangeSyncRoutine {
         void onTextChanged(String text);
     }
 }

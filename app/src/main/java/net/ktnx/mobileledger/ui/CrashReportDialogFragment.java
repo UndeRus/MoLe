@@ -79,7 +79,7 @@ public class CrashReportDialogFragment extends DialogFragment {
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onShow(DialogInterface dialogIinterface) {
+            public void onShow(DialogInterface dialogInterface) {
                 dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
                         .setOnClickListener(new View.OnClickListener() {
                             @Override

@@ -62,7 +62,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     protected String error;
     private String token;
     private String session;
-    private LedgerTransaction ltr;
+    private LedgerTransaction transaction;
     private MobileLedgerProfile mProfile;
     private boolean simulate = false;
 
@@ -84,7 +84,8 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         http.setRequestProperty("Accept", "*/*");
 
         net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction jsonTransaction =
-                net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.fromLedgerTransaction(ltr);
+                net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.fromLedgerTransaction(
+                        transaction);
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer =
                 mapper.writerFor(net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.class);
@@ -99,7 +100,8 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         http.setRequestProperty("Accept", "*/*");
 
         net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction jsonTransaction =
-                net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.fromLedgerTransaction(ltr);
+                net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.fromLedgerTransaction(
+                        transaction);
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer =
                 mapper.writerFor(net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.class);
@@ -175,14 +177,14 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         if (token != null)
             params.addPair("_token", token);
 
-        SimpleDate transactionDate = ltr.getDate();
+        SimpleDate transactionDate = transaction.getDate();
         if (transactionDate == null) {
             transactionDate = SimpleDate.today();
         }
 
         params.addPair("date", Globals.formatLedgerDate(transactionDate));
-        params.addPair("description", ltr.getDescription());
-        for (LedgerTransactionAccount acc : ltr.getAccounts()) {
+        params.addPair("description", transaction.getDescription());
+        for (LedgerTransactionAccount acc : transaction.getAccounts()) {
             params.addPair("account", acc.getAccountName());
             if (acc.isAmountSet())
                 params.addPair("amount", String.format(Locale.US, "%1.2f", acc.getAmount()));
@@ -258,7 +260,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
         error = null;
         try {
-            ltr = ledgerTransactions[0];
+            transaction = ledgerTransactions[0];
 
             switch (mProfile.getApiVersion()) {
                 case auto:

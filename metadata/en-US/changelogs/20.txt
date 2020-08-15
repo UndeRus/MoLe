@@ -1,6 +1,6 @@
  * NEW:
   - App shortcuts for starting the new transaction activity on Android 7.1+
-  - Auto-filling of the accounts in the new transaction screen can be limitted to the transactions using accounts corresponding to a filter -- the filter is set in the profile details
+  - Auto-filling of the accounts in the new transaction screen can be limited to the transactions using accounts corresponding to a filter -- the filter is set in the profile details
  * IMPROVED:
   - Account list: Accounts with many commodities have their commodity list collapsed to avoid filling too much of the screen with one account
   - Account list: Viewing account's transactions migrated to a context menu

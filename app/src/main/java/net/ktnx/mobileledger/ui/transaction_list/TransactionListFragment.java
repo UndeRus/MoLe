@@ -98,8 +98,8 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         MainActivity mainActivity = getMainActivity();
 
-        swiper = mainActivity.findViewById(R.id.transaction_swipe);
-        if (swiper == null)
+        refreshLayout = mainActivity.findViewById(R.id.transaction_swipe);
+        if (refreshLayout == null)
             throw new RuntimeException("Can't get hold on the swipe layout");
         root = mainActivity.findViewById(R.id.transaction_root);
         if (root == null)
@@ -116,7 +116,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
 
-        swiper.setOnRefreshListener(() -> {
+        refreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing transactions via swipe");
             Data.scheduleTransactionListRetrieval(mainActivity);
         });
@@ -137,7 +137,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
         Data.accountFilter.observe(getViewLifecycleOwner(), this::onAccountNameFilterChanged);
 
         TransactionListViewModel.updating.addObserver(
-                (o, arg) -> swiper.setRefreshing(TransactionListViewModel.updating.get()));
+                (o, arg) -> refreshLayout.setRefreshing(TransactionListViewModel.updating.get()));
         TransactionListViewModel.updateError.addObserver((o, arg) -> {
             String err = TransactionListViewModel.updateError.get();
             if (err == null)

@@ -89,9 +89,9 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         manageFabOnScroll();
 
-        swiper = mainActivity.findViewById(R.id.account_swiper);
+        refreshLayout = mainActivity.findViewById(R.id.account_swipe_refresh_layout);
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
-        swiper.setOnRefreshListener(() -> {
+        refreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");
             Data.scheduleTransactionListRetrieval(mainActivity);
         });

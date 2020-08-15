@@ -3,7 +3,7 @@
 * SECURITY
     + avoid exposing basic HTTP authentication to wifi portals
     + profile editor: warn when using authentication with insecure HTTP scheme
-    + permit cleartext HTTP traffic on Android 8+ (still, please use HTTPS to keep yout data safe while in transit)
+    + permit cleartext HTTP traffic on Android 8+ (still, please use HTTPS to keep your data safe while in transit)
 * IMPROVEMENTS
     + clarify that crash reports are sent via email and user can review them before sending
     + allow toggling password visibility in profile details

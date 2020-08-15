@@ -30,7 +30,7 @@ import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.DimensionUtils;
 
 public class MobileLedgerListFragment extends Fragment {
-    public SwipeRefreshLayout swiper;
+    public SwipeRefreshLayout refreshLayout;
     public TransactionListAdapter modelAdapter;
     protected RecyclerView root;
     @NonNull
@@ -38,14 +38,14 @@ public class MobileLedgerListFragment extends Fragment {
         return (MainActivity) requireActivity();
     }
     protected void themeChanged(Integer counter) {
-        swiper.setColorSchemeColors(Colors.getSwipeCircleColors());
+        refreshLayout.setColorSchemeColors(Colors.getSwipeCircleColors());
     }
     public void onBackgroundTaskRunningChanged(Boolean isRunning) {
         if (getActivity() == null)
             return;
-        if (swiper == null)
+        if (refreshLayout == null)
             return;
-        swiper.setRefreshing(isRunning);
+        refreshLayout.setRefreshing(isRunning);
     }
     protected void manageFabOnScroll() {
         final MainActivity mainActivity = getMainActivity();

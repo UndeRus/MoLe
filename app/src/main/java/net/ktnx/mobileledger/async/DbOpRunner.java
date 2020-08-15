@@ -36,7 +36,7 @@ class DbOpRunner extends Thread {
         while (!interrupted()) {
             try {
                 DbOpItem item = queue.take();
-                debug("opQrunner", "Got " + item.sql);
+                debug("opQRunner", "Got " + item.sql);
                 {
                     SQLiteDatabase db = App.getDatabase();
                     if (BuildConfig.DEBUG) {
@@ -54,7 +54,7 @@ class DbOpRunner extends Thread {
                             }
                             b.append("]");
                         }
-                        debug("opQrunner", b.toString());
+                        debug("opQRunner", b.toString());
                     }
                     db.execSQL(item.sql, item.params);
                 }

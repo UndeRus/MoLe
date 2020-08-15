@@ -4,4 +4,4 @@
 * FIXES:
     + fixed crash when parsing posting flags with hledger-web before 1.14
     + visual fixes
-    + fix numerical entry with some samsung keyboards
+    + fix numerical entry with some Samsung keyboards

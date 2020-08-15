@@ -186,7 +186,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         this.recyclerView = null;
     }
     public void descriptionSelected(String description) {
-        debug("descr selected", description);
+        debug("description selected", description);
         if (!accountListIsEmpty())
             return;
 
@@ -212,8 +212,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         sb.append(" ORDER BY t.year desc, t.month desc, t.day desc LIMIT 1");
 
         final String sql = sb.toString();
-        debug("descr", sql);
-        debug("descr", params.toString());
+        debug("description", sql);
+        debug("description", params.toString());
 
         Activity activity = (Activity) recyclerView.getContext();
         // FIXME: handle exceptions?
@@ -238,14 +238,14 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 if (Misc.isEmptyOrNull(accFilter))
                     return;
 
-                debug("descr", "Trying transaction search without preferred account filter");
+                debug("description", "Trying transaction search without preferred account filter");
 
                 final String broaderSql =
                         "select t.profile, t.id from transactions t where t.description=?" +
                         " ORDER BY year desc, month desc, day desc LIMIT 1";
                 params.remove(1);
-                debug("descr", broaderSql);
-                debug("descr", description);
+                debug("description", broaderSql);
+                debug("description", description);
 
                 activity.runOnUiThread(() -> {
                     Snackbar.make(recyclerView, R.string.ignoring_preferred_account,
