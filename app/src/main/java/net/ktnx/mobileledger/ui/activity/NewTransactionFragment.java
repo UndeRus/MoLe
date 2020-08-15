@@ -114,7 +114,6 @@ public class NewTransactionFragment extends Fragment {
             throw new RSInvalidStateException(
                     "getActivity() returned null within onActivityCreated()");
 
-        list = activity.findViewById(R.id.new_transaction_accounts);
         viewModel = new ViewModelProvider(activity).get(NewTransactionModel.class);
         viewModel.observeDataProfile(this);
         mProfile = Data.profile.getValue();
@@ -131,7 +130,6 @@ public class NewTransactionFragment extends Fragment {
                      if (isSubmittable) {
                          if (fab != null) {
                              fab.show();
-                             fab.setEnabled(true);
                          }
                      }
                      else {
@@ -179,7 +177,7 @@ public class NewTransactionFragment extends Fragment {
 //                        p.setVisibility(View.VISIBLE);
 //
 //                }, 10);
-                        p.setVisibility(View.VISIBLE);
+                p.setVisibility(View.VISIBLE);
             }
             else
                 p.setVisibility(View.INVISIBLE);
@@ -193,7 +191,7 @@ public class NewTransactionFragment extends Fragment {
         outState.putInt("focused", focusedItem);
     }
     private void onFabPressed() {
-        fab.setEnabled(false);
+        fab.hide();
         Misc.hideSoftKeyboard(this);
         if (mListener != null) {
             SimpleDate date = viewModel.getDate();
