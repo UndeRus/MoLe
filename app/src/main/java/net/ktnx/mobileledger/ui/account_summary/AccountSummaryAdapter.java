@@ -39,10 +39,12 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Locker;
+import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -187,6 +189,7 @@ public class AccountSummaryAdapter
             return true;
         }
         public void bindToAccount(LedgerAccount acc) {
+            Logger.debug("accounts", String.format(Locale.US, "Binding to '%s'", acc.getName()));
             Context ctx = row.getContext();
             Resources rm = ctx.getResources();
             mAccount = acc;

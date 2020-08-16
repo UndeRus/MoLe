@@ -37,14 +37,16 @@ public class MobileLedgerProfileTest {
     }
     private void aTest(LedgerAccount[] oldList, LedgerAccount[] newList,
                        LedgerAccount[] expectedResult) {
-        List<LedgerAccount> result = MobileLedgerProfile.mergeAccountLists(listFromArray(oldList),
-                listFromArray(newList));
+        List<LedgerAccount> result =
+                MobileLedgerProfile.mergeAccountListsFromWeb(listFromArray(oldList),
+                        listFromArray(newList));
         assertArrayEquals(expectedResult, result.toArray());
     }
     private void negTest(LedgerAccount[] oldList, LedgerAccount[] newList,
                          LedgerAccount[] expectedResult) {
-        List<LedgerAccount> result = MobileLedgerProfile.mergeAccountLists(listFromArray(oldList),
-                listFromArray(newList));
+        List<LedgerAccount> result =
+                MobileLedgerProfile.mergeAccountListsFromWeb(listFromArray(oldList),
+                        listFromArray(newList));
         assertThrows(ArrayComparisonFailure.class,
                 () -> assertArrayEquals(expectedResult, result.toArray()));
     }
@@ -76,9 +78,9 @@ public class MobileLedgerProfileTest {
         LedgerAccount acc1b = new LedgerAccount(null, "Acc1", null);
         acc1b.setExpanded(true);
         acc1b.setAmountsExpanded(true);
-        List<LedgerAccount> merged =
-                MobileLedgerProfile.mergeAccountLists(listFromArray(new LedgerAccount[]{acc1a}),
-                        listFromArray(new LedgerAccount[]{acc1b}));
+        List<LedgerAccount> merged = MobileLedgerProfile.mergeAccountListsFromWeb(
+                listFromArray(new LedgerAccount[]{acc1a}),
+                listFromArray(new LedgerAccount[]{acc1b}));
         assertArrayEquals(new LedgerAccount[]{acc1b}, merged.toArray());
         assertSame(merged.get(0), acc1a);
         // restore original values, modified by the merge

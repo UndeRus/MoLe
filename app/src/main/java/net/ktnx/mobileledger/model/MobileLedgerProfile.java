@@ -214,10 +214,12 @@ public final class MobileLedgerProfile {
                 continue;
             }
 
-            // two items with same account names; merge UI-controlled fields
-            oldAcc.setExpanded(newAcc.isExpanded());
-            oldAcc.setAmountsExpanded(newAcc.amountsExpanded());
-            merged.add(oldAcc);
+            // two items with same account names; forward-merge UI-controlled fields
+            // it is important that the result list contains a new LedgerAccount instance
+            // so that the change is propagated to the UI
+            newAcc.setExpanded(oldAcc.isExpanded());
+            newAcc.setAmountsExpanded(oldAcc.amountsExpanded());
+            merged.add(newAcc);
         }
 
         return merged;
