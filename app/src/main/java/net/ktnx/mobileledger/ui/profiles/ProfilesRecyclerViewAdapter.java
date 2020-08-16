@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -56,7 +56,7 @@ public class ProfilesRecyclerViewAdapter
         MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
         editProfile(view, profile);
     };
-    public MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
+    public final MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
     private RecyclerView recyclerView;
     private ItemTouchHelper rearrangeHelper;
     private boolean animationsEnabled = true;
@@ -106,23 +106,29 @@ public class ProfilesRecyclerViewAdapter
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         this.recyclerView = recyclerView;
-        if (editingProfiles.getValue())
+        if (editingProfiles())
             rearrangeHelper.attachToRecyclerView(recyclerView);
     }
+    public boolean editingProfiles() {
+        final Boolean b = editingProfiles.getValue();
+        if (b == null)
+            return false;
+        return b;
+    }
     public void startEditingProfiles() {
-        if (editingProfiles.getValue())
+        if (editingProfiles())
             return;
         this.editingProfiles.setValue(true);
         rearrangeHelper.attachToRecyclerView(recyclerView);
     }
     public void stopEditingProfiles() {
-        if (!editingProfiles.getValue())
+        if (!editingProfiles())
             return;
         this.editingProfiles.setValue(false);
         rearrangeHelper.attachToRecyclerView(null);
     }
     public void flipEditingProfiles() {
-        if (editingProfiles.getValue())
+        if (editingProfiles())
             stopEditingProfiles();
         else
             startEditingProfiles();
@@ -138,7 +144,7 @@ public class ProfilesRecyclerViewAdapter
         context.startActivity(intent);
     }
     private void onProfileRowClicked(View v) {
-        if (editingProfiles.getValue())
+        if (editingProfiles())
             return;
         MobileLedgerProfile profile = (MobileLedgerProfile) v.getTag();
         if (profile == null)
@@ -171,7 +177,7 @@ public class ProfilesRecyclerViewAdapter
         });
 
         View.OnTouchListener dragStarter = (v, event) -> {
-            if (rearrangeHelper != null && editingProfiles.getValue()) {
+            if (rearrangeHelper != null && editingProfiles()) {
                 rearrangeHelper.startDrag(holder);
                 return true;
             }
@@ -207,7 +213,7 @@ public class ProfilesRecyclerViewAdapter
         final boolean sameProfile = currentProfile.equals(profile);
         holder.itemView.setBackground(
                 sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
-        if (editingProfiles.getValue()) {
+        if (editingProfiles()) {
             boolean wasHidden = holder.mEditButton.getVisibility() == View.GONE;
             holder.mRearrangeHandle.setVisibility(View.VISIBLE);
             holder.mEditButton.setVisibility(View.VISIBLE);
