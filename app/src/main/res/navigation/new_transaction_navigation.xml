@@ -30,7 +30,11 @@
             android:id="@+id/action_newTransactionFragment_to_newTransactionSavingFragment"
             app:destination="@id/newTransactionSavingFragment"
             app:enterAnim="@anim/slide_in_up"
-            app:exitAnim="@anim/slide_out_up" />
+            app:exitAnim="@anim/slide_out_up"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/new_transaction_navigation"
+            app:popUpToInclusive="true"
+            />
         <argument
             android:name="error"
             app:argType="string"
@@ -46,14 +50,20 @@
             app:destination="@id/newTransactionFragment"
             app:enterAnim="@anim/slide_in_up"
             app:exitAnim="@anim/slide_out_up"
+            app:launchSingleTop="true"
             app:popExitAnim="@anim/slide_out_down"
+            app:popUpTo="@id/new_transaction_navigation"
+            app:popUpToInclusive="true"
             />
         <action
             android:id="@+id/action_newTransactionSavingFragment_Failure"
             app:destination="@id/newTransactionFragment"
             app:enterAnim="@anim/slide_in_down"
             app:exitAnim="@anim/slide_out_down"
+            app:launchSingleTop="true"
             app:popExitAnim="@anim/slide_out_up"
+            app:popUpTo="@id/new_transaction_navigation"
+            app:popUpToInclusive="true"
             />
     </fragment>
 </navigation>
