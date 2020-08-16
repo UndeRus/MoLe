@@ -49,7 +49,6 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     public static final int AMOUNT_LIMIT = 3;
-    private MobileLedgerProfile profile;
     private AsyncListDiffer<LedgerAccount> listDiffer;
     AccountSummaryAdapter() {
         listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<LedgerAccount>() {
@@ -84,8 +83,7 @@ public class AccountSummaryAdapter
         return listDiffer.getCurrentList()
                          .size();
     }
-    public void setAccounts(MobileLedgerProfile profile, List<LedgerAccount> newList) {
-        this.profile = profile;
+    public void setAccounts(List<LedgerAccount> newList) {
         listDiffer.submitList(newList);
     }
     static class LedgerRowHolder extends RecyclerView.ViewHolder {

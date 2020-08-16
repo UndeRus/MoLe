@@ -98,13 +98,12 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         MobileLedgerProfile profile = Data.getProfile();
         profile.getDisplayedAccounts()
-               .observe(getViewLifecycleOwner(),
-                       (accounts) -> onAccountsChanged(profile, accounts));
+               .observe(getViewLifecycleOwner(), this::onAccountsChanged);
     }
-    private void onAccountsChanged(MobileLedgerProfile profile, List<LedgerAccount> accounts) {
+    private void onAccountsChanged(List<LedgerAccount> accounts) {
         Logger.debug("async-acc",
                 String.format(Locale.US, "fragment: got new account list (%d items)",
                         accounts.size()));
-        modelAdapter.setAccounts(profile, accounts);
+        modelAdapter.setAccounts(accounts);
     }
 }
