@@ -66,7 +66,7 @@ public final class Data {
     public static final MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
-    public static final MutableLiveData<Locale> locale = new MutableLiveData<>(Locale.getDefault());
+    public static final MutableLiveData<Locale> locale = new MutableLiveData<>();
     public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
     private static final MutableLiveData<MobileLedgerProfile> profile =
             new InertMutableLiveData<>();
@@ -74,6 +74,11 @@ public final class Data {
     private static final Locker profilesLocker = new Locker();
     public static MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
     private static RetrieveTransactionsTask retrieveTransactionsTask;
+
+    static {
+        locale.setValue(Locale.getDefault());
+    }
+
     @NonNull
     public static MobileLedgerProfile getProfile() {
         return Objects.requireNonNull(profile.getValue());
@@ -189,10 +194,10 @@ public final class Data {
     public static void refreshCurrencyData(Locale locale) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
         java.util.Currency currency = formatter.getCurrency();
-        String symbol = currency.getSymbol();
+        String symbol = currency != null ? currency.getSymbol() : "";
         Logger.debug("locale", String.format(
                 "Discovering currency symbol position for locale %s (currency is %s; symbol is %s)",
-                locale.toString(), currency.toString(), symbol));
+                locale.toString(), currency != null ? currency.toString() : "<none>", symbol));
         String formatted = formatter.format(1234.56f);
         Logger.debug("locale", String.format("1234.56 formats as '%s'", formatted));
 
