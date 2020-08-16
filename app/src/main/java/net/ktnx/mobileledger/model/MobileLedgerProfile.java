@@ -173,8 +173,8 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public static ArrayList<LedgerAccount> mergeAccountLists(List<LedgerAccount> oldList,
-                                                             List<LedgerAccount> newList) {
+    public static ArrayList<LedgerAccount> mergeAccountListsFromWeb(List<LedgerAccount> oldList,
+                                                                    List<LedgerAccount> newList) {
         LedgerAccount oldAcc, newAcc;
         ArrayList<LedgerAccount> merged = new ArrayList<>();
 
@@ -224,10 +224,10 @@ public final class MobileLedgerProfile {
 
         return merged;
     }
-    public void mergeAccountList(List<LedgerAccount> newList) {
+    public void mergeAccountListFromWeb(List<LedgerAccount> newList) {
 
         try (LockHolder l = accountsLocker.lockForWriting()) {
-            allAccounts = mergeAccountLists(allAccounts, newList);
+            allAccounts = mergeAccountListsFromWeb(allAccounts, newList);
             updateAccountsMap(allAccounts);
         }
     }
@@ -691,7 +691,7 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
 
-        mergeAccountList(list);
+        mergeAccountListFromWeb(list);
         updateDisplayedAccounts();
     }
     public synchronized Locker lockAccountsForWriting() {
@@ -728,7 +728,7 @@ public final class MobileLedgerProfile {
                                                             List<LedgerTransaction> transactions) {
         storeAccountAndTransactionListAsync(accounts, transactions, false);
 
-        mergeAccountList(accounts);
+        mergeAccountListFromWeb(accounts);
         updateDisplayedAccounts();
 
         allTransactions.postValue(transactions);
