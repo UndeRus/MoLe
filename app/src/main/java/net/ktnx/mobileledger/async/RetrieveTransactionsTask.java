@@ -276,7 +276,8 @@ public class RetrieveTransactionsTask
                             progress.setProgress(++processedTransactionCount);
                             if (maxTransactionId < transactionId)
                                 maxTransactionId = transactionId;
-                            if ((progress.isIndeterminate()) || (progress.getTotal() < transactionId))
+                            if ((progress.isIndeterminate()) ||
+                                (progress.getTotal() < transactionId))
                                 progress.setTotal(transactionId);
                             publishProgress(progress);
                         }

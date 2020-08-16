@@ -229,8 +229,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     if (row == null) {
                         row = new LinearLayout(ctx);
                         LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
-                        inflater.inflate(
-                                R.layout.transaction_list_row_accounts_table_row, row);
+                        inflater.inflate(R.layout.transaction_list_row_accounts_table_row, row);
                         holder.tableAccounts.addView(row);
                     }
                     TextView dummyText = row.findViewById(R.id.dummy_text);
