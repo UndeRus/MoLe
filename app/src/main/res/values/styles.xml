@@ -32,6 +32,12 @@
         </item>
         <item name="colorError">#FFE1E2</item>
         <item name="colorOnError">#CD1609</item>
+        <item name="colorPrimary">#935ff2</item>
+        <item name="colorPrimaryTransparent">#00935ff2</item>
+        <item name="colorSecondary">#6920ed</item>
+        <item name="colorPrimaryDark">#6920ed</item>
+        <item name="table_row_dark_bg">#efe7fd</item>
+        <item name="table_row_light_bg">#f9f6fe</item>
     </style>
 
     <!-- theme list start -->
