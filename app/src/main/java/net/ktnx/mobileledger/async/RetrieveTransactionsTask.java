@@ -75,6 +75,7 @@ public class RetrieveTransactionsTask
     private Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     private MobileLedgerProfile profile;
+    private int expectedPostingsCount = -1;
     public RetrieveTransactionsTask(@NonNull MobileLedgerProfile profile) {
         this.profile = profile;
     }
@@ -131,6 +132,7 @@ public class RetrieveTransactionsTask
     private String retrieveTransactionListLegacy() throws IOException, HTTPException {
         Progress progress = Progress.indeterminate();
         progress.setState(ProgressState.RUNNING);
+        progress.setTotal(expectedPostingsCount);
         int maxTransactionId = -1;
         ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
@@ -393,6 +395,7 @@ public class RetrieveTransactionsTask
                 throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
 
             AccountListParser parser = new AccountListParser(resp);
+            expectedPostingsCount = 0;
 
             while (true) {
                 throwIfCancelled();
@@ -400,7 +403,7 @@ public class RetrieveTransactionsTask
                 if (parsedAccount == null) {
                     break;
                 }
-
+                expectedPostingsCount += parsedAccount.getAnumpostings();
                 final String accName = parsedAccount.getAname();
                 LedgerAccount acc = map.get(accName);
                 if (acc != null)
@@ -462,6 +465,7 @@ public class RetrieveTransactionsTask
     private boolean retrieveTransactionList() throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         int maxTransactionId = Data.transactions.size();
+        progress.setTotal(expectedPostingsCount);
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "transactions");
         http.setAllowUserInteraction(false);
@@ -480,7 +484,7 @@ public class RetrieveTransactionsTask
 
             TransactionListParser parser = new TransactionListParser(resp);
 
-            int processedTransactionCount = 0;
+            int processedPostings = 0;
 
             while (true) {
                 throwIfCancelled();
@@ -492,7 +496,8 @@ public class RetrieveTransactionsTask
                 LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
                 trList.add(transaction);
 
-                progress.setProgress(++processedTransactionCount);
+                progress.setProgress(processedPostings += transaction.getAccounts()
+                                                                     .size());
                 publishProgress(progress);
             }
 

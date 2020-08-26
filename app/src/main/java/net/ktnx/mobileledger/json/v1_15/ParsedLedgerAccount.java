@@ -26,7 +26,14 @@ public class ParsedLedgerAccount {
     private List<ParsedBalance> aebalance;
     private List<ParsedBalance> aibalance;
     private String aname;
+    private int anumpostings;
     public ParsedLedgerAccount() {
+    }
+    public int getAnumpostings() {
+        return anumpostings;
+    }
+    public void setAnumpostings(int anumpostings) {
+        this.anumpostings = anumpostings;
     }
     public List<ParsedBalance> getAebalance() {
         return aebalance;
