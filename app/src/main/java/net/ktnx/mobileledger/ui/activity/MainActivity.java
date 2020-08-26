@@ -174,6 +174,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         Data.profiles.observe(this, this::onProfileListChanged);
         Data.backgroundTaskProgress.observe(this, this::onRetrieveProgress);
+        Data.backgroundTasksRunning.observe(this, this::onRetrieveRunningChanged);
 
         if (barDrawerToggle == null) {
             barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar,
@@ -331,8 +332,11 @@ public class MainActivity extends ProfileThemedActivity {
                         "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
                         lastUpdate.getTime() / 1000f, now / 1000f));
 
-            Data.scheduleTransactionListRetrieval(this);
+            scheduleDataRetrieval();
         }
+    }
+    public void scheduleDataRetrieval() {
+        Data.scheduleTransactionListRetrieval();
     }
     private void createShortcuts(List<MobileLedgerProfile> list) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1)
@@ -570,23 +574,32 @@ public class MainActivity extends ProfileThemedActivity {
         Data.stopTransactionsRetrieval();
         bTransactionListCancelDownload.setEnabled(false);
     }
-    public void onRetrieveStart() {
-        ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
-        bTransactionListCancelDownload.setEnabled(true);
-        ColorStateList csl = Colors.getColorStateList();
-        progressBar.setIndeterminateTintList(csl);
-        progressBar.setProgressTintList(csl);
-        progressBar.setIndeterminate(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            progressBar.setProgress(0, false);
-        else
-            progressBar.setProgress(0);
-        findViewById(R.id.transaction_progress_layout).setVisibility(View.VISIBLE);
+    public void onRetrieveRunningChanged(Boolean running) {
+        final View progressLayout = findViewById(R.id.transaction_progress_layout);
+        if (running) {
+            ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
+            bTransactionListCancelDownload.setEnabled(true);
+            ColorStateList csl = Colors.getColorStateList();
+            progressBar.setIndeterminateTintList(csl);
+            progressBar.setProgressTintList(csl);
+            progressBar.setIndeterminate(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                progressBar.setProgress(0, false);
+            }
+            else {
+                progressBar.setProgress(0);
+            }
+            progressLayout.setVisibility(View.VISIBLE);
+        }
+        else {
+            progressLayout.setVisibility(View.GONE);
+        }
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
         ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
 
         if (progress.getState() == RetrieveTransactionsTask.ProgressState.FINISHED) {
+            Logger.debug("progress", "Done");
             findViewById(R.id.transaction_progress_layout).setVisibility(View.GONE);
 
             Data.transactionRetrievalDone();
@@ -607,22 +620,25 @@ public class MainActivity extends ProfileThemedActivity {
 
 
         bTransactionListCancelDownload.setEnabled(true);
-        ColorStateList csl = Colors.getColorStateList();
-        progressBar.setIndeterminateTintList(csl);
-        progressBar.setProgressTintList(csl);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            progressBar.setProgress(0, false);
-        else
-            progressBar.setProgress(0);
+//        ColorStateList csl = Colors.getColorStateList();
+//        progressBar.setIndeterminateTintList(csl);
+//        progressBar.setProgressTintList(csl);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+//            progressBar.setProgress(0, false);
+//        else
+//            progressBar.setProgress(0);
         findViewById(R.id.transaction_progress_layout).setVisibility(View.VISIBLE);
 
-        if (progress.isIndeterminate() || (progress.getTotal() == 0)) {
+        if (progress.isIndeterminate() || (progress.getTotal() <= 0)) {
             progressBar.setIndeterminate(true);
+            Logger.debug("progress", "indeterminate");
         }
         else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 progressBar.setMin(0);
             }
+            Logger.debug("progress",
+                    String.format(Locale.US, "%d/%d", progress.getProgress(), progress.getTotal()));
             progressBar.setMax(progress.getTotal());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 progressBar.setProgress(progress.getProgress(), true);

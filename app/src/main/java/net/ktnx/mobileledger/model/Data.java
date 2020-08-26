@@ -29,7 +29,6 @@ import androidx.lifecycle.Observer;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
-import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
@@ -37,7 +36,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableList;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
-import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -167,7 +165,7 @@ public final class Data {
         }
         return profile;
     }
-    public synchronized static void scheduleTransactionListRetrieval(MainActivity activity) {
+    public synchronized static void scheduleTransactionListRetrieval() {
         if (retrieveTransactionsTask != null) {
             Logger.debug("db", "Ignoring request for transaction retrieval - already active");
             return;
@@ -178,8 +176,7 @@ public final class Data {
             return;
         }
 
-        retrieveTransactionsTask =
-                new RetrieveTransactionsTask(new WeakReference<>(activity), profile.getValue());
+        retrieveTransactionsTask = new RetrieveTransactionsTask(profile.getValue());
         Logger.debug("db", "Created a background transaction retrieval task");
 
         retrieveTransactionsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);

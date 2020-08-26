@@ -118,7 +118,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         refreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing transactions via swipe");
-            Data.scheduleTransactionListRetrieval(mainActivity);
+            mainActivity.scheduleDataRetrieval();
         });
 
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);

@@ -36,14 +36,12 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
@@ -72,15 +70,12 @@ public class RetrieveTransactionsTask
     private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
     private static final Pattern reDecimalPoint = Pattern.compile("\\.\\d\\d?$");
     private static final Pattern reDecimalComma = Pattern.compile(",\\d\\d?$");
-    private WeakReference<MainActivity> contextRef;
     // %3A is '='
     private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     private Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     private MobileLedgerProfile profile;
-    public RetrieveTransactionsTask(WeakReference<MainActivity> contextRef,
-                                    @NonNull MobileLedgerProfile profile) {
-        this.contextRef = contextRef;
+    public RetrieveTransactionsTask(@NonNull MobileLedgerProfile profile) {
         this.profile = profile;
     }
     private static void L(String msg) {
@@ -117,14 +112,6 @@ public class RetrieveTransactionsTask
     protected void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
         Data.backgroundTaskProgress.postValue(values[0]);
-    }
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        MainActivity context = getContext();
-        if (context == null)
-            return;
-        context.onRetrieveStart();
     }
     @Override
     protected void onPostExecute(String error) {
@@ -549,9 +536,6 @@ public class RetrieveTransactionsTask
             Data.backgroundTaskFinished();
         }
     }
-    private MainActivity getContext() {
-        return contextRef.get();
-    }
     private void throwIfCancelled() {
         if (isCancelled())
             throw new OperationCanceledException(null);
@@ -601,6 +585,7 @@ public class RetrieveTransactionsTask
         protected void setTotal(int total) {
             this.total = total;
             state = ProgressState.RUNNING;
+            indeterminate = total == -1;
         }
         private void ensureState(ProgressState wanted) {
             if (state != wanted)

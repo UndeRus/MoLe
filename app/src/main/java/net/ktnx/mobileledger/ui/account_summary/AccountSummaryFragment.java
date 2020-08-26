@@ -93,7 +93,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
         refreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");
-            Data.scheduleTransactionListRetrieval(mainActivity);
+            Data.scheduleTransactionListRetrieval();
         });
 
         MobileLedgerProfile profile = Data.getProfile();
