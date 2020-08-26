@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -38,11 +38,11 @@ public class ParsedLedgerAccount {
     public List<ParsedBalance> getAebalance() {
         return aebalance;
     }
-    public List<ParsedBalance> getAibalance() {
-        return aibalance;
-    }
     public void setAebalance(List<ParsedBalance> aebalance) {
         this.aebalance = aebalance;
+    }
+    public List<ParsedBalance> getAibalance() {
+        return aibalance;
     }
     public void setAibalance(List<ParsedBalance> aibalance) {
         this.aibalance = aibalance;

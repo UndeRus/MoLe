@@ -38,11 +38,11 @@ public class ParsedLedgerAccount {
     public List<ParsedBalance> getAebalance() {
         return aebalance;
     }
-    public List<ParsedBalance> getAibalance() {
-        return aibalance;
-    }
     public void setAebalance(List<ParsedBalance> aebalance) {
         this.aebalance = aebalance;
+    }
+    public List<ParsedBalance> getAibalance() {
+        return aibalance;
     }
     public void setAibalance(List<ParsedBalance> aibalance) {
         this.aibalance = aibalance;
