@@ -634,18 +634,18 @@ public class MainActivity extends ProfileThemedActivity {
             Logger.debug("progress", "indeterminate");
         }
         else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                progressBar.setMin(0);
+            if (progressBar.isIndeterminate()) {
+                progressBar.setIndeterminate(false);
             }
             Logger.debug("progress",
                     String.format(Locale.US, "%d/%d", progress.getProgress(), progress.getTotal()));
             progressBar.setMax(progress.getTotal());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                progressBar.setProgress(progress.getProgress(), true);
-            }
+            // for some reason animation doesn't work - no progress is shown (stick at 0)
+            // on lineageOS 14.1 (Nougat, 7.1.2)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                progressBar.setProgress(progress.getProgress(), false);
             else
                 progressBar.setProgress(progress.getProgress());
-            progressBar.setIndeterminate(false);
         }
     }
     public void fabShouldShow() {
