@@ -72,8 +72,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static net.ktnx.mobileledger.utils.Logger.debug;
-
 /*
  * TODO: reports
  *  */
@@ -146,9 +144,9 @@ public class MainActivity extends ProfileThemedActivity {
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        debug("MainActivity", "onCreate()/entry");
+        Logger.debug("MainActivity", "onCreate()/entry");
         super.onCreate(savedInstanceState);
-        debug("MainActivity", "onCreate()/after super");
+        Logger.debug("MainActivity", "onCreate()/after super");
         setContentView(R.layout.activity_main);
 
         fab = findViewById(R.id.btn_add_transaction);
@@ -326,9 +324,9 @@ public class MainActivity extends ProfileThemedActivity {
         long now = new Date().getTime();
         if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
             if (lastUpdate == null)
-                debug("db::", "WEB data never fetched. scheduling a fetch");
+                Logger.debug("db::", "WEB data never fetched. scheduling a fetch");
             else
-                debug("db", String.format(Locale.ENGLISH,
+                Logger.debug("db", String.format(Locale.ENGLISH,
                         "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
                         lastUpdate.getTime() / 1000f, now / 1000f));
 
@@ -380,7 +378,7 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.nav_profile_list).setMinimumHeight(
                 (int) (getResources().getDimension(R.dimen.thumb_row_height) * newList.size()));
 
-        debug("profiles", "profile list changed");
+        Logger.debug("profiles", "profile list changed");
         mProfileListAdapter.notifyDataSetChanged();
 
         createShortcuts(newList);
@@ -413,7 +411,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         int newProfileTheme = haveProfile ? profile.getThemeHue() : -1;
         if (newProfileTheme != Colors.profileThemeId) {
-            debug("profiles",
+            Logger.debug("profiles",
                     String.format(Locale.ENGLISH, "profile theme %d → %d", Colors.profileThemeId,
                             newProfileTheme));
             Colors.profileThemeId = newProfileTheme;
@@ -429,7 +427,7 @@ public class MainActivity extends ProfileThemedActivity {
         mProfileListAdapter.notifyDataSetChanged();
 
         Data.transactions.clear();
-        debug("transactions", "requesting list reload");
+        Logger.debug("transactions", "requesting list reload");
         TransactionListViewModel.scheduleTransactionListReload();
 
         if (haveProfile) {
@@ -456,14 +454,14 @@ public class MainActivity extends ProfileThemedActivity {
         TextView v = findViewById(R.id.transactions_last_update);
         if (newValue == null) {
             l.setVisibility(View.INVISIBLE);
-            debug("main", "no last update date :(");
+            Logger.debug("main", "no last update date :(");
         }
         else {
             final String text = DateFormat.getDateTimeInstance()
                                           .format(newValue);
             v.setText(text);
             l.setVisibility(View.VISIBLE);
-            debug("main", String.format("Date formatted: %s", text));
+            Logger.debug("main", String.format("Date formatted: %s", text));
         }
 
         scheduleDataRetrievalIfStale(newValue);
@@ -548,7 +546,7 @@ public class MainActivity extends ProfileThemedActivity {
                 mBackMeansToAccountList = false;
             }
             else {
-                debug("fragments", String.format(Locale.ENGLISH, "manager stack: %d",
+                Logger.debug("fragments", String.format(Locale.ENGLISH, "manager stack: %d",
                         getSupportFragmentManager().getBackStackEntryCount()));
 
                 super.onBackPressed();
@@ -561,7 +559,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         long last_update = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
 
-        debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", last_update));
+        Logger.debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", last_update));
         if (last_update == 0) {
             Data.lastUpdateDate.postValue(null);
         }
@@ -570,7 +568,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void onStopTransactionRefreshClick(View view) {
-        debug("interactive", "Cancelling transactions refresh");
+        Logger.debug("interactive", "Cancelling transactions refresh");
         Data.stopTransactionsRetrieval();
         bTransactionListCancelDownload.setEnabled(false);
     }
@@ -667,7 +665,7 @@ public class MainActivity extends ProfileThemedActivity {
         @NotNull
         @Override
         public Fragment getItem(int position) {
-            debug("main", String.format(Locale.ENGLISH, "Switching to fragment %d", position));
+            Logger.debug("main", String.format(Locale.ENGLISH, "Switching to fragment %d", position));
             switch (position) {
                 case 0:
 //                    debug("flow", "Creating account summary fragment");
