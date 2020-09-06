@@ -37,6 +37,7 @@ import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
+import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.Contract;
 
@@ -421,11 +422,13 @@ public final class MobileLedgerProfile {
             db.endTransaction();
         }
     }
-    public void storeAccount(SQLiteDatabase db, LedgerAccount acc, boolean storeUiFields) {
+    public void storeAccount(SQLiteDatabase db, int generation, LedgerAccount acc,
+                             boolean storeUiFields) {
         // replace into is a bad idea because it would reset hidden to its default value
         // we like the default, but for new accounts only
-        String sql = "update accounts set keep = 1";
+        String sql = "update accounts set generation = ?";
         List<Object> params = new ArrayList<>();
+        params.add(generation);
         if (storeUiFields) {
             sql += ", expanded=?";
             params.add(acc.isExpanded() ? 1 : 0);
@@ -436,37 +439,52 @@ public final class MobileLedgerProfile {
         db.execSQL(sql, params.toArray());
 
         db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, " +
-                   "expanded, keep) " + "select ?,?,?,?,?,0,1 where (select changes() = 0)",
+                   "expanded, generation) select ?,?,?,?,?,0,? where (select changes() = 0)",
                 new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
-                             acc.getLevel()
+                             acc.getLevel(), generation
                 });
 //        debug("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
-    public void storeAccountValue(SQLiteDatabase db, String name, String currency, Float amount) {
+    public void storeAccountValue(SQLiteDatabase db, int generation, String name, String currency,
+                                  Float amount) {
         db.execSQL("replace into account_values(profile, account, " +
-                   "currency, value, keep) values(?, ?, ?, ?, 1);",
-                new Object[]{uuid, name, Misc.emptyIsNull(currency), amount});
+                   "currency, value, generation) values(?, ?, ?, ?, ?);",
+                new Object[]{uuid, name, Misc.emptyIsNull(currency), amount, generation});
     }
-    public void storeTransaction(SQLiteDatabase db, LedgerTransaction tr) {
+    public void storeTransaction(SQLiteDatabase db, int generation, LedgerTransaction tr) {
         tr.fillDataHash();
-        db.execSQL("DELETE from transactions WHERE profile=? and id=?",
-                new Object[]{uuid, tr.getId()});
-        db.execSQL("DELETE from transaction_accounts WHERE profile = ? and transaction_id=?",
-                new Object[]{uuid, tr.getId()});
-
+        SimpleDate d = tr.getDate();
+        db.execSQL("UPDATE transactions SET year=?, month=?, day=?, description=?, comment=?, " +
+                   "data_hash=?, generation=? WHERE profile=? AND id=?",
+                new Object[]{d.year, d.month, d.day, tr.getDescription(), tr.getComment(),
+                             tr.getDataHash(), generation, uuid, tr.getId()
+                });
         db.execSQL("INSERT INTO transactions(profile, id, year, month, day, description, " +
-                   "comment, data_hash, keep) values(?,?,?,?,?,?,?,?,1)",
+                   "comment, data_hash, generation) " +
+                   "select ?,?,?,?,?,?,?,?,? WHERE (select changes() = 0)",
                 new Object[]{uuid, tr.getId(), tr.getDate().year, tr.getDate().month,
                              tr.getDate().day, tr.getDescription(), tr.getComment(),
-                             tr.getDataHash()
+                             tr.getDataHash(), generation
                 });
 
+        int accountOrderNo = 1;
         for (LedgerTransactionAccount item : tr.getAccounts()) {
-            db.execSQL("INSERT INTO transaction_accounts(profile, transaction_id, " +
-                       "account_name, amount, currency, comment) values(?, ?, ?, ?, ?, ?)",
-                    new Object[]{uuid, tr.getId(), item.getAccountName(), item.getAmount(),
-                                 Misc.nullIsEmpty(item.getCurrency()), item.getComment()
+            db.execSQL("UPDATE transaction_accounts SET account_name=?, amount=?, currency=?, " +
+                       "comment=?, generation=? " +
+                       "WHERE profile=? AND transaction_id=? AND order_no=?",
+                    new Object[]{item.getAccountName(), item.getAmount(),
+                                 Misc.nullIsEmpty(item.getCurrency()), item.getComment(),
+                                 generation, uuid, tr.getId(), accountOrderNo
                     });
+            db.execSQL("INSERT INTO transaction_accounts(profile, transaction_id, " +
+                       "order_no, account_name, amount, currency, comment, generation) " +
+                       "select ?, ?, ?, ?, ?, ?, ?, ? WHERE (select changes() = 0)",
+                    new Object[]{uuid, tr.getId(), accountOrderNo, item.getAccountName(),
+                                 item.getAmount(), Misc.nullIsEmpty(item.getCurrency()),
+                                 item.getComment(), generation
+                    });
+
+            accountOrderNo++;
         }
 //        debug("profile", String.format("Transaction %d stored", tr.getId()));
     }
@@ -558,33 +576,43 @@ public final class MobileLedgerProfile {
 //        debug("profile", String.format("Profile.setThemeHue(%d) called", themeHue));
         this.themeHue = themeHue;
     }
-    public void markTransactionsAsNotPresent(SQLiteDatabase db) {
-        db.execSQL("UPDATE transactions set keep=0 where profile=?", new String[]{uuid});
-
+    public int getNextTransactionsGeneration(SQLiteDatabase db) {
+        int generation = 1;
+        try (Cursor c = db.rawQuery("SELECT generation FROM transactions WHERE profile=? LIMIT 1",
+                new String[]{uuid}))
+        {
+            if (c.moveToFirst()) {
+                generation = c.getInt(0) + 1;
+            }
+        }
+        return generation;
     }
-    private void markAccountsAsNotPresent(SQLiteDatabase db) {
-        db.execSQL("update account_values set keep=0 where profile=?;", new String[]{uuid});
-        db.execSQL("update accounts set keep=0 where profile=?;", new String[]{uuid});
-
+    private int getNextAccountsGeneration(SQLiteDatabase db) {
+        int generation = 1;
+        try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile=? LIMIT 1",
+                new String[]{uuid}))
+        {
+            if (c.moveToFirst()) {
+                generation = c.getInt(0) + 1;
+            }
+        }
+        return generation;
     }
-    private void deleteNotPresentAccounts(SQLiteDatabase db) {
-        db.execSQL("delete from account_values where keep=0 and profile=?", new String[]{uuid});
-        db.execSQL("delete from accounts where keep=0 and profile=?", new String[]{uuid});
+    private void deleteNotPresentAccounts(SQLiteDatabase db, int generation) {
+        Logger.debug("db/benchmark", "Deleting obsolete accounts");
+        db.execSQL("DELETE FROM account_values WHERE profile=? AND generation <> ?",
+                new Object[]{uuid, generation});
+        db.execSQL("DELETE FROM accounts WHERE profile=? AND generation <> ?",
+                new Object[]{uuid, generation});
+        Logger.debug("db/benchmark", "Done deleting obsolete accounts");
     }
-    private void markTransactionAsPresent(SQLiteDatabase db, LedgerTransaction transaction) {
-        db.execSQL("UPDATE transactions SET keep = 1 WHERE profile = ? and id=?",
-                new Object[]{uuid, transaction.getId()
-                });
-    }
-    private void markTransactionsBeforeTransactionAsPresent(SQLiteDatabase db,
-                                                            LedgerTransaction transaction) {
-        db.execSQL("UPDATE transactions SET keep=1 WHERE profile = ? and id < ?",
-                new Object[]{uuid, transaction.getId()
-                });
-
-    }
-    private void deleteNotPresentTransactions(SQLiteDatabase db) {
-        db.execSQL("DELETE FROM transactions WHERE profile=? AND keep = 0", new String[]{uuid});
+    private void deleteNotPresentTransactions(SQLiteDatabase db, int generation) {
+        Logger.debug("db/benchmark", "Deleting obsolete transactions");
+        db.execSQL("DELETE FROM transaction_accounts WHERE profile=? AND generation <> ?",
+                new Object[]{uuid, generation});
+        db.execSQL("DELETE FROM transactions WHERE profile=? AND generation <> ?",
+                new Object[]{uuid, generation});
+        Logger.debug("db/benchmark", "Done deleting obsolete transactions");
     }
     private void setLastUpdateStamp() {
         debug("db", "Updating transaction value stamp");
@@ -676,14 +704,19 @@ public final class MobileLedgerProfile {
         SQLiteDatabase db = App.getDatabase();
         db.beginTransactionNonExclusive();
         try {
-            markAccountsAsNotPresent(db);
+            Logger.debug("db/benchmark",
+                    String.format(Locale.US, "Storing %d accounts", list.size()));
+            int gen = getNextAccountsGeneration(db);
+            Logger.debug("db/benckmark",
+                    String.format(Locale.US, "Got next generation of %d", gen));
             for (LedgerAccount acc : list) {
-                storeAccount(db, acc, false);
+                storeAccount(db, gen, acc, false);
                 for (LedgerAmount amt : acc.getAmounts()) {
-                    storeAccountValue(db, acc.getName(), amt.getCurrency(), amt.getAmount());
+                    storeAccountValue(db, gen, acc.getName(), amt.getCurrency(), amt.getAmount());
                 }
             }
-            deleteNotPresentAccounts(db);
+            Logger.debug("db/benchmark", "Done storing accounts");
+            deleteNotPresentAccounts(db, gen);
             setLastUpdateStamp();
             db.setTransactionSuccessful();
         }
@@ -700,19 +733,6 @@ public final class MobileLedgerProfile {
     }
     public void setAndStoreTransactionList(ArrayList<LedgerTransaction> list) {
         storeTransactionListAsync(this, list);
-        SQLiteDatabase db = App.getDatabase();
-        db.beginTransactionNonExclusive();
-        try {
-            markTransactionsAsNotPresent(db);
-            for (LedgerTransaction tr : list)
-                storeTransaction(db, tr);
-            deleteNotPresentTransactions(db);
-            setLastUpdateStamp();
-            db.setTransactionSuccessful();
-        }
-        finally {
-            db.endTransaction();
-        }
 
         allTransactions.postValue(list);
     }
@@ -924,15 +944,15 @@ public final class MobileLedgerProfile {
             SQLiteDatabase db = App.getDatabase();
             db.beginTransactionNonExclusive();
             try {
-                profile.markAccountsAsNotPresent(db);
+                int generation = profile.getNextAccountsGeneration(db);
                 if (isInterrupted())
                     return;
                 for (LedgerAccount acc : list) {
-                    profile.storeAccount(db, acc, storeUiFields);
+                    profile.storeAccount(db, generation, acc, storeUiFields);
                     if (isInterrupted())
                         return;
                 }
-                profile.deleteNotPresentAccounts(db);
+                profile.deleteNotPresentAccounts(db, generation);
                 if (isInterrupted())
                     return;
                 profile.setLastUpdateStamp();
@@ -956,15 +976,20 @@ public final class MobileLedgerProfile {
             SQLiteDatabase db = App.getDatabase();
             db.beginTransactionNonExclusive();
             try {
-                profile.markTransactionsAsNotPresent(db);
+                Logger.debug("db/benchmark",
+                        String.format(Locale.US, "Storing %d transactions", list.size()));
+                int generation = profile.getNextTransactionsGeneration(db);
+                Logger.debug("db/benchmark",
+                        String.format(Locale.US, "Got next generation of %d", generation));
                 if (isInterrupted())
                     return;
                 for (LedgerTransaction tr : list) {
-                    profile.storeTransaction(db, tr);
+                    profile.storeTransaction(db, generation, tr);
                     if (isInterrupted())
                         return;
                 }
-                profile.deleteNotPresentTransactions(db);
+                Logger.debug("db/benchmark", "Done storing transactions");
+                profile.deleteNotPresentTransactions(db, generation);
                 if (isInterrupted())
                     return;
                 profile.setLastUpdateStamp();
@@ -994,33 +1019,33 @@ public final class MobileLedgerProfile {
             SQLiteDatabase db = App.getDatabase();
             db.beginTransactionNonExclusive();
             try {
-                profile.markAccountsAsNotPresent(db);
+                int accountsGeneration = profile.getNextAccountsGeneration(db);
                 if (isInterrupted())
                     return;
 
-                profile.markTransactionsAsNotPresent(db);
+                int transactionsGeneration = profile.getNextTransactionsGeneration(db);
                 if (isInterrupted()) {
                     return;
                 }
 
                 for (LedgerAccount acc : accounts) {
-                    profile.storeAccount(db, acc, storeAccUiFields);
+                    profile.storeAccount(db, accountsGeneration, acc, storeAccUiFields);
                     if (isInterrupted())
                         return;
                 }
 
                 for (LedgerTransaction tr : transactions) {
-                    profile.storeTransaction(db, tr);
+                    profile.storeTransaction(db, transactionsGeneration, tr);
                     if (isInterrupted()) {
                         return;
                     }
                 }
 
-                profile.deleteNotPresentAccounts(db);
+                profile.deleteNotPresentAccounts(db, accountsGeneration);
                 if (isInterrupted()) {
                     return;
                 }
-                profile.deleteNotPresentTransactions(db);
+                profile.deleteNotPresentTransactions(db, transactionsGeneration);
                 if (isInterrupted())
                     return;
 
