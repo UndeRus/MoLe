@@ -162,7 +162,7 @@ public final class MobileLedgerProfile {
         db.beginTransactionNonExclusive();
         try {
             int orderNo = 0;
-            for (MobileLedgerProfile p : Data.profiles.getValue()) {
+            for (MobileLedgerProfile p : Objects.requireNonNull(Data.profiles.getValue())) {
                 db.execSQL("update profiles set order_no=? where uuid=?",
                         new Object[]{orderNo, p.getUuid()});
                 p.orderNo = orderNo;
