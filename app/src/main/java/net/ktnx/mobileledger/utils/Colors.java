@@ -156,8 +156,9 @@ public class Colors {
     public static @ColorInt
     int getPrimaryColorForHue(int hueDegrees) {
         int result = hslColor(hueDegrees / 360f, 0.845f, hueLightness(hueDegrees));
-        debug("colors", String.format(Locale.ENGLISH, "getPrimaryColorForHue(%d) = %x", hueDegrees,
-                result));
+//        debug("colors", String.format(Locale.ENGLISH, "getPrimaryColorForHue(%d) = %x",
+//        hueDegrees,
+//                result));
         return result;
     }
     public static void setupTheme(Activity activity) {
