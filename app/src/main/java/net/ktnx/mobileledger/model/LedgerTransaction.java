@@ -33,6 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
@@ -56,7 +57,7 @@ public class LedgerTransaction {
     private SimpleDate date;
     private String description;
     private String comment;
-    private ArrayList<LedgerTransactionAccount> accounts;
+    private List<LedgerTransactionAccount> accounts;
     private String dataHash;
     private boolean dataLoaded;
     public LedgerTransaction(Integer id, String dateString, String description)
@@ -91,7 +92,7 @@ public class LedgerTransaction {
         this.dataHash = null;
         this.dataLoaded = false;
     }
-    public ArrayList<LedgerTransactionAccount> getAccounts() {
+    public List<LedgerTransactionAccount> getAccounts() {
         return accounts;
     }
     public void addAccount(LedgerTransactionAccount item) {
@@ -104,7 +105,6 @@ public class LedgerTransaction {
     }
     @NonNull
     public SimpleDate getDate() {
-        loadData(App.getDatabase());
         if (date == null)
             throw new IllegalStateException("Transaction has no date");
         return date;
@@ -130,6 +130,7 @@ public class LedgerTransaction {
         return id;
     }
     protected void fillDataHash() {
+        loadData(App.getDatabase());
         if (dataHash != null)
             return;
         try {
@@ -163,18 +164,7 @@ public class LedgerTransaction {
                     String.format("Unable to get instance of %s digest", DIGEST_TYPE), e);
         }
     }
-    public boolean existsInDb(SQLiteDatabase db) {
-        fillDataHash();
-        try (Cursor c = db.rawQuery("SELECT 1 from transactions where data_hash = ?",
-                new String[]{dataHash}))
-        {
-            boolean result = c.moveToFirst();
-//            debug("db", String.format("Transaction %d (%s) %s", id, dataHash,
-//                    result ? "already present" : "not present"));
-            return result;
-        }
-    }
-    public void loadData(SQLiteDatabase db) {
+    public synchronized void loadData(SQLiteDatabase db) {
         if (dataLoaded)
             return;
 
@@ -237,5 +227,8 @@ public class LedgerTransaction {
         }
 
         return false;
+    }
+    public void markDataAsLoaded() {
+        dataLoaded = true;
     }
 }

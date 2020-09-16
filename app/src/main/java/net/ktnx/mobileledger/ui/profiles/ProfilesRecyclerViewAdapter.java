@@ -45,7 +45,6 @@ import net.ktnx.mobileledger.utils.Colors;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -194,8 +193,8 @@ public class ProfilesRecyclerViewAdapter
             throw new AssertionError();
         final MobileLedgerProfile profile = profiles.get(position);
         final MobileLedgerProfile currentProfile = Data.getProfile();
-        debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
-                profile.getUuid(), currentProfile.getUuid()));
+//        debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
+//                profile.getUuid(), currentProfile.getUuid()));
         holder.itemView.setTag(profile);
 
         int hue = profile.getThemeHue();

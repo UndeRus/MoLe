@@ -19,9 +19,8 @@ package net.ktnx.mobileledger.async;
 
 import android.os.AsyncTask;
 
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TransactionListItem;
-import net.ktnx.mobileledger.utils.LockHolder;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
@@ -29,32 +28,45 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
-public class TransactionDateFinder extends AsyncTask<SimpleDate, Void, Integer> {
+public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Params, Void, Integer> {
+    private MainModel model;
     @Override
     protected void onPostExecute(Integer pos) {
-        Data.foundTransactionItemIndex.setValue(pos);
+        model.foundTransactionItemIndex.setValue(pos);
     }
     @Override
-    protected Integer doInBackground(SimpleDate... simpleDates) {
-        SimpleDate date = simpleDates[0];
+    protected Integer doInBackground(Params... param) {
+        this.model = param[0].model;
+        SimpleDate date = param[0].date;
         Logger.debug("go-to-date",
                 String.format(Locale.US, "Looking for date %04d-%02d-%02d", date.year, date.month,
                         date.day));
-        Logger.debug("go-to-date", String.format(Locale.US, "List contains %d transactions",
-                Data.transactions.size()));
+        List<TransactionListItem> transactions = Objects.requireNonNull(
+                param[0].model.getDisplayedTransactions()
+                              .getValue());
+        Logger.debug("go-to-date",
+                String.format(Locale.US, "List contains %d transactions", transactions.size()));
 
-        try (LockHolder locker = Data.transactions.lockForWriting()) {
-            List<TransactionListItem> transactions = Data.transactions.getList();
-            TransactionListItem target = new TransactionListItem(date, true);
-            int found = Collections.binarySearch(transactions, target,
-                    new TransactionListItemComparator());
-            if (found >= 0)
-                return found;
-            else
-                return 1 - found;
+        TransactionListItem target = new TransactionListItem(date, true);
+        int found =
+                Collections.binarySearch(transactions, target, new TransactionListItemComparator());
+        if (found >= 0)
+            return found;
+        else
+            return 1 - found;
+    }
+
+    public static class Params {
+        public MainModel model;
+        public SimpleDate date;
+        public Params(MainModel model, SimpleDate date) {
+            this.model = model;
+            this.date = date;
         }
     }
+
     static class TransactionListItemComparator implements Comparator<TransactionListItem> {
         @Override
         public int compare(TransactionListItem a, TransactionListItem b) {

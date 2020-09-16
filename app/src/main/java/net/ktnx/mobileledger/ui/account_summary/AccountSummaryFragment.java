@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
@@ -70,10 +71,12 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         debug("flow", "AccountSummaryFragment.onActivityCreated()");
         super.onActivityCreated(savedInstanceState);
 
+        MainModel model = new ViewModelProvider(requireActivity()).get(MainModel.class);
+
         Data.backgroundTasksRunning.observe(this.getViewLifecycleOwner(),
                 this::onBackgroundTaskRunningChanged);
 
-        modelAdapter = new AccountSummaryAdapter();
+        modelAdapter = new AccountSummaryAdapter(model);
         MainActivity mainActivity = getMainActivity();
 
         root = mainActivity.findViewById(R.id.account_root);
@@ -93,12 +96,11 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
         refreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");
-            Data.scheduleTransactionListRetrieval();
+            model.scheduleTransactionListRetrieval();
         });
 
-        MobileLedgerProfile profile = Data.getProfile();
-        profile.getDisplayedAccounts()
-               .observe(getViewLifecycleOwner(), this::onAccountsChanged);
+        model.getDisplayedAccounts()
+             .observe(getViewLifecycleOwner(), this::onAccountsChanged);
     }
     private void onAccountsChanged(List<LedgerAccount> accounts) {
         Logger.debug("async-acc",

@@ -25,7 +25,6 @@ import android.content.pm.ShortcutManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +42,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -51,15 +51,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.async.RefreshDescriptionsTask;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
-import net.ktnx.mobileledger.ui.transaction_list.TransactionListViewModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
@@ -95,6 +94,7 @@ public class MainActivity extends ProfileThemedActivity {
     private ActionBarDrawerToggle barDrawerToggle;
     private ViewPager.SimpleOnPageChangeListener pageChangeListener;
     private MobileLedgerProfile profile;
+    private MainModel mainModel;
     @Override
     protected void onStart() {
         super.onStart();
@@ -107,8 +107,10 @@ public class MainActivity extends ProfileThemedActivity {
     protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
-        if (Data.accountFilter.getValue() != null)
-            outState.putString(STATE_ACC_FILTER, Data.accountFilter.getValue());
+        if (mainModel.getAccountFilter()
+                     .getValue() != null)
+            outState.putString(STATE_ACC_FILTER, mainModel.getAccountFilter()
+                                                          .getValue());
     }
     @Override
     protected void onDestroy() {
@@ -148,6 +150,8 @@ public class MainActivity extends ProfileThemedActivity {
         super.onCreate(savedInstanceState);
         Logger.debug("MainActivity", "onCreate()/after super");
         setContentView(R.layout.activity_main);
+
+        mainModel = new ViewModelProvider(this).get(MainModel.class);
 
         fab = findViewById(R.id.btn_add_transaction);
         profileListHeadMore = findViewById(R.id.nav_profiles_start_edit);
@@ -226,10 +230,11 @@ public class MainActivity extends ProfileThemedActivity {
             if (currentPage != -1) {
                 mCurrentPage = currentPage;
             }
-            Data.accountFilter.setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
+            mainModel.getAccountFilter()
+                     .setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
         }
 
-        Data.lastUpdateDate.observe(this, this::updateLastUpdateDisplay);
+        mainModel.lastUpdateDate.observe(this, this::updateLastUpdateDisplay);
 
         findViewById(R.id.btn_no_profiles_add).setOnClickListener(
                 v -> startEditProfileActivity(null));
@@ -319,6 +324,16 @@ public class MainActivity extends ProfileThemedActivity {
             else
                 drawer.close();
         });
+
+        mainModel.getUpdateError()
+                 .observe(this, (error) -> {
+                     if (error == null)
+                         return;
+
+                     Snackbar.make(mViewPager, error, Snackbar.LENGTH_LONG)
+                             .show();
+                     mainModel.clearUpdateError();
+                 });
     }
     private void scheduleDataRetrievalIfStale(Date lastUpdate) {
         long now = new Date().getTime();
@@ -330,11 +345,8 @@ public class MainActivity extends ProfileThemedActivity {
                         "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
                         lastUpdate.getTime() / 1000f, now / 1000f));
 
-            scheduleDataRetrieval();
+            mainModel.scheduleTransactionListRetrieval();
         }
-    }
-    public void scheduleDataRetrieval() {
-        Data.scheduleTransactionListRetrieval();
     }
     private void createShortcuts(List<MobileLedgerProfile> list) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1)
@@ -403,9 +415,7 @@ public class MainActivity extends ProfileThemedActivity {
         else
             setTitle(R.string.app_name);
 
-        if (this.profile != null)
-            this.profile.getDisplayedAccounts()
-                        .removeObservers(this);
+        mainModel.setProfile(profile);
 
         this.profile = profile;
 
@@ -426,12 +436,12 @@ public class MainActivity extends ProfileThemedActivity {
 
         mProfileListAdapter.notifyDataSetChanged();
 
-        Data.transactions.clear();
-        Logger.debug("transactions", "requesting list reload");
-        TransactionListViewModel.scheduleTransactionListReload();
+        mainModel.clearTransactions();
 
         if (haveProfile) {
-            profile.scheduleAccountListReload();
+            mainModel.scheduleAccountListReload();
+            Logger.debug("transactions", "requesting list reload");
+            mainModel.scheduleTransactionListReload();
 
             if (profile.isPostingPermitted()) {
                 mToolbar.setSubtitle(null);
@@ -472,7 +482,7 @@ public class MainActivity extends ProfileThemedActivity {
         // un-hook all observed LiveData
         Data.removeProfileObservers(this);
         Data.profiles.removeObservers(this);
-        Data.lastUpdateDate.removeObservers(this);
+        mainModel.lastUpdateDate.removeObservers(this);
 
         recreate();
     }
@@ -518,7 +528,8 @@ public class MainActivity extends ProfileThemedActivity {
     }
     private void showAccountSummaryFragment() {
         mViewPager.setCurrentItem(0, true);
-        Data.accountFilter.setValue(null);
+        mainModel.getAccountFilter()
+                 .setValue(null);
     }
     public void onLatestTransactionsClicked(View view) {
         drawer.closeDrawers();
@@ -526,7 +537,8 @@ public class MainActivity extends ProfileThemedActivity {
         showTransactionsFragment(null);
     }
     public void showTransactionsFragment(String accName) {
-        Data.accountFilter.setValue(accName);
+        mainModel.getAccountFilter()
+                 .setValue(accName);
         mViewPager.setCurrentItem(1, true);
     }
     public void showAccountTransactions(String accountName) {
@@ -541,7 +553,8 @@ public class MainActivity extends ProfileThemedActivity {
         }
         else {
             if (mBackMeansToAccountList && (mViewPager.getCurrentItem() == 1)) {
-                Data.accountFilter.setValue(null);
+                mainModel.getAccountFilter()
+                         .setValue(null);
                 showAccountSummaryFragment();
                 mBackMeansToAccountList = false;
             }
@@ -559,17 +572,18 @@ public class MainActivity extends ProfileThemedActivity {
 
         long last_update = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
 
-        Logger.debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", last_update));
+        Logger.debug("transactions",
+                String.format(Locale.ENGLISH, "Last update = %d", last_update));
         if (last_update == 0) {
-            Data.lastUpdateDate.postValue(null);
+            mainModel.lastUpdateDate.postValue(null);
         }
         else {
-            Data.lastUpdateDate.postValue(new Date(last_update));
+            mainModel.lastUpdateDate.postValue(new Date(last_update));
         }
     }
     public void onStopTransactionRefreshClick(View view) {
         Logger.debug("interactive", "Cancelling transactions refresh");
-        Data.stopTransactionsRetrieval();
+        mainModel.stopTransactionsRetrieval();
         bTransactionListCancelDownload.setEnabled(false);
     }
     public void onRetrieveRunningChanged(Boolean running) {
@@ -600,18 +614,13 @@ public class MainActivity extends ProfileThemedActivity {
             Logger.debug("progress", "Done");
             findViewById(R.id.transaction_progress_layout).setVisibility(View.GONE);
 
-            Data.transactionRetrievalDone();
+            mainModel.transactionRetrievalDone();
 
             if (progress.getError() != null) {
                 Snackbar.make(mViewPager, progress.getError(), Snackbar.LENGTH_LONG)
                         .show();
                 return;
             }
-
-            updateLastUpdateTextFromDB();
-
-            new RefreshDescriptionsTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            TransactionListViewModel.scheduleTransactionListReload();
 
             return;
         }
@@ -635,8 +644,9 @@ public class MainActivity extends ProfileThemedActivity {
             if (progressBar.isIndeterminate()) {
                 progressBar.setIndeterminate(false);
             }
-            Logger.debug("progress",
-                    String.format(Locale.US, "%d/%d", progress.getProgress(), progress.getTotal()));
+//            Logger.debug("progress",
+//                    String.format(Locale.US, "%d/%d", progress.getProgress(), progress.getTotal
+//                    ()));
             progressBar.setMax(progress.getTotal());
             // for some reason animation doesn't work - no progress is shown (stick at 0)
             // on lineageOS 14.1 (Nougat, 7.1.2)
@@ -665,7 +675,8 @@ public class MainActivity extends ProfileThemedActivity {
         @NotNull
         @Override
         public Fragment getItem(int position) {
-            Logger.debug("main", String.format(Locale.ENGLISH, "Switching to fragment %d", position));
+            Logger.debug("main",
+                    String.format(Locale.ENGLISH, "Switching to fragment %d", position));
             switch (position) {
                 case 0:
 //                    debug("flow", "Creating account summary fragment");

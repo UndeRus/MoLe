@@ -153,6 +153,8 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
                 tr.addAccount(p.asLedgerAccount());
             }
         }
+
+        tr.markDataAsLoaded();
         return tr;
     }
 }

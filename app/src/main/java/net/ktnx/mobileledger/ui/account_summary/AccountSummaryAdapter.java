@@ -37,6 +37,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
@@ -52,7 +53,10 @@ public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     public static final int AMOUNT_LIMIT = 3;
     private AsyncListDiffer<LedgerAccount> listDiffer;
-    AccountSummaryAdapter() {
+    private MainModel model;
+    AccountSummaryAdapter(MainModel model) {
+        this.model = model;
+
         listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<LedgerAccount>() {
             @Override
             public boolean areItemsTheSame(@NotNull LedgerAccount oldItem,
@@ -88,7 +92,7 @@ public class AccountSummaryAdapter
     public void setAccounts(List<LedgerAccount> newList) {
         listDiffer.submitList(newList);
     }
-    static class LedgerRowHolder extends RecyclerView.ViewHolder {
+    class LedgerRowHolder extends RecyclerView.ViewHolder {
         TextView tvAccountName, tvAccountAmounts;
         ConstraintLayout row;
         View expanderContainer;
@@ -128,8 +132,8 @@ public class AccountSummaryAdapter
             if (profile == null) {
                 return;
             }
-            try (Locker ignored = profile.lockAccountsForWriting()) {
-                LedgerAccount realAccount = profile.locateAccount(mAccount.getName());
+            try (Locker ignored = model.lockAccountsForWriting()) {
+                LedgerAccount realAccount = model.locateAccount(mAccount.getName());
                 if (realAccount == null)
                     return;
 
@@ -138,7 +142,7 @@ public class AccountSummaryAdapter
             }
             expanderContainer.animate()
                              .rotation(mAccount.isExpanded() ? 0 : 180);
-            profile.updateDisplayedAccounts();
+            model.updateDisplayedAccounts();
 
             DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
                     new Object[]{mAccount.isExpanded(), mAccount.getName(), profile.getUuid()

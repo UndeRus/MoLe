@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 public class TransactionListItem {
@@ -26,16 +27,14 @@ public class TransactionListItem {
     private SimpleDate date;
     private boolean monthShown;
     private LedgerTransaction transaction;
-    private boolean odd;
     public TransactionListItem(SimpleDate date, boolean monthShown) {
         this.type = Type.DELIMITER;
         this.date = date;
         this.monthShown = monthShown;
     }
-    public TransactionListItem(LedgerTransaction transaction, boolean isOdd) {
+    public TransactionListItem(LedgerTransaction transaction) {
         this.type = Type.TRANSACTION;
         this.transaction = transaction;
-        this.odd = isOdd;
     }
     @NonNull
     public Type getType() {
@@ -43,16 +42,16 @@ public class TransactionListItem {
     }
     @NonNull
     public SimpleDate getDate() {
-        return (date != null) ? date : transaction.getDate();
+        if (date != null)
+            return date;
+        transaction.loadData(App.getDatabase());
+        return transaction.getDate();
     }
     public boolean isMonthShown() {
         return monthShown;
     }
     public LedgerTransaction getTransaction() {
         return transaction;
-    }
-    public boolean isOdd() {
-        return odd;
     }
     public enum Type {TRANSACTION, DELIMITER}
 }

@@ -34,7 +34,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class MobileLedgerDatabase extends SQLiteOpenHelper {
     private static final String DB_NAME = "MoLe.db";
-    private static final int LATEST_REVISION = 37;
+    private static final int LATEST_REVISION = 39;
     private static final String CREATE_DB_SQL = "create_db";
 
     private final Application mContext;
@@ -62,7 +62,7 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
         db.execSQL("pragma case_sensitive_like=ON;");
-//        db.execSQL("PRAGMA foreign_keys=ON");
+        db.execSQL("PRAGMA foreign_keys=ON");
     }
 
     private void applyRevision(SQLiteDatabase db, int rev_no) {

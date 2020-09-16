@@ -283,7 +283,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                     profileUUID, transactionId));
 
         tr = profile.loadTransaction(transactionId);
-        ArrayList<LedgerTransactionAccount> accounts = tr.getAccounts();
+        List<LedgerTransactionAccount> accounts = tr.getAccounts();
         NewTransactionModel.Item firstNegative = null;
         NewTransactionModel.Item firstPositive = null;
         int singleNegativeIndex = -1;

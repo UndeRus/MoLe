@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.model;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,12 +32,9 @@ import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
-import net.ktnx.mobileledger.utils.ObservableList;
-import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -47,20 +43,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class Data {
-    public static final ObservableList<TransactionListItem> transactions =
-            new ObservableList<>(new ArrayList<>());
-    public static final MutableLiveData<SimpleDate> earliestTransactionDate =
-            new MutableLiveData<>(null);
-    public static final MutableLiveData<SimpleDate> latestTransactionDate =
-            new MutableLiveData<>(null);
     public static final MutableLiveData<Boolean> backgroundTasksRunning =
             new MutableLiveData<>(false);
     public static final MutableLiveData<RetrieveTransactionsTask.Progress> backgroundTaskProgress =
             new MutableLiveData<>();
-    public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>();
     public static final MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
             new MutableLiveData<>(null);
-    public static final MutableLiveData<String> accountFilter = new MutableLiveData<>();
     public static final MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
@@ -70,8 +58,6 @@ public final class Data {
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
-    public static MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
-    private static RetrieveTransactionsTask retrieveTransactionsTask;
 
     static {
         locale.setValue(Locale.getDefault());
@@ -97,7 +83,6 @@ public final class Data {
     }
     public static void setCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
-        stopTransactionsRetrieval();
         profile.setValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
@@ -164,29 +149,6 @@ public final class Data {
             }
         }
         return profile;
-    }
-    public synchronized static void scheduleTransactionListRetrieval() {
-        if (retrieveTransactionsTask != null) {
-            Logger.debug("db", "Ignoring request for transaction retrieval - already active");
-            return;
-        }
-        MobileLedgerProfile pr = profile.getValue();
-        if (pr == null) {
-            Logger.debug("ui", "Ignoring refresh -- no current profile");
-            return;
-        }
-
-        retrieveTransactionsTask = new RetrieveTransactionsTask(profile.getValue());
-        Logger.debug("db", "Created a background transaction retrieval task");
-
-        retrieveTransactionsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-    public static synchronized void stopTransactionsRetrieval() {
-        if (retrieveTransactionsTask != null)
-            retrieveTransactionsTask.cancel(false);
-    }
-    public static void transactionRetrievalDone() {
-        retrieveTransactionsTask = null;
     }
     public static void refreshCurrencyData(Locale locale) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);

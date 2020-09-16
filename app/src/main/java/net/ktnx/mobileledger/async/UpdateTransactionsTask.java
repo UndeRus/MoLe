@@ -25,26 +25,24 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.model.TransactionListItem;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.SimpleDate;
-
-import java.util.ArrayList;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
-public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
-    protected String doInBackground(String[] filterAccName) {
+public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
+    protected String doInBackground(MainModel[] model) {
         final MobileLedgerProfile profile = Data.getProfile();
 
         String profile_uuid = profile.getUuid();
         Data.backgroundTaskStarted();
         try {
-            ArrayList<TransactionListItem> newList = new ArrayList<>();
-
             String sql;
             String[] params;
 
-            if (filterAccName[0] == null) {
+            final String accFilter = model[0].getAccountFilter()
+                                             .getValue();
+            if (accFilter == null) {
                 sql = "SELECT id, year, month, day FROM transactions WHERE profile=? ORDER BY " +
                       "year desc, month desc, day desc, id desc";
                 params = new String[]{profile_uuid};
@@ -57,44 +55,25 @@ public class UpdateTransactionsTask extends AsyncTask<String, Void, String> {
                       "and ta.account_name LIKE ?||'%' AND ta" +
                       ".amount <> 0 ORDER BY tr.year desc, tr.month desc, tr.day desc, tr.id " +
                       "desc";
-                params = new String[]{profile_uuid, filterAccName[0]};
+                params = new String[]{profile_uuid, accFilter};
             }
 
             debug("UTT", sql);
-            SimpleDate latestDate = null, earliestDate = null;
+            TransactionAccumulator accumulator = new TransactionAccumulator(model[0]);
+
             SQLiteDatabase db = App.getDatabase();
-            boolean odd = true;
-            SimpleDate lastDate = SimpleDate.today();
             try (Cursor cursor = db.rawQuery(sql, params)) {
                 while (cursor.moveToNext()) {
                     if (isCancelled())
                         return null;
 
-                    int transaction_id = cursor.getInt(0);
-                    SimpleDate date =
-                            new SimpleDate(cursor.getInt(1), cursor.getInt(2), cursor.getInt(3));
-
-                    if (null == latestDate)
-                        latestDate = date;
-                    earliestDate = date;
-
-                    if (!date.equals(lastDate)) {
-                        boolean showMonth =
-                                (date.month != lastDate.month) || (date.year != lastDate.year);
-                        newList.add(new TransactionListItem(date, showMonth));
-                    }
-                    newList.add(
-                            new TransactionListItem(new LedgerTransaction(transaction_id), odd));
-//                    debug("UTT", String.format("got transaction %d", transaction_id));
-
-                    lastDate = date;
-                    odd = !odd;
+                    accumulator.put(new LedgerTransaction(cursor.getInt(0)),
+                            new SimpleDate(cursor.getInt(1), cursor.getInt(2), cursor.getInt(3)));
                 }
-                Data.transactions.setList(newList);
-                Data.latestTransactionDate.postValue(latestDate);
-                Data.earliestTransactionDate.postValue(earliestDate);
-                debug("UTT", "transaction list value updated");
             }
+
+            accumulator.done();
+            debug("UTT", "transaction list value updated");
 
             return null;
         }

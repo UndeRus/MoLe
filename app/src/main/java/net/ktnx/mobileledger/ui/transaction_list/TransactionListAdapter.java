@@ -39,26 +39,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.model.TransactionListItem;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.DateFormat;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowHolder> {
-    private MobileLedgerProfile profile;
+    private MainModel model;
     private AsyncListDiffer<TransactionListItem> listDiffer;
-    public TransactionListAdapter() {
+    public TransactionListAdapter(MainModel model) {
         super();
+        this.model = model;
+
         listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<TransactionListItem>() {
             @Override
             public boolean areItemsTheSame(@NonNull TransactionListItem oldItem,
@@ -99,7 +102,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         });
     }
     public void onBindViewHolder(@NonNull TransactionRowHolder holder, int position) {
-        TransactionListItem item = TransactionListViewModel.getTransactionListItem(position);
+        TransactionListItem item = listDiffer.getCurrentList()
+                                             .get(position);
 
         // in a race when transaction value is reduced, but the model hasn't been notified yet
         // the view will disappear when the notifications reaches the model, so by simply omitting
@@ -120,8 +124,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
                 TransactionLoader loader = new TransactionLoader();
                 loader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                        new TransactionLoaderParams(tr, holder, position,
-                                Data.accountFilter.getValue(), item.isOdd()));
+                        new TransactionLoaderParams(tr, holder, position, model.getAccountFilter()
+                                                                               .getValue()));
 
                 // WORKAROUND what seems to be a bug in CardHolder somewhere
                 // when a view that was previously holding a delimiter is re-purposed
@@ -169,7 +173,13 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
     @Override
     public int getItemCount() {
-        return Data.transactions.size();
+        return listDiffer.getCurrentList()
+                         .size();
+    }
+    public void setTransactions(List<TransactionListItem> newList) {
+        Logger.debug("transactions",
+                String.format(Locale.US, "Got new transaction list (%d items)", newList.size()));
+        listDiffer.submitList(newList);
     }
     enum LoaderStep {HEAD, ACCOUNTS, DONE}
 
@@ -178,12 +188,11 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         @Override
         protected Void doInBackground(TransactionLoaderParams... p) {
             LedgerTransaction tr = p[0].transaction;
-            boolean odd = p[0].odd;
 
             SQLiteDatabase db = App.getDatabase();
             tr.loadData(db);
 
-            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr, odd));
+            publishProgress(new TransactionLoaderStep(p[0].holder, p[0].position, tr));
 
             int rowIndex = 0;
             // FIXME ConcurrentModificationException in ArrayList$ltr.next (ArrayList.java:831)
@@ -292,14 +301,12 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         TransactionRowHolder holder;
         int position;
         String boldAccountName;
-        boolean odd;
         TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder,
-                                int position, String boldAccountName, boolean odd) {
+                                int position, String boldAccountName) {
             this.transaction = transaction;
             this.holder = holder;
             this.position = position;
             this.boldAccountName = boldAccountName;
-            this.odd = odd;
         }
     }
 }

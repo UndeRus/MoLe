@@ -91,4 +91,9 @@ public class SimpleDate implements Comparable<SimpleDate> {
 
         return Integer.compare(day, date.day);
     }
+    public Calendar asCalendar() {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month, day);
+        return calendar;
+    }
 }

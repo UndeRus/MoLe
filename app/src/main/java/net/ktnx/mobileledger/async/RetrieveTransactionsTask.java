@@ -36,6 +36,7 @@ import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -48,15 +49,17 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class RetrieveTransactionsTask
-        extends AsyncTask<Void, RetrieveTransactionsTask.Progress, String> {
+public class RetrieveTransactionsTask extends
+        AsyncTask<Void, RetrieveTransactionsTask.Progress, RetrieveTransactionsTask.Result> {
     private static final int MATCHING_TRANSACTIONS_LIMIT = 150;
     private static final Pattern reComment = Pattern.compile("^\\s*;");
     private static final Pattern reTransactionStart = Pattern.compile(
@@ -74,10 +77,16 @@ public class RetrieveTransactionsTask
     private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     private Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
+    private MainModel mainModel;
     private MobileLedgerProfile profile;
+    private List<LedgerAccount> prevAccounts;
     private int expectedPostingsCount = -1;
-    public RetrieveTransactionsTask(@NonNull MobileLedgerProfile profile) {
+    public RetrieveTransactionsTask(@NonNull MainModel mainModel,
+                                    @NonNull MobileLedgerProfile profile,
+                                    List<LedgerAccount> accounts) {
+        this.mainModel = mainModel;
         this.profile = profile;
+        this.prevAccounts = accounts;
     }
     private static void L(String msg) {
         //debug("transaction-parser", msg);
@@ -115,11 +124,11 @@ public class RetrieveTransactionsTask
         Data.backgroundTaskProgress.postValue(values[0]);
     }
     @Override
-    protected void onPostExecute(String error) {
-        super.onPostExecute(error);
+    protected void onPostExecute(Result result) {
+        super.onPostExecute(result);
         Progress progress = new Progress();
         progress.setState(ProgressState.FINISHED);
-        progress.setError(error);
+        progress.setError(result.error);
         onProgressUpdate(progress);
     }
     @Override
@@ -129,15 +138,14 @@ public class RetrieveTransactionsTask
         progress.setState(ProgressState.FINISHED);
         onProgressUpdate(progress);
     }
-    private String retrieveTransactionListLegacy() throws IOException, HTTPException {
+    private void retrieveTransactionListLegacy(List<LedgerAccount> accounts,
+                                               List<LedgerTransaction> transactions)
+            throws IOException, HTTPException {
         Progress progress = Progress.indeterminate();
         progress.setState(ProgressState.RUNNING);
         progress.setTotal(expectedPostingsCount);
         int maxTransactionId = -1;
-        ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
-        ArrayList<LedgerAccount> displayed = new ArrayList<>();
-        ArrayList<LedgerTransaction> transactions = new ArrayList<>();
         LedgerAccount lastAccount = null;
         ArrayList<LedgerAccount> syntheticAccounts = new ArrayList<>();
 
@@ -202,7 +210,7 @@ public class RetrieveTransactionsTask
                             }
                             lastAccount = new LedgerAccount(profile, accName, parentAccount);
 
-                            list.add(lastAccount);
+                            accounts.add(lastAccount);
                             map.put(accName, lastAccount);
 
                             state = ParserState.EXPECTING_ACCOUNT_AMOUNT;
@@ -284,7 +292,7 @@ public class RetrieveTransactionsTask
                         if (m.find()) {
                             if (transactionId == 0)
                                 throw new TransactionParserException(
-                                        "Transaction Id is 0 while expecting " + "description");
+                                        "Transaction Id is 0 while expecting description");
 
                             String date = Objects.requireNonNull(m.group(1));
                             try {
@@ -295,8 +303,8 @@ public class RetrieveTransactionsTask
                                         new LedgerTransaction(transactionId, date, m.group(2));
                             }
                             catch (ParseException e) {
-                                e.printStackTrace();
-                                return String.format("Error parsing date '%s'", date);
+                                throw new TransactionParserException(
+                                        String.format("Error parsing date '%s'", date));
                             }
                             state = ParserState.EXPECTING_TRANSACTION_DETAILS;
                             L(String.format(Locale.ENGLISH,
@@ -345,10 +353,6 @@ public class RetrieveTransactionsTask
             }
 
             throwIfCancelled();
-
-            profile.setAndStoreAccountAndTransactionListFromWeb(list, transactions);
-
-            return null;
         }
     }
     private @NonNull
@@ -372,14 +376,14 @@ public class RetrieveTransactionsTask
         createdAccounts.add(acc);
         return acc;
     }
-    private boolean retrieveAccountList() throws IOException, HTTPException {
+    private List<LedgerAccount> retrieveAccountList() throws IOException, HTTPException {
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
         http.setAllowUserInteraction(false);
         switch (http.getResponseCode()) {
             case 200:
                 break;
             case 404:
-                return false;
+                return null;
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
@@ -388,9 +392,11 @@ public class RetrieveTransactionsTask
         ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
         HashMap<String, LedgerAccount> currentMap = new HashMap<>();
-        for (LedgerAccount acc : Objects.requireNonNull(profile.getAllAccounts()))
+        for (LedgerAccount acc : prevAccounts)
             currentMap.put(acc.getName(), acc);
+        throwIfCancelled();
         try (InputStream resp = http.getInputStream()) {
+            throwIfCancelled();
             if (http.getResponseCode() != 200)
                 throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
 
@@ -459,12 +465,11 @@ public class RetrieveTransactionsTask
             }
         }
 
-        profile.setAndStoreAccountListFromWeb(list);
-        return true;
+        return list;
     }
-    private boolean retrieveTransactionList() throws IOException, ParseException, HTTPException {
+    private List<LedgerTransaction> retrieveTransactionList()
+            throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
-        int maxTransactionId = Data.transactions.size();
         progress.setTotal(expectedPostingsCount);
 
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "transactions");
@@ -474,13 +479,13 @@ public class RetrieveTransactionsTask
             case 200:
                 break;
             case 404:
-                return false;
+                return null;
             default:
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
+        ArrayList<LedgerTransaction> trList = new ArrayList<>();
         try (InputStream resp = http.getInputStream()) {
             throwIfCancelled();
-            ArrayList<LedgerTransaction> trList = new ArrayList<>();
 
             TransactionListParser parser = new TransactionListParser(resp);
 
@@ -498,44 +503,73 @@ public class RetrieveTransactionsTask
 
                 progress.setProgress(processedPostings += transaction.getAccounts()
                                                                      .size());
+//                Logger.debug("trParser",
+//                        String.format(Locale.US, "Parsed transaction %d - %s", transaction
+//                        .getId(),
+//                                transaction.getDescription()));
+//                for (LedgerTransactionAccount acc : transaction.getAccounts()) {
+//                    Logger.debug("trParser",
+//                            String.format(Locale.US, "  %s", acc.getAccountName()));
+//                }
                 publishProgress(progress);
             }
 
             throwIfCancelled();
-            profile.setAndStoreTransactionList(trList);
         }
 
-        return true;
+        // json interface returns transactions if file order and the rest of the machinery
+        // expects them in reverse chronological order
+        Collections.sort(trList, (o1, o2) -> {
+            int res = o2.getDate()
+                        .compareTo(o1.getDate());
+            if (res != 0)
+                return res;
+            return Integer.compare(o2.getId(), o1.getId());
+        });
+        return trList;
     }
 
     @SuppressLint("DefaultLocale")
     @Override
-    protected String doInBackground(Void... params) {
+    protected Result doInBackground(Void... params) {
         Data.backgroundTaskStarted();
+        List<LedgerAccount> accounts;
+        List<LedgerTransaction> transactions;
         try {
-            if (!retrieveAccountList() || !retrieveTransactionList())
-                return retrieveTransactionListLegacy();
-            return null;
+            accounts = retrieveAccountList();
+            if (accounts == null)
+                transactions = null;
+            else
+                transactions = retrieveTransactionList();
+            if (accounts == null || transactions == null) {
+                accounts = new ArrayList<>();
+                transactions = new ArrayList<>();
+                retrieveTransactionListLegacy(accounts, transactions);
+            }
+            mainModel.setAndStoreAccountAndTransactionListFromWeb(accounts, transactions);
+
+            return new Result(accounts, transactions);
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
-            return "Invalid server URL";
+            return new Result("Invalid server URL");
         }
         catch (HTTPException e) {
             e.printStackTrace();
-            return String.format("HTTP error %d: %s", e.getResponseCode(), e.getResponseMessage());
+            return new Result(String.format("HTTP error %d: %s", e.getResponseCode(),
+                    e.getResponseMessage()));
         }
         catch (IOException e) {
             e.printStackTrace();
-            return e.getLocalizedMessage();
+            return new Result(e.getLocalizedMessage());
         }
         catch (ParseException e) {
             e.printStackTrace();
-            return "Network error";
+            return new Result("Network error");
         }
         catch (OperationCanceledException e) {
             e.printStackTrace();
-            return "Operation cancelled";
+            return new Result("Operation cancelled");
         }
         finally {
             Data.backgroundTaskFinished();
@@ -622,6 +656,19 @@ public class RetrieveTransactionsTask
     private static class TransactionParserException extends IllegalStateException {
         TransactionParserException(String message) {
             super(message);
+        }
+    }
+
+    public static class Result {
+        public String error;
+        public List<LedgerAccount> accounts;
+        public List<LedgerTransaction> transactions;
+        Result(String error) {
+            this.error = error;
+        }
+        Result(List<LedgerAccount> accounts, List<LedgerTransaction> transactions) {
+            this.accounts = accounts;
+            this.transactions = transactions;
         }
     }
 }
