@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -48,8 +48,8 @@ public class HueRing extends View {
     private float innerR;
     private float bandWidth;
     private float centerR;
-    private RectF centerRect = new RectF();
-    private RectF ringRect = new RectF();
+    private final RectF centerRect = new RectF();
+    private final RectF ringRect = new RectF();
     private int markerOverflow;
     private int markerStrokeWidth;
     public HueRing(Context context, @Nullable AttributeSet attrs) {

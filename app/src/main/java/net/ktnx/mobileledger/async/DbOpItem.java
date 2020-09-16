@@ -18,9 +18,9 @@
 package net.ktnx.mobileledger.async;
 
 class DbOpItem {
-    String sql;
-    Object[] params;
-    Runnable onReady;
+    final String sql;
+    final Object[] params;
+    final Runnable onReady;
     public DbOpItem(String sql, Object[] params, Runnable onReady) {
         this.sql = sql;
         this.params = params;

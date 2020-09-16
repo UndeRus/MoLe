@@ -38,6 +38,7 @@
         <item name="colorPrimaryDark">#6920ed</item>
         <item name="table_row_dark_bg">#efe7fd</item>
         <item name="table_row_light_bg">#f9f6fe</item>
+        <item name="background">@null</item>
     </style>
 
     <!-- theme list start -->

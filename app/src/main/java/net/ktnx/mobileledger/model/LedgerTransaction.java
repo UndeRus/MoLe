@@ -52,12 +52,12 @@ public class LedgerTransaction {
             return res;
         return Float.compare(o1.getAmount(), o2.getAmount());
     };
-    private String profile;
-    private Integer id;
+    private final String profile;
+    private final Integer id;
     private SimpleDate date;
     private String description;
     private String comment;
-    private List<LedgerTransactionAccount> accounts;
+    private final List<LedgerTransactionAccount> accounts;
     private String dataHash;
     private boolean dataLoaded;
     public LedgerTransaction(Integer id, String dateString, String description)

@@ -51,13 +51,13 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class ProfilesRecyclerViewAdapter
         extends RecyclerView.Adapter<ProfilesRecyclerViewAdapter.ProfileListViewHolder> {
     private static WeakReference<ProfilesRecyclerViewAdapter> instanceRef;
+    public final MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
     private final View.OnClickListener mOnClickListener = view -> {
         MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
         editProfile(view, profile);
     };
-    public final MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
+    private final ItemTouchHelper rearrangeHelper;
     private RecyclerView recyclerView;
-    private ItemTouchHelper rearrangeHelper;
     private boolean animationsEnabled = true;
     public ProfilesRecyclerViewAdapter() {
         instanceRef = new WeakReference<>(this);

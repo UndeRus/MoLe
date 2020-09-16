@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -16,11 +16,10 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:type="linear"
-        android:endColor="?colorPrimaryTransparent"
-        android:centerColor="?colorPrimary"
-        android:startColor="?colorPrimaryTransparent" />
-    <size android:height="2dp" />
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_star_border_black_24dp"
+        android:state_checked="false"/>
+    <item android:drawable="@drawable/ic_star_black_24dp"
+        android:state_checked="true"/>
+    <item android:drawable="@drawable/ic_star_border_black_24dp" />
+</selector>

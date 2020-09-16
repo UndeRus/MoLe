@@ -45,8 +45,8 @@ public final class Globals {
                 }
             };
     public static String[] monthNames;
-    public static String developerEmail = "dam+mole-crash@ktnx.net";
-    private static Pattern reLedgerDate =
+    public static final String developerEmail = "dam+mole-crash@ktnx.net";
+    private static final Pattern reLedgerDate =
             Pattern.compile("^(?:(?:(\\d+)/)??(\\d\\d?)/)?(\\d\\d?)$");
     public static void hideSoftKeyboard(Activity act) {
         // hide the keyboard

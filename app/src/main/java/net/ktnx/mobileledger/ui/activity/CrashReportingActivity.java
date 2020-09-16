@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -37,32 +37,29 @@ public abstract class CrashReportingActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
 
-                try {
-                    PackageInfo pi = getApplicationContext().getPackageManager()
-                            .getPackageInfo(getPackageName(), 0);
-                    pw.format("MoLe version: %s\n", pi.versionName);
-                }
-                catch (Exception oh) {
-                    pw.print("Error getting package version:\n");
-                    oh.printStackTrace(pw);
-                    pw.print("\n");
-                }
-                pw.format("OS version: %s; API level %d\n\n", Build.VERSION.RELEASE,
-                        Build.VERSION.SDK_INT);
-                e.printStackTrace(pw);
-
-                Log.e(null, sw.toString());
-
-                CrashReportDialogFragment df = new CrashReportDialogFragment();
-                df.setCrashReportText(sw.toString());
-                df.show(getSupportFragmentManager(), "crash_report");
+            try {
+                PackageInfo pi = getApplicationContext().getPackageManager()
+                                                        .getPackageInfo(getPackageName(), 0);
+                pw.format("MoLe version: %s\n", pi.versionName);
             }
+            catch (Exception oh) {
+                pw.print("Error getting package version:\n");
+                oh.printStackTrace(pw);
+                pw.print("\n");
+            }
+            pw.format("OS version: %s; API level %d\n\n", Build.VERSION.RELEASE,
+                    Build.VERSION.SDK_INT);
+            e.printStackTrace(pw);
+
+            Log.e(null, sw.toString());
+
+            CrashReportDialogFragment df = new CrashReportDialogFragment();
+            df.setCrashReportText(sw.toString());
+            df.show(getSupportFragmentManager(), "crash_report");
         });
         debug("crash", "Uncaught exception handler set");
     }

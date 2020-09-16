@@ -65,7 +65,7 @@ public class MainModel extends ViewModel {
     private final MutableLiveData<String> updateError = new MutableLiveData<>();
     private MobileLedgerProfile profile;
     private List<LedgerAccount> allAccounts = new ArrayList<>();
-    private Map<String, LedgerAccount> accountMap = new HashMap<>();
+    private final Map<String, LedgerAccount> accountMap = new HashMap<>();
     private SimpleDate firstTransactionDate;
     private SimpleDate lastTransactionDate;
     transient private RetrieveTransactionsTask retrieveTransactionsTask;
@@ -274,8 +274,8 @@ public class MainModel extends ViewModel {
     }
 
     static class AccountListLoader extends Thread {
-        private MobileLedgerProfile profile;
-        private MainModel model;
+        private final MobileLedgerProfile profile;
+        private final MainModel model;
         AccountListLoader(MobileLedgerProfile profile, MainModel model) {
             this.profile = profile;
             this.model = model;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,6 +19,10 @@ package net.ktnx.mobileledger.utils;
 
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -34,15 +38,11 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class ObservableList<T> extends Observable implements List<T> {
     private List<T> list;
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private int notificationBlocks = 0;
     private boolean notificationWasBlocked = false;
     public ObservableList(List<T> list) {
@@ -81,11 +81,14 @@ public class ObservableList<T> extends Observable implements List<T> {
         throw new RuntimeException("Iterators break encapsulation and ignore locking");
 //        return list.iterator();
     }
+    @NotNull
     public Object[] toArray() {
         try (LockHolder lh = lockForReading()) {
             return list.toArray();
         }
     }
+    @Override
+    @NotNull
     public <T1> T1[] toArray(@Nullable T1[] a) {
         try (LockHolder lh = lockForReading()) {
             return list.toArray(a);
@@ -95,7 +98,8 @@ public class ObservableList<T> extends Observable implements List<T> {
         try (LockHolder lh = lockForWriting()) {
             boolean result = list.add(t);
             lh.downgrade();
-            if (result) forceNotify();
+            if (result)
+                forceNotify();
             return result;
         }
     }
@@ -234,40 +238,46 @@ public class ObservableList<T> extends Observable implements List<T> {
     @NotNull
     @RequiresApi(api = Build.VERSION_CODES.N)
     public Spliterator<T> spliterator() {
-        if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
-                "Iterators break encapsulation and ignore locking. Write-lock first");
+        if (!lock.isWriteLockedByCurrentThread())
+            throw new RuntimeException(
+                    "Iterators break encapsulation and ignore locking. Write-lock first");
         return list.spliterator();
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public boolean removeIf(Predicate<? super T> filter) {
+    public boolean removeIf(@NotNull Predicate<? super T> filter) {
         try (LockHolder lh = lockForWriting()) {
             boolean result = list.removeIf(filter);
             lh.downgrade();
-            if (result) forceNotify();
+            if (result)
+                forceNotify();
             return result;
         }
     }
+    @NotNull
     @RequiresApi(api = Build.VERSION_CODES.N)
     public Stream<T> stream() {
         if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
                 "Iterators break encapsulation and ignore locking. Write-lock first");
         return list.stream();
     }
+    @NotNull
     @RequiresApi(api = Build.VERSION_CODES.N)
     public Stream<T> parallelStream() {
-        if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
-                "Iterators break encapsulation and ignore locking. Write-lock first");
+        if (!lock.isWriteLockedByCurrentThread())
+            throw new RuntimeException(
+                    "Iterators break encapsulation and ignore locking. Write-lock first");
         return list.parallelStream();
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public void forEach(Consumer<? super T> action) {
+    public void forEach(@NotNull Consumer<? super T> action) {
         try (LockHolder lh = lockForReading()) {
             list.forEach(action);
         }
     }
     public List<T> getList() {
-        if (!lock.isWriteLockedByCurrentThread()) throw new RuntimeException(
-                "Direct list access breaks encapsulation and ignore locking. Write-lock first");
+        if (!lock.isWriteLockedByCurrentThread())
+            throw new RuntimeException(
+                    "Direct list access breaks encapsulation and ignore locking. Write-lock first");
         return list;
     }
     public void setList(List<T> aList) {

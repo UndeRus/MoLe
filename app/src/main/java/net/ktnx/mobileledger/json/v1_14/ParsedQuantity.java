@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -47,11 +47,11 @@ public class ParsedQuantity {
         int pointPos = input.indexOf('.');
         if (pointPos >= 0) {
             String integral = input.replace(".", "");
-            decimalMantissa = Long.valueOf(integral);
+            decimalMantissa = Long.parseLong(integral);
             decimalPlaces = input.length() - pointPos - 1;
         }
         else {
-            decimalMantissa = Long.valueOf(input);
+            decimalMantissa = Long.parseLong(input);
             decimalPlaces = 0;
         }
     }

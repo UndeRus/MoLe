@@ -57,7 +57,7 @@ public class ObservableValue<T> {
         impl.setChanged();
         impl.notifyObservers();
     }
-    private class ObservableValueImpl<T> extends Observable {
+    private static class ObservableValueImpl<T> extends Observable {
         protected T value;
         public void setValue(T newValue) {
             setValue(newValue, true);
@@ -66,7 +66,8 @@ public class ObservableValue<T> {
             super.setChanged();
         }
         private synchronized void setValue(T newValue, boolean notify) {
-            if ((newValue == null) && (value == null)) return;
+            if ((newValue == null) && (value == null))
+                return;
 
             if ((newValue != null) && newValue.equals(value)) return;
 

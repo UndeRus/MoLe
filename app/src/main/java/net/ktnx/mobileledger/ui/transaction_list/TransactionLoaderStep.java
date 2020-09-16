@@ -21,10 +21,10 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 
 class TransactionLoaderStep {
+    private final TransactionListAdapter.LoaderStep step;
+    private final TransactionRowHolder holder;
     private int position;
     private int accountCount;
-    private TransactionListAdapter.LoaderStep step;
-    private TransactionRowHolder holder;
     private LedgerTransaction transaction;
     private LedgerTransactionAccount account;
     private int accountPosition;

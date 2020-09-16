@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package net.ktnx.mobileledger.utils;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class Locker implements AutoCloseable {
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     public LockHolder lockForWriting() {
         ReentrantReadWriteLock.WriteLock wLock = lock.writeLock();
         wLock.lock();

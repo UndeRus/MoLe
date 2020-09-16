@@ -52,8 +52,8 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     public static final int AMOUNT_LIMIT = 3;
-    private AsyncListDiffer<LedgerAccount> listDiffer;
-    private MainModel model;
+    private final AsyncListDiffer<LedgerAccount> listDiffer;
+    private final MainModel model;
     AccountSummaryAdapter(MainModel model) {
         this.model = model;
 
@@ -93,11 +93,11 @@ public class AccountSummaryAdapter
         listDiffer.submitList(newList);
     }
     class LedgerRowHolder extends RecyclerView.ViewHolder {
-        TextView tvAccountName, tvAccountAmounts;
-        ConstraintLayout row;
-        View expanderContainer;
-        ImageView expander;
-        View accountExpanderContainer;
+        final TextView tvAccountName, tvAccountAmounts;
+        final ConstraintLayout row;
+        final View expanderContainer;
+        final ImageView expander;
+        final View accountExpanderContainer;
         LedgerAccount mAccount;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
@@ -178,14 +178,11 @@ public class AccountSummaryAdapter
             final String accountName = mAccount.getName();
             builder.setTitle(accountName);
             builder.setItems(R.array.acc_ctx_menu, (dialog, which) -> {
-                switch (which) {
-                    case 0:
-                        // show transactions
-                        activity.showAccountTransactions(accountName);
-                        break;
-                    default:
-                        throw new RuntimeException(
-                                String.format("Unknown menu item id (%d)", which));
+                if (which == 0) {// show transactions
+                    activity.showAccountTransactions(accountName);
+                }
+                else {
+                    throw new RuntimeException(String.format("Unknown menu item id (%d)", which));
                 }
                 dialog.dismiss();
             });

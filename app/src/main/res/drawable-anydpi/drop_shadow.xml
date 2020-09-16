@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright © 2019 Damyan Ivanov.
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -15,9 +15,10 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid
-        android:color="?colorPrimary"
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#80000000"
+        android:endColor="#00000000"
+        android:angle="270"
         />
 </shape>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -42,7 +42,7 @@ public class Currency {
                            (oldItem.hasGap == newItem.hasGap);
                 }
             };
-    private int id;
+    private final int id;
     private String name;
     private Position position;
     private boolean hasGap;
@@ -120,9 +120,7 @@ public class Currency {
     }
     public enum Position {
         before(-1), after(1), unknown(0), none(-2);
-        private int value;
         Position(int value) {
-            this.value = value;
         }
         static Position valueOf(int value) {
             switch (value) {

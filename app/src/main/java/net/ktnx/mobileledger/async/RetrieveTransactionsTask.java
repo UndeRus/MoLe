@@ -74,12 +74,13 @@ public class RetrieveTransactionsTask extends
     private static final Pattern reDecimalPoint = Pattern.compile("\\.\\d\\d?$");
     private static final Pattern reDecimalComma = Pattern.compile(",\\d\\d?$");
     // %3A is '='
-    private Pattern reAccountName = Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
-    private Pattern reAccountValue = Pattern.compile(
+    private final Pattern reAccountName =
+            Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
+    private final Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
-    private MainModel mainModel;
-    private MobileLedgerProfile profile;
-    private List<LedgerAccount> prevAccounts;
+    private final MainModel mainModel;
+    private final MobileLedgerProfile profile;
+    private final List<LedgerAccount> prevAccounts;
     private int expectedPostingsCount = -1;
     public RetrieveTransactionsTask(@NonNull MainModel mainModel,
                                     @NonNull MobileLedgerProfile profile,

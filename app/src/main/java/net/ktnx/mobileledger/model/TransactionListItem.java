@@ -23,7 +23,7 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 public class TransactionListItem {
-    private Type type;
+    private final Type type;
     private SimpleDate date;
     private boolean monthShown;
     private LedgerTransaction transaction;

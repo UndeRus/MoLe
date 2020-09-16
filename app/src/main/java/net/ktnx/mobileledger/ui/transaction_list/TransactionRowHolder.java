@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -29,14 +29,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 
 class TransactionRowHolder extends RecyclerView.ViewHolder {
-    TextView tvDescription;
-    TextView tvComment;
-    LinearLayout tableAccounts;
-    ConstraintLayout row;
-    ConstraintLayout vDelimiter;
-    CardView vTransaction;
-    TextView tvDelimiterMonth, tvDelimiterDate;
-    View vDelimiterThick;
+    final TextView tvDescription;
+    final TextView tvComment;
+    final LinearLayout tableAccounts;
+    final ConstraintLayout row;
+    final ConstraintLayout vDelimiter;
+    final CardView vTransaction;
+    final TextView tvDelimiterMonth, tvDelimiterDate;
+    final View vDelimiterThick;
     public TransactionRowHolder(@NonNull View itemView) {
         super(itemView);
         this.row = itemView.findViewById(R.id.transaction_row);

@@ -56,8 +56,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowHolder> {
-    private MainModel model;
-    private AsyncListDiffer<TransactionListItem> listDiffer;
+    private final MainModel model;
+    private final AsyncListDiffer<TransactionListItem> listDiffer;
     public TransactionListAdapter(MainModel model) {
         super();
         this.model = model;
@@ -297,10 +297,10 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     }
 
     private static class TransactionLoaderParams {
-        LedgerTransaction transaction;
-        TransactionRowHolder holder;
-        int position;
-        String boldAccountName;
+        final LedgerTransaction transaction;
+        final TransactionRowHolder holder;
+        final int position;
+        final String boldAccountName;
         TransactionLoaderParams(LedgerTransaction transaction, TransactionRowHolder holder,
                                 int position, String boldAccountName) {
             this.transaction = transaction;

@@ -59,8 +59,8 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
     }
 
     public static class Params {
-        public MainModel model;
-        public SimpleDate date;
+        public final MainModel model;
+        public final SimpleDate date;
         public Params(MainModel model, SimpleDate date) {
             this.model = model;
             this.date = date;

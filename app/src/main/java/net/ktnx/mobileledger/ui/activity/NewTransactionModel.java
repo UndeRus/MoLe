@@ -46,18 +46,18 @@ public class NewTransactionModel extends ViewModel {
     final ArrayList<Item> items = new ArrayList<>();
     final MutableLiveData<Boolean> isSubmittable = new MutableLiveData<>(false);
     final MutableLiveData<Boolean> showComments = new MutableLiveData<>(true);
-    private final Item header = new Item(this, null, "");
+    private final Item header = new Item(this, "");
     private final Item trailer = new Item(this);
     private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
     private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
     private final AtomicInteger busyCounter = new AtomicInteger(0);
     private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
-    private boolean observingDataProfile;
-    private Observer<MobileLedgerProfile> profileObserver = profile -> {
+    private final Observer<MobileLedgerProfile> profileObserver = profile -> {
         showCurrency.postValue(profile.getShowCommodityByDefault());
         showComments.postValue(profile.getShowCommentsByDefault());
     };
+    private boolean observingDataProfile;
     void observeShowComments(LifecycleOwner owner, Observer<? super Boolean> observer) {
         showComments.observe(owner, observer);
     }
@@ -227,27 +227,26 @@ public class NewTransactionModel extends ViewModel {
 
 
     static class Item {
-        private ItemType type;
-        private MutableLiveData<SimpleDate> date = new MutableLiveData<>();
-        private MutableLiveData<String> description = new MutableLiveData<>();
+        private final ItemType type;
+        private final MutableLiveData<SimpleDate> date = new MutableLiveData<>();
+        private final MutableLiveData<String> description = new MutableLiveData<>();
+        private final MutableLiveData<String> amountHint = new MutableLiveData<>(null);
+        private final NewTransactionModel model;
+        private final MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
+        private final MutableLiveData<String> comment = new MutableLiveData<>(null);
+        private final MutableLiveData<Currency> currency = new MutableLiveData<>(null);
+        private final MutableLiveData<Boolean> amountValid = new MutableLiveData<>(true);
         private LedgerTransactionAccount account;
-        private MutableLiveData<String> amountHint = new MutableLiveData<>(null);
-        private NewTransactionModel model;
-        private MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
         private FocusedElement focusedElement = FocusedElement.Account;
-        private MutableLiveData<String> comment = new MutableLiveData<>(null);
-        private MutableLiveData<Currency> currency = new MutableLiveData<>(null);
-        private MutableLiveData<Boolean> amountValid = new MutableLiveData<>(true);
         private boolean amountHintIsSet = false;
         Item(NewTransactionModel model) {
             this.model = model;
             type = ItemType.bottomFiller;
             editable.setValue(false);
         }
-        Item(NewTransactionModel model, SimpleDate date, String description) {
+        Item(NewTransactionModel model, String description) {
             this.model = model;
             this.type = ItemType.generalData;
-            this.date.setValue(date);
             this.description.setValue(description);
             this.editable.setValue(true);
         }
@@ -272,14 +271,14 @@ public class NewTransactionModel extends ViewModel {
             return model;
         }
         void setEditable(boolean editable) {
-            ensureType(ItemType.generalData, ItemType.transactionRow);
+            ensureTypeIsGeneralDataOrTransactionRow();
             this.editable.setValue(editable);
         }
-        private void ensureType(ItemType type1, ItemType type2) {
-            if ((type != type1) && (type != type2)) {
+        private void ensureTypeIsGeneralDataOrTransactionRow() {
+            if ((type != ItemType.generalData) && (type != ItemType.transactionRow)) {
                 throw new RuntimeException(
                         String.format("Actual type (%s) differs from wanted (%s or %s)", type,
-                                type1, type2));
+                                ItemType.generalData, ItemType.transactionRow));
             }
         }
         String getAmountHint() {
@@ -446,8 +445,8 @@ public class NewTransactionModel extends ViewModel {
         void stopObservingCurrency(Observer<Currency> observer) {
             currency.removeObserver(observer);
         }
-        boolean isOfType(ItemType type) {
-            return this.type == type;
+        boolean isBottomFiller() {
+            return this.type == ItemType.bottomFiller;
         }
         boolean isAmountHintSet() {
             return amountHintIsSet;

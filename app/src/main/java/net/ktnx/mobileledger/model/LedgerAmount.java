@@ -22,11 +22,10 @@ import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 
 public class LedgerAmount {
-    private String currency;
-    private float amount;
+    private final String currency;
+    private final float amount;
 
-    public
-    LedgerAmount(float amount, @NonNull String currency) {
+    public LedgerAmount(float amount, @NonNull String currency) {
         this.currency = currency;
         this.amount = amount;
     }

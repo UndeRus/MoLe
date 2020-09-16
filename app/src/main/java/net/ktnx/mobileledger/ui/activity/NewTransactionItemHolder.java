@@ -65,33 +65,33 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private final TextView tvCurrency;
     private final Observer<Boolean> showCommentsObserver;
     private final TextView tvTransactionComment;
+    private final TextView tvDate;
+    private final AutoCompleteTextView tvDescription;
+    private final TextView tvDummy;
+    private final AutoCompleteTextView tvAccount;
+    private final TextView tvComment;
+    private final EditText tvAmount;
+    private final ViewGroup lHead;
+    private final ViewGroup lAccount;
+    private final FrameLayout lPadding;
+    private final MobileLedgerProfile mProfile;
+    private final Observer<SimpleDate> dateObserver;
+    private final Observer<String> descriptionObserver;
+    private final Observer<String> transactionCommentObserver;
+    private final Observer<String> hintObserver;
+    private final Observer<Integer> focusedAccountObserver;
+    private final Observer<Integer> accountCountObserver;
+    private final Observer<Boolean> editableObserver;
+    private final Observer<Currency.Position> currencyPositionObserver;
+    private final Observer<Boolean> currencyGapObserver;
+    private final Observer<Locale> localeObserver;
+    private final Observer<Currency> currencyObserver;
+    private final Observer<Boolean> showCurrencyObserver;
+    private final Observer<String> commentObserver;
+    private final Observer<Boolean> amountValidityObserver;
     private String decimalSeparator;
     private NewTransactionModel.Item item;
-    private TextView tvDate;
-    private AutoCompleteTextView tvDescription;
-    private TextView tvDummy;
-    private AutoCompleteTextView tvAccount;
-    private TextView tvComment;
-    private EditText tvAmount;
-    private ViewGroup lHead;
-    private ViewGroup lAccount;
-    private FrameLayout lPadding;
-    private MobileLedgerProfile mProfile;
     private Date date;
-    private Observer<SimpleDate> dateObserver;
-    private Observer<String> descriptionObserver;
-    private Observer<String> transactionCommentObserver;
-    private Observer<String> hintObserver;
-    private Observer<Integer> focusedAccountObserver;
-    private Observer<Integer> accountCountObserver;
-    private Observer<Boolean> editableObserver;
-    private Observer<Currency.Position> currencyPositionObserver;
-    private Observer<Boolean> currencyGapObserver;
-    private Observer<Locale> localeObserver;
-    private Observer<Currency> currencyObserver;
-    private Observer<Boolean> showCurrencyObserver;
-    private Observer<String> commentObserver;
-    private Observer<Boolean> amountValidityObserver;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     //TODO multiple amounts with different currencies per posting
@@ -683,7 +683,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 final NewTransactionActivity activity =
                         (NewTransactionActivity) tvDescription.getContext();
 
-                if (!item.isOfType(ItemType.bottomFiller)) {
+                if (!item.isBottomFiller()) {
                     item.observeEditableFlag(activity, editableObserver);
                     item.getModel()
                         .observeFocusedItem(activity, focusedAccountObserver);

@@ -63,8 +63,8 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     private String token;
     private String session;
     private LedgerTransaction transaction;
-    private MobileLedgerProfile mProfile;
-    private boolean simulate;
+    private final MobileLedgerProfile mProfile;
+    private final boolean simulate;
 
     public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile,
                                boolean simulate) {
@@ -315,7 +315,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
 
     public enum API {
         auto(0), html(-1), pre_1_15(-2), post_1_14(-3);
-        private static SparseArray<API> map = new SparseArray<>();
+        private static final SparseArray<API> map = new SparseArray<>();
 
         static {
             for (API item : API.values()) {

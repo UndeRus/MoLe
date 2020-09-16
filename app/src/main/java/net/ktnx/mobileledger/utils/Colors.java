@@ -45,6 +45,7 @@ public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
     public static final int THEME_HUE_STEP_DEG = 5;
     public static final int baseHueStep = 60;
+    public static final MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
     private static final float blueLightness = 0.665f;
     private static final float yellowLightness = 0.350f;
     private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
@@ -54,8 +55,7 @@ public class Colors {
     @ColorInt
     public static int tableRowDarkBG;
     public static int profileThemeId = -1;
-    public static MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
-    private static int[] themeIDs =
+    private static final int[] themeIDs =
             {R.style.AppTheme_000, R.style.AppTheme_005, R.style.AppTheme_010, R.style.AppTheme_015,
              R.style.AppTheme_020, R.style.AppTheme_025, R.style.AppTheme_030, R.style.AppTheme_035,
              R.style.AppTheme_040, R.style.AppTheme_045, R.style.AppTheme_050, R.style.AppTheme_055,

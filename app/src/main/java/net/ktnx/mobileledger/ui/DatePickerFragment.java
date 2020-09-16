@@ -39,7 +39,7 @@ public class DatePickerFragment extends AppCompatDialogFragment
     static final Pattern reYMD = Pattern.compile("^\\s*(\\d+)\\d*/\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reMD = Pattern.compile("^\\s*(\\d+)\\s*/\\s*(\\d+)\\s*$");
     static final Pattern reD = Pattern.compile("\\s*(\\d+)\\s*$");
-    private Calendar presentDate = GregorianCalendar.getInstance();
+    private final Calendar presentDate = GregorianCalendar.getInstance();
     private DatePickedListener onDatePickedListener;
     private long minDate = 0;
     private long maxDate = Long.MAX_VALUE;

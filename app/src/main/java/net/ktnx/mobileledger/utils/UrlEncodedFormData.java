@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UrlEncodedFormData {
-    private List<AbstractMap.SimpleEntry<String,String>> pairs;
+    private final List<AbstractMap.SimpleEntry<String, String>> pairs;
 
     public UrlEncodedFormData() {
         pairs = new ArrayList<>();

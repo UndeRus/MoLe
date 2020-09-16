@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,15 +19,15 @@ package net.ktnx.mobileledger.utils;
 
 import android.os.Build;
 
+import androidx.annotation.RequiresApi;
+
 import java.util.Observable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntUnaryOperator;
 
-import androidx.annotation.RequiresApi;
-
 public class ObservableAtomicInteger extends Observable {
-    private AtomicInteger holder;
+    private final AtomicInteger holder;
     ObservableAtomicInteger() {
         super();
         holder = new AtomicInteger();

@@ -24,9 +24,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class SimpleDate implements Comparable<SimpleDate> {
-    public int year;
-    public int month;
-    public int day;
+    public final int year;
+    public final int month;
+    public final int day;
     public SimpleDate(int y, int m, int d) {
         year = y;
         month = m;

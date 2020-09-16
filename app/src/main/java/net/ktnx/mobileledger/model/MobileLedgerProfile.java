@@ -566,7 +566,7 @@ public final class MobileLedgerProfile {
     public enum FutureDates {
         None(0), OneWeek(7), TwoWeeks(14), OneMonth(30), TwoMonths(60), ThreeMonths(90),
         SixMonths(180), OneYear(365), All(-1);
-        private static SparseArray<FutureDates> map = new SparseArray<>();
+        private static final SparseArray<FutureDates> map = new SparseArray<>();
 
         static {
             for (FutureDates item : FutureDates.values()) {

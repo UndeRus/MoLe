@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -49,50 +48,33 @@ public class CrashReportDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.crash_dialog, null);
         ((TextView) view.findViewById(R.id.textCrashReport)).setText(mCrashReportText);
         repScroll = view.findViewById(R.id.scrollText);
-        builder.setTitle(R.string.crash_dialog_title).setView(view)
-                .setPositiveButton(R.string.btn_send_crash_report,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // still nothing
-                                Intent email = new Intent(Intent.ACTION_SEND);
-                                email.putExtra(Intent.EXTRA_EMAIL,
-                                        new String[]{Globals.developerEmail});
-                                email.putExtra(Intent.EXTRA_SUBJECT, "MoLe crash report");
-                                email.putExtra(Intent.EXTRA_TEXT, mCrashReportText);
-                                email.setType("message/rfc822");
-                                startActivity(Intent.createChooser(email,
-                                        getResources().getString(R.string.send_crash_via)));
-                            }
-                        })
-                .setNegativeButton(R.string.btn_not_now, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        CrashReportDialogFragment.this.getDialog().cancel();
-                    }
-                })
-                .setNeutralButton(R.string.btn_show_report, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
+        builder.setTitle(R.string.crash_dialog_title)
+               .setView(view)
+               .setPositiveButton(R.string.btn_send_crash_report, (dialog, which) -> {
+                   // still nothing
+                   Intent email = new Intent(Intent.ACTION_SEND);
+                   email.putExtra(Intent.EXTRA_EMAIL, new String[]{Globals.developerEmail});
+                   email.putExtra(Intent.EXTRA_SUBJECT, "MoLe crash report");
+                   email.putExtra(Intent.EXTRA_TEXT, mCrashReportText);
+                   email.setType("message/rfc822");
+                   startActivity(Intent.createChooser(email,
+                           getResources().getString(R.string.send_crash_via)));
+               })
+               .setNegativeButton(R.string.btn_not_now,
+                       (dialog, which) -> CrashReportDialogFragment.this.getDialog()
+                                                                        .cancel())
+               .setNeutralButton(R.string.btn_show_report, (dialog, which) -> {
+               });
 
         AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-                dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
-                        .setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (repScroll != null) {
-                                    repScroll.setVisibility(View.VISIBLE);
-                                    v.setVisibility(View.GONE);
-                                }
-                            }
-                        });
-            }
-        });
+        dialog.setOnShowListener(dialogInterface -> dialog.getButton(AlertDialog.BUTTON_NEUTRAL)
+                                                          .setOnClickListener(v -> {
+                                                              if (repScroll != null) {
+                                                                  repScroll.setVisibility(
+                                                                          View.VISIBLE);
+                                                                  v.setVisibility(View.GONE);
+                                                              }
+                                                          }));
         return dialog;
     }
     @Override

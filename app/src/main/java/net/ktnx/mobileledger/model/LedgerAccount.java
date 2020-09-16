@@ -30,12 +30,12 @@ public class LedgerAccount {
     private String name;
     private String shortName;
     private int level;
-    private LedgerAccount parent;
+    private final LedgerAccount parent;
     private boolean expanded;
     private List<LedgerAmount> amounts;
     private boolean hasSubAccounts;
     private boolean amountsExpanded;
-    private WeakReference<MobileLedgerProfile> profileWeakReference;
+    private final WeakReference<MobileLedgerProfile> profileWeakReference;
 
     public LedgerAccount(MobileLedgerProfile profile, String name, @Nullable LedgerAccount parent) {
         this.profileWeakReference = new WeakReference<>(profile);

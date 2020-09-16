@@ -53,9 +53,9 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItemHolder>
         implements DescriptionSelectedCallback {
-    private NewTransactionModel model;
+    private final NewTransactionModel model;
     private MobileLedgerProfile mProfile;
-    private ItemTouchHelper touchHelper;
+    private final ItemTouchHelper touchHelper;
     private RecyclerView recyclerView;
     private int checkHoldCounter = 0;
     NewTransactionItemsAdapter(NewTransactionModel viewModel, MobileLedgerProfile profile) {
@@ -651,7 +651,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     }
 
     private static class BalanceForCurrency {
-        private HashMap<String, Float> hashMap = new HashMap<>();
+        private final HashMap<String, Float> hashMap = new HashMap<>();
         float get(String currencyName) {
             Float f = hashMap.get(currencyName);
             if (f == null) {
@@ -672,7 +672,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     }
 
     private static class ItemsForCurrency {
-        private HashMap<String, List<NewTransactionModel.Item>> hashMap = new HashMap<>();
+        private final HashMap<String, List<NewTransactionModel.Item>> hashMap = new HashMap<>();
         @NonNull
         List<NewTransactionModel.Item> getList(@Nullable String currencyName) {
             List<NewTransactionModel.Item> list = hashMap.get(currencyName);

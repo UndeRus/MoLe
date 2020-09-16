@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -21,14 +21,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.utils.Colors;
 
-import androidx.annotation.NonNull;
-
 public class HueRingDialog extends Dialog {
     private final int currentHue;
-    private int initialHue;
+    private final int initialHue;
     private HueRing hueRing;
     private HueSelectedListener listener;
 
