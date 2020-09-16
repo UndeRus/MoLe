@@ -335,15 +335,15 @@ public class MainActivity extends ProfileThemedActivity {
                      mainModel.clearUpdateError();
                  });
     }
-    private void scheduleDataRetrievalIfStale(Date lastUpdate) {
+    private void scheduleDataRetrievalIfStale(long lastUpdate) {
         long now = new Date().getTime();
-        if ((lastUpdate == null) || (now > (lastUpdate.getTime() + (24 * 3600 * 1000)))) {
-            if (lastUpdate == null)
+        if ((lastUpdate == 0) || (now > (lastUpdate + (24 * 3600 * 1000)))) {
+            if (lastUpdate == 0)
                 Logger.debug("db::", "WEB data never fetched. scheduling a fetch");
             else
                 Logger.debug("db", String.format(Locale.ENGLISH,
                         "WEB data last fetched at %1.3f and now is %1.3f. re-fetching",
-                        lastUpdate.getTime() / 1000f, now / 1000f));
+                        lastUpdate / 1000f, now / 1000f));
 
             mainModel.scheduleTransactionListRetrieval();
         }
@@ -473,8 +473,6 @@ public class MainActivity extends ProfileThemedActivity {
             l.setVisibility(View.VISIBLE);
             Logger.debug("main", String.format("Date formatted: %s", text));
         }
-
-        scheduleDataRetrievalIfStale(newValue);
     }
     private void profileThemeChanged() {
         storeThemeIdInPrefs(profile.getThemeHue());
@@ -580,6 +578,8 @@ public class MainActivity extends ProfileThemedActivity {
         else {
             mainModel.lastUpdateDate.postValue(new Date(last_update));
         }
+        scheduleDataRetrievalIfStale(last_update);
+
     }
     public void onStopTransactionRefreshClick(View view) {
         Logger.debug("interactive", "Cancelling transactions refresh");
