@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.activity;
 import android.annotation.SuppressLint;
 import android.graphics.Typeface;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
@@ -270,9 +271,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             final View focusedView = tvTransactionComment.findFocus();
             tvTransactionComment.setTypeface(null,
                     (focusedView == tvTransactionComment) ? Typeface.NORMAL : Typeface.ITALIC);
-            tvTransactionComment.setVisibility(((focusedView != tvTransactionComment) &&
-                                                Misc.isEmptyOrNull(transactionComment))
-                                               ? View.INVISIBLE : View.VISIBLE);
+            tvTransactionComment.setVisibility(
+                    ((focusedView != tvTransactionComment) && TextUtils.isEmpty(transactionComment))
+                    ? View.INVISIBLE : View.VISIBLE);
 
         };
         hintObserver = hint -> {
@@ -389,8 +390,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             tvComment.setTypeface(null,
                     (focusedView == tvComment) ? Typeface.NORMAL : Typeface.ITALIC);
             tvComment.setVisibility(
-                    ((focusedView != tvComment) && Misc.isEmptyOrNull(comment)) ? View.INVISIBLE
-                                                                                : View.VISIBLE);
+                    ((focusedView != tvComment) && TextUtils.isEmpty(comment)) ? View.INVISIBLE
+                                                                               : View.VISIBLE);
         };
 
         showCommentsObserver = show -> {
@@ -444,7 +445,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             textColor = (alpha << 24) | (0x00ffffff & textColor);
             textView.setTypeface(null, Typeface.ITALIC);
             textView.setHint("");
-            if (Misc.isEmptyOrNull(textView.getText())) {
+            if (TextUtils.isEmpty(textView.getText())) {
                 textView.setVisibility(View.INVISIBLE);
             }
         }

@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.database.Cursor;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -195,7 +196,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         ArrayList<String> params = new ArrayList<>();
         StringBuilder sb = new StringBuilder("select t.profile, t.id from transactions t");
 
-        if (!Misc.isEmptyOrNull(accFilter)) {
+        if (!TextUtils.isEmpty(accFilter)) {
             sb.append(" JOIN transaction_accounts ta")
               .append(" ON ta.profile = t.profile")
               .append(" AND ta.transaction_id = t.id");
@@ -204,7 +205,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         sb.append(" WHERE t.description=?");
         params.add(description);
 
-        if (!Misc.isEmptyOrNull(accFilter)) {
+        if (!TextUtils.isEmpty(accFilter)) {
             sb.append(" AND ta.account_name LIKE '%'||?||'%'");
             params.add(accFilter);
         }
@@ -235,7 +236,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             }
             @Override
             public void onNoRows() {
-                if (Misc.isEmptyOrNull(accFilter))
+                if (TextUtils.isEmpty(accFilter))
                     return;
 
                 debug("description", "Trying transaction search without preferred account filter");

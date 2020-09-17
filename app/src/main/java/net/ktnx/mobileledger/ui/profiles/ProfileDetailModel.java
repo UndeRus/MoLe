@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.ui.profiles;
 
+import android.text.TextUtils;
+
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -203,7 +205,7 @@ public class ProfileDetailModel extends ViewModel {
             showCommodityByDefault.setValue(mProfile.getShowCommodityByDefault());
             {
                 String comm = mProfile.getDefaultCommodity();
-                if (Misc.isEmptyOrNull(comm))
+                if (TextUtils.isEmpty(comm))
                     setDefaultCommodity(null);
                 else
                     setDefaultCommodity(new Currency(-1, comm));

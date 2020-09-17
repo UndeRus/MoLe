@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -63,20 +63,11 @@ public class Misc {
     public static String nullIsEmpty(String str) {
         return (str == null) ? "" : str;
     }
-    public static boolean isEmptyOrNull (String str) {
-        if (str == null) return true;
-        return str.isEmpty();
-    }
     public static boolean equalStrings(String u, CharSequence text) {
         return nullIsEmpty(u).equals(text.toString());
     }
     public static boolean equalStrings(String a, String b) {
         return nullIsEmpty(a).equals(nullIsEmpty(b));
-    }
-    public static boolean isEmptyOrNull(CharSequence text) {
-        if (text == null)
-            return true;
-        return text.length() == 0;
     }
     public static String trim(@Nullable String string) {
         if (string == null)
