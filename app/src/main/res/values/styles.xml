@@ -719,8 +719,6 @@
         <item name="android:paddingEnd">@dimen/activity_horizontal_margin</item>
     </style>
 
-    <style name="account_summary_account_name"></style>
-
     <style name="account_summary_amounts">
         <item name="android:textAlignment">viewEnd</item>
     </style>
