@@ -35,6 +35,9 @@
         </item>
         <item name="colorError">#FFE1E2</item>
         <item name="colorOnError">#CD1609</item>
+        <item name="main_header_shadow_height">12dp</item>
+        <item name="shadowStartColor">#C0000000</item>
+        <item name="shadowEndColor">#00000000</item>
     </style>
 
     <!-- theme list start -->

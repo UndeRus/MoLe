@@ -23,5 +23,7 @@
     <attr name="textColor" format="reference|color"/>
     <attr name="commentColor" format="reference|color" />
     <attr name="colorPrimaryTransparent" format="reference|color" />
-
+    <attr name="main_header_shadow_height" format="reference|dimension" />
+    <attr name="shadowStartColor" format="reference|color" />
+    <attr name="shadowEndColor" format="reference|color" />
 </resources>

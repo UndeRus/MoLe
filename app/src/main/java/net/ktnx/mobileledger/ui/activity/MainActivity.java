@@ -29,6 +29,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -460,7 +461,7 @@ public class MainActivity extends ProfileThemedActivity {
         updateLastUpdateTextFromDB();
     }
     private void updateLastUpdateDisplay(Date newValue) {
-        LinearLayout l = findViewById(R.id.transactions_last_update_layout);
+        ViewGroup l = findViewById(R.id.transactions_last_update_layout);
         TextView v = findViewById(R.id.transactions_last_update);
         if (newValue == null) {
             l.setVisibility(View.INVISIBLE);

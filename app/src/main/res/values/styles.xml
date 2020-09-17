@@ -39,6 +39,9 @@
         <item name="table_row_dark_bg">#efe7fd</item>
         <item name="table_row_light_bg">#f9f6fe</item>
         <item name="background">@null</item>
+        <item name="main_header_shadow_height">4dp</item>
+        <item name="shadowStartColor">#80000000</item>
+        <item name="shadowEndColor">#00000000</item>
     </style>
 
     <!-- theme list start -->
