@@ -36,8 +36,10 @@ public class TransactionAccumulator {
     public void put(LedgerTransaction transaction, SimpleDate date) {
         if (done)
             throw new IllegalStateException("Can't put new items after done()");
-        if (null == latestDate)
+        if (null == latestDate) {
             latestDate = date;
+            list.add(new TransactionListItem(date, SimpleDate.today().month != date.month));
+        }
         earliestDate = date;
 
         if (!date.equals(lastDate)) {
