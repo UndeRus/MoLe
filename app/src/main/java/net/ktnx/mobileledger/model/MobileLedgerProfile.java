@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.model;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import androidx.annotation.Nullable;
@@ -332,6 +333,24 @@ public final class MobileLedgerProfile {
     }
     public void storeAccountValue(SQLiteDatabase db, int generation, String name, String currency,
                                   Float amount) {
+        if (!TextUtils.isEmpty(currency)) {
+            boolean exists;
+            try (Cursor c = db.rawQuery("select 1 from currencies where name=?",
+                    new String[]{currency}))
+            {
+                exists = c.moveToFirst();
+            }
+            if (!exists) {
+                db.execSQL(
+                        "insert into currencies(id, name, position, has_gap) values((select max" +
+                        "(id) from currencies)+1, ?, ?, ?)", new Object[]{currency,
+                                                                          Objects.requireNonNull(
+                                                                                  Data.currencySymbolPosition.getValue()).toString(),
+                                                                          Data.currencyGap.getValue()
+                        });
+            }
+        }
+
         db.execSQL("replace into account_values(profile, account, " +
                    "currency, value, generation) values(?, ?, ?, ?, ?);",
                 new Object[]{uuid, name, Misc.emptyIsNull(currency), amount, generation});
