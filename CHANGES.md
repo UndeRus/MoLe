@@ -1,4 +1,15 @@
 # Changes
+## [0.15.0] - TBA
+
+* NEW
+    + splash screen on startup
+* IMPROVEMENTS
+    + theme fixes, improved contrast
+    + better responsivity, more work moved to background threads
+    + faster storage of retrieved data
+* FIXES
+    + fixed progress of data retrieval from hledger-web
+    + fixed extra fetches of remote data
 
 ## [0.14.1] - 2020-06-28
 
