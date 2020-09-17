@@ -527,7 +527,7 @@ public final class MobileLedgerProfile {
         {
             while (c.moveToNext()) {
                 Currency currency = new Currency(c.getInt(0), c.getString(1),
-                        Currency.Position.valueOf(c.getInt(2)), c.getInt(3) == 1);
+                        Currency.Position.valueOf(c.getString(2)), c.getInt(3) == 1);
                 result.add(currency);
             }
         }
@@ -548,7 +548,7 @@ public final class MobileLedgerProfile {
         {
             if (cursor.moveToFirst()) {
                 return new Currency(cursor.getInt(0), cursor.getString(1),
-                        Currency.Position.valueOf(cursor.getInt(2)), cursor.getInt(3) == 1);
+                        Currency.Position.valueOf(cursor.getString(2)), cursor.getInt(3) == 1);
             }
             return null;
         }

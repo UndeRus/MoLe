@@ -119,22 +119,6 @@ public class Currency {
         this.hasGap = hasGap;
     }
     public enum Position {
-        before(-1), after(1), unknown(0), none(-2);
-        Position(int value) {
-        }
-        static Position valueOf(int value) {
-            switch (value) {
-                case -1:
-                    return before;
-                case +1:
-                    return after;
-                case 0:
-                    return unknown;
-                case -2:
-                    return none;
-                default:
-                    throw new IllegalStateException(String.format("Unexpected value (%d)", value));
-            }
-        }
+        before, after, unknown, none
     }
 }
