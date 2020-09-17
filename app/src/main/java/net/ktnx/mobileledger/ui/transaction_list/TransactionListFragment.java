@@ -56,8 +56,6 @@ import java.util.Locale;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
-// TODO: support transaction-level comment
-
 public class TransactionListFragment extends MobileLedgerListFragment
         implements DatePickerFragment.DatePickedListener {
     private MenuItem menuTransactionListFilter;
