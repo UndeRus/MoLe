@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.account_summary;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,38 +36,54 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
+import net.ktnx.mobileledger.model.AccountListItem;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Locker;
-import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Observer;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryAdapter
         extends RecyclerView.Adapter<AccountSummaryAdapter.LedgerRowHolder> {
     public static final int AMOUNT_LIMIT = 3;
-    private final AsyncListDiffer<LedgerAccount> listDiffer;
+    private final AsyncListDiffer<AccountListItem> listDiffer;
     private final MainModel model;
     AccountSummaryAdapter(MainModel model) {
         this.model = model;
 
-        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<LedgerAccount>() {
+        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<AccountListItem>() {
             @Override
-            public boolean areItemsTheSame(@NotNull LedgerAccount oldItem,
-                                           @NotNull LedgerAccount newItem) {
-                return TextUtils.equals(oldItem.getName(), newItem.getName());
+            public boolean areItemsTheSame(@NotNull AccountListItem oldItem,
+                                           @NotNull AccountListItem newItem) {
+                final AccountListItem.Type oldType = oldItem.getType();
+                final AccountListItem.Type newType = newItem.getType();
+                if (oldType == AccountListItem.Type.HEADER) {
+                    return newType == AccountListItem.Type.HEADER;
+                }
+                if (oldType != newType)
+                    return false;
+
+                return TextUtils.equals(oldItem.getAccount()
+                                               .getName(), newItem.getAccount()
+                                                                  .getName());
             }
             @Override
-            public boolean areContentsTheSame(@NotNull LedgerAccount oldItem,
-                                              @NotNull LedgerAccount newItem) {
-                return oldItem.equals(newItem);
+            public boolean areContentsTheSame(@NotNull AccountListItem oldItem,
+                                              @NotNull AccountListItem newItem) {
+                if (oldItem.getType()
+                           .equals(AccountListItem.Type.HEADER))
+                    return true;
+                return oldItem.getAccount()
+                              .equals(newItem.getAccount());
             }
         });
     }
@@ -89,26 +106,33 @@ public class AccountSummaryAdapter
         return listDiffer.getCurrentList()
                          .size();
     }
-    public void setAccounts(List<LedgerAccount> newList) {
+    public void setAccounts(List<AccountListItem> newList) {
         listDiffer.submitList(newList);
     }
     class LedgerRowHolder extends RecyclerView.ViewHolder {
-        final TextView tvAccountName, tvAccountAmounts;
-        final ConstraintLayout row;
-        final View expanderContainer;
-        final ImageView expander;
-        final View accountExpanderContainer;
+        private final TextView tvAccountName, tvAccountAmounts;
+        private final ConstraintLayout row;
+        private final View expanderContainer;
+        private final View amountExpanderContainer;
+        private final View lLastUpdate;
+        private final TextView tvLastUpdate;
+        private final View vAccountNameLayout;
         LedgerAccount mAccount;
+        private AccountListItem.Type lastType;
+        private Observer lastUpdateObserver;
         public LedgerRowHolder(@NonNull View itemView) {
             super(itemView);
 
             row = itemView.findViewById(R.id.account_summary_row);
+            vAccountNameLayout = itemView.findViewById(R.id.account_name_layout);
             tvAccountName = itemView.findViewById(R.id.account_row_acc_name);
             tvAccountAmounts = itemView.findViewById(R.id.account_row_acc_amounts);
             expanderContainer = itemView.findViewById(R.id.account_expander_container);
-            expander = itemView.findViewById(R.id.account_expander);
-            accountExpanderContainer =
+            ImageView expander = itemView.findViewById(R.id.account_expander);
+            amountExpanderContainer =
                     itemView.findViewById(R.id.account_row_amounts_expander_container);
+            lLastUpdate = itemView.findViewById(R.id.last_update_container);
+            tvLastUpdate = itemView.findViewById(R.id.last_update_text);
 
             itemView.setOnLongClickListener(this::onItemLongClick);
             tvAccountName.setOnLongClickListener(this::onItemLongClick);
@@ -121,6 +145,7 @@ public class AccountSummaryAdapter
             expanderContainer.setOnClickListener(v -> toggleAccountExpanded());
             expander.setOnClickListener(v -> toggleAccountExpanded());
             tvAccountAmounts.setOnClickListener(v -> toggleAmountsExpanded());
+
         }
         private void toggleAccountExpanded() {
             if (!mAccount.hasSubAccounts())
@@ -156,11 +181,11 @@ public class AccountSummaryAdapter
             mAccount.toggleAmountsExpanded();
             if (mAccount.amountsExpanded()) {
                 tvAccountAmounts.setText(mAccount.getAmountsString());
-                accountExpanderContainer.setVisibility(View.GONE);
+                amountExpanderContainer.setVisibility(View.GONE);
             }
             else {
                 tvAccountAmounts.setText(mAccount.getAmountsString(AMOUNT_LIMIT));
-                accountExpanderContainer.setVisibility(View.VISIBLE);
+                amountExpanderContainer.setVisibility(View.VISIBLE);
             }
 
             MobileLedgerProfile profile = mAccount.getProfile();
@@ -189,38 +214,103 @@ public class AccountSummaryAdapter
             builder.show();
             return true;
         }
-        public void bindToAccount(LedgerAccount acc) {
-            Logger.debug("accounts", String.format(Locale.US, "Binding to '%s'", acc.getName()));
-            Context ctx = row.getContext();
-            Resources rm = ctx.getResources();
-            mAccount = acc;
+        public void bindToAccount(AccountListItem item) {
+            final AccountListItem.Type newType = item.getType();
+            setType(newType);
 
-            row.setTag(acc);
+            switch (newType) {
+                case ACCOUNT:
+                    LedgerAccount acc = item.getAccount();
 
-            tvAccountName.setText(acc.getShortName());
+                    debug("accounts", String.format(Locale.US, "Binding to '%s'", acc.getName()));
+                    Context ctx = row.getContext();
+                    Resources rm = ctx.getResources();
+                    mAccount = acc;
 
-            ConstraintLayout.LayoutParams lp =
-                    (ConstraintLayout.LayoutParams) tvAccountName.getLayoutParams();
-            lp.setMarginStart(
-                    acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
+                    row.setTag(acc);
 
-            if (acc.hasSubAccounts()) {
-                expanderContainer.setVisibility(View.VISIBLE);
-                expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
+                    tvAccountName.setText(acc.getShortName());
+
+                    ConstraintLayout.LayoutParams lp =
+                            (ConstraintLayout.LayoutParams) tvAccountName.getLayoutParams();
+                    lp.setMarginStart(
+                            acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) /
+                            3);
+
+                    if (acc.hasSubAccounts()) {
+                        expanderContainer.setVisibility(View.VISIBLE);
+                        expanderContainer.setRotation(acc.isExpanded() ? 0 : 180);
+                    }
+                    else {
+                        expanderContainer.setVisibility(View.GONE);
+                    }
+
+                    int amounts = acc.getAmountCount();
+                    if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
+                        tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
+                        amountExpanderContainer.setVisibility(View.VISIBLE);
+                    }
+                    else {
+                        tvAccountAmounts.setText(acc.getAmountsString());
+                        amountExpanderContainer.setVisibility(View.GONE);
+                    }
+
+                    break;
+                case HEADER:
+                    setLastUpdateText(Data.lastUpdate.get());
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + newType);
             }
-            else {
-                expanderContainer.setVisibility(View.GONE);
+
+        }
+        void setLastUpdateText(long lastUpdate) {
+            final int formatFlags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
+                                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_NUMERIC_DATE;
+            tvLastUpdate.setText((lastUpdate == 0) ? "----" : DateUtils.formatDateTime(
+                    tvLastUpdate.getContext(), lastUpdate, formatFlags));
+        }
+        private void initLastUpdateObserver() {
+            if (lastUpdateObserver != null)
+                return;
+
+            lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdate.get());
+
+            Data.lastUpdate.addObserver(lastUpdateObserver);
+        }
+        private void dropLastUpdateObserver() {
+            if (lastUpdateObserver == null)
+                return;
+
+            Data.lastUpdate.deleteObserver(lastUpdateObserver);
+            lastUpdateObserver = null;
+        }
+        private void setType(AccountListItem.Type newType) {
+            if (newType == lastType)
+                return;
+
+            switch (newType) {
+                case ACCOUNT:
+                    row.setLongClickable(true);
+                    amountExpanderContainer.setVisibility(View.VISIBLE);
+                    vAccountNameLayout.setVisibility(View.VISIBLE);
+                    tvAccountAmounts.setVisibility(View.VISIBLE);
+                    lLastUpdate.setVisibility(View.GONE);
+                    dropLastUpdateObserver();
+                    break;
+                case HEADER:
+                    row.setLongClickable(false);
+                    tvAccountAmounts.setVisibility(View.GONE);
+                    amountExpanderContainer.setVisibility(View.GONE);
+                    vAccountNameLayout.setVisibility(View.GONE);
+                    lLastUpdate.setVisibility(View.VISIBLE);
+                    initLastUpdateObserver();
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + newType);
             }
 
-            int amounts = acc.getAmountCount();
-            if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
-                tvAccountAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
-                accountExpanderContainer.setVisibility(View.VISIBLE);
-            }
-            else {
-                tvAccountAmounts.setText(acc.getAmountsString());
-                accountExpanderContainer.setVisibility(View.GONE);
-            }
+            lastType = newType;
         }
     }
 }

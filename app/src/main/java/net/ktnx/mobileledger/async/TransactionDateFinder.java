@@ -24,6 +24,8 @@ import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -61,7 +63,7 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
     public static class Params {
         public final MainModel model;
         public final SimpleDate date;
-        public Params(MainModel model, SimpleDate date) {
+        public Params(@NotNull MainModel model, @NotNull SimpleDate date) {
             this.model = model;
             this.date = date;
         }
@@ -69,7 +71,11 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
 
     static class TransactionListItemComparator implements Comparator<TransactionListItem> {
         @Override
-        public int compare(TransactionListItem a, TransactionListItem b) {
+        public int compare(@NotNull TransactionListItem a, @NotNull TransactionListItem b) {
+            if (a.getType() == TransactionListItem.Type.HEADER)
+                return +1;
+            if (b.getType() == TransactionListItem.Type.HEADER)
+                return -1;
             final SimpleDate aDate = a.getDate();
             final SimpleDate bDate = b.getDate();
             int res = aDate.compareTo(bDate);

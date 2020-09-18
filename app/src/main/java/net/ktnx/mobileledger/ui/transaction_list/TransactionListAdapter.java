@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
@@ -76,6 +77,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         return oldItem.getTransaction()
                                       .getId() == newItem.getTransaction()
                                                          .getId();
+                    case HEADER:
+                        return true;    // there can be only one header
                     default:
                         throw new IllegalStateException(
                                 String.format(Locale.US, "Unexpected transaction item type %s",
@@ -92,6 +95,10 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     case TRANSACTION:
                         return oldItem.getTransaction()
                                       .equals(newItem.getTransaction());
+                    case HEADER:
+                        // headers don't differ in their contents. they observe the last update
+                        // date and react to its changes
+                        return true;
                     default:
                         throw new IllegalStateException(
                                 String.format(Locale.US, "Unexpected transaction item type %s",
@@ -112,10 +119,11 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
         if (item == null)
             return;
 
-        switch (item.getType()) {
+        final TransactionListItem.Type newType = item.getType();
+        holder.setType(newType);
+
+        switch (newType) {
             case TRANSACTION:
-                holder.vTransaction.setVisibility(View.VISIBLE);
-                holder.vDelimiter.setVisibility(View.GONE);
                 LedgerTransaction tr = item.getTransaction();
 
                 //        debug("transactions", String.format("Filling position %d with %d
@@ -137,8 +145,6 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 break;
             case DELIMITER:
                 SimpleDate date = item.getDate();
-                holder.vTransaction.setVisibility(View.GONE);
-                holder.vDelimiter.setVisibility(View.VISIBLE);
                 holder.tvDelimiterDate.setText(DateFormat.getDateInstance()
                                                          .format(date.toDate()));
                 if (item.isMonthShown()) {
@@ -159,9 +165,14 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                     holder.vDelimiterThick.setVisibility(View.GONE);
                 }
                 break;
+            case HEADER:
+                holder.setLastUpdateText(Data.lastUpdate.get());
+
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + newType);
         }
     }
-
     @NonNull
     @Override
     public TransactionRowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

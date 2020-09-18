@@ -32,9 +32,11 @@ import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
+import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -54,6 +56,8 @@ public final class Data {
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
     public static final MutableLiveData<Locale> locale = new MutableLiveData<>();
     public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
+    public static final MutableLiveData<Date> lastUpdateLiveData = new MutableLiveData<>(null);
+    public static final ObservableValue<Long> lastUpdate = new ObservableValue<>();
     private static final MutableLiveData<MobileLedgerProfile> profile =
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);

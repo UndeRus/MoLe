@@ -32,9 +32,9 @@
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:visibility="visible"
+        app:cardCornerRadius="0dp"
         app:cardElevation="2dp"
         app:cardUseCompatPadding="false"
-        app:cardCornerRadius="0dp"
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,13 +67,13 @@
                     />
                 <TextView
                     android:id="@+id/transaction_comment"
+                    style="@style/transaction_list_comment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="0dp"
                     android:layout_marginTop="0dp"
                     android:text="Comment text"
                     tools:ignore="HardcodedText"
-                    style="@style/transaction_list_comment"
                     />
             </LinearLayout>
 
@@ -142,5 +142,6 @@
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <include layout="@layout/last_update_layout" />
 
 </FrameLayout>

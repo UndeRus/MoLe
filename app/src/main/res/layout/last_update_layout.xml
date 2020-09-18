@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright © 2020 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/last_update_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    >
+    <TextView
+        android:id="@+id/last_update_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="@string/transactions_last_update_label"
+        android:textAppearance="@android:style/TextAppearance.Material.Small"
+        app:layout_constraintEnd_toStartOf="@id/last_update_text"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/last_update_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_weight="1"
+        android:text="\?"
+        android:textAppearance="@android:style/TextAppearance.Material.Small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

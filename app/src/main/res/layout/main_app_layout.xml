@@ -70,39 +70,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/transactions_last_update_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="24dp"
-                    android:orientation="horizontal"
-                    >
-
-                    <TextView
-                        android:id="@+id/transaction_last_update_label"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:text="@string/transactions_last_update_label"
-                        android:textAppearance="@android:style/TextAppearance.Material.Small"
-                        app:layout_constraintEnd_toStartOf="@id/transactions_last_update"
-                        app:layout_constraintTop_toTopOf="parent"
-                        />
-
-                    <TextView
-                        android:id="@+id/transactions_last_update"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="\?"
-                        android:textAppearance="@android:style/TextAppearance.Material.Small"
-                        tools:ignore="HardcodedText"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
                 <LinearLayout
                     android:id="@+id/transaction_progress_layout"
                     android:layout_width="match_parent"

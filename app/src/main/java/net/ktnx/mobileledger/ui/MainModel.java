@@ -32,6 +32,7 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.async.TransactionAccumulator;
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
+import net.ktnx.mobileledger.model.AccountListItem;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -55,17 +56,17 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class MainModel extends ViewModel {
     public final MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
-    public final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>(null);
     private final MutableLiveData<Boolean> updatingFlag = new MutableLiveData<>(false);
     private final MutableLiveData<String> accountFilter = new MutableLiveData<>();
     private final MutableLiveData<List<TransactionListItem>> displayedTransactions =
             new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<List<LedgerAccount>> displayedAccounts = new MutableLiveData<>();
+    private final MutableLiveData<List<AccountListItem>> displayedAccounts =
+            new MutableLiveData<>();
     private final Locker accountsLocker = new Locker();
     private final MutableLiveData<String> updateError = new MutableLiveData<>();
+    private final Map<String, LedgerAccount> accountMap = new HashMap<>();
     private MobileLedgerProfile profile;
     private List<LedgerAccount> allAccounts = new ArrayList<>();
-    private final Map<String, LedgerAccount> accountMap = new HashMap<>();
     private SimpleDate firstTransactionDate;
     private SimpleDate lastTransactionDate;
     transient private RetrieveTransactionsTask retrieveTransactionsTask;
@@ -127,7 +128,7 @@ public class MainModel extends ViewModel {
         debug("db", "Updating transaction value stamp");
         Date now = new Date();
         profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
-        lastUpdateDate.postValue(now);
+        Data.lastUpdateLiveData.postValue(now);
     }
     public void scheduleTransactionListReload() {
         UpdateTransactionsTask task = new UpdateTransactionsTask();
@@ -209,7 +210,7 @@ public class MainModel extends ViewModel {
             updateAccountsMap(allAccounts);
         }
     }
-    public LiveData<List<LedgerAccount>> getDisplayedAccounts() {
+    public LiveData<List<AccountListItem>> getDisplayedAccounts() {
         return displayedAccounts;
     }
     synchronized public void scheduleAccountListReload() {
@@ -355,18 +356,17 @@ public class MainModel extends ViewModel {
         }
         @Override
         public void run() {
-            List<LedgerAccount> newDisplayed = new ArrayList<>();
+            List<AccountListItem> newDisplayed = new ArrayList<>();
             Logger.debug("dFilter", "waiting for synchronized block");
             Logger.debug("dFilter", String.format(Locale.US,
                     "entered synchronized block (about to examine %d accounts)", list.size()));
+            newDisplayed.add(new AccountListItem());    // header
             for (LedgerAccount a : list) {
-                if (isInterrupted()) {
+                if (isInterrupted())
                     return;
-                }
 
-                if (a.isVisible()) {
-                    newDisplayed.add(a);
-                }
+                if (a.isVisible())
+                    newDisplayed.add(new AccountListItem(a));
             }
             if (!isInterrupted()) {
                 model.displayedAccounts.postValue(newDisplayed);

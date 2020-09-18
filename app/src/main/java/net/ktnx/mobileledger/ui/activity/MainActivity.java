@@ -29,7 +29,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -66,7 +65,6 @@ import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -234,8 +232,6 @@ public class MainActivity extends ProfileThemedActivity {
             mainModel.getAccountFilter()
                      .setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
         }
-
-        mainModel.lastUpdateDate.observe(this, this::updateLastUpdateDisplay);
 
         findViewById(R.id.btn_no_profiles_add).setOnClickListener(
                 v -> startEditProfileActivity(null));
@@ -460,28 +456,13 @@ public class MainActivity extends ProfileThemedActivity {
 
         updateLastUpdateTextFromDB();
     }
-    private void updateLastUpdateDisplay(Date newValue) {
-        ViewGroup l = findViewById(R.id.transactions_last_update_layout);
-        TextView v = findViewById(R.id.transactions_last_update);
-        if (newValue == null) {
-            l.setVisibility(View.INVISIBLE);
-            Logger.debug("main", "no last update date :(");
-        }
-        else {
-            final String text = DateFormat.getDateTimeInstance()
-                                          .format(newValue);
-            v.setText(text);
-            l.setVisibility(View.VISIBLE);
-            Logger.debug("main", String.format("Date formatted: %s", text));
-        }
-    }
     private void profileThemeChanged() {
         storeThemeIdInPrefs(profile.getThemeHue());
 
         // un-hook all observed LiveData
         Data.removeProfileObservers(this);
         Data.profiles.removeObservers(this);
-        mainModel.lastUpdateDate.removeObservers(this);
+        Data.lastUpdateLiveData.removeObservers(this);
 
         recreate();
     }
@@ -569,17 +550,28 @@ public class MainActivity extends ProfileThemedActivity {
         if (profile == null)
             return;
 
-        long last_update = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
+        long lastUpdate = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
 
-        Logger.debug("transactions",
-                String.format(Locale.ENGLISH, "Last update = %d", last_update));
-        if (last_update == 0) {
-            mainModel.lastUpdateDate.postValue(null);
+        Logger.debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", lastUpdate));
+        if (lastUpdate == 0) {
+            Data.lastUpdateLiveData.postValue(null);
         }
         else {
-            mainModel.lastUpdateDate.postValue(new Date(last_update));
+            Data.lastUpdateLiveData.postValue(new Date(lastUpdate));
         }
-        scheduleDataRetrievalIfStale(last_update);
+
+        // this is unfortunate, but it appears we need a two-stage rocket to make
+        // a value reach a recycler view item holder. first stage is a regular
+        // LiveData that can be observed by an activity (this).
+        // the second stage forwards the changes, in the UI thread, to the
+        // observable value, observed by the view holders.
+        // view holders can't observe the LiveData because they don't have
+        // access to lifecycle owners. oh, also the value is updated by a thread
+        // so it must be tunnelled by an activity for it to reach the view
+        // holders in the UI thread
+        Data.lastUpdateLiveData.observe(this, date -> runOnUiThread(
+                () -> Data.lastUpdate.set((date == null) ? 0 : date.getTime())));
+        scheduleDataRetrievalIfStale(lastUpdate);
 
     }
     public void onStopTransactionRefreshClick(View view) {

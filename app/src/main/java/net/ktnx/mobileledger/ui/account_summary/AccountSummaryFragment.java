@@ -31,8 +31,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.model.AccountListItem;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
@@ -102,7 +102,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         model.getDisplayedAccounts()
              .observe(getViewLifecycleOwner(), this::onAccountsChanged);
     }
-    private void onAccountsChanged(List<LedgerAccount> accounts) {
+    private void onAccountsChanged(List<AccountListItem> accounts) {
         Logger.debug("async-acc",
                 String.format(Locale.US, "fragment: got new account list (%d items)",
                         accounts.size()));

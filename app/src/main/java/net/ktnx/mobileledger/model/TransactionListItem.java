@@ -22,19 +22,24 @@ import androidx.annotation.NonNull;
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
+import org.jetbrains.annotations.NotNull;
+
 public class TransactionListItem {
     private final Type type;
     private SimpleDate date;
     private boolean monthShown;
     private LedgerTransaction transaction;
-    public TransactionListItem(SimpleDate date, boolean monthShown) {
+    public TransactionListItem(@NotNull SimpleDate date, boolean monthShown) {
         this.type = Type.DELIMITER;
         this.date = date;
         this.monthShown = monthShown;
     }
-    public TransactionListItem(LedgerTransaction transaction) {
+    public TransactionListItem(@NotNull LedgerTransaction transaction) {
         this.type = Type.TRANSACTION;
         this.transaction = transaction;
+    }
+    public TransactionListItem() {
+        this.type = Type.HEADER;
     }
     @NonNull
     public Type getType() {
@@ -44,14 +49,20 @@ public class TransactionListItem {
     public SimpleDate getDate() {
         if (date != null)
             return date;
+        if (type == Type.HEADER)
+            throw new IllegalStateException("Header item has no date");
         transaction.loadData(App.getDatabase());
         return transaction.getDate();
     }
     public boolean isMonthShown() {
         return monthShown;
     }
+    @NotNull
     public LedgerTransaction getTransaction() {
+        if (type != Type.TRANSACTION)
+            throw new IllegalStateException(
+                    String.format("Item type is not %s, but %s", Type.TRANSACTION, type));
         return transaction;
     }
-    public enum Type {TRANSACTION, DELIMITER}
+    public enum Type {TRANSACTION, DELIMITER, HEADER}
 }

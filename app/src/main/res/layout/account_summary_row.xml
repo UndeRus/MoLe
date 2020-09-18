@@ -77,12 +77,12 @@
                 android:background="@drawable/ic_expand_less_black_24dp"
                 android:backgroundTint="?colorPrimary"
                 android:clickable="true"
+                android:contentDescription="@string/sub_accounts_expand_collapse_trigger_description"
                 android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="@string/sub_accounts_expand_collapse_trigger_description"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -118,5 +118,5 @@
         >
 
     </FrameLayout>
-
+    <include layout="@layout/last_update_layout" />
 </androidx.constraintlayout.widget.ConstraintLayout>
