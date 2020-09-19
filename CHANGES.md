@@ -7,7 +7,7 @@
     + show account/transaction counts
 * IMPROVEMENTS
     + theme fixes, improved contrast
-    + better responsivity, more work moved to background threads
+    + better responsiveness, more work moved to background threads
     + faster storage of retrieved data
     + last update info moved to lists to save space
 * FIXES
