@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -257,32 +256,29 @@ public class AccountSummaryAdapter
 
                     break;
                 case HEADER:
-                    setLastUpdateText(Data.lastUpdate.get());
+                    setLastUpdateText(Data.lastUpdateText.get());
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + newType);
             }
 
         }
-        void setLastUpdateText(long lastUpdate) {
-            final int formatFlags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
-                                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_NUMERIC_DATE;
-            tvLastUpdate.setText((lastUpdate == 0) ? "----" : DateUtils.formatDateTime(
-                    tvLastUpdate.getContext(), lastUpdate, formatFlags));
+        void setLastUpdateText(String text) {
+            tvLastUpdate.setText(text);
         }
         private void initLastUpdateObserver() {
             if (lastUpdateObserver != null)
                 return;
 
-            lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdate.get());
+            lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdateText.get());
 
-            Data.lastUpdate.addObserver(lastUpdateObserver);
+            Data.lastUpdateText.addObserver(lastUpdateObserver);
         }
         private void dropLastUpdateObserver() {
             if (lastUpdateObserver == null)
                 return;
 
-            Data.lastUpdate.deleteObserver(lastUpdateObserver);
+            Data.lastUpdateText.deleteObserver(lastUpdateObserver);
             lastUpdateObserver = null;
         }
         private void setType(AccountListItem.Type newType) {

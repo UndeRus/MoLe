@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -154,4 +154,5 @@
     <string name="navigation_drawer_open">Отваряне на страничния панел</string>
     <string name="navigation_drawer_close">Затваряне на страничния панел</string>
     <string name="nav_header_desc">Заглавна част на страничния панел</string>
+    <string name="transaction_count_summary">%,d движения към %s</string>
 </resources>

@@ -124,11 +124,11 @@ public class MainModel extends ViewModel {
 
         return merged;
     }
-    private void setLastUpdateStamp() {
+    private void setLastUpdateStamp(long transactionCount) {
         debug("db", "Updating transaction value stamp");
         Date now = new Date();
         profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
-        Data.lastUpdateLiveData.postValue(now);
+        Data.lastUpdateDate.postValue(now);
     }
     public void scheduleTransactionListReload() {
         UpdateTransactionsTask task = new UpdateTransactionsTask();
@@ -147,8 +147,9 @@ public class MainModel extends ViewModel {
     public LiveData<List<TransactionListItem>> getDisplayedTransactions() {
         return displayedTransactions;
     }
-    public void setDisplayedTransactions(List<TransactionListItem> list) {
+    public void setDisplayedTransactions(List<TransactionListItem> list, int transactionCount) {
         displayedTransactions.postValue(list);
+        Data.lastUpdateTransactionCount.postValue(transactionCount);
     }
     public SimpleDate getFirstTransactionDate() {
         return firstTransactionDate;
@@ -227,7 +228,7 @@ public class MainModel extends ViewModel {
             List<LedgerAccount> accounts, List<LedgerTransaction> transactions) {
         profile.storeAccountAndTransactionListAsync(accounts, transactions);
 
-        setLastUpdateStamp();
+        setLastUpdateStamp(transactions.size());
 
         mergeAccountListFromWeb(accounts);
         updateDisplayedAccounts();

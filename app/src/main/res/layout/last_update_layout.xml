@@ -23,27 +23,18 @@
     android:layout_height="wrap_content"
     android:paddingTop="4dp"
     >
-    <TextView
-        android:id="@+id/last_update_label"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/transactions_last_update_label"
-        android:textAppearance="@android:style/TextAppearance.Material.Small"
-        app:layout_constraintEnd_toStartOf="@id/last_update_text"
-        app:layout_constraintTop_toTopOf="parent"
-        />
 
     <TextView
         android:id="@+id/last_update_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
         android:layout_weight="1"
-        android:text="\?"
+        android:gravity="center"
+        android:text="1 123 transactions as of 29.02.2020 13:37"
         android:textAppearance="@android:style/TextAppearance.Material.Small"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText"
         />

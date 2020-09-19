@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -64,22 +63,18 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
         if (lastUpdateObserver != null)
             return;
 
-        lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdate.get());
+        lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdateText.get());
 
-        Data.lastUpdate.addObserver(lastUpdateObserver);
+        Data.lastUpdateText.addObserver(lastUpdateObserver);
     }
-    void setLastUpdateText(long lastUpdate) {
-        final int formatFlags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
-                                DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_NUMERIC_DATE;
-        tvLastUpdate.setText((lastUpdate == 0) ? "----"
-                                               : DateUtils.formatDateTime(tvLastUpdate.getContext(),
-                                                       lastUpdate, formatFlags));
+    void setLastUpdateText(String text) {
+        tvLastUpdate.setText(text);
     }
     private void dropLastUpdateObserver() {
         if (lastUpdateObserver == null)
             return;
 
-        Data.lastUpdate.deleteObserver(lastUpdateObserver);
+        Data.lastUpdateText.deleteObserver(lastUpdateObserver);
         lastUpdateObserver = null;
     }
     void setType(TransactionListItem.Type newType) {

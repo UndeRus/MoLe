@@ -56,8 +56,10 @@ public final class Data {
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
     public static final MutableLiveData<Locale> locale = new MutableLiveData<>();
     public static final MutableLiveData<Boolean> drawerOpen = new MutableLiveData<>(false);
-    public static final MutableLiveData<Date> lastUpdateLiveData = new MutableLiveData<>(null);
-    public static final ObservableValue<Long> lastUpdate = new ObservableValue<>();
+    public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>(null);
+    public static final MutableLiveData<Integer> lastUpdateTransactionCount =
+            new MutableLiveData<>(0);
+    public static final ObservableValue<String> lastUpdateText = new ObservableValue<>();
     private static final MutableLiveData<MobileLedgerProfile> profile =
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);

@@ -27,6 +27,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -69,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /*
  * TODO: reports
@@ -331,6 +333,9 @@ public class MainActivity extends ProfileThemedActivity {
                              .show();
                      mainModel.clearUpdateError();
                  });
+        Data.locale.observe(this, l -> refreshLastUpdateInfo());
+        Data.lastUpdateDate.observe(this, date -> refreshLastUpdateInfo());
+        Data.lastUpdateTransactionCount.observe(this, date -> refreshLastUpdateInfo());
     }
     private void scheduleDataRetrievalIfStale(long lastUpdate) {
         long now = new Date().getTime();
@@ -462,7 +467,8 @@ public class MainActivity extends ProfileThemedActivity {
         // un-hook all observed LiveData
         Data.removeProfileObservers(this);
         Data.profiles.removeObservers(this);
-        Data.lastUpdateLiveData.removeObservers(this);
+        Data.lastUpdateTransactionCount.removeObservers(this);
+        Data.lastUpdateDate.removeObservers(this);
 
         recreate();
     }
@@ -554,25 +560,25 @@ public class MainActivity extends ProfileThemedActivity {
 
         Logger.debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", lastUpdate));
         if (lastUpdate == 0) {
-            Data.lastUpdateLiveData.postValue(null);
+            Data.lastUpdateDate.postValue(null);
         }
         else {
-            Data.lastUpdateLiveData.postValue(new Date(lastUpdate));
+            Data.lastUpdateDate.postValue(new Date(lastUpdate));
         }
 
-        // this is unfortunate, but it appears we need a two-stage rocket to make
-        // a value reach a recycler view item holder. first stage is a regular
-        // LiveData that can be observed by an activity (this).
-        // the second stage forwards the changes, in the UI thread, to the
-        // observable value, observed by the view holders.
-        // view holders can't observe the LiveData because they don't have
-        // access to lifecycle owners. oh, also the value is updated by a thread
-        // so it must be tunnelled by an activity for it to reach the view
-        // holders in the UI thread
-        Data.lastUpdateLiveData.observe(this, date -> runOnUiThread(
-                () -> Data.lastUpdate.set((date == null) ? 0 : date.getTime())));
         scheduleDataRetrievalIfStale(lastUpdate);
 
+    }
+    private void refreshLastUpdateInfo() {
+        final int formatFlags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
+                                DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_NUMERIC_DATE;
+        String template = getResources().getString(R.string.transaction_count_summary);
+        Integer transactionCount = Data.lastUpdateTransactionCount.getValue();
+        Date lastUpdate = Data.lastUpdateDate.getValue();
+        Data.lastUpdateText.set((lastUpdate == null) ? "----" : String.format(
+                Objects.requireNonNull(Data.locale.getValue()), template,
+                (transactionCount == null) ? 0 : transactionCount,
+                DateUtils.formatDateTime(this, lastUpdate.getTime(), formatFlags)));
     }
     public void onStopTransactionRefreshClick(View view) {
         Logger.debug("interactive", "Cancelling transactions refresh");

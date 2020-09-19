@@ -166,7 +166,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 }
                 break;
             case HEADER:
-                holder.setLastUpdateText(Data.lastUpdate.get());
+                holder.setLastUpdateText(Data.lastUpdateText.get());
 
                 break;
             default:
