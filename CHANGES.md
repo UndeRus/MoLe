@@ -1,15 +1,19 @@
 # Changes
+
 ## [0.15.0] - TBA
 
 * NEW
     + splash screen on startup
+    + show account/transaction counts
 * IMPROVEMENTS
     + theme fixes, improved contrast
     + better responsivity, more work moved to background threads
     + faster storage of retrieved data
+    + last update info moved to lists to save space
 * FIXES
     + fixed progress of data retrieval from hledger-web
     + fixed extra fetches of remote data
+    + fill currency list with data from the journal
 
 ## [0.14.1] - 2020-06-28
 
