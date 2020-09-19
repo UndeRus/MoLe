@@ -28,24 +28,26 @@ public class TransactionAccumulator {
     private final ArrayList<TransactionListItem> list = new ArrayList<>();
     private final MainModel model;
     private SimpleDate earliestDate, latestDate;
-    private SimpleDate lastDate = SimpleDate.today();
+    private SimpleDate lastDate;
     private boolean done;
     private int transactionCount = 0;
     public TransactionAccumulator(MainModel model) {
         this.model = model;
+
+        list.add(new TransactionListItem());    // head item
     }
     public void put(LedgerTransaction transaction, SimpleDate date) {
         if (done)
             throw new IllegalStateException("Can't put new items after done()");
 
         // first item
-        if (null == latestDate) {
-            list.add(new TransactionListItem());
+        if (null == latestDate)
             latestDate = date;
-        }
         earliestDate = date;
 
         if (!date.equals(lastDate)) {
+            if (lastDate == null)
+                lastDate = SimpleDate.today();
             boolean showMonth = date.month != lastDate.month || date.year != lastDate.year;
             list.add(new TransactionListItem(date, showMonth));
         }
