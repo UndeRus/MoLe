@@ -59,7 +59,10 @@ public final class Data {
     public static final MutableLiveData<Date> lastUpdateDate = new MutableLiveData<>(null);
     public static final MutableLiveData<Integer> lastUpdateTransactionCount =
             new MutableLiveData<>(0);
-    public static final ObservableValue<String> lastUpdateText = new ObservableValue<>();
+    public static final MutableLiveData<Integer> lastUpdateAccountCount = new MutableLiveData<>(0);
+    public static final ObservableValue<String> lastTransactionsUpdateText =
+            new ObservableValue<>();
+    public static final ObservableValue<String> lastAccountsUpdateText = new ObservableValue<>();
     private static final MutableLiveData<MobileLedgerProfile> profile =
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);

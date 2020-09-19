@@ -256,7 +256,7 @@ public class AccountSummaryAdapter
 
                     break;
                 case HEADER:
-                    setLastUpdateText(Data.lastUpdateText.get());
+                    setLastUpdateText(Data.lastAccountsUpdateText.get());
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + newType);
@@ -270,15 +270,15 @@ public class AccountSummaryAdapter
             if (lastUpdateObserver != null)
                 return;
 
-            lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdateText.get());
+            lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastAccountsUpdateText.get());
 
-            Data.lastUpdateText.addObserver(lastUpdateObserver);
+            Data.lastAccountsUpdateText.addObserver(lastUpdateObserver);
         }
         private void dropLastUpdateObserver() {
             if (lastUpdateObserver == null)
                 return;
 
-            Data.lastUpdateText.deleteObserver(lastUpdateObserver);
+            Data.lastAccountsUpdateText.deleteObserver(lastUpdateObserver);
             lastUpdateObserver = null;
         }
         private void setType(AccountListItem.Type newType) {

@@ -165,4 +165,5 @@
     <string name="splash_icon_description">Main app icon</string>
     <string name="sub_accounts_expand_collapse_trigger_description">Sub-accounts expand/collapse trigger</string>
     <string name="transaction_count_summary">%,d transactions as of %s</string>
+    <string name="account_count_summary">%,d accounts as of %s</string>
 </resources>

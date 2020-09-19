@@ -362,15 +362,20 @@ public class MainModel extends ViewModel {
             Logger.debug("dFilter", String.format(Locale.US,
                     "entered synchronized block (about to examine %d accounts)", list.size()));
             newDisplayed.add(new AccountListItem());    // header
+
+            int count = 0;
             for (LedgerAccount a : list) {
                 if (isInterrupted())
                     return;
 
-                if (a.isVisible())
+                if (a.isVisible()) {
                     newDisplayed.add(new AccountListItem(a));
+                    count++;
+                }
             }
             if (!isInterrupted()) {
                 model.displayedAccounts.postValue(newDisplayed);
+                Data.lastUpdateAccountCount.postValue(count);
             }
             Logger.debug("dFilter", "left synchronized block");
         }

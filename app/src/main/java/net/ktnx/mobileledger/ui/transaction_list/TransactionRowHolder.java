@@ -63,9 +63,9 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
         if (lastUpdateObserver != null)
             return;
 
-        lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastUpdateText.get());
+        lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastTransactionsUpdateText.get());
 
-        Data.lastUpdateText.addObserver(lastUpdateObserver);
+        Data.lastTransactionsUpdateText.addObserver(lastUpdateObserver);
     }
     void setLastUpdateText(String text) {
         tvLastUpdate.setText(text);
@@ -74,7 +74,7 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
         if (lastUpdateObserver == null)
             return;
 
-        Data.lastUpdateText.deleteObserver(lastUpdateObserver);
+        Data.lastTransactionsUpdateText.deleteObserver(lastUpdateObserver);
         lastUpdateObserver = null;
     }
     void setType(TransactionListItem.Type newType) {

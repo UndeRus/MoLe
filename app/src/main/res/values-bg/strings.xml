@@ -155,4 +155,5 @@
     <string name="navigation_drawer_close">Затваряне на страничния панел</string>
     <string name="nav_header_desc">Заглавна част на страничния панел</string>
     <string name="transaction_count_summary">%,d движения към %s</string>
+    <string name="account_count_summary">%,d сметки към %s</string>
 </resources>

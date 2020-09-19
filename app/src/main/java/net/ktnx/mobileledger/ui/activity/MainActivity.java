@@ -336,6 +336,7 @@ public class MainActivity extends ProfileThemedActivity {
         Data.locale.observe(this, l -> refreshLastUpdateInfo());
         Data.lastUpdateDate.observe(this, date -> refreshLastUpdateInfo());
         Data.lastUpdateTransactionCount.observe(this, date -> refreshLastUpdateInfo());
+        Data.lastUpdateAccountCount.observe(this, date -> refreshLastUpdateInfo());
     }
     private void scheduleDataRetrievalIfStale(long lastUpdate) {
         long now = new Date().getTime();
@@ -468,6 +469,7 @@ public class MainActivity extends ProfileThemedActivity {
         Data.removeProfileObservers(this);
         Data.profiles.removeObservers(this);
         Data.lastUpdateTransactionCount.removeObservers(this);
+        Data.lastUpdateAccountCount.removeObservers(this);
         Data.lastUpdateDate.removeObservers(this);
 
         recreate();
@@ -572,13 +574,27 @@ public class MainActivity extends ProfileThemedActivity {
     private void refreshLastUpdateInfo() {
         final int formatFlags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
                                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_NUMERIC_DATE;
-        String template = getResources().getString(R.string.transaction_count_summary);
+        String templateForTransactions =
+                getResources().getString(R.string.transaction_count_summary);
+        String templateForAccounts = getResources().getString(R.string.account_count_summary);
+        Integer accountCount = Data.lastUpdateAccountCount.getValue();
         Integer transactionCount = Data.lastUpdateTransactionCount.getValue();
         Date lastUpdate = Data.lastUpdateDate.getValue();
-        Data.lastUpdateText.set((lastUpdate == null) ? "----" : String.format(
-                Objects.requireNonNull(Data.locale.getValue()), template,
-                (transactionCount == null) ? 0 : transactionCount,
-                DateUtils.formatDateTime(this, lastUpdate.getTime(), formatFlags)));
+        if (lastUpdate == null) {
+            Data.lastTransactionsUpdateText.set("----");
+            Data.lastAccountsUpdateText.set("----");
+        }
+        else {
+            Data.lastTransactionsUpdateText.set(
+                    String.format(Objects.requireNonNull(Data.locale.getValue()),
+                            templateForTransactions,
+                            transactionCount == null ? 0 : transactionCount,
+                            DateUtils.formatDateTime(this, lastUpdate.getTime(), formatFlags)));
+            Data.lastAccountsUpdateText.set(
+                    String.format(Objects.requireNonNull(Data.locale.getValue()),
+                            templateForAccounts, accountCount == null ? 0 : accountCount,
+                            DateUtils.formatDateTime(this, lastUpdate.getTime(), formatFlags)));
+        }
     }
     public void onStopTransactionRefreshClick(View view) {
         Logger.debug("interactive", "Cancelling transactions refresh");
