@@ -42,7 +42,6 @@ public class TransactionAccumulator {
         if (null == latestDate) {
             list.add(new TransactionListItem());
             latestDate = date;
-            list.add(new TransactionListItem(date, SimpleDate.today().month != date.month));
         }
         earliestDate = date;
 
