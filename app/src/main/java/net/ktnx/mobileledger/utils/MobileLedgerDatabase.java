@@ -24,6 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import net.ktnx.mobileledger.BuildConfig;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +36,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class MobileLedgerDatabase extends SQLiteOpenHelper {
     private static final String DB_NAME = "MoLe.db";
-    private static final int LATEST_REVISION = 39;
+    private static final int LATEST_REVISION = 40;
     private static final String CREATE_DB_SQL = "create_db";
 
     private final Application mContext;
@@ -54,7 +56,9 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        debug("db", "onUpgrade called");
+        debug("db",
+                String.format(Locale.US, "needs upgrade from version %d to version %d", oldVersion,
+                        newVersion));
         for (int i = oldVersion + 1; i <= newVersion; i++)
             applyRevision(db, i);
     }
@@ -62,7 +66,8 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
         db.execSQL("pragma case_sensitive_like=ON;");
-        db.execSQL("PRAGMA foreign_keys=ON");
+        if (BuildConfig.DEBUG)
+            db.execSQL("PRAGMA foreign_keys=ON");
     }
 
     private void applyRevision(SQLiteDatabase db, int rev_no) {
