@@ -271,6 +271,7 @@ public class MainModel extends ViewModel {
     public void clearUpdateError() {
         updateError.postValue(null);
     }
+    public void clearAccounts() { displayedAccounts.postValue(new ArrayList<>()); }
     public void clearTransactions() {
         displayedTransactions.setValue(new ArrayList<>());
     }

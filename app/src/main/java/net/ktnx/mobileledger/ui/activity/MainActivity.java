@@ -439,6 +439,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         mProfileListAdapter.notifyDataSetChanged();
 
+        mainModel.clearAccounts();
         mainModel.clearTransactions();
 
         if (haveProfile) {
