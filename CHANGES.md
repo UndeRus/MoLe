@@ -1,6 +1,6 @@
 # Changes
 
-## [0.15.0] - TBA
+## [0.15.0] - 2020-09-20
 
 * NEW
     + splash screen on startup
