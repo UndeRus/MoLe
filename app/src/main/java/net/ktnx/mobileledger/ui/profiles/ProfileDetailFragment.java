@@ -112,32 +112,7 @@ public class ProfileDetailFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.profile_details, menu);
         final MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
-        menuDeleteProfile.setOnMenuItemClickListener(item -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle(mProfile.getName());
-            builder.setMessage(R.string.remove_profile_dialog_message);
-            builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
-                debug("profiles",
-                        String.format("[fragment] removing profile %s", mProfile.getUuid()));
-                mProfile.removeFromDB();
-                ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
-                if (oldList == null)
-                    throw new AssertionError();
-                ArrayList<MobileLedgerProfile> newList = new ArrayList<>(oldList);
-                newList.remove(mProfile);
-                Data.profiles.setValue(newList);
-                if (mProfile.equals(Data.getProfile())) {
-                    debug("profiles", "[fragment] setting current profile to 0");
-                    Data.setCurrentProfile(newList.get(0));
-                }
-
-                final FragmentActivity activity = getActivity();
-                if (activity != null)
-                    activity.finish();
-            });
-            builder.show();
-            return false;
-        });
+        menuDeleteProfile.setOnMenuItemClickListener(item -> onDeleteProfile());
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
 
         if (BuildConfig.DEBUG) {
@@ -145,6 +120,31 @@ public class ProfileDetailFragment extends Fragment {
             menuWipeProfileData.setOnMenuItemClickListener(ignored -> onWipeDataMenuClicked());
             menuWipeProfileData.setVisible(mProfile != null);
         }
+    }
+    private boolean onDeleteProfile() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(mProfile.getName());
+        builder.setMessage(R.string.remove_profile_dialog_message);
+        builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
+            debug("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
+            mProfile.removeFromDB();
+            ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
+            if (oldList == null)
+                throw new AssertionError();
+            ArrayList<MobileLedgerProfile> newList = new ArrayList<>(oldList);
+            newList.remove(mProfile);
+            Data.profiles.setValue(newList);
+            if (mProfile.equals(Data.getProfile())) {
+                debug("profiles", "[fragment] setting current profile to 0");
+                Data.setCurrentProfile(newList.get(0));
+            }
+
+            final FragmentActivity activity = getActivity();
+            if (activity != null)
+                activity.finish();
+        });
+        builder.show();
+        return false;
     }
     private boolean onWipeDataMenuClicked() {
         // this is a development option, so no confirmation
