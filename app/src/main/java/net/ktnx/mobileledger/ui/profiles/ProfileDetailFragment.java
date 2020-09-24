@@ -139,8 +139,6 @@ public class ProfileDetailFragment extends Fragment {
             return false;
         });
         final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        menuDeleteProfile.setVisible(
-                (mProfile != null) && (profiles != null) && (profiles.size() > 1));
 
         if (BuildConfig.DEBUG) {
             final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
