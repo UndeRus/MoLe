@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
@@ -80,7 +79,6 @@ public class MainActivity extends ProfileThemedActivity {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
-    private static final String PREF_THEME_ID = "themeId";
     DrawerLayout drawer;
     private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
     private View bTransactionListCancelDownload;
@@ -132,13 +130,9 @@ public class MainActivity extends ProfileThemedActivity {
     }
     @Override
     protected void setupProfileColors() {
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        int profileColor = prefs.getInt(PREF_THEME_ID, -2);
-        if (profileColor == -2)
-            profileColor = Data.retrieveCurrentThemeIdFromDb();
+        final int profileColor = Data.retrieveCurrentThemeIdFromDb();
         Colors.setupTheme(this, profileColor);
         Colors.profileThemeId = profileColor;
-        storeThemeIdInPrefs(profileColor);
     }
     @Override
     protected void onResume() {
@@ -464,8 +458,6 @@ public class MainActivity extends ProfileThemedActivity {
         updateLastUpdateTextFromDB();
     }
     private void profileThemeChanged() {
-        storeThemeIdInPrefs(profile.getThemeHue());
-
         // un-hook all observed LiveData
         Data.removeProfileObservers(this);
         Data.profiles.removeObservers(this);
@@ -474,13 +466,6 @@ public class MainActivity extends ProfileThemedActivity {
         Data.lastUpdateDate.removeObservers(this);
 
         recreate();
-    }
-    private void storeThemeIdInPrefs(int themeId) {
-        // store the new theme id in the preferences
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor e = prefs.edit();
-        e.putInt(PREF_THEME_ID, themeId);
-        e.apply();
     }
     public void startEditProfileActivity(MobileLedgerProfile profile) {
         Intent intent = new Intent(this, ProfileDetailActivity.class);
