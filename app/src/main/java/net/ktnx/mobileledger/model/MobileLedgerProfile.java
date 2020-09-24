@@ -452,12 +452,12 @@ public final class MobileLedgerProfile {
         db.beginTransactionNonExclusive();
         try {
             Object[] uuid_param = new Object[]{uuid};
-            db.execSQL("delete from profiles where uuid=?", uuid_param);
-            db.execSQL("delete from accounts where profile=?", uuid_param);
-            db.execSQL("delete from account_values where profile=?", uuid_param);
-            db.execSQL("delete from transactions where profile=?", uuid_param);
             db.execSQL("delete from transaction_accounts where profile=?", uuid_param);
+            db.execSQL("delete from transactions where profile=?", uuid_param);
+            db.execSQL("delete from account_values where profile=?", uuid_param);
+            db.execSQL("delete from accounts where profile=?", uuid_param);
             db.execSQL("delete from options where profile=?", uuid_param);
+            db.execSQL("delete from profiles where uuid=?", uuid_param);
             db.setTransactionSuccessful();
         }
         finally {
