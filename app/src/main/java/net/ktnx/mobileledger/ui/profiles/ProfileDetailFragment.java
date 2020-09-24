@@ -417,22 +417,35 @@ public class ProfileDetailFragment extends Fragment {
             return;
 
         ProfileDetailModel model = getModel();
+        final ArrayList<MobileLedgerProfile> profiles =
+                Objects.requireNonNull(Data.profiles.getValue());
 
         if (mProfile != null) {
+            int pos = Data.profiles.getValue()
+                                   .indexOf(mProfile);
+            mProfile = new MobileLedgerProfile(mProfile);
             model.updateProfile(mProfile);
-//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
             mProfile.storeInDB();
             debug("profiles", "profile stored in DB");
-            triggerProfileChange();
+            profiles.set(pos, mProfile);
+//                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
+
+            final MobileLedgerProfile currentProfile = Data.getProfile();
+            if (mProfile.getUuid()
+                        .equals(currentProfile.getUuid()))
+            {
+                Data.setCurrentProfile(mProfile);
+            }
+
+            ProfilesRecyclerViewAdapter viewAdapter = ProfilesRecyclerViewAdapter.getInstance();
+            if (viewAdapter != null)
+                viewAdapter.notifyItemChanged(pos);
         }
         else {
             mProfile = new MobileLedgerProfile(String.valueOf(UUID.randomUUID()));
             model.updateProfile(mProfile);
             mProfile.storeInDB();
-            final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-            if (profiles == null)
-                throw new AssertionError();
-            ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);
+            final ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);
             newList.add(mProfile);
             Data.profiles.setValue(newList);
             MobileLedgerProfile.storeProfilesOrder();
