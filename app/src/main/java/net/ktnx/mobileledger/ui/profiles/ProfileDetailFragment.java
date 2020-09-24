@@ -61,6 +61,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -157,9 +158,8 @@ public class ProfileDetailFragment extends Fragment {
     private void triggerProfileChange() {
         int index = Data.getProfileIndex(mProfile);
         MobileLedgerProfile newProfile = new MobileLedgerProfile(mProfile);
-        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        if (profiles == null)
-            throw new AssertionError();
+        final ArrayList<MobileLedgerProfile> profiles =
+                Objects.requireNonNull(Data.profiles.getValue());
         profiles.set(index, newProfile);
 
         ProfilesRecyclerViewAdapter viewAdapter = ProfilesRecyclerViewAdapter.getInstance();
