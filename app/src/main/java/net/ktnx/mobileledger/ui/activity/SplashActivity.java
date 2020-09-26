@@ -22,7 +22,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.activity.ComponentActivity;
 import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.R;
@@ -32,7 +31,7 @@ import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
-public class SplashActivity extends ComponentActivity {
+public class SplashActivity extends CrashReportingActivity {
     private static final long keepActiveForMS = 500;
     private long startupTime;
     private boolean running = true;
