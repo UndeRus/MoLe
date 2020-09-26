@@ -57,6 +57,13 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.execSQL("pragma case_sensitive_like=ON;");
+        if (BuildConfig.DEBUG)
+            db.execSQL("PRAGMA foreign_keys=ON");
+    }
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         debug("db",
                 String.format(Locale.US, "needs upgrade from version %d to version %d", oldVersion,
@@ -64,14 +71,6 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
         for (int i = oldVersion + 1; i <= newVersion; i++)
             applyRevision(db, i);
     }
-    @Override
-    public void onOpen(SQLiteDatabase db) {
-        super.onOpen(db);
-        db.execSQL("pragma case_sensitive_like=ON;");
-        if (BuildConfig.DEBUG)
-            db.execSQL("PRAGMA foreign_keys=ON");
-    }
-
     private void applyRevision(SQLiteDatabase db, int rev_no) {
         String rev_file = String.format(Locale.US, "sql_%d", rev_no);
 
