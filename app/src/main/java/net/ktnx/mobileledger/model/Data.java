@@ -92,7 +92,7 @@ public final class Data {
     }
     public static void setCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
         MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
-        profile.setValue(newProfile);
+        profile.postValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {

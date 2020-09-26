@@ -122,7 +122,7 @@ public final class MobileLedgerProfile {
                     result = item;
             }
         }
-        Data.profiles.setValue(list);
+        Data.profiles.postValue(list);
         return result;
     }
     public static void storeProfilesOrder() {

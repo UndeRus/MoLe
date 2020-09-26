@@ -24,6 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
+
 import net.ktnx.mobileledger.BuildConfig;
 
 import java.io.BufferedReader;
@@ -35,10 +37,10 @@ import java.util.Locale;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class MobileLedgerDatabase extends SQLiteOpenHelper {
+    public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static final String DB_NAME = "MoLe.db";
     private static final int LATEST_REVISION = 40;
     private static final String CREATE_DB_SQL = "create_db";
-
     private final Application mContext;
 
     public MobileLedgerDatabase(Application context) {
