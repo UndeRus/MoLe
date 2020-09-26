@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -30,7 +30,8 @@ import net.ktnx.mobileledger.utils.Colors;
 public class ProfileThemedActivity extends CrashReportingActivity {
     protected MobileLedgerProfile mProfile;
     protected void setupProfileColors() {
-        Colors.setupTheme(this, mProfile);
+        final int themeHue = (mProfile == null) ? -1 : mProfile.getThemeHue();
+        Colors.setupTheme(this, themeHue);
     }
     @Override
     protected void onStart() {

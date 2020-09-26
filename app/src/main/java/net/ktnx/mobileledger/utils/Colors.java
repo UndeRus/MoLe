@@ -23,58 +23,54 @@ import android.content.res.Resources;
 import android.util.TypedValue;
 
 import androidx.annotation.ColorInt;
-import androidx.annotation.ColorLong;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.HueRing;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Objects;
 
-import static java.lang.Math.abs;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
-    public static final int THEME_HUE_STEP_DEG = 5;
-    public static final int baseHueStep = 60;
     public static final MutableLiveData<Integer> themeWatch = new MutableLiveData<>(0);
-    private static final float blueLightness = 0.665f;
-    private static final float yellowLightness = 0.350f;
     private static final int[][] EMPTY_STATES = new int[][]{new int[0]};
     private static final int SWIPE_COLOR_COUNT = 6;
+    private static final int[] themeIDs =
+            {R.style.AppTheme_default, R.style.AppTheme_000, R.style.AppTheme_005,
+             R.style.AppTheme_010, R.style.AppTheme_015, R.style.AppTheme_020, R.style.AppTheme_025,
+             R.style.AppTheme_030, R.style.AppTheme_035, R.style.AppTheme_040, R.style.AppTheme_045,
+             R.style.AppTheme_050, R.style.AppTheme_055, R.style.AppTheme_060, R.style.AppTheme_065,
+             R.style.AppTheme_070, R.style.AppTheme_075, R.style.AppTheme_080, R.style.AppTheme_085,
+             R.style.AppTheme_090, R.style.AppTheme_095, R.style.AppTheme_100, R.style.AppTheme_105,
+             R.style.AppTheme_110, R.style.AppTheme_115, R.style.AppTheme_120, R.style.AppTheme_125,
+             R.style.AppTheme_130, R.style.AppTheme_135, R.style.AppTheme_140, R.style.AppTheme_145,
+             R.style.AppTheme_150, R.style.AppTheme_155, R.style.AppTheme_160, R.style.AppTheme_165,
+             R.style.AppTheme_170, R.style.AppTheme_175, R.style.AppTheme_180, R.style.AppTheme_185,
+             R.style.AppTheme_190, R.style.AppTheme_195, R.style.AppTheme_200, R.style.AppTheme_205,
+             R.style.AppTheme_210, R.style.AppTheme_215, R.style.AppTheme_220, R.style.AppTheme_225,
+             R.style.AppTheme_230, R.style.AppTheme_235, R.style.AppTheme_240, R.style.AppTheme_245,
+             R.style.AppTheme_250, R.style.AppTheme_255, R.style.AppTheme_260, R.style.AppTheme_265,
+             R.style.AppTheme_270, R.style.AppTheme_275, R.style.AppTheme_280, R.style.AppTheme_285,
+             R.style.AppTheme_290, R.style.AppTheme_295, R.style.AppTheme_300, R.style.AppTheme_305,
+             R.style.AppTheme_310, R.style.AppTheme_315, R.style.AppTheme_320, R.style.AppTheme_325,
+             R.style.AppTheme_330, R.style.AppTheme_335, R.style.AppTheme_340, R.style.AppTheme_345,
+             R.style.AppTheme_350, R.style.AppTheme_355,
+             };
+    private static final HashMap<Integer, Integer> themePrimaryColor = new HashMap<>();
     public static @ColorInt
     int secondary;
     @ColorInt
     public static int tableRowDarkBG;
     public static int profileThemeId = -1;
-    private static final int[] themeIDs =
-            {R.style.AppTheme_000, R.style.AppTheme_005, R.style.AppTheme_010, R.style.AppTheme_015,
-             R.style.AppTheme_020, R.style.AppTheme_025, R.style.AppTheme_030, R.style.AppTheme_035,
-             R.style.AppTheme_040, R.style.AppTheme_045, R.style.AppTheme_050, R.style.AppTheme_055,
-             R.style.AppTheme_060, R.style.AppTheme_065, R.style.AppTheme_070, R.style.AppTheme_075,
-             R.style.AppTheme_080, R.style.AppTheme_085, R.style.AppTheme_090, R.style.AppTheme_095,
-             R.style.AppTheme_100, R.style.AppTheme_105, R.style.AppTheme_110, R.style.AppTheme_115,
-             R.style.AppTheme_120, R.style.AppTheme_125, R.style.AppTheme_130, R.style.AppTheme_135,
-             R.style.AppTheme_140, R.style.AppTheme_145, R.style.AppTheme_150, R.style.AppTheme_155,
-             R.style.AppTheme_160, R.style.AppTheme_165, R.style.AppTheme_170, R.style.AppTheme_175,
-             R.style.AppTheme_180, R.style.AppTheme_185, R.style.AppTheme_190, R.style.AppTheme_195,
-             R.style.AppTheme_200, R.style.AppTheme_205, R.style.AppTheme_210, R.style.AppTheme_215,
-             R.style.AppTheme_220, R.style.AppTheme_225, R.style.AppTheme_230, R.style.AppTheme_235,
-             R.style.AppTheme_240, R.style.AppTheme_245, R.style.AppTheme_250, R.style.AppTheme_255,
-             R.style.AppTheme_260, R.style.AppTheme_265, R.style.AppTheme_270, R.style.AppTheme_275,
-             R.style.AppTheme_280, R.style.AppTheme_285, R.style.AppTheme_290, R.style.AppTheme_295,
-             R.style.AppTheme_300, R.style.AppTheme_305, R.style.AppTheme_310, R.style.AppTheme_315,
-             R.style.AppTheme_320, R.style.AppTheme_325, R.style.AppTheme_330, R.style.AppTheme_335,
-             R.style.AppTheme_340, R.style.AppTheme_345, R.style.AppTheme_350, R.style.AppTheme_355,
-             };
     public static void refreshColors(Resources.Theme theme) {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
@@ -82,118 +78,54 @@ public class Colors {
         theme.resolveAttribute(R.attr.colorSecondary, tv, true);
         secondary = tv.data;
 
+        if (themePrimaryColor.size() == 0) {
+            for (int themeId : themeIDs) {
+                Resources.Theme tmpTheme = theme.getResources()
+                                                .newTheme();
+                tmpTheme.applyStyle(themeId, true);
+                tmpTheme.resolveAttribute(R.attr.colorPrimary, tv, false);
+                themePrimaryColor.put(themeId, tv.data);
+            }
+        }
+
         // trigger theme observers
         themeWatch.postValue(themeWatch.getValue() + 1);
     }
     public static @ColorInt
-    int hslColor(float hueRatio, float saturation, float lightness) {
-        return 0xff000000 | hslTriplet(hueRatio, saturation, lightness);
-    }
-    public static @ColorInt
-    int hslTriplet(float hueRatio, float saturation, float lightness) {
-        @ColorLong long result;
-        float h = hueRatio * 6;
-        float c = (1 - abs(2f * lightness - 1)) * saturation;
-        float h_mod_2 = h % 2;
-        float x = c * (1 - Math.abs(h_mod_2 - 1));
-        int r, g, b;
-        float m = lightness - c / 2f;
-
-        if (h < 1 || h == 6)
-            return tupleToColor(c + m, x + m, 0 + m);
-        if (h < 2)
-            return tupleToColor(x + m, c + m, 0 + m);
-        if (h < 3)
-            return tupleToColor(0 + m, c + m, x + m);
-        if (h < 4)
-            return tupleToColor(0 + m, x + m, c + m);
-        if (h < 5)
-            return tupleToColor(x + m, 0 + m, c + m);
-        if (h < 6)
-            return tupleToColor(c + m, 0 + m, x + m);
-
-        throw new IllegalArgumentException(String.format(
-                "Unexpected value for h (%1.3f) while converting hsl(%1.3f, %1.3f, %1.3f) to rgb",
-                h, hueRatio, saturation, lightness));
-    }
-    public static @ColorInt
-    int tupleToColor(float r, float g, float b) {
-        int r_int = Math.round(255 * r);
-        int g_int = Math.round(255 * g);
-        int b_int = Math.round(255 * b);
-        return (r_int << 16) | (g_int << 8) | b_int;
-    }
-    public static float baseHueLightness(int baseHueDegrees) {
-        switch (baseHueDegrees % 360) {
-            case 0:
-                return 0.550f;   // red
-            case 60:
-                return 0.250f;  // yellow
-            case 120:
-                return 0.290f;  // green
-            case 180:
-                return 0.300f;  // cyan
-            case 240:
-                return 0.710f;  // blue
-            case 300:
-                return 0.450f;   // magenta
-            default:
-                throw new IllegalStateException(
-                        String.format(Locale.US, "baseHueLightness called with invalid value %d",
-                                baseHueDegrees));
+    int getPrimaryColorForHue(int hueDegrees) {
+        if (hueDegrees == DEFAULT_HUE_DEG)
+            return Objects.requireNonNull(themePrimaryColor.get(R.style.AppTheme_default));
+        int mod = hueDegrees % HueRing.hueStepDegrees;
+        if (mod == 0) {
+            int themeId = getThemeIdForHue(hueDegrees);
+            Integer result = Objects.requireNonNull(themePrimaryColor.get(themeId));
+            debug("colors",
+                    String.format(Locale.US, "getPrimaryColorForHue(%d) = %x", hueDegrees, result));
+            return result;
+        }
+        else {
+            int x0 = hueDegrees - mod;
+            int x1 = (x0 + HueRing.hueStepDegrees) % 360;
+            float y0 = Objects.requireNonNull(themePrimaryColor.get(getThemeIdForHue(x0)));
+            float y1 = Objects.requireNonNull(themePrimaryColor.get(getThemeIdForHue(x1)));
+            return Math.round(y0 + hueDegrees * (y1 - y0) / (x1 - x0));
         }
     }
-    public static float hueLightness(int hueDegrees) {
-        int mod = hueDegrees % baseHueStep;
-        int x0 = hueDegrees - mod;
-        int x1 = x0 + baseHueStep;
-
-        float y0 = baseHueLightness(x0);
-        float y1 = baseHueLightness(x1);
-
-        return y0 + (hueDegrees - x0) * (y1 - y0) / (x1 - x0);
-    }
-    public static @ColorInt
-    int getPrimaryColorForHue(int hueDegrees) {
-        int result = hslColor(hueDegrees / 360f, 0.845f, hueLightness(hueDegrees));
-//        debug("colors", String.format(Locale.ENGLISH, "getPrimaryColorForHue(%d) = %x",
-//        hueDegrees,
-//                result));
-        return result;
-    }
-    public static void setupTheme(Activity activity) {
-        MobileLedgerProfile profile = Data.getProfile();
-        setupTheme(activity, profile);
-    }
-    public static void setupTheme(Activity activity, @Nullable MobileLedgerProfile profile) {
-        final int themeHue = (profile == null) ? -1 : profile.getThemeHue();
-        setupTheme(activity, themeHue);
-    }
     public static int getThemeIdForHue(int themeHue) {
-        int themeId = -1;
+        int themeIndex = -1;
         if (themeHue == 360)
             themeHue = 0;
         if ((themeHue >= 0) && (themeHue < 360) && (themeHue != DEFAULT_HUE_DEG)) {
-            int index;
             if ((themeHue % HueRing.hueStepDegrees) != 0) {
                 Logger.warn("profiles",
                         String.format(Locale.US, "Adjusting unexpected hue %d", themeHue));
-                index = Math.round(1f * themeHue / HueRing.hueStepDegrees);
+                themeIndex = Math.round(1f * themeHue / HueRing.hueStepDegrees);
             }
             else
-                index = themeHue / HueRing.hueStepDegrees;
-
-            themeId = themeIDs[index];
+                themeIndex = themeHue / HueRing.hueStepDegrees;
         }
 
-        if (themeId < 0) {
-            themeId = R.style.AppTheme_default;
-            debug("profiles",
-                    String.format(Locale.ENGLISH, "Theme hue %d not supported, using the default",
-                            themeHue));
-        }
-
-        return themeId;
+        return themeIDs[themeIndex + 1];    // 0 is the default theme
     }
     public static void setupTheme(Activity activity, int themeHue) {
         int themeId = getThemeIdForHue(themeHue);
@@ -292,10 +224,10 @@ public class Colors {
             chosenHue = (chosenIntervalStart + (largestInterval / 2)) % 360;
         }
 
-        final int mod = chosenHue % THEME_HUE_STEP_DEG;
+        final int mod = chosenHue % HueRing.hueStepDegrees;
         if (mod != 0) {
-            if (mod > THEME_HUE_STEP_DEG / 2)
-                chosenHue += (THEME_HUE_STEP_DEG - mod); // 13 += (5-3) = 15
+            if (mod > HueRing.hueStepDegrees / 2)
+                chosenHue += (HueRing.hueStepDegrees - mod); // 13 += (5-3) = 15
             else
                 chosenHue -= mod;       // 12 -= 2 = 10
         }
