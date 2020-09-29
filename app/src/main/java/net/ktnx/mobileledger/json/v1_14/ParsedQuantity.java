@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedQuantity {
-    protected long decimalMantissa;
-    protected int decimalPlaces;
+    private long decimalMantissa;
+    private int decimalPlaces;
     public ParsedQuantity() {
     }
     public ParsedQuantity(String input) {

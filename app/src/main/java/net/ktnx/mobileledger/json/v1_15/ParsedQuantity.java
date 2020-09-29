@@ -20,21 +20,39 @@ package net.ktnx.mobileledger.json.v1_15;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedQuantity extends net.ktnx.mobileledger.json.v1_14.ParsedQuantity {
-    private float floatingPoint;
-    private boolean floatingPointSet = false;
-    public float getFloatingPoint() {
-        if (!floatingPointSet)
-            throw new IllegalStateException("floatingPoint is not set");
-        return floatingPoint;
+public class ParsedQuantity {
+    private long decimalMantissa;
+    private int decimalPlaces;
+    public ParsedQuantity() {
     }
-    public void setFloatingPoint(float floatingPoint) {
-        this.floatingPoint = floatingPoint;
-        floatingPointSet = true;
+    public ParsedQuantity(String input) {
+        parseString(input);
+    }
+    public long getDecimalMantissa() {
+        return decimalMantissa;
+    }
+    public void setDecimalMantissa(long decimalMantissa) {
+        this.decimalMantissa = decimalMantissa;
+    }
+    public int getDecimalPlaces() {
+        return decimalPlaces;
+    }
+    public void setDecimalPlaces(int decimalPlaces) {
+        this.decimalPlaces = decimalPlaces;
     }
     public float asFloat() {
-        if (floatingPointSet)
-            return floatingPoint;
         return (float) (decimalMantissa * Math.pow(10, -decimalPlaces));
+    }
+    public void parseString(String input) {
+        int pointPos = input.indexOf('.');
+        if (pointPos >= 0) {
+            String integral = input.replace(".", "");
+            decimalMantissa = Long.parseLong(integral);
+            decimalPlaces = input.length() - pointPos - 1;
+        }
+        else {
+            decimalMantissa = Long.parseLong(input);
+            decimalPlaces = 0;
+        }
     }
 }
