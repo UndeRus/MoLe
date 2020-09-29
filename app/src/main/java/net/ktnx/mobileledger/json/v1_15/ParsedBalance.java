@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -25,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class ParsedBalance {
     private ParsedQuantity aquantity;
     private String acommodity;
-    private ParsedStyle astyle;
     public ParsedBalance() {
     }
     public ParsedQuantity getAquantity() {
@@ -40,11 +39,5 @@ public class ParsedBalance {
     }
     public void setAcommodity(String acommodity) {
         this.acommodity = acommodity;
-    }
-    public ParsedStyle getAstyle() {
-        return astyle;
-    }
-    public void setAstyle(ParsedStyle astyle) {
-        this.astyle = astyle;
     }
 }

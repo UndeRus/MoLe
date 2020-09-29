@@ -40,7 +40,6 @@ class ParsedPrice {
         private ParsedQuantity aquantity;
         private String acommodity;
         private boolean aismultiplier;
-        private ParsedStyle astyle;
         public Contents() {
             acommodity = "";
         }
@@ -67,12 +66,6 @@ class ParsedPrice {
         }
         public void setAismultiplier(boolean aismultiplier) {
             this.aismultiplier = aismultiplier;
-        }
-        public ParsedStyle getAstyle() {
-            return astyle;
-        }
-        public void setAstyle(ParsedStyle astyle) {
-            this.astyle = astyle;
         }
     }
 }

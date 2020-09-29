@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -24,7 +24,6 @@ public class ParsedAmount {
     private String acommodity;
     private ParsedQuantity aquantity;
     private boolean aismultiplier;
-    private ParsedStyle astyle;
     private ParsedPrice aprice;
     public ParsedAmount() {
     }
@@ -52,11 +51,4 @@ public class ParsedAmount {
     public void setAismultiplier(boolean aismultiplier) {
         this.aismultiplier = aismultiplier;
     }
-    public ParsedStyle getAstyle() {
-        return astyle;
-    }
-    public void setAstyle(ParsedStyle astyle) {
-        this.astyle = astyle;
-    }
-
 }
