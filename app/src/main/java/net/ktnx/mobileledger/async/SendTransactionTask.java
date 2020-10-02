@@ -59,12 +59,12 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private final TaskCallback taskCallback;
+    private final MobileLedgerProfile mProfile;
+    private final boolean simulate;
     protected String error;
     private String token;
     private String session;
     private LedgerTransaction transaction;
-    private final MobileLedgerProfile mProfile;
-    private final boolean simulate;
 
     public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile,
                                boolean simulate) {
