@@ -147,8 +147,19 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     case 201:
                         break;
                     case 400:
-                    case 405:
+                    case 405: {
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
+                        String line;
+                        int count = 0;
+                        while (count <= 5) {
+                            line = reader.readLine();
+                            if (line == null)
+                                break;
+                            Logger.debug("network", line);
+                            count++;
+                        }
                         return false; // will cause a retry with the legacy method
+                    }
                     default:
                         BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
                         String line = reader.readLine();
