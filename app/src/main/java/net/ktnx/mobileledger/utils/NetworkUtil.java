@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,7 +17,11 @@
 
 package net.ktnx.mobileledger.utils;
 
+import androidx.annotation.NonNull;
+
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -27,14 +31,19 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
-    public static HttpURLConnection prepareConnection(MobileLedgerProfile profile, String path)
-            throws IOException {
-        String url = profile.getUrl();
-        final boolean use_auth = profile.isAuthEnabled();
-        if (!url.endsWith("/")) url += "/";
-        url += path;
-        debug("network", "Connecting to " + url);
-        HttpURLConnection http = (HttpURLConnection) new URL(url).openConnection();
+    @NotNull
+    public static HttpURLConnection prepareConnection(@NonNull MobileLedgerProfile profile,
+                                                      @NonNull String path) throws IOException {
+        return prepareConnection(profile.getUrl(), path, profile.isAuthEnabled());
+    }
+    public static HttpURLConnection prepareConnection(@NonNull String url, @NonNull String path,
+                                                      boolean authEnabled) throws IOException {
+        String connectURL = url;
+        if (!connectURL.endsWith("/"))
+            connectURL += "/";
+        connectURL += path;
+        debug("network", "Connecting to " + connectURL);
+        HttpURLConnection http = (HttpURLConnection) new URL(connectURL).openConnection();
         http.setAllowUserInteraction(true);
         http.setRequestProperty("Accept-Charset", "UTF-8");
         http.setInstanceFollowRedirects(false);

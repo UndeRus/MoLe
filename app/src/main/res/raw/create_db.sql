@@ -12,6 +12,7 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+create table profiles(uuid varchar not null primary key, name not null, url not null, use_authentication boolean not null, auth_user varchar, auth_password varchar, order_no integer, permit_posting boolean default 0, theme integer default -1, preferred_accounts_filter varchar, future_dates integer, api_version integer, show_commodity_by_default boolean default 0, default_commodity varchar, show_comments_by_default boolean default 1, detected_version_pre_1_19 boolean, detected_version_major integer, detected_version_minor integer);
 create table accounts(profile varchar not null, name varchar not null, name_upper varchar not null, level integer not null, parent_name varchar, expanded default 1, amounts_expanded boolean default 0, generation integer default 0);
 create unique index un_accounts on accounts(profile, name);
 create table options(profile varchar not null, name varchar not null, value varchar);
@@ -20,7 +21,6 @@ create table account_values(profile varchar not null, account varchar not null, 
 create unique index un_account_values on account_values(profile,account,currency);
 create table description_history(description varchar not null primary key, description_upper varchar, generation integer default 0);
 create unique index un_description_history on description_history(description_upper);
-create table profiles(uuid varchar not null primary key, name not null, url not null, use_authentication boolean not null, auth_user varchar, auth_password varchar, order_no integer, permit_posting boolean default 0, theme integer default -1, preferred_accounts_filter varchar, future_dates integer, api_version integer, show_commodity_by_default boolean default 0, default_commodity varchar, show_comments_by_default boolean default 1);
 create table transactions(profile varchar not null, id integer not null, data_hash varchar not null, year integer not null, month integer not null, day integer not null, description varchar not null, comment varchar, generation integer default 0);
 create unique index un_transactions_id on transactions(profile,id);
 create unique index un_transactions_data_hash on transactions(profile,data_hash);

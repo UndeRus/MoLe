@@ -129,26 +129,65 @@
 
         </LinearLayout>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/api_version_layout"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp">
 
             <TextView
+                android:id="@+id/api_version_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/profile_api_version_title"
-                android:textAppearance="?android:textAppearanceListItem" />
+                android:textAppearance="?android:textAppearanceListItem"
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <TextView
                 android:id="@+id/api_version_text"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:textAppearanceListItemSecondary"
-                android:textColor="?attr/textColor" />
-        </LinearLayout>
+                android:textColor="?attr/textColor"
+                app:layout_constraintEnd_toStartOf="@id/detected_version_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/api_version_label"
+                />
+            <TextView
+                android:id="@+id/detected_version_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="end"
+                android:text="@string/detected_version_label"
+                android:textAppearance="?android:textAppearanceListItemSecondary"
+                app:layout_constraintEnd_toStartOf="@id/detected_version_text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/api_version_text"
+                />
+            <TextView
+                android:id="@+id/detected_version_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/api_version_unknown_label"
+                android:textAppearance="?android:textAppearanceListItemSecondary"
+                android:textColor="?attr/textColor"
+                app:layout_constraintEnd_toStartOf="@id/api_version_detect_button"
+                app:layout_constraintTop_toBottomOf="@id/api_version_text"
+                />
+            <TextView
+                android:id="@+id/api_version_detect_button"
+                android:layout_width="24dp"
+                android:layout_height="0dp"
+                android:drawableBottom="@drawable/ic_refresh_primary_24dp"
+                android:foregroundGravity="bottom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/api_version_label"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <Switch
             android:id="@+id/profile_permit_posting"

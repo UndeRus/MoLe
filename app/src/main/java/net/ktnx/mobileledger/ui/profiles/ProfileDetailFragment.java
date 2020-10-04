@@ -282,33 +282,26 @@ public class ProfileDetailFragment extends Fragment {
         apiVersionText = context.findViewById(R.id.api_version_text);
         model.observeApiVersion(viewLifecycleOwner,
                 apiVer -> apiVersionText.setText(apiVer.getDescription(getResources())));
-        context.findViewById(R.id.api_version_layout)
-               .setOnClickListener(v -> {
-                   MenuInflater mi = new MenuInflater(context);
-                   PopupMenu menu = new PopupMenu(context, v);
-                   menu.inflate(R.menu.api_version);
-                   menu.setOnMenuItemClickListener(item -> {
-                       SendTransactionTask.API apiVer;
-                       switch (item.getItemId()) {
-                           case R.id.api_version_menu_html:
-                               apiVer = SendTransactionTask.API.html;
-                               break;
-                           case R.id.api_version_menu_post_1_14:
-                               apiVer = SendTransactionTask.API.post_1_14;
-                               break;
-                           case R.id.api_version_menu_pre_1_15:
-                               apiVer = SendTransactionTask.API.pre_1_15;
-                               break;
-                           case R.id.api_version_menu_auto:
-                           default:
-                               apiVer = SendTransactionTask.API.auto;
-                       }
-                       model.setApiVersion(apiVer);
-                       apiVersionText.setText(apiVer.getDescription(getResources()));
-                       return true;
-                   });
-                   menu.show();
-               });
+        context.findViewById(R.id.api_version_label)
+               .setOnClickListener(this::chooseAPIVersion);
+        context.findViewById(R.id.api_version_text)
+               .setOnClickListener(this::chooseAPIVersion);
+
+        TextView detectedApiVersion = context.findViewById(R.id.detected_version_text);
+        model.observeDetectedVersion(viewLifecycleOwner, ver -> {
+            if (ver == null)
+                detectedApiVersion.setText(context.getResources()
+                                                  .getString(R.string.api_version_unknown_label));
+            else if (ver.isPre_1_20())
+                detectedApiVersion.setText(context.getResources()
+                                                  .getString(R.string.api_pre_1_19));
+            else
+                detectedApiVersion.setText(ver.toString());
+        });
+        detectedApiVersion.setOnClickListener(v -> model.triggerVersionDetection());
+        context.findViewById(R.id.api_version_detect_button)
+               .setOnClickListener(v -> model.triggerVersionDetection());
+
         authParams = context.findViewById(R.id.auth_params);
 
         useAuthentication = context.findViewById(R.id.enable_http_auth);
@@ -385,6 +378,34 @@ public class ProfileDetailFragment extends Fragment {
         });
 
         profileName.requestFocus();
+    }
+    private void chooseAPIVersion(View v) {
+        Activity context = getActivity();
+        ProfileDetailModel model = getModel();
+        MenuInflater mi = new MenuInflater(context);
+        PopupMenu menu = new PopupMenu(context, v);
+        menu.inflate(R.menu.api_version);
+        menu.setOnMenuItemClickListener(item -> {
+            SendTransactionTask.API apiVer;
+            switch (item.getItemId()) {
+                case R.id.api_version_menu_html:
+                    apiVer = SendTransactionTask.API.html;
+                    break;
+                case R.id.api_version_menu_post_1_14:
+                    apiVer = SendTransactionTask.API.post_1_14;
+                    break;
+                case R.id.api_version_menu_pre_1_15:
+                    apiVer = SendTransactionTask.API.pre_1_15;
+                    break;
+                case R.id.api_version_menu_auto:
+                default:
+                    apiVer = SendTransactionTask.API.auto;
+            }
+            model.setApiVersion(apiVer);
+            apiVersionText.setText(apiVer.getDescription(getResources()));
+            return true;
+        });
+        menu.show();
     }
     private MobileLedgerProfile.FutureDates futureDatesSettingFromMenuItemId(int itemId) {
         switch (itemId) {

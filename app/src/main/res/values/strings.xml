@@ -166,4 +166,7 @@
     <string name="sub_accounts_expand_collapse_trigger_description">Sub-accounts expand/collapse trigger</string>
     <string name="transaction_count_summary">%,d transactions as of %s</string>
     <string name="account_count_summary">%,d accounts as of %s</string>
+    <string name="api_version_unknown_label">Unknown</string>
+    <string name="api_pre_1_19">Before 1.20.?</string>
+    <string name="detected_version_label">Detected version</string>
 </resources>

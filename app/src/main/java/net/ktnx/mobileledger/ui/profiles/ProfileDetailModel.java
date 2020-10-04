@@ -26,9 +26,22 @@ import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.model.Currency;
+import net.ktnx.mobileledger.model.HledgerVersion;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
+import net.ktnx.mobileledger.utils.NetworkUtil;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ProfileDetailModel extends ViewModel {
     private static final String HTTPS_URL_START = "https://";
@@ -47,7 +60,9 @@ public class ProfileDetailModel extends ViewModel {
     private final MutableLiveData<String> authPassword = new MutableLiveData<>(null);
     private final MutableLiveData<String> preferredAccountsFilter = new MutableLiveData<>(null);
     private final MutableLiveData<Integer> themeId = new MutableLiveData<>(-1);
+    private final MutableLiveData<HledgerVersion> detectedVersion = new MutableLiveData<>(null);
     public int initialThemeHue = Colors.DEFAULT_HUE_DEG;
+    private VersionDetectionThread versionDetectionThread;
     public ProfileDetailModel() {
     }
     String getProfileName() {
@@ -130,6 +145,14 @@ public class ProfileDetailModel extends ViewModel {
     }
     void observeApiVersion(LifecycleOwner lfo, Observer<SendTransactionTask.API> o) {
         apiVersion.observe(lfo, o);
+    }
+    HledgerVersion getDetectedVersion() { return detectedVersion.getValue(); }
+    void setDetectedVersion(HledgerVersion newValue) {
+        if (!Objects.equals(detectedVersion.getValue(), newValue))
+            detectedVersion.setValue(newValue);
+    }
+    void observeDetectedVersion(LifecycleOwner lfo, Observer<HledgerVersion> o) {
+        detectedVersion.observe(lfo, o);
     }
     String getUrl() {
         return url.getValue();
@@ -218,6 +241,7 @@ public class ProfileDetailModel extends ViewModel {
             authPassword.setValue(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
             preferredAccountsFilter.setValue(mProfile.getPreferredAccountsFilter());
             themeId.setValue(mProfile.getThemeHue());
+            detectedVersion.setValue(mProfile.getDetectedVersion());
         }
         else {
             profileName.setValue(null);
@@ -232,9 +256,8 @@ public class ProfileDetailModel extends ViewModel {
             authPassword.setValue("");
             preferredAccountsFilter.setValue(null);
             themeId.setValue(newProfileHue);
+            detectedVersion.setValue(null);
         }
-
-
     }
     void updateProfile(MobileLedgerProfile mProfile) {
         mProfile.setName(profileName.getValue());
@@ -251,5 +274,62 @@ public class ProfileDetailModel extends ViewModel {
         mProfile.setThemeHue(themeId.getValue());
         mProfile.setFutureDates(futureDates.getValue());
         mProfile.setApiVersion(apiVersion.getValue());
+        mProfile.setDetectedVersion(detectedVersion.getValue());
+    }
+    synchronized public void triggerVersionDetection() {
+        if (versionDetectionThread != null)
+            versionDetectionThread.interrupt();
+
+        versionDetectionThread = new VersionDetectionThread(this);
+        versionDetectionThread.start();
+    }
+    static class VersionDetectionThread extends Thread {
+        private final Pattern versionPattern =
+                Pattern.compile("^\"(\\d+)\\.(\\d+)(?:\\.(\\d+))?\"$");
+        private final ProfileDetailModel model;
+        public VersionDetectionThread(ProfileDetailModel model) {
+            this.model = model;
+        }
+        @Override
+        public void run() {
+            try {
+                HttpURLConnection http = NetworkUtil.prepareConnection(model.getUrl(), "version",
+                        model.getUseAuthentication());
+                switch (http.getResponseCode()) {
+                    case 200:
+                        break;
+                    case 404:
+                        model.detectedVersion.postValue(new HledgerVersion(true));
+                        return;
+                    default:
+                        Logger.debug("profile", String.format(Locale.US,
+                                "HTTP error detecting hledger-web version: [%d] %s",
+                                http.getResponseCode(), http.getResponseMessage()));
+                        model.detectedVersion.postValue(null);
+                        return;
+                }
+                InputStream stream = http.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                String version = reader.readLine();
+                Matcher m = versionPattern.matcher(version);
+                if (m.matches()) {
+                    int major = Integer.parseInt(Objects.requireNonNull(m.group(1)));
+                    int minor = Integer.parseInt(Objects.requireNonNull(m.group(2)));
+                    final boolean hasPatch = m.groupCount() >= 3;
+                    int patch = hasPatch ? Integer.parseInt(Objects.requireNonNull(m.group(3))) : 0;
+
+                    model.detectedVersion.postValue(
+                            hasPatch ? new HledgerVersion(major, minor, patch)
+                                     : new HledgerVersion(major, minor));
+                }
+                else {
+                    Logger.debug("profile",
+                            String.format("Unrecognised version string '%s'", version));
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

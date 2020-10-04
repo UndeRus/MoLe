@@ -63,6 +63,7 @@ public final class MobileLedgerProfile {
     private FutureDates futureDates = FutureDates.None;
     private boolean accountsLoaded;
     private boolean transactionsLoaded;
+    private HledgerVersion detectedVersion;
     // N.B. when adding new fields, update the copy-constructor below
     transient private AccountAndTransactionListSaver accountAndTransactionListSaver;
     public MobileLedgerProfile(String uuid) {
@@ -86,6 +87,8 @@ public final class MobileLedgerProfile {
         defaultCommodity = origin.defaultCommodity;
         accountsLoaded = origin.accountsLoaded;
         transactionsLoaded = origin.transactionsLoaded;
+        if (origin.detectedVersion != null)
+            detectedVersion = new HledgerVersion(origin.detectedVersion);
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
@@ -97,7 +100,8 @@ public final class MobileLedgerProfile {
                                          "auth_password, permit_posting, theme, order_no, " +
                                          "preferred_accounts_filter, future_dates, api_version, " +
                                          "show_commodity_by_default, default_commodity, " +
-                                         "show_comments_by_default FROM " +
+                                         "show_comments_by_default, detected_version_pre_1_19, " +
+                                         "detected_version_major, detected_version_minor FROM " +
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
@@ -116,6 +120,21 @@ public final class MobileLedgerProfile {
                 item.setShowCommodityByDefault(cursor.getInt(12) == 1);
                 item.setDefaultCommodity(cursor.getString(13));
                 item.setShowCommentsByDefault(cursor.getInt(14) == 1);
+                {
+                    boolean pre_1_20 = cursor.getInt(15) == 1;
+                    int major = cursor.getInt(16);
+                    int minor = cursor.getInt(17);
+
+                    if (!pre_1_20 && major == 0 && minor == 0) {
+                        item.detectedVersion = null;
+                    }
+                    else if (pre_1_20) {
+                        item.detectedVersion = new HledgerVersion(true);
+                    }
+                    else {
+                        item.detectedVersion = new HledgerVersion(major, minor);
+                    }
+                }
                 list.add(item);
                 if (item.getUuid()
                         .equals(currentProfileUUID))
@@ -141,6 +160,12 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    public HledgerVersion getDetectedVersion() {
+        return detectedVersion;
+    }
+    public void setDetectedVersion(HledgerVersion detectedVersion) {
+        this.detectedVersion = detectedVersion;
     }
     @Contract(value = "null -> false", pure = true)
     @Override
@@ -178,6 +203,8 @@ public final class MobileLedgerProfile {
         if (themeHue != p.themeHue)
             return false;
         if (apiVersion != p.apiVersion)
+            return false;
+        if (!Objects.equals(detectedVersion, p.detectedVersion))
             return false;
         return futureDates == p.futureDates;
     }
@@ -294,13 +321,18 @@ public final class MobileLedgerProfile {
             db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
                        "use_authentication, auth_user, auth_password, theme, order_no, " +
                        "preferred_accounts_filter, future_dates, api_version, " +
-                       "show_commodity_by_default, default_commodity, show_comments_by_default) " +
-                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       "show_commodity_by_default, default_commodity, show_comments_by_default," +
+                       "detected_version_pre_1_19, detected_version_major, " +
+                       "detected_version_minor) " +
+                       "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     new Object[]{uuid, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeHue, orderNo,
                                  preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt(),
-                                 showCommodityByDefault, defaultCommodity, showCommentsByDefault
+                                 showCommodityByDefault, defaultCommodity, showCommentsByDefault,
+                                 (detectedVersion != null) && detectedVersion.isPre_1_20(),
+                                 (detectedVersion == null) ? 0 : detectedVersion.getMajor(),
+                                 (detectedVersion == null) ? 0 : detectedVersion.getMinor()
                     });
             db.setTransactionSuccessful();
         }

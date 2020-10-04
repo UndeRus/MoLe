@@ -156,4 +156,7 @@
     <string name="nav_header_desc">Заглавна част на страничния панел</string>
     <string name="transaction_count_summary">%,d движения към %s</string>
     <string name="account_count_summary">%,d сметки към %s</string>
+    <string name="api_version_unknown_label">Неизвестна</string>
+    <string name="api_pre_1_19">Преди 1.20.?</string>
+    <string name="detected_version_label">Открита версия</string>
 </resources>

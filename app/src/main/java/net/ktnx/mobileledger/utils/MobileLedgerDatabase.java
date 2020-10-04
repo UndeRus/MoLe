@@ -39,7 +39,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class MobileLedgerDatabase extends SQLiteOpenHelper {
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static final String DB_NAME = "MoLe.db";
-    private static final int LATEST_REVISION = 40;
+    private static final int LATEST_REVISION = 41;
     private static final String CREATE_DB_SQL = "create_db";
     private final Application mContext;
 
