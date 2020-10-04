@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2019 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -56,6 +56,12 @@ public class ParsedPosting extends net.ktnx.mobileledger.json.ParsedPosting {
         qty.setDecimalPlaces(2);
         qty.setDecimalMantissa(Math.round(acc.getAmount() * 100));
         amt.setAquantity(qty);
+        ParsedStyle style = new ParsedStyle();
+        style.setAscommodityside(getCommoditySide());
+        style.setAscommodityspaced(getCommoditySpaced());
+        style.setAsprecision(2);
+        style.setAsdecimalpoint('.');
+        amt.setAstyle(style);
         if (acc.getCurrency() != null)
             amt.setAcommodity(acc.getCurrency());
         amounts.add(amt);
