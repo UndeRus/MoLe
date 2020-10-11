@@ -61,6 +61,7 @@ public class ProfileDetailModel extends ViewModel {
     private final MutableLiveData<String> preferredAccountsFilter = new MutableLiveData<>(null);
     private final MutableLiveData<Integer> themeId = new MutableLiveData<>(-1);
     private final MutableLiveData<HledgerVersion> detectedVersion = new MutableLiveData<>(null);
+    private final MutableLiveData<Boolean> detectingHledgerVersion = new MutableLiveData<>(false);
     public int initialThemeHue = Colors.DEFAULT_HUE_DEG;
     private VersionDetectionThread versionDetectionThread;
     public ProfileDetailModel() {
@@ -219,6 +220,9 @@ public class ProfileDetailModel extends ViewModel {
     void observeThemeId(LifecycleOwner lfo, Observer<Integer> o) {
         themeId.observe(lfo, o);
     }
+    void observeDetectingHledgerVersion(LifecycleOwner lfo, Observer<Boolean> o) {
+        detectingHledgerVersion.observe(lfo, o);
+    }
     void setValuesFromProfile(MobileLedgerProfile mProfile, int newProfileHue) {
         final int profileThemeId;
         if (mProfile != null) {
@@ -284,29 +288,28 @@ public class ProfileDetailModel extends ViewModel {
         versionDetectionThread.start();
     }
     static class VersionDetectionThread extends Thread {
+        static final int TARGET_PROCESS_DURATION = 1000;
         private final Pattern versionPattern =
                 Pattern.compile("^\"(\\d+)\\.(\\d+)(?:\\.(\\d+))?\"$");
         private final ProfileDetailModel model;
         public VersionDetectionThread(ProfileDetailModel model) {
             this.model = model;
         }
-        @Override
-        public void run() {
+        private HledgerVersion detectVersion() {
+            HttpURLConnection http = null;
             try {
-                HttpURLConnection http = NetworkUtil.prepareConnection(model.getUrl(), "version",
+                http = NetworkUtil.prepareConnection(model.getUrl(), "version",
                         model.getUseAuthentication());
                 switch (http.getResponseCode()) {
                     case 200:
                         break;
                     case 404:
-                        model.detectedVersion.postValue(new HledgerVersion(true));
-                        return;
+                        return new HledgerVersion(true);
                     default:
                         Logger.debug("profile", String.format(Locale.US,
                                 "HTTP error detecting hledger-web version: [%d] %s",
                                 http.getResponseCode(), http.getResponseMessage()));
-                        model.detectedVersion.postValue(null);
-                        return;
+                        return null;
                 }
                 InputStream stream = http.getInputStream();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -318,17 +321,42 @@ public class ProfileDetailModel extends ViewModel {
                     final boolean hasPatch = m.groupCount() >= 3;
                     int patch = hasPatch ? Integer.parseInt(Objects.requireNonNull(m.group(3))) : 0;
 
-                    model.detectedVersion.postValue(
-                            hasPatch ? new HledgerVersion(major, minor, patch)
-                                     : new HledgerVersion(major, minor));
+                    return hasPatch ? new HledgerVersion(major, minor, patch)
+                                    : new HledgerVersion(major, minor);
                 }
                 else {
                     Logger.debug("profile",
                             String.format("Unrecognised version string '%s'", version));
+                    return null;
                 }
             }
             catch (IOException e) {
                 e.printStackTrace();
+                return null;
+            }
+        }
+        @Override
+        public void run() {
+            model.detectingHledgerVersion.postValue(true);
+            try {
+                long startTime = System.currentTimeMillis();
+
+                final HledgerVersion version = detectVersion();
+
+                long elapsed = System.currentTimeMillis() - startTime;
+                Logger.debug("profile", "Detection duration " + elapsed);
+                if (elapsed < TARGET_PROCESS_DURATION) {
+                    try {
+                        Thread.sleep(TARGET_PROCESS_DURATION - elapsed);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                model.detectedVersion.postValue(version);
+            }
+            finally {
+                model.detectingHledgerVersion.postValue(false);
             }
         }
     }

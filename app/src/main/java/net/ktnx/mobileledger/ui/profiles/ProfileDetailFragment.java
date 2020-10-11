@@ -299,8 +299,11 @@ public class ProfileDetailFragment extends Fragment {
                 detectedApiVersion.setText(ver.toString());
         });
         detectedApiVersion.setOnClickListener(v -> model.triggerVersionDetection());
-        context.findViewById(R.id.api_version_detect_button)
-               .setOnClickListener(v -> model.triggerVersionDetection());
+        final View detectButton = context.findViewById(R.id.api_version_detect_button);
+        detectButton.setOnClickListener(v -> model.triggerVersionDetection());
+        model.observeDetectingHledgerVersion(viewLifecycleOwner, running -> {
+            detectButton.setVisibility(running ? View.VISIBLE : View.INVISIBLE);
+        });
 
         authParams = context.findViewById(R.id.auth_params);
 
