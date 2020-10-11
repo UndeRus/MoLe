@@ -32,7 +32,7 @@ import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 public class SplashActivity extends CrashReportingActivity {
-    private static final long keepActiveForMS = 500;
+    private static final long keepActiveForMS = 400;
     private long startupTime;
     private boolean running = true;
     @Override
