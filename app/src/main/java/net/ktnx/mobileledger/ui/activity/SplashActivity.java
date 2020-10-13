@@ -105,7 +105,7 @@ public class SplashActivity extends CrashReportingActivity {
             String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
             MobileLedgerProfile startupProfile = Data.getProfile(profileUUID);
             if (startupProfile != null)
-                Data.setCurrentProfile(startupProfile);
+                Data.postCurrentProfile(startupProfile);
             return null;
         }
         @Override
