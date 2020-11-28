@@ -101,7 +101,7 @@
                         android:background="@drawable/ic_clear_accent_24dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:onClick="onStopTransactionRefreshClick" />
+                        />
                 </LinearLayout>
 
             </LinearLayout>

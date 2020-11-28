@@ -237,6 +237,8 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.nav_new_profile_button).setOnClickListener(
                 v -> startEditProfileActivity(null));
 
+        findViewById(R.id.transaction_list_cancel_download).setOnClickListener(this::onStopTransactionRefreshClick);
+
         RecyclerView root = findViewById(R.id.nav_profile_list);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
