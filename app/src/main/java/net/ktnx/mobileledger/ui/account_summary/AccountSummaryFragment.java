@@ -67,9 +67,9 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
     @Override
 
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@Nullable View view, @Nullable Bundle savedInstanceState) {
         debug("flow", "AccountSummaryFragment.onActivityCreated()");
-        super.onActivityCreated(savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
 
         MainModel model = new ViewModelProvider(requireActivity()).get(MainModel.class);
 

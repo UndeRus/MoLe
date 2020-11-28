@@ -89,9 +89,9 @@ public class TransactionListFragment extends MobileLedgerListFragment
         debug("flow", "TransactionListFragment.onPause()");
     }
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
         debug("flow", "TransactionListFragment.onActivityCreated called");
-        super.onActivityCreated(savedInstanceState);
+        super.onViewCreated(view, savedInstanceState);
 
         Data.backgroundTasksRunning.observe(getViewLifecycleOwner(),
                 this::onBackgroundTaskRunningChanged);
@@ -129,7 +129,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
         accNameFilter = mainActivity.findViewById(R.id.transaction_filter_account_name);
 
         MLDB.hookAutocompletionAdapter(mainActivity, accNameFilter, "accounts", "name");
-        accNameFilter.setOnItemClickListener((parent, view, position, id) -> {
+        accNameFilter.setOnItemClickListener((parent, v, position, id) -> {
 //                debug("tmp", "direct onItemClick");
             Cursor c = (Cursor) parent.getItemAtPosition(position);
             model.getAccountFilter()

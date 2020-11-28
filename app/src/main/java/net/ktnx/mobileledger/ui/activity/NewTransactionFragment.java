@@ -106,8 +106,8 @@ public class NewTransactionFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(@NotNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         FragmentActivity activity = getActivity();
         if (activity == null)
             throw new RSInvalidStateException(
