@@ -79,7 +79,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         modelAdapter = new AccountSummaryAdapter(model);
         MainActivity mainActivity = getMainActivity();
 
-        root = mainActivity.findViewById(R.id.account_root);
+        root = view.findViewById(R.id.account_root);
         LinearLayoutManager llm = new LinearLayoutManager(mainActivity);
         llm.setOrientation(RecyclerView.VERTICAL);
         root.setLayoutManager(llm);
@@ -92,7 +92,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         manageFabOnScroll();
 
-        refreshLayout = mainActivity.findViewById(R.id.account_swipe_refresh_layout);
+        refreshLayout = view.findViewById(R.id.account_swipe_refresh_layout);
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
         refreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");

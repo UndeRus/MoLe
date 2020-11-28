@@ -100,10 +100,10 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         model = new ViewModelProvider(requireActivity()).get(MainModel.class);
 
-        refreshLayout = mainActivity.findViewById(R.id.transaction_swipe);
+        refreshLayout = view.findViewById(R.id.transaction_swipe);
         if (refreshLayout == null)
             throw new RuntimeException("Can't get hold on the swipe layout");
-        root = mainActivity.findViewById(R.id.transaction_root);
+        root = view.findViewById(R.id.transaction_root);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
         modelAdapter = new TransactionListAdapter(model);
@@ -125,8 +125,8 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
 
-        vAccountFilter = mainActivity.findViewById(R.id.transaction_list_account_name_filter);
-        accNameFilter = mainActivity.findViewById(R.id.transaction_filter_account_name);
+        vAccountFilter = view.findViewById(R.id.transaction_list_account_name_filter);
+        accNameFilter = view.findViewById(R.id.transaction_filter_account_name);
 
         MLDB.hookAutocompletionAdapter(mainActivity, accNameFilter, "accounts", "name");
         accNameFilter.setOnItemClickListener((parent, v, position, id) -> {
@@ -146,8 +146,8 @@ public class TransactionListFragment extends MobileLedgerListFragment
         model.getDisplayedTransactions()
              .observe(getViewLifecycleOwner(), list -> modelAdapter.setTransactions(list));
 
-        mainActivity.findViewById(R.id.clearAccountNameFilter)
-                    .setOnClickListener(v -> {
+        view.findViewById(R.id.clearAccountNameFilter)
+            .setOnClickListener(v -> {
                         model.getAccountFilter()
                              .setValue(null);
                         vAccountFilter.setVisibility(View.GONE);
