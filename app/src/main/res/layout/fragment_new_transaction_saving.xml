@@ -65,7 +65,6 @@
         android:indeterminate="true"
         android:indeterminateTint="?colorPrimary"
         android:progressTint="?colorPrimary"
-        app:growMode="incoming"
         app:layout_constraintBottom_toBottomOf="@id/textView4"
         app:layout_constraintEnd_toStartOf="@id/textView4"
         app:layout_constraintTop_toTopOf="@id/textView4"
