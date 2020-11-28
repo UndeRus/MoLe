@@ -159,4 +159,5 @@
     <string name="api_version_unknown_label">Неизвестна</string>
     <string name="api_pre_1_19">Преди 1.20.?</string>
     <string name="detected_version_label">Открита версия</string>
+    <string name="new_transaction_fab_description">Знак плюс</string>
 </resources>

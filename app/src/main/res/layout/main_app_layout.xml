@@ -37,6 +37,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:maxImageSize="36dp"
         app:srcCompat="@drawable/ic_add_white_24dp"
+        android:contentDescription="@string/new_transaction_fab_description"
         />
 
     <androidx.drawerlayout.widget.DrawerLayout

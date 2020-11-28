@@ -169,4 +169,5 @@
     <string name="api_version_unknown_label">Unknown</string>
     <string name="api_pre_1_19">Before 1.20.?</string>
     <string name="detected_version_label">Detected version</string>
+    <string name="new_transaction_fab_description">Plus icon</string>
 </resources>
