@@ -40,12 +40,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -83,7 +83,7 @@ public class MainActivity extends ProfileThemedActivity {
     private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
     private View bTransactionListCancelDownload;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
+    private ViewPager2 mViewPager;
     private FloatingActionButton fab;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
@@ -91,7 +91,7 @@ public class MainActivity extends ProfileThemedActivity {
     private Toolbar mToolbar;
     private DrawerLayout.SimpleDrawerListener drawerListener;
     private ActionBarDrawerToggle barDrawerToggle;
-    private ViewPager.SimpleOnPageChangeListener pageChangeListener;
+    private ViewPager2.OnPageChangeCallback pageChangeCallback;
     private MobileLedgerProfile profile;
     private MainModel mainModel;
     @Override
@@ -124,8 +124,8 @@ public class MainActivity extends ProfileThemedActivity {
             drawer.removeDrawerListener(barDrawerToggle);
         barDrawerToggle = null;
         if (mViewPager != null)
-            mViewPager.removeOnPageChangeListener(pageChangeListener);
-        pageChangeListener = null;
+            mViewPager.unregisterOnPageChangeCallback(pageChangeCallback);
+        pageChangeCallback = null;
         super.onDestroy();
     }
     @Override
@@ -156,7 +156,7 @@ public class MainActivity extends ProfileThemedActivity {
         profileListHeadAddProfile = findViewById(R.id.nav_new_profile_button);
         drawer = findViewById(R.id.drawer_layout);
         bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(this);
         mViewPager = findViewById(R.id.root_frame);
 
         Bundle extra = getIntent().getBundleExtra(BUNDLE_SAVED_STATE);
@@ -196,8 +196,8 @@ public class MainActivity extends ProfileThemedActivity {
 
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        if (pageChangeListener == null) {
-            pageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
+        if (pageChangeCallback == null) {
+            pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
                 @Override
                 public void onPageSelected(int position) {
                     mCurrentPage = position;
@@ -216,7 +216,7 @@ public class MainActivity extends ProfileThemedActivity {
                     super.onPageSelected(position);
                 }
             };
-            mViewPager.addOnPageChangeListener(pageChangeListener);
+            mViewPager.registerOnPageChangeCallback(pageChangeCallback);
         }
 
         mCurrentPage = 0;
@@ -669,15 +669,14 @@ public class MainActivity extends ProfileThemedActivity {
         fab.hide();
     }
 
-    public static class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public static class SectionsPagerAdapter extends FragmentStateAdapter {
 
-        SectionsPagerAdapter(FragmentManager fm) {
-            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        public SectionsPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+            super(fragmentActivity);
         }
-
         @NotNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
             Logger.debug("main",
                     String.format(Locale.ENGLISH, "Switching to fragment %d", position));
             switch (position) {
@@ -693,7 +692,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return 2;
         }
     }
