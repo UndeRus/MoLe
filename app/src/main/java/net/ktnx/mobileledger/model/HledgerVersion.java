@@ -23,14 +23,15 @@ import androidx.annotation.Nullable;
 import java.util.Locale;
 
 public class HledgerVersion {
-    private int major;
-    private int minor;
-    private int patch;
-    private boolean isPre_1_20;
-    private boolean hasPatch;
+    private final int major;
+    private final int minor;
+    private final int patch;
+    private final boolean isPre_1_20;
+    private final boolean hasPatch;
     public HledgerVersion(int major, int minor) {
         this.major = major;
         this.minor = minor;
+        this.patch = 0;
         this.isPre_1_20 = false;
         this.hasPatch = false;
     }
@@ -44,7 +45,7 @@ public class HledgerVersion {
     public HledgerVersion(boolean pre_1_20) {
         if (!pre_1_20)
             throw new IllegalArgumentException("pre_1_20 argument must be true");
-        this.major = this.minor = 0;
+        this.major = this.minor = this.patch = 0;
         this.isPre_1_20 = true;
         this.hasPatch = false;
     }
