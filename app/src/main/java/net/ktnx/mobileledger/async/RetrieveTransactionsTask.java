@@ -27,8 +27,6 @@ import androidx.annotation.NonNull;
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.v1_15.AccountListParser;
-import net.ktnx.mobileledger.json.v1_15.ParsedBalance;
-import net.ktnx.mobileledger.json.v1_15.ParsedLedgerAccount;
 import net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction;
 import net.ktnx.mobileledger.json.v1_15.TransactionListParser;
 import net.ktnx.mobileledger.model.Data;
@@ -118,6 +116,9 @@ public class RetrieveTransactionsTask extends
         else {
             return null;
         }
+    }
+    public MobileLedgerProfile getProfile() {
+        return profile;
     }
     @Override
     protected void onProgressUpdate(Progress... values) {
@@ -356,9 +357,9 @@ public class RetrieveTransactionsTask extends
             throwIfCancelled();
         }
     }
-    private @NonNull
-    LedgerAccount ensureAccountExists(String accountName, HashMap<String, LedgerAccount> map,
-                                      ArrayList<LedgerAccount> createdAccounts) {
+    @NonNull
+    public LedgerAccount ensureAccountExists(String accountName, HashMap<String, LedgerAccount> map,
+                                             ArrayList<LedgerAccount> createdAccounts) {
         LedgerAccount acc = map.get(accountName);
 
         if (acc != null)
@@ -376,6 +377,9 @@ public class RetrieveTransactionsTask extends
         acc = new LedgerAccount(profile, accountName, parentAccount);
         createdAccounts.add(acc);
         return acc;
+    }
+    public void addNumberOfPostings(int number) {
+        expectedPostingsCount += number;
     }
     private List<LedgerAccount> retrieveAccountList() throws IOException, HTTPException {
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
@@ -406,53 +410,10 @@ public class RetrieveTransactionsTask extends
 
             while (true) {
                 throwIfCancelled();
-                ParsedLedgerAccount parsedAccount = parser.nextAccount();
-                if (parsedAccount == null) {
+                LedgerAccount acc = parser.nextLedgerAccount(this, map);
+                if (acc == null)
                     break;
-                }
-                expectedPostingsCount += parsedAccount.getAnumpostings();
-                final String accName = parsedAccount.getAname();
-                LedgerAccount acc = map.get(accName);
-                if (acc != null)
-                    throw new RuntimeException(
-                            String.format("Account '%s' already present", acc.getName()));
-                String parentName = LedgerAccount.extractParentName(accName);
-                ArrayList<LedgerAccount> createdParents = new ArrayList<>();
-                LedgerAccount parent;
-                if (parentName == null) {
-                    parent = null;
-                }
-                else {
-                    parent = ensureAccountExists(parentName, map, createdParents);
-                    parent.setHasSubAccounts(true);
-                }
-                acc = new LedgerAccount(profile, accName, parent);
                 list.add(acc);
-                map.put(accName, acc);
-
-                String lastCurrency = null;
-                float lastCurrencyAmount = 0;
-                for (ParsedBalance b : parsedAccount.getAibalance()) {
-                    throwIfCancelled();
-                    final String currency = b.getAcommodity();
-                    final float amount = b.getAquantity()
-                                          .asFloat();
-                    if (currency.equals(lastCurrency)) {
-                        lastCurrencyAmount += amount;
-                    }
-                    else {
-                        if (lastCurrency != null) {
-                            acc.addAmount(lastCurrencyAmount, lastCurrency);
-                        }
-                        lastCurrency = currency;
-                        lastCurrencyAmount = amount;
-                    }
-                }
-                if (lastCurrency != null) {
-                    acc.addAmount(lastCurrencyAmount, lastCurrency);
-                }
-                for (LedgerAccount p : createdParents)
-                    acc.propagateAmountsTo(p);
             }
             throwIfCancelled();
         }
@@ -576,7 +537,7 @@ public class RetrieveTransactionsTask extends
             Data.backgroundTaskFinished();
         }
     }
-    private void throwIfCancelled() {
+    public void throwIfCancelled() {
         if (isCancelled())
             throw new OperationCanceledException(null);
     }

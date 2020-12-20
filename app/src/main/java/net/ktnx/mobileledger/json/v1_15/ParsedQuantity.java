@@ -20,39 +20,5 @@ package net.ktnx.mobileledger.json.v1_15;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedQuantity {
-    private long decimalMantissa;
-    private int decimalPlaces;
-    public ParsedQuantity() {
-    }
-    public ParsedQuantity(String input) {
-        parseString(input);
-    }
-    public long getDecimalMantissa() {
-        return decimalMantissa;
-    }
-    public void setDecimalMantissa(long decimalMantissa) {
-        this.decimalMantissa = decimalMantissa;
-    }
-    public int getDecimalPlaces() {
-        return decimalPlaces;
-    }
-    public void setDecimalPlaces(int decimalPlaces) {
-        this.decimalPlaces = decimalPlaces;
-    }
-    public float asFloat() {
-        return (float) (decimalMantissa * Math.pow(10, -decimalPlaces));
-    }
-    public void parseString(String input) {
-        int pointPos = input.indexOf('.');
-        if (pointPos >= 0) {
-            String integral = input.replace(".", "");
-            decimalMantissa = Long.parseLong(integral);
-            decimalPlaces = input.length() - pointPos - 1;
-        }
-        else {
-            decimalMantissa = Long.parseLong(input);
-            decimalPlaces = 0;
-        }
-    }
+public class ParsedQuantity extends net.ktnx.mobileledger.json.ParsedQuantity {
 }

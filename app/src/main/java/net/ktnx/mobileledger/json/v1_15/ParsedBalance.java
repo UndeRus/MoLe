@@ -17,29 +17,12 @@
 
 package net.ktnx.mobileledger.json.v1_15;
 
-import androidx.annotation.NonNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedBalance {
-    private ParsedQuantity aquantity;
-    private String acommodity;
+public class ParsedBalance extends net.ktnx.mobileledger.json.ParsedBalance {
     private ParsedStyle astyle;
     public ParsedBalance() {
-    }
-    public ParsedQuantity getAquantity() {
-        return aquantity;
-    }
-    public void setAquantity(ParsedQuantity aquantity) {
-        this.aquantity = aquantity;
-    }
-    @NonNull
-    public String getAcommodity() {
-        return (acommodity == null) ? "" : acommodity;
-    }
-    public void setAcommodity(String acommodity) {
-        this.acommodity = acommodity;
     }
     public ParsedStyle getAstyle() {
         return astyle;

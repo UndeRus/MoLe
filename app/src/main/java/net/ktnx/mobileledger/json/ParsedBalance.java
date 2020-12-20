@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -15,21 +15,28 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_15;
+package net.ktnx.mobileledger.json;
+
+import androidx.annotation.NonNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedLedgerAccount extends net.ktnx.mobileledger.json.ParsedLedgerAccount {
-    private List<ParsedBalance> aebalance;
-    public ParsedLedgerAccount() {
+public class ParsedBalance {
+    private ParsedQuantity aquantity;
+    private String acommodity;
+    public ParsedQuantity getAquantity() {
+        return aquantity;
     }
-    public List<ParsedBalance> getAebalance() {
-        return aebalance;
+    public void setAquantity(ParsedQuantity aquantity) {
+        this.aquantity = aquantity;
     }
-    public void setAebalance(List<ParsedBalance> aebalance) {
-        this.aebalance = aebalance;
+    @NonNull
+    public String getAcommodity() {
+        return (acommodity == null) ? "" : acommodity;
     }
+    public void setAcommodity(String acommodity) {
+        this.acommodity = acommodity;
+    }
+
 }
