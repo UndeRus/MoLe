@@ -378,6 +378,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         showCurrencyObserver = showCurrency -> {
             if (showCurrency) {
                 tvCurrency.setVisibility(View.VISIBLE);
+                String defaultCommodity = mProfile.getDefaultCommodity();
+                item.setCurrency(
+                        (defaultCommodity == null) ? null : Currency.loadByName(defaultCommodity));
             }
             else {
                 tvCurrency.setVisibility(View.GONE);
