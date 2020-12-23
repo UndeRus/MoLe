@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,6 +32,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
@@ -180,7 +181,7 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
                 Data.currencySymbolPosition.setValue(Currency.Position.after);
         });
 
-        Switch gap = csd.findViewById(R.id.currency_gap);
+        SwitchMaterial gap = csd.findViewById(R.id.currency_gap);
 
         gap.setChecked(Data.currencyGap.getValue());
 
