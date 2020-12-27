@@ -309,7 +309,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                             break;
                         case Description:
                             boolean focused = tvDescription.requestFocus();
-                            tvDescription.dismissDropDown();
+//                            tvDescription.dismissDropDown();
                             if (focused)
                                 Misc.showSoftKeyboard(
                                         (NewTransactionActivity) tvDescription.getContext());
