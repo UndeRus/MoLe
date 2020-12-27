@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -21,10 +21,13 @@ import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
+import net.ktnx.mobileledger.model.LedgerTransaction;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 
-public class TransactionListParser {
+public class TransactionListParser extends net.ktnx.mobileledger.json.TransactionListParser {
 
     private final MappingIterator<ParsedLedgerTransaction> iterator;
 
@@ -34,7 +37,8 @@ public class TransactionListParser {
         ObjectReader reader = mapper.readerFor(ParsedLedgerTransaction.class);
         iterator = reader.readValues(input);
     }
-    public ParsedLedgerTransaction nextTransaction() {
-        return iterator.hasNext() ? iterator.next() : null;
+    public LedgerTransaction nextTransaction() throws ParseException {
+        return iterator.hasNext() ? iterator.next()
+                                            .asLedgerTransaction() : null;
     }
 }

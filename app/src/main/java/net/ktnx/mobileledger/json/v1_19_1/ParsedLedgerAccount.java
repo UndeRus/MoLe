@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_14;
+package net.ktnx.mobileledger.json.v1_19_1;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -28,17 +28,17 @@ public class ParsedLedgerAccount extends net.ktnx.mobileledger.json.ParsedLedger
     private List<ParsedBalance> aibalance;
     public ParsedLedgerAccount() {
     }
-    public List<ParsedBalance> getAebalance() {
-        return aebalance;
-    }
-    public void setAebalance(List<ParsedBalance> aebalance) {
-        this.aebalance = aebalance;
-    }
     public List<ParsedBalance> getAibalance() {
         return aibalance;
     }
     public void setAibalance(List<ParsedBalance> aibalance) {
         this.aibalance = aibalance;
+    }
+    public List<ParsedBalance> getAebalance() {
+        return aebalance;
+    }
+    public void setAebalance(List<ParsedBalance> aebalance) {
+        this.aebalance = aebalance;
     }
     @Override
     public List<SimpleBalance> getSimpleBalance() {

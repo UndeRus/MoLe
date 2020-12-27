@@ -17,14 +17,17 @@
 
 package net.ktnx.mobileledger.json;
 
-import net.ktnx.mobileledger.json.ParsedBalance;
+import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.model.LedgerAccount;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class ParsedLedgerAccount {
+public abstract class ParsedLedgerAccount {
     private String aname;
     private int anumpostings;
-    private List<ParsedBalance> aibalance;
+    public abstract List<SimpleBalance> getSimpleBalance();
     public String getAname() {
         return aname;
     }
@@ -37,10 +40,71 @@ public class ParsedLedgerAccount {
     public void setAnumpostings(int anumpostings) {
         this.anumpostings = anumpostings;
     }
-    public List<ParsedBalance> getAibalance() {
-        return aibalance;
+    public LedgerAccount toLedgerAccount(RetrieveTransactionsTask task,
+                                         HashMap<String, LedgerAccount> map) {
+        task.addNumberOfPostings(getAnumpostings());
+        final String accName = getAname();
+        LedgerAccount acc = map.get(accName);
+        if (acc != null)
+            throw new RuntimeException(
+                    String.format("Account '%s' already present", acc.getName()));
+        String parentName = LedgerAccount.extractParentName(accName);
+        ArrayList<LedgerAccount> createdParents = new ArrayList<>();
+        LedgerAccount parent;
+        if (parentName == null) {
+            parent = null;
+        }
+        else {
+            parent = task.ensureAccountExists(parentName, map, createdParents);
+            parent.setHasSubAccounts(true);
+        }
+        acc = new LedgerAccount(task.getProfile(), accName, parent);
+        map.put(accName, acc);
+
+        String lastCurrency = null;
+        float lastCurrencyAmount = 0;
+        for (SimpleBalance b : getSimpleBalance()) {
+            task.throwIfCancelled();
+            final String currency = b.getCommodity();
+            final float amount = b.getAmount();
+            if (currency.equals(lastCurrency)) {
+                lastCurrencyAmount += amount;
+            }
+            else {
+                if (lastCurrency != null) {
+                    acc.addAmount(lastCurrencyAmount, lastCurrency);
+                }
+                lastCurrency = currency;
+                lastCurrencyAmount = amount;
+            }
+        }
+        if (lastCurrency != null) {
+            acc.addAmount(lastCurrencyAmount, lastCurrency);
+        }
+        for (LedgerAccount p : createdParents)
+            acc.propagateAmountsTo(p);
+
+        return acc;
     }
-    public void setAibalance(List<ParsedBalance> aibalance) {
-        this.aibalance = aibalance;
+
+    static public class SimpleBalance {
+        private String commodity;
+        private float amount;
+        public SimpleBalance(String commodity, float amount) {
+            this.commodity = commodity;
+            this.amount = amount;
+        }
+        public String getCommodity() {
+            return commodity;
+        }
+        public void setCommodity(String commodity) {
+            this.commodity = commodity;
+        }
+        public float getAmount() {
+            return amount;
+        }
+        public void setAmount(float amount) {
+            this.amount = amount;
+        }
     }
 }

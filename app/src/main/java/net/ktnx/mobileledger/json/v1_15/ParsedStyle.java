@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -20,42 +20,4 @@ package net.ktnx.mobileledger.json.v1_15;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedStyle {
-    private int asprecision;
-    private char asdecimalpoint;
-    private char ascommodityside;
-    private int digitgroups;
-    private boolean ascommodityspaced;
-    public ParsedStyle() {
-    }
-    public int getAsprecision() {
-        return asprecision;
-    }
-    public void setAsprecision(int asprecision) {
-        this.asprecision = asprecision;
-    }
-    public char getAsdecimalpoint() {
-        return asdecimalpoint;
-    }
-    public void setAsdecimalpoint(char asdecimalpoint) {
-        this.asdecimalpoint = asdecimalpoint;
-    }
-    public char getAscommodityside() {
-        return ascommodityside;
-    }
-    public void setAscommodityside(char ascommodityside) {
-        this.ascommodityside = ascommodityside;
-    }
-    public int getDigitgroups() {
-        return digitgroups;
-    }
-    public void setDigitgroups(int digitgroups) {
-        this.digitgroups = digitgroups;
-    }
-    public boolean isAscommodityspaced() {
-        return ascommodityspaced;
-    }
-    public void setAscommodityspaced(boolean ascommodityspaced) {
-        this.ascommodityspaced = ascommodityspaced;
-    }
-}
+public class ParsedStyle extends net.ktnx.mobileledger.json.v1_14.ParsedStyle {}

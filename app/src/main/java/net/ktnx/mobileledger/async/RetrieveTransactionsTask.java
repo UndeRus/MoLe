@@ -24,17 +24,20 @@ import android.os.OperationCanceledException;
 
 import androidx.annotation.NonNull;
 
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
+
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.err.HTTPException;
-import net.ktnx.mobileledger.json.v1_15.AccountListParser;
-import net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction;
-import net.ktnx.mobileledger.json.v1_15.TransactionListParser;
+import net.ktnx.mobileledger.json.AccountListParser;
+import net.ktnx.mobileledger.json.ApiNotSupportedException;
+import net.ktnx.mobileledger.json.TransactionListParser;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -381,7 +384,40 @@ public class RetrieveTransactionsTask extends
     public void addNumberOfPostings(int number) {
         expectedPostingsCount += number;
     }
-    private List<LedgerAccount> retrieveAccountList() throws IOException, HTTPException {
+    private List<LedgerAccount> retrieveAccountList()
+            throws IOException, HTTPException, ApiNotSupportedException {
+        final SendTransactionTask.API apiVersion = profile.getApiVersion();
+        if (apiVersion.equals(SendTransactionTask.API.auto)) {
+            return retrieveAccountListAnyVersion();
+        }
+        else if (apiVersion.equals(SendTransactionTask.API.html)) {
+            Logger.debug("json",
+                    "Declining using JSON API for /accounts with configured legacy API version");
+            return null;
+        }
+        else {
+            return retrieveAccountListForVersion(apiVersion);
+        }
+    }
+    private List<LedgerAccount> retrieveAccountListAnyVersion()
+            throws HTTPException, ApiNotSupportedException {
+        for (SendTransactionTask.API ver : SendTransactionTask.API.allVersions) {
+            try {
+                return retrieveAccountListForVersion(ver);
+            }
+            catch (Exception e) {
+                Logger.debug("json",
+                        String.format(Locale.US, "Error during account list retrieval using API %s",
+                                ver.getDescription()));
+            }
+
+            throw new ApiNotSupportedException();
+        }
+
+        throw new RuntimeException("This should never be reached");
+    }
+    private List<LedgerAccount> retrieveAccountListForVersion(SendTransactionTask.API version)
+            throws IOException, HTTPException {
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
         http.setAllowUserInteraction(false);
         switch (http.getResponseCode()) {
@@ -405,12 +441,12 @@ public class RetrieveTransactionsTask extends
             if (http.getResponseCode() != 200)
                 throw new IOException(String.format("HTTP error %d", http.getResponseCode()));
 
-            AccountListParser parser = new AccountListParser(resp);
+            AccountListParser parser = AccountListParser.forApiVersion(version, resp);
             expectedPostingsCount = 0;
 
             while (true) {
                 throwIfCancelled();
-                LedgerAccount acc = parser.nextLedgerAccount(this, map);
+                LedgerAccount acc = parser.nextAccount(this, map);
                 if (acc == null)
                     break;
                 list.add(acc);
@@ -430,7 +466,40 @@ public class RetrieveTransactionsTask extends
         return list;
     }
     private List<LedgerTransaction> retrieveTransactionList()
-            throws IOException, ParseException, HTTPException {
+            throws ParseException, HTTPException, IOException, ApiNotSupportedException {
+        final SendTransactionTask.API apiVersion = profile.getApiVersion();
+        if (apiVersion.equals(SendTransactionTask.API.auto)) {
+            return retrieveTransactionListAnyVersion();
+        }
+        else if (apiVersion.equals(SendTransactionTask.API.html)) {
+            Logger.debug("json",
+                    "Declining using JSON API for /accounts with configured legacy API version");
+            return null;
+        }
+        else {
+            return retrieveTransactionListForVersion(apiVersion);
+        }
+
+    }
+    private List<LedgerTransaction> retrieveTransactionListAnyVersion()
+            throws ApiNotSupportedException {
+        for (SendTransactionTask.API ver : SendTransactionTask.API.allVersions) {
+            try {
+                return retrieveTransactionListForVersion(ver);
+            }
+            catch (Exception | HTTPException e) {
+                Logger.debug("json",
+                        String.format(Locale.US, "Error during account list retrieval using API %s",
+                                ver.getDescription()));
+            }
+
+            throw new ApiNotSupportedException();
+        }
+
+        throw new RuntimeException("This should never be reached");
+    }
+    private List<LedgerTransaction> retrieveTransactionListForVersion(
+            SendTransactionTask.API apiVersion) throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         progress.setTotal(expectedPostingsCount);
 
@@ -449,18 +518,17 @@ public class RetrieveTransactionsTask extends
         try (InputStream resp = http.getInputStream()) {
             throwIfCancelled();
 
-            TransactionListParser parser = new TransactionListParser(resp);
+            TransactionListParser parser = TransactionListParser.forApiVersion(apiVersion, resp);
 
             int processedPostings = 0;
 
             while (true) {
                 throwIfCancelled();
-                ParsedLedgerTransaction parsedTransaction = parser.nextTransaction();
+                LedgerTransaction transaction = parser.nextTransaction();
                 throwIfCancelled();
-                if (parsedTransaction == null)
+                if (transaction == null)
                     break;
 
-                LedgerTransaction transaction = parsedTransaction.asLedgerTransaction();
                 trList.add(transaction);
 
                 progress.setProgress(processedPostings += transaction.getAccounts()
@@ -499,10 +567,15 @@ public class RetrieveTransactionsTask extends
         List<LedgerTransaction> transactions;
         try {
             accounts = retrieveAccountList();
+            // accounts is null in API-version auto-detection and means
+            // requesting 'html' API version via the JSON classes
+            // this can't work, and the null results in the legacy code below
+            // being called
             if (accounts == null)
                 transactions = null;
             else
                 transactions = retrieveTransactionList();
+
             if (accounts == null || transactions == null) {
                 accounts = new ArrayList<>();
                 transactions = new ArrayList<>();
@@ -525,6 +598,10 @@ public class RetrieveTransactionsTask extends
             e.printStackTrace();
             return new Result(e.getLocalizedMessage());
         }
+        catch (RuntimeJsonMappingException e) {
+            e.printStackTrace();
+            return new Result(Result.ERR_JSON_PARSER_ERROR);
+        }
         catch (ParseException e) {
             e.printStackTrace();
             return new Result("Network error");
@@ -532,6 +609,10 @@ public class RetrieveTransactionsTask extends
         catch (OperationCanceledException e) {
             e.printStackTrace();
             return new Result("Operation cancelled");
+        }
+        catch (ApiNotSupportedException e) {
+            e.printStackTrace();
+            return new Result("Server version not supported");
         }
         finally {
             Data.backgroundTaskFinished();
@@ -622,6 +703,7 @@ public class RetrieveTransactionsTask extends
     }
 
     public static class Result {
+        public static String ERR_JSON_PARSER_ERROR = "err_json_parser";
         public String error;
         public List<LedgerAccount> accounts;
         public List<LedgerTransaction> transactions;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2020 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,17 +19,5 @@ package net.ktnx.mobileledger.json.v1_15;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.List;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedLedgerAccount extends net.ktnx.mobileledger.json.ParsedLedgerAccount {
-    private List<ParsedBalance> aebalance;
-    public ParsedLedgerAccount() {
-    }
-    public List<ParsedBalance> getAebalance() {
-        return aebalance;
-    }
-    public void setAebalance(List<ParsedBalance> aebalance) {
-        this.aebalance = aebalance;
-    }
-}
+public class ParsedLedgerAccount extends net.ktnx.mobileledger.json.v1_14.ParsedLedgerAccount {}

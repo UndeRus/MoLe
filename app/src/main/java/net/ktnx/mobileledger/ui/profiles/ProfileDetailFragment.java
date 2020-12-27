@@ -287,19 +287,23 @@ public class ProfileDetailFragment extends Fragment {
         context.findViewById(R.id.api_version_text)
                .setOnClickListener(this::chooseAPIVersion);
 
-        TextView detectedApiVersion = context.findViewById(R.id.detected_version_text);
+        context.findViewById(R.id.server_version_label)
+               .setOnClickListener(v -> model.triggerVersionDetection());
+        TextView detectedServerVersion = context.findViewById(R.id.detected_server_version_text);
         model.observeDetectedVersion(viewLifecycleOwner, ver -> {
             if (ver == null)
-                detectedApiVersion.setText(context.getResources()
-                                                  .getString(R.string.api_version_unknown_label));
-            else if (ver.isPre_1_20())
-                detectedApiVersion.setText(context.getResources()
-                                                  .getString(R.string.api_pre_1_19));
+                detectedServerVersion.setText(context.getResources()
+                                                     .getString(
+                                                             R.string.server_version_unknown_label));
+            else if (ver.isPre_1_20_1())
+                detectedServerVersion.setText(context.getResources()
+                                                     .getString(
+                                                             R.string.detected_server_pre_1_20_1));
             else
-                detectedApiVersion.setText(ver.toString());
+                detectedServerVersion.setText(ver.toString());
         });
-        detectedApiVersion.setOnClickListener(v -> model.triggerVersionDetection());
-        final View detectButton = context.findViewById(R.id.api_version_detect_button);
+        detectedServerVersion.setOnClickListener(v -> model.triggerVersionDetection());
+        final View detectButton = context.findViewById(R.id.server_version_detect_button);
         detectButton.setOnClickListener(v -> model.triggerVersionDetection());
         model.observeDetectingHledgerVersion(viewLifecycleOwner, running -> {
             detectButton.setVisibility(running ? View.VISIBLE : View.INVISIBLE);
@@ -394,11 +398,14 @@ public class ProfileDetailFragment extends Fragment {
                 case R.id.api_version_menu_html:
                     apiVer = SendTransactionTask.API.html;
                     break;
-                case R.id.api_version_menu_post_1_14:
-                    apiVer = SendTransactionTask.API.post_1_14;
+                case R.id.api_version_menu_1_19_1:
+                    apiVer = SendTransactionTask.API.v1_19_1;
                     break;
-                case R.id.api_version_menu_pre_1_15:
-                    apiVer = SendTransactionTask.API.pre_1_15;
+                case R.id.api_version_menu_1_15:
+                    apiVer = SendTransactionTask.API.v1_15;
+                    break;
+                case R.id.api_version_menu_1_14:
+                    apiVer = SendTransactionTask.API.v1_14;
                     break;
                 case R.id.api_version_menu_auto:
                 default:

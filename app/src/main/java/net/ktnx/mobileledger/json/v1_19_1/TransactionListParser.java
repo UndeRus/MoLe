@@ -15,26 +15,30 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_15;
+package net.ktnx.mobileledger.json.v1_19_1;
 
+import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.model.LedgerTransaction;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 
-public class AccountListParser extends net.ktnx.mobileledger.json.AccountListParser {
+public class TransactionListParser extends net.ktnx.mobileledger.json.TransactionListParser {
 
-    public AccountListParser(InputStream input) throws IOException {
+    private final MappingIterator<ParsedLedgerTransaction> iterator;
+
+    public TransactionListParser(InputStream input) throws IOException {
+
         ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.readerFor(ParsedLedgerAccount.class);
-
+        ObjectReader reader = mapper.readerFor(ParsedLedgerTransaction.class);
         iterator = reader.readValues(input);
     }
-    @Override
-    public SendTransactionTask.API getApiVersion() {
-        return SendTransactionTask.API.v1_15;
+    public LedgerTransaction nextTransaction() throws ParseException {
+        return iterator.hasNext() ? iterator.next()
+                                            .asLedgerTransaction() : null;
     }
 }

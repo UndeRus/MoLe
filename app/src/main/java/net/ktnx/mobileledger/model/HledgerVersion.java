@@ -20,39 +20,41 @@ package net.ktnx.mobileledger.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.ktnx.mobileledger.async.SendTransactionTask;
+
 import java.util.Locale;
 
 public class HledgerVersion {
     private final int major;
     private final int minor;
     private final int patch;
-    private final boolean isPre_1_20;
+    private final boolean isPre_1_20_1;
     private final boolean hasPatch;
     public HledgerVersion(int major, int minor) {
         this.major = major;
         this.minor = minor;
         this.patch = 0;
-        this.isPre_1_20 = false;
+        this.isPre_1_20_1 = false;
         this.hasPatch = false;
     }
     public HledgerVersion(int major, int minor, int patch) {
         this.major = major;
         this.minor = minor;
         this.patch = patch;
-        this.isPre_1_20 = false;
+        this.isPre_1_20_1 = false;
         this.hasPatch = true;
     }
-    public HledgerVersion(boolean pre_1_20) {
-        if (!pre_1_20)
-            throw new IllegalArgumentException("pre_1_20 argument must be true");
+    public HledgerVersion(boolean pre_1_20_1) {
+        if (!pre_1_20_1)
+            throw new IllegalArgumentException("pre_1_20_1 argument must be true");
         this.major = this.minor = this.patch = 0;
-        this.isPre_1_20 = true;
+        this.isPre_1_20_1 = true;
         this.hasPatch = false;
     }
     public HledgerVersion(HledgerVersion origin) {
         this.major = origin.major;
         this.minor = origin.minor;
-        this.isPre_1_20 = origin.isPre_1_20;
+        this.isPre_1_20_1 = origin.isPre_1_20_1;
         this.patch = origin.patch;
         this.hasPatch = origin.hasPatch;
     }
@@ -64,12 +66,12 @@ public class HledgerVersion {
             return false;
         HledgerVersion that = (HledgerVersion) obj;
 
-        return (this.isPre_1_20 == that.isPre_1_20 && this.major == that.major &&
+        return (this.isPre_1_20_1 == that.isPre_1_20_1 && this.major == that.major &&
                 this.minor == that.minor && this.patch == that.patch &&
                 this.hasPatch == that.hasPatch);
     }
-    public boolean isPre_1_20() {
-        return isPre_1_20;
+    public boolean isPre_1_20_1() {
+        return isPre_1_20_1;
     }
     public int getMajor() {
         return major;
@@ -83,9 +85,19 @@ public class HledgerVersion {
     @NonNull
     @Override
     public String toString() {
-        if (isPre_1_20)
+        if (isPre_1_20_1)
             return "(before 1.20)";
         return hasPatch ? String.format(Locale.ROOT, "%d.%d.%d", major, minor, patch)
                         : String.format(Locale.ROOT, "%d.%d", major, minor);
+    }
+    public boolean atLeast(int major, int minor) {
+        return ((this.major == major) && (this.minor >= minor)) || (this.major > major);
+    }
+    @org.jetbrains.annotations.Nullable
+    public SendTransactionTask.API getSuitableApiVersion() {
+        if (isPre_1_20_1)
+            return null;
+
+        return SendTransactionTask.API.v1_19_1;
     }
 }

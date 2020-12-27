@@ -330,7 +330,7 @@ public final class MobileLedgerProfile {
                                  authEnabled ? authPassword : null, themeHue, orderNo,
                                  preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt(),
                                  showCommodityByDefault, defaultCommodity, showCommentsByDefault,
-                                 (detectedVersion != null) && detectedVersion.isPre_1_20(),
+                                 (detectedVersion != null) && detectedVersion.isPre_1_20_1(),
                                  (detectedVersion == null) ? 0 : detectedVersion.getMajor(),
                                  (detectedVersion == null) ? 0 : detectedVersion.getMinor()
                     });
@@ -625,7 +625,7 @@ public final class MobileLedgerProfile {
             }
         }
 
-        private int value;
+        private final int value;
         FutureDates(int value) {
             this.value = value;
         }

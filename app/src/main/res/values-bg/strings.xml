@@ -126,11 +126,11 @@
     <string name="future_dates_all">Без ограничения</string>
     <string name="future_dates_none">Без въвеждане на бъдещи дати</string>
     <string name="profile_future_dates_label">Въвеждане на дати в бъдещето</string>
-    <string name="api_auto">Автоматично откриване</string>
+    <string name="api_auto">Автоматична</string>
     <string name="api_html">Версия преди 1.14</string>
-    <string name="api_post_1_14">Версия 1.15 или по-нова</string>
-    <string name="api_pre_1_15">Версия 1.14.x</string>
-    <string name="profile_api_version_title">Версия на сървъра</string>
+    <string name="api_1_15">Версия 1.15</string>
+    <string name="api_1_14">Версия 1.14</string>
+    <string name="profile_api_version_title">Версия на протокола</string>
     <string name="add_button">Добавяне…</string>
     <string name="close_button">Затваряне</string>
     <string name="transaction_account_comment_hint">бележка</string>
@@ -156,8 +156,12 @@
     <string name="nav_header_desc">Заглавна част на страничния панел</string>
     <string name="transaction_count_summary">%,d движения към %s</string>
     <string name="account_count_summary">%,d сметки към %s</string>
-    <string name="api_version_unknown_label">Неизвестна</string>
-    <string name="api_pre_1_19">Преди 1.20.?</string>
+    <string name="server_version_unknown_label">Неизвестна</string>
+    <string name="detected_server_pre_1_20_1">Преди 1.20.1</string>
     <string name="detected_version_label">Открита версия</string>
     <string name="new_transaction_fab_description">Знак плюс</string>
+    <string name="api_1_19_1">Версия 1.19.1</string>
+    <string name="profile_server_version_title">Версия на сървъра</string>
+    <string name="err_json_parser_error">Грешка при разчитане на отговора от сървъра. Вероятно настроената врсия на протокола е грешна.</string>
+    <string name="btn_profile_options">Настройка на профила</string>
 </resources>

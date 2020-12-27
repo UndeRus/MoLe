@@ -15,26 +15,19 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_15;
+package net.ktnx.mobileledger.json.v1_19_1;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import net.ktnx.mobileledger.async.SendTransactionTask;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-public class AccountListParser extends net.ktnx.mobileledger.json.AccountListParser {
-
-    public AccountListParser(InputStream input) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectReader reader = mapper.readerFor(ParsedLedgerAccount.class);
-
-        iterator = reader.readValues(input);
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ParsedStyle extends net.ktnx.mobileledger.json.ParsedStyle {
+    private ParsedPrecision asprecision;
+    public ParsedStyle() {
     }
-    @Override
-    public SendTransactionTask.API getApiVersion() {
-        return SendTransactionTask.API.v1_15;
+    public ParsedPrecision getAsprecision() {
+        return asprecision;
+    }
+    public void setAsprecision(ParsedPrecision asprecision) {
+        this.asprecision = asprecision;
     }
 }

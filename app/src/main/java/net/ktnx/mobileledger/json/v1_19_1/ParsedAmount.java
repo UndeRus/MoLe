@@ -15,14 +15,42 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_14;
+package net.ktnx.mobileledger.json.v1_19_1;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedBalance extends net.ktnx.mobileledger.json.ParsedBalance {
+public class ParsedAmount {
+    private String acommodity;
+    private ParsedQuantity aquantity;
+    private boolean aismultiplier;
     private ParsedStyle astyle;
-    public ParsedBalance() {
+    private ParsedPrice aprice;
+    public ParsedAmount() {
+    }
+    public ParsedPrice getAprice() {
+        return aprice;
+    }
+    public void setAprice(ParsedPrice aprice) {
+        this.aprice = aprice;
+    }
+    public String getAcommodity() {
+        return acommodity;
+    }
+    public void setAcommodity(String acommodity) {
+        this.acommodity = acommodity;
+    }
+    public ParsedQuantity getAquantity() {
+        return aquantity;
+    }
+    public void setAquantity(ParsedQuantity aquantity) {
+        this.aquantity = aquantity;
+    }
+    public boolean isAismultiplier() {
+        return aismultiplier;
+    }
+    public void setAismultiplier(boolean aismultiplier) {
+        this.aismultiplier = aismultiplier;
     }
     public ParsedStyle getAstyle() {
         return astyle;
@@ -30,4 +58,5 @@ public class ParsedBalance extends net.ktnx.mobileledger.json.ParsedBalance {
     public void setAstyle(ParsedStyle astyle) {
         this.astyle = astyle;
     }
+
 }

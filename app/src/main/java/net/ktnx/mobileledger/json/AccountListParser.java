@@ -20,79 +20,47 @@ package net.ktnx.mobileledger.json;
 import com.fasterxml.jackson.databind.MappingIterator;
 
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.model.LedgerAccount;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 abstract public class AccountListParser {
     protected MappingIterator<net.ktnx.mobileledger.json.ParsedLedgerAccount> iterator;
+    public static AccountListParser forApiVersion(SendTransactionTask.API version,
+                                                  InputStream input) throws IOException {
+        switch (version) {
+            case v1_14:
+                return new net.ktnx.mobileledger.json.v1_14.AccountListParser(input);
+            case v1_15:
+                return new net.ktnx.mobileledger.json.v1_15.AccountListParser(input);
+            case v1_19_1:
+                return new net.ktnx.mobileledger.json.v1_19_1.AccountListParser(input);
+            default:
+                throw new RuntimeException("Unsupported version " + version.toString());
+        }
 
-    public ParsedLedgerAccount nextAccount() {
+    }
+    public abstract SendTransactionTask.API getApiVersion();
+    public LedgerAccount nextAccount(RetrieveTransactionsTask task,
+                                     HashMap<String, LedgerAccount> map) {
         if (!iterator.hasNext())
             return null;
 
-        ParsedLedgerAccount next = iterator.next();
+        LedgerAccount next = iterator.next()
+                                     .toLedgerAccount(task, map);
 
-        if (next.getAname()
+        if (next.getName()
                 .equalsIgnoreCase("root"))
-            return nextAccount();
+            return nextAccount(task, map);
 
-        debug("accounts", String.format("Got account '%s' [v1.15]", next.getAname()));
+        debug("accounts", String.format("Got account '%s' [%s]", next.getName(),
+                getApiVersion().getDescription()));
         return next;
-    }
-    public LedgerAccount nextLedgerAccount(RetrieveTransactionsTask task,
-                                           HashMap<String, LedgerAccount> map) {
-        ParsedLedgerAccount parsedAccount = nextAccount();
-        if (parsedAccount == null)
-            return null;
-
-        task.addNumberOfPostings(parsedAccount.getAnumpostings());
-        final String accName = parsedAccount.getAname();
-        LedgerAccount acc = map.get(accName);
-        if (acc != null)
-            throw new RuntimeException(
-                    String.format("Account '%s' already present", acc.getName()));
-        String parentName = LedgerAccount.extractParentName(accName);
-        ArrayList<LedgerAccount> createdParents = new ArrayList<>();
-        LedgerAccount parent;
-        if (parentName == null) {
-            parent = null;
-        }
-        else {
-            parent = task.ensureAccountExists(parentName, map, createdParents);
-            parent.setHasSubAccounts(true);
-        }
-        acc = new LedgerAccount(task.getProfile(), accName, parent);
-        map.put(accName, acc);
-
-        String lastCurrency = null;
-        float lastCurrencyAmount = 0;
-        for (ParsedBalance b : parsedAccount.getAibalance()) {
-            task.throwIfCancelled();
-            final String currency = b.getAcommodity();
-            final float amount = b.getAquantity()
-                                  .asFloat();
-            if (currency.equals(lastCurrency)) {
-                lastCurrencyAmount += amount;
-            }
-            else {
-                if (lastCurrency != null) {
-                    acc.addAmount(lastCurrencyAmount, lastCurrency);
-                }
-                lastCurrency = currency;
-                lastCurrencyAmount = amount;
-            }
-        }
-        if (lastCurrency != null) {
-            acc.addAmount(lastCurrencyAmount, lastCurrency);
-        }
-        for (LedgerAccount p : createdParents)
-            acc.propagateAmountsTo(p);
-
-        return acc;
     }
 
 }

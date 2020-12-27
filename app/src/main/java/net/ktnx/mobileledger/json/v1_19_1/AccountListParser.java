@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_15;
+package net.ktnx.mobileledger.json.v1_19_1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -35,6 +35,6 @@ public class AccountListParser extends net.ktnx.mobileledger.json.AccountListPar
     }
     @Override
     public SendTransactionTask.API getApiVersion() {
-        return SendTransactionTask.API.v1_15;
+        return SendTransactionTask.API.v1_19_1;
     }
 }

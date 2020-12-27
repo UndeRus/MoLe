@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -237,7 +238,8 @@ public class MainActivity extends ProfileThemedActivity {
         findViewById(R.id.nav_new_profile_button).setOnClickListener(
                 v -> startEditProfileActivity(null));
 
-        findViewById(R.id.transaction_list_cancel_download).setOnClickListener(this::onStopTransactionRefreshClick);
+        findViewById(R.id.transaction_list_cancel_download).setOnClickListener(
+                this::onStopTransactionRefreshClick);
 
         RecyclerView root = findViewById(R.id.nav_profile_list);
         if (root == null)
@@ -619,9 +621,19 @@ public class MainActivity extends ProfileThemedActivity {
 
             mainModel.transactionRetrievalDone();
 
-            if (progress.getError() != null) {
-                Snackbar.make(mViewPager, progress.getError(), Snackbar.LENGTH_LONG)
-                        .show();
+            String error = progress.getError();
+            if (error != null) {
+                if (error.equals(RetrieveTransactionsTask.Result.ERR_JSON_PARSER_ERROR))
+                    error = getResources().getString(R.string.err_json_parser_error);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(error);
+                builder.setPositiveButton(R.string.btn_profile_options, (dialog, which) -> {
+                    Logger.debug("error", "will start profile editor");
+                    startEditProfileActivity(profile);
+                });
+                builder.create()
+                       .show();
                 return;
             }
 

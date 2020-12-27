@@ -293,10 +293,10 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                 case html:
                     legacySendOkWithRetry();
                     break;
-                case pre_1_15:
+                case v1_14:
                     send_1_14_OK();
                     break;
-                case post_1_14:
+                case v1_15:
                     send_1_15_OK();
                     break;
                 default:
@@ -327,8 +327,9 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     }
 
     public enum API {
-        auto(0), html(-1), pre_1_15(-2), post_1_14(-3);
+        auto(0), html(-1), v1_14(-2), v1_15(-3), v1_19_1(-4);
         private static final SparseArray<API> map = new SparseArray<>();
+        public static API[] allVersions = {v1_19_1, v1_15, v1_14};
 
         static {
             for (API item : API.values()) {
@@ -336,7 +337,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             }
         }
 
-        private int value;
+        private final int value;
 
         API(int value) {
             this.value = value;
@@ -353,12 +354,30 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     return resources.getString(R.string.api_auto);
                 case html:
                     return resources.getString(R.string.api_html);
-                case pre_1_15:
-                    return resources.getString(R.string.api_pre_1_15);
-                case post_1_14:
-                    return resources.getString(R.string.api_post_1_14);
+                case v1_14:
+                    return resources.getString(R.string.api_1_14);
+                case v1_15:
+                    return resources.getString(R.string.api_1_15);
+                case v1_19_1:
+                    return resources.getString(R.string.api_1_19_1);
                 default:
                     throw new IllegalStateException("Unexpected value: " + value);
+            }
+        }
+        public String getDescription() {
+            switch (this) {
+                case auto:
+                    return "(automatic)";
+                case html:
+                    return "(HTML)";
+                case v1_14:
+                    return "1.14";
+                case v1_15:
+                    return "1.15";
+                case v1_19_1:
+                    return "1.19.1";
+                default:
+                    throw new IllegalStateException("Unexpected value: " + this);
             }
         }
     }

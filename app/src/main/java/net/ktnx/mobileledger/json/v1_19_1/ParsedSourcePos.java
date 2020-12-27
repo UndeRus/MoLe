@@ -15,19 +15,29 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.json.v1_14;
+package net.ktnx.mobileledger.json.v1_19_1;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.ArrayList;
+import java.util.List;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class ParsedStyle extends net.ktnx.mobileledger.json.ParsedStyle {
-    private int asprecision;
-    public ParsedStyle() {
+class ParsedSourcePos {
+    private String tag = "JournalSourcePos";
+    private List<Object> contents;
+    public ParsedSourcePos() {
+        contents = new ArrayList<>();
+        contents.add("");
+        contents.add(new Integer[]{1, 1});
     }
-    public int getAsprecision() {
-        return asprecision;
+    public String getTag() {
+        return tag;
     }
-    public void setAsprecision(int asprecision) {
-        this.asprecision = asprecision;
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+    public List<Object> getContents() {
+        return contents;
+    }
+    public void setContents(List<Object> contents) {
+        this.contents = contents;
     }
 }
