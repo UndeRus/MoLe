@@ -29,7 +29,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +41,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputLayout;
 
 import net.ktnx.mobileledger.BuildConfig;
@@ -86,7 +86,7 @@ public class ProfileDetailFragment extends Fragment {
     private boolean defaultCommoditySet;
     private TextInputLayout urlLayout;
     private LinearLayout authParams;
-    private Switch useAuthentication;
+    private SwitchMaterial useAuthentication;
     private TextView userName;
     private TextInputLayout userNameLayout;
     private TextView password;
@@ -242,14 +242,14 @@ public class ProfileDetailFragment extends Fragment {
                    cpf.show(activity.getSupportFragmentManager(), "currency-selector");
                });
 
-        Switch showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
+        SwitchMaterial showCommodityByDefault = context.findViewById(R.id.profile_show_commodity);
         showCommodityByDefault.setOnCheckedChangeListener(
                 (buttonView, isChecked) -> model.setShowCommodityByDefault(isChecked));
         model.observeShowCommodityByDefault(viewLifecycleOwner, showCommodityByDefault::setChecked);
 
         View postingSubItems = context.findViewById(R.id.posting_sub_items);
 
-        Switch postingPermitted = context.findViewById(R.id.profile_permit_posting);
+        SwitchMaterial postingPermitted = context.findViewById(R.id.profile_permit_posting);
         model.observePostingPermitted(viewLifecycleOwner, isChecked -> {
             postingPermitted.setChecked(isChecked);
             postingSubItems.setVisibility(isChecked ? View.VISIBLE : View.GONE);
@@ -257,7 +257,7 @@ public class ProfileDetailFragment extends Fragment {
         postingPermitted.setOnCheckedChangeListener(
                 ((buttonView, isChecked) -> model.setPostingPermitted(isChecked)));
 
-        Switch showCommentsByDefault = context.findViewById(R.id.profile_show_comments);
+        SwitchMaterial showCommentsByDefault = context.findViewById(R.id.profile_show_comments);
         model.observeShowCommentsByDefault(viewLifecycleOwner, showCommentsByDefault::setChecked);
         showCommentsByDefault.setOnCheckedChangeListener(
                 ((buttonView, isChecked) -> model.setShowCommentsByDefault(isChecked)));
