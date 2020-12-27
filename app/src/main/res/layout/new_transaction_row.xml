@@ -21,7 +21,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ntr_data"
@@ -57,7 +58,8 @@
             app:layout_constraintHorizontal_weight="8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="TextFields" />
+            tools:ignore="TextFields"
+            />
 
         <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
             android:id="@+id/new_transaction_description"
@@ -78,7 +80,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_weight="30"
             app:layout_constraintStart_toEndOf="@id/new_transaction_date"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/transaction_comment_layout"
@@ -86,7 +89,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/new_transaction_description">
+            app:layout_constraintTop_toBottomOf="@id/new_transaction_description"
+            >
 
             <TextView
                 android:id="@+id/comment_button"
@@ -95,7 +99,8 @@
                 android:background="@drawable/ic_comment_gray_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <net.ktnx.mobileledger.ui.EditTextWithClear
                 android:id="@+id/transaction_comment"
@@ -106,7 +111,8 @@
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/comment_button"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -115,7 +121,8 @@
         android:id="@+id/ntr_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true">
+        android:animateLayoutChanges="true"
+        >
 
         <net.ktnx.mobileledger.ui.AutoCompleteTextViewWithClear
             android:id="@+id/account_row_acc_name"
@@ -129,7 +136,8 @@
             android:selectAllOnFocus="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/comment_layout"
@@ -137,7 +145,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@id/amount_layout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name">
+            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name"
+            >
 
             <TextView
                 android:id="@id/comment_button"
@@ -146,7 +155,8 @@
                 android:background="@drawable/ic_comment_gray_24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
             <net.ktnx.mobileledger.ui.EditTextWithClear
                 android:id="@+id/comment"
@@ -157,7 +167,8 @@
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/comment_button"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -165,7 +176,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name">
+            app:layout_constraintTop_toBottomOf="@id/account_row_acc_name"
+            >
 
             <EditText
                 android:id="@+id/account_row_acc_amounts"
@@ -186,7 +198,8 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/currency"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_min="@dimen/text_margin" />
+                app:layout_constraintWidth_min="@dimen/text_margin"
+                />
 
             <TextView
                 android:id="@+id/currency"
@@ -201,7 +214,8 @@
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -210,7 +224,8 @@
         android:id="@+id/ntr_padding"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:minHeight="80dp">
+        android:minHeight="80dp"
+        >
 
     </FrameLayout>
 
