@@ -41,6 +41,11 @@ public class ProfileThemedActivity extends CrashReportingActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         initProfile();
         setupProfileColors();
+        Data.observeProfile(this, profile -> {
+            mProfile = profile;
+            setupProfileColors();
+        });
+
         super.onCreate(savedInstanceState);
     }
     protected void initProfile() {
