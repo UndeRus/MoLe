@@ -301,6 +301,8 @@ public class MainActivity extends ProfileThemedActivity {
         Data.lastUpdateDate.observe(this, date -> refreshLastUpdateInfo());
         Data.lastUpdateTransactionCount.observe(this, date -> refreshLastUpdateInfo());
         Data.lastUpdateAccountCount.observe(this, date -> refreshLastUpdateInfo());
+        b.navAccountSummary.setOnClickListener(this::onAccountSummaryClicked);
+        b.navLatestTransactions.setOnClickListener(this::onLatestTransactionsClicked);
     }
     private void scheduleDataRetrievalIfStale(long lastUpdate) {
         long now = new Date().getTime();

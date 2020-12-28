@@ -292,7 +292,6 @@
                                 <TextView
                                     android:id="@+id/nav_account_summary"
                                     style="@style/nav_button"
-                                    android:onClick="onAccountSummaryClicked"
                                     android:text="@string/account_summary_title"
                                     app:drawableStartCompat="@drawable/ic_home_black_24dp"
                                     />
@@ -300,7 +299,6 @@
                                 <TextView
                                     android:id="@+id/nav_latest_transactions"
                                     style="@style/nav_button"
-                                    android:onClick="onLatestTransactionsClicked"
                                     android:text="@string/nav_transactions_title"
                                     app:drawableStartCompat="@drawable/ic_event_note_black_24dp"
                                     />
