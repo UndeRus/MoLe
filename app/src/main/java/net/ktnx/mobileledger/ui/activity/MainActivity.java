@@ -30,14 +30,11 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -48,11 +45,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.databinding.ActivityMainBinding;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
@@ -79,33 +76,28 @@ public class MainActivity extends ProfileThemedActivity {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
-    DrawerLayout drawer;
-    private View profileListHeadMore, profileListHeadCancel, profileListHeadAddProfile;
-    private View bTransactionListCancelDownload;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager2 mViewPager;
-    private FloatingActionButton fab;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
     private boolean mBackMeansToAccountList = false;
-    private Toolbar mToolbar;
     private DrawerLayout.SimpleDrawerListener drawerListener;
     private ActionBarDrawerToggle barDrawerToggle;
     private ViewPager2.OnPageChangeCallback pageChangeCallback;
     private MobileLedgerProfile profile;
     private MainModel mainModel;
+    private ActivityMainBinding b;
     @Override
     protected void onStart() {
         super.onStart();
 
         Logger.debug("MainActivity", "onStart()");
 
-        mViewPager.setCurrentItem(mCurrentPage, false);
+        b.mainPager.setCurrentItem(mCurrentPage, false);
     }
     @Override
     protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_CURRENT_PAGE, mViewPager.getCurrentItem());
+        outState.putInt(STATE_CURRENT_PAGE, b.mainPager.getCurrentItem());
         if (mainModel.getAccountFilter()
                      .getValue() != null)
             outState.putString(STATE_ACC_FILTER, mainModel.getAccountFilter()
@@ -114,17 +106,12 @@ public class MainActivity extends ProfileThemedActivity {
     @Override
     protected void onDestroy() {
         mSectionsPagerAdapter = null;
-        RecyclerView root = findViewById(R.id.nav_profile_list);
-        if (root != null)
-            root.setAdapter(null);
-        if (drawer != null)
-            drawer.removeDrawerListener(drawerListener);
+        b.navProfileList.setAdapter(null);
+        b.drawerLayout.removeDrawerListener(drawerListener);
         drawerListener = null;
-        if (drawer != null)
-            drawer.removeDrawerListener(barDrawerToggle);
+        b.drawerLayout.removeDrawerListener(barDrawerToggle);
         barDrawerToggle = null;
-        if (mViewPager != null)
-            mViewPager.unregisterOnPageChangeCallback(pageChangeCallback);
+        b.mainPager.unregisterOnPageChangeCallback(pageChangeCallback);
         pageChangeCallback = null;
         super.onDestroy();
     }
@@ -138,28 +125,19 @@ public class MainActivity extends ProfileThemedActivity {
         Logger.debug("MainActivity", "onCreate()/entry");
         super.onCreate(savedInstanceState);
         Logger.debug("MainActivity", "onCreate()/after super");
-        setContentView(R.layout.activity_main);
+        b = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(b.getRoot());
 
         mainModel = new ViewModelProvider(this).get(MainModel.class);
 
-        fab = findViewById(R.id.btn_add_transaction);
-        profileListHeadMore = findViewById(R.id.nav_profiles_start_edit);
-        profileListHeadCancel = findViewById(R.id.nav_profiles_cancel_edit);
-        LinearLayout profileListHeadMoreAndCancel =
-                findViewById(R.id.nav_profile_list_head_buttons);
-        profileListHeadAddProfile = findViewById(R.id.nav_new_profile_button);
-        drawer = findViewById(R.id.drawer_layout);
-        bTransactionListCancelDownload = findViewById(R.id.transaction_list_cancel_download);
         mSectionsPagerAdapter = new SectionsPagerAdapter(this);
-        mViewPager = findViewById(R.id.root_frame);
 
         Bundle extra = getIntent().getBundleExtra(BUNDLE_SAVED_STATE);
         if (extra != null && savedInstanceState == null)
             savedInstanceState = extra;
 
 
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
+        setSupportActionBar(b.toolbar);
 
         Data.observeProfile(this, this::onProfileChanged);
 
@@ -168,19 +146,18 @@ public class MainActivity extends ProfileThemedActivity {
         Data.backgroundTasksRunning.observe(this, this::onRetrieveRunningChanged);
 
         if (barDrawerToggle == null) {
-            barDrawerToggle = new ActionBarDrawerToggle(this, drawer, mToolbar,
+            barDrawerToggle = new ActionBarDrawerToggle(this, b.drawerLayout, b.toolbar,
                     R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.addDrawerListener(barDrawerToggle);
+            b.drawerLayout.addDrawerListener(barDrawerToggle);
         }
         barDrawerToggle.syncState();
 
         try {
             PackageInfo pi = getApplicationContext().getPackageManager()
                                                     .getPackageInfo(getPackageName(), 0);
-            ((TextView) findViewById(R.id.nav_upper).findViewById(
-                    R.id.drawer_version_text)).setText(pi.versionName);
-            ((TextView) findViewById(R.id.no_profiles_layout).findViewById(
-                    R.id.drawer_version_text)).setText(pi.versionName);
+            ((TextView) b.navUpper.findViewById(R.id.drawer_version_text)).setText(pi.versionName);
+            ((TextView) b.noProfilesLayout.findViewById(R.id.drawer_version_text)).setText(
+                    pi.versionName);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -188,7 +165,7 @@ public class MainActivity extends ProfileThemedActivity {
 
         markDrawerItemCurrent(R.id.nav_account_summary);
 
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        b.mainPager.setAdapter(mSectionsPagerAdapter);
 
         if (pageChangeCallback == null) {
             pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
@@ -210,7 +187,7 @@ public class MainActivity extends ProfileThemedActivity {
                     super.onPageSelected(position);
                 }
             };
-            mViewPager.registerOnPageChangeCallback(pageChangeCallback);
+            b.mainPager.registerOnPageChangeCallback(pageChangeCallback);
         }
 
         mCurrentPage = 0;
@@ -223,49 +200,44 @@ public class MainActivity extends ProfileThemedActivity {
                      .setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
         }
 
-        findViewById(R.id.btn_no_profiles_add).setOnClickListener(
+        b.btnNoProfilesAdd.setOnClickListener(
                 v -> MobileLedgerProfile.startEditProfileActivity(this, null));
 
-        findViewById(R.id.btn_add_transaction).setOnClickListener(this::fabNewTransactionClicked);
+        b.btnAddTransaction.setOnClickListener(this::fabNewTransactionClicked);
 
-        findViewById(R.id.nav_new_profile_button).setOnClickListener(
+        b.navNewProfileButton.setOnClickListener(
                 v -> MobileLedgerProfile.startEditProfileActivity(this, null));
 
-        findViewById(R.id.transaction_list_cancel_download).setOnClickListener(
-                this::onStopTransactionRefreshClick);
-
-        RecyclerView root = findViewById(R.id.nav_profile_list);
-        if (root == null)
-            throw new RuntimeException("Can't get hold on the transaction value view");
+        b.transactionListCancelDownload.setOnClickListener(this::onStopTransactionRefreshClick);
 
         if (mProfileListAdapter == null)
             mProfileListAdapter = new ProfilesRecyclerViewAdapter();
-        root.setAdapter(mProfileListAdapter);
+        b.navProfileList.setAdapter(mProfileListAdapter);
 
         mProfileListAdapter.editingProfiles.observe(this, newValue -> {
             if (newValue) {
-                profileListHeadMore.setVisibility(View.GONE);
-                profileListHeadCancel.setVisibility(View.VISIBLE);
-                profileListHeadAddProfile.setVisibility(View.VISIBLE);
-                if (drawer.isDrawerOpen(GravityCompat.START)) {
-                    profileListHeadMore.startAnimation(
+                b.navProfilesStartEdit.setVisibility(View.GONE);
+                b.navProfilesCancelEdit.setVisibility(View.VISIBLE);
+                b.navNewProfileButton.setVisibility(View.VISIBLE);
+                if (b.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    b.navProfilesStartEdit.startAnimation(
                             AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_out));
-                    profileListHeadCancel.startAnimation(
+                    b.navProfilesCancelEdit.startAnimation(
                             AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in));
-                    profileListHeadAddProfile.startAnimation(
+                    b.navNewProfileButton.startAnimation(
                             AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in));
                 }
             }
             else {
-                profileListHeadCancel.setVisibility(View.GONE);
-                profileListHeadMore.setVisibility(View.VISIBLE);
-                profileListHeadAddProfile.setVisibility(View.GONE);
-                if (drawer.isDrawerOpen(GravityCompat.START)) {
-                    profileListHeadCancel.startAnimation(
+                b.navProfilesCancelEdit.setVisibility(View.GONE);
+                b.navProfilesStartEdit.setVisibility(View.VISIBLE);
+                b.navNewProfileButton.setVisibility(View.GONE);
+                if (b.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    b.navProfilesCancelEdit.startAnimation(
                             AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_out));
-                    profileListHeadMore.startAnimation(
+                    b.navProfilesStartEdit.startAnimation(
                             AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_in));
-                    profileListHeadAddProfile.startAnimation(
+                    b.navNewProfileButton.startAnimation(
                             AnimationUtils.loadAnimation(MainActivity.this, R.anim.fade_out));
                 }
             }
@@ -276,11 +248,12 @@ public class MainActivity extends ProfileThemedActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
         llm.setOrientation(RecyclerView.VERTICAL);
-        root.setLayoutManager(llm);
+        b.navProfileList.setLayoutManager(llm);
 
-        profileListHeadMore.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
-        profileListHeadCancel.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
-        profileListHeadMoreAndCancel.setOnClickListener(
+        b.navProfilesStartEdit.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
+        b.navProfilesCancelEdit.setOnClickListener(
+                (v) -> mProfileListAdapter.flipEditingProfiles());
+        b.navProfileListHeadButtons.setOnClickListener(
                 (v) -> mProfileListAdapter.flipEditingProfiles());
         if (drawerListener == null) {
             drawerListener = new DrawerLayout.SimpleDrawerListener() {
@@ -305,14 +278,14 @@ public class MainActivity extends ProfileThemedActivity {
                     fabHide();
                 }
             };
-            drawer.addDrawerListener(drawerListener);
+            b.drawerLayout.addDrawerListener(drawerListener);
         }
 
         Data.drawerOpen.observe(this, open -> {
             if (open)
-                drawer.open();
+                b.drawerLayout.open();
             else
-                drawer.close();
+                b.drawerLayout.close();
         });
 
         mainModel.getUpdateError()
@@ -320,7 +293,7 @@ public class MainActivity extends ProfileThemedActivity {
                      if (error == null)
                          return;
 
-                     Snackbar.make(mViewPager, error, Snackbar.LENGTH_LONG)
+                     Snackbar.make(b.mainPager, error, Snackbar.LENGTH_LONG)
                              .show();
                      mainModel.clearUpdateError();
                  });
@@ -373,15 +346,15 @@ public class MainActivity extends ProfileThemedActivity {
     }
     private void onProfileListChanged(List<MobileLedgerProfile> newList) {
         if ((newList == null) || newList.isEmpty()) {
-            findViewById(R.id.no_profiles_layout).setVisibility(View.VISIBLE);
-            findViewById(R.id.main_app_layout).setVisibility(View.GONE);
+            b.noProfilesLayout.setVisibility(View.VISIBLE);
+            b.mainAppLayout.setVisibility(View.GONE);
             return;
         }
 
-        findViewById(R.id.main_app_layout).setVisibility(View.VISIBLE);
-        findViewById(R.id.no_profiles_layout).setVisibility(View.GONE);
+        b.mainAppLayout.setVisibility(View.VISIBLE);
+        b.noProfilesLayout.setVisibility(View.GONE);
 
-        findViewById(R.id.nav_profile_list).setMinimumHeight(
+        b.navProfileList.setMinimumHeight(
                 (int) (getResources().getDimension(R.dimen.thumb_row_height) * newList.size()));
 
         Logger.debug("profiles", "profile list changed");
@@ -425,8 +398,8 @@ public class MainActivity extends ProfileThemedActivity {
             return;
         }
 
-        findViewById(R.id.no_profiles_layout).setVisibility(haveProfile ? View.GONE : View.VISIBLE);
-        findViewById(R.id.pager_layout).setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
+        b.noProfilesLayout.setVisibility(haveProfile ? View.GONE : View.VISIBLE);
+        b.pagerLayout.setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
         mProfileListAdapter.notifyDataSetChanged();
 
@@ -439,17 +412,17 @@ public class MainActivity extends ProfileThemedActivity {
             mainModel.scheduleTransactionListReload();
 
             if (profile.isPostingPermitted()) {
-                mToolbar.setSubtitle(null);
-                fab.show();
+                b.toolbar.setSubtitle(null);
+                b.btnAddTransaction.show();
             }
             else {
-                mToolbar.setSubtitle(R.string.profile_subtitle_read_only);
-                fab.hide();
+                b.toolbar.setSubtitle(R.string.profile_subtitle_read_only);
+                b.btnAddTransaction.hide();
             }
         }
         else {
-            mToolbar.setSubtitle(null);
-            fab.hide();
+            b.toolbar.setSubtitle(null);
+            b.btnAddTransaction.hide();
         }
 
         updateLastUpdateTextFromDB();
@@ -470,36 +443,35 @@ public class MainActivity extends ProfileThemedActivity {
         overridePendingTransition(R.anim.slide_in_up, R.anim.dummy);
     }
     public void markDrawerItemCurrent(int id) {
-        TextView item = drawer.findViewById(id);
+        TextView item = b.drawerLayout.findViewById(id);
         item.setBackgroundColor(Colors.tableRowDarkBG);
 
-        LinearLayout actions = drawer.findViewById(R.id.nav_actions);
-        for (int i = 0; i < actions.getChildCount(); i++) {
-            View view = actions.getChildAt(i);
+        for (int i = 0; i < b.navActions.getChildCount(); i++) {
+            View view = b.navActions.getChildAt(i);
             if (view.getId() != id) {
                 view.setBackgroundColor(Color.TRANSPARENT);
             }
         }
     }
     public void onAccountSummaryClicked(View view) {
-        drawer.closeDrawers();
+        b.drawerLayout.closeDrawers();
 
         showAccountSummaryFragment();
     }
     private void showAccountSummaryFragment() {
-        mViewPager.setCurrentItem(0, true);
+        b.mainPager.setCurrentItem(0, true);
         mainModel.getAccountFilter()
                  .setValue(null);
     }
     public void onLatestTransactionsClicked(View view) {
-        drawer.closeDrawers();
+        b.drawerLayout.closeDrawers();
 
         showTransactionsFragment(null);
     }
     public void showTransactionsFragment(String accName) {
         mainModel.getAccountFilter()
                  .setValue(accName);
-        mViewPager.setCurrentItem(1, true);
+        b.mainPager.setCurrentItem(1, true);
     }
     public void showAccountTransactions(String accountName) {
         mBackMeansToAccountList = true;
@@ -507,12 +479,11 @@ public class MainActivity extends ProfileThemedActivity {
     }
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (b.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            b.drawerLayout.closeDrawer(GravityCompat.START);
         }
         else {
-            if (mBackMeansToAccountList && (mViewPager.getCurrentItem() == 1)) {
+            if (mBackMeansToAccountList && (b.mainPager.getCurrentItem() == 1)) {
                 mainModel.getAccountFilter()
                          .setValue(null);
                 showAccountSummaryFragment();
@@ -571,35 +542,31 @@ public class MainActivity extends ProfileThemedActivity {
     public void onStopTransactionRefreshClick(View view) {
         Logger.debug("interactive", "Cancelling transactions refresh");
         mainModel.stopTransactionsRetrieval();
-        bTransactionListCancelDownload.setEnabled(false);
+        b.transactionListCancelDownload.setEnabled(false);
     }
     public void onRetrieveRunningChanged(Boolean running) {
-        final View progressLayout = findViewById(R.id.transaction_progress_layout);
         if (running) {
-            ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
-            bTransactionListCancelDownload.setEnabled(true);
+            b.transactionListCancelDownload.setEnabled(true);
             ColorStateList csl = Colors.getColorStateList();
-            progressBar.setIndeterminateTintList(csl);
-            progressBar.setProgressTintList(csl);
-            progressBar.setIndeterminate(true);
+            b.transactionListProgressBar.setIndeterminateTintList(csl);
+            b.transactionListProgressBar.setProgressTintList(csl);
+            b.transactionListProgressBar.setIndeterminate(true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                progressBar.setProgress(0, false);
+                b.transactionListProgressBar.setProgress(0, false);
             }
             else {
-                progressBar.setProgress(0);
+                b.transactionListProgressBar.setProgress(0);
             }
-            progressLayout.setVisibility(View.VISIBLE);
+            b.transactionProgressLayout.setVisibility(View.VISIBLE);
         }
         else {
-            progressLayout.setVisibility(View.GONE);
+            b.transactionProgressLayout.setVisibility(View.GONE);
         }
     }
     public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
-        ProgressBar progressBar = findViewById(R.id.transaction_list_progress_bar);
-
         if (progress.getState() == RetrieveTransactionsTask.ProgressState.FINISHED) {
             Logger.debug("progress", "Done");
-            findViewById(R.id.transaction_progress_layout).setVisibility(View.GONE);
+            b.transactionProgressLayout.setVisibility(View.GONE);
 
             mainModel.transactionRetrievalDone();
 
@@ -623,7 +590,7 @@ public class MainActivity extends ProfileThemedActivity {
         }
 
 
-        bTransactionListCancelDownload.setEnabled(true);
+        b.transactionListCancelDownload.setEnabled(true);
 //        ColorStateList csl = Colors.getColorStateList();
 //        progressBar.setIndeterminateTintList(csl);
 //        progressBar.setProgressTintList(csl);
@@ -631,36 +598,36 @@ public class MainActivity extends ProfileThemedActivity {
 //            progressBar.setProgress(0, false);
 //        else
 //            progressBar.setProgress(0);
-        findViewById(R.id.transaction_progress_layout).setVisibility(View.VISIBLE);
+        b.transactionProgressLayout.setVisibility(View.VISIBLE);
 
         if (progress.isIndeterminate() || (progress.getTotal() <= 0)) {
-            progressBar.setIndeterminate(true);
+            b.transactionListProgressBar.setIndeterminate(true);
             Logger.debug("progress", "indeterminate");
         }
         else {
-            if (progressBar.isIndeterminate()) {
-                progressBar.setIndeterminate(false);
+            if (b.transactionListProgressBar.isIndeterminate()) {
+                b.transactionListProgressBar.setIndeterminate(false);
             }
 //            Logger.debug("progress",
 //                    String.format(Locale.US, "%d/%d", progress.getProgress(), progress.getTotal
 //                    ()));
-            progressBar.setMax(progress.getTotal());
+            b.transactionListProgressBar.setMax(progress.getTotal());
             // for some reason animation doesn't work - no progress is shown (stick at 0)
             // on lineageOS 14.1 (Nougat, 7.1.2)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                progressBar.setProgress(progress.getProgress(), false);
+                b.transactionListProgressBar.setProgress(progress.getProgress(), false);
             else
-                progressBar.setProgress(progress.getProgress());
+                b.transactionListProgressBar.setProgress(progress.getProgress());
         }
     }
     public void fabShouldShow() {
-        if ((profile != null) && profile.isPostingPermitted() && !drawer.isOpen())
-            fab.show();
+        if ((profile != null) && profile.isPostingPermitted() && !b.drawerLayout.isOpen())
+            b.btnAddTransaction.show();
         else
             fabHide();
     }
     public void fabHide() {
-        fab.hide();
+        b.btnAddTransaction.hide();
     }
 
     public static class SectionsPagerAdapter extends FragmentStateAdapter {

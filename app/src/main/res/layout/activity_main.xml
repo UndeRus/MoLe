@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2019 Damyan Ivanov.
+  ~ Copyright © 2020 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -15,14 +15,413 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.MainActivity"
+    >
 
-    <include
-        layout="@layout/no_profiles"
-        android:visibility="gone" />
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/no_profiles_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?table_row_dark_bg"
+        android:visibility="gone"
+        >
 
-    <include
-        layout="@layout/main_app_layout"
-        android:visibility="gone" />
+        <FrameLayout
+            android:id="@+id/welcome_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <include layout="@layout/nav_header_layout" />
+        </FrameLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="@dimen/activity_horizontal_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/welcome_header"
+            >
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:text="@string/text_welcome"
+                android:textColor="?textColor"
+                android:textSize="48sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/text_welcome_profile_needed"
+                android:textColor="?textColor"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView"
+                />
+
+            <Button
+                android:id="@+id/btn_no_profiles_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="?colorSecondary"
+                android:drawablePadding="16dp"
+                android:text="@string/create_profile_label"
+                android:textColor="@color/design_default_color_on_primary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_app_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/colorBackground"
+        android:orientation="vertical"
+        android:visibility="gone"
+        >
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_add_transaction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/new_transaction_fab_description"
+            app:backgroundTint="?colorSecondary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:maxImageSize="36dp"
+            app:srcCompat="@drawable/ic_add_white_24dp"
+            />
+
+        <androidx.drawerlayout.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:openDrawer="start"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/pager_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <androidx.appcompat.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/toolbar_height"
+                    android:background="?colorPrimary"
+                    android:theme="@style/AppTheme.AppBarOverlay"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:popupTheme="@style/AppTheme.PopupOverlay"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/main_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/toolbar"
+                    >
+
+                    <LinearLayout
+                        android:id="@+id/transaction_progress_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        >
+
+                        <ProgressBar
+                            android:id="@+id/transaction_list_progress_bar"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="-8dp"
+                            android:layout_marginBottom="-7dp"
+                            android:layout_weight="1"
+                            android:indeterminate="true"
+                            android:min="0"
+                            android:padding="0dp"
+                            android:progressTint="?colorPrimary"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            />
+
+                        <TextView
+                            android:id="@+id/transaction_list_cancel_download"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/ic_clear_accent_24dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/main_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/main_header"
+                    >
+
+                </androidx.viewpager2.widget.ViewPager2>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="?attr/main_header_shadow_height"
+                    android:background="@drawable/drop_shadow"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/main_header"
+                    />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.navigation.NavigationView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/nav_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:fitsSystemWindows="true"
+                >
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="0dp"
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical"
+                    >
+
+                    <LinearLayout
+                        android:id="@+id/nav_fixed_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/list_divider"
+                        android:elevation="2dp"
+                        android:orientation="vertical"
+                        android:showDividers="beginning"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        >
+
+                        <TextView
+                            android:id="@+id/textView2"
+                            style="@style/nav_button"
+                            android:layout_weight="1"
+                            android:text="@string/action_settings"
+                            app:drawableStartCompat="@drawable/ic_settings_black_24dp"
+                            />
+
+                    </LinearLayout>
+
+                    <ScrollView
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintBottom_toTopOf="@+id/nav_fixed_items"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        >
+
+                        <LinearLayout
+                            android:id="@+id/nav_upper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:animateLayoutChanges="true"
+                            android:orientation="vertical"
+                            android:showDividers="beginning"
+                            app:layout_constraintBottom_toTopOf="@+id/nav_fixed_items"
+                            app:layout_constraintTop_toBottomOf="@+id/nav_header"
+                            >
+
+                            <include layout="@layout/nav_header_layout" />
+
+                            <LinearLayout
+                                android:id="@+id/nav_actions"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                >
+
+                                <TextView
+                                    android:id="@+id/nav_account_summary"
+                                    style="@style/nav_button"
+                                    android:onClick="onAccountSummaryClicked"
+                                    android:text="@string/account_summary_title"
+                                    app:drawableStartCompat="@drawable/ic_home_black_24dp"
+                                    />
+
+                                <TextView
+                                    android:id="@+id/nav_latest_transactions"
+                                    style="@style/nav_button"
+                                    android:onClick="onLatestTransactionsClicked"
+                                    android:text="@string/nav_transactions_title"
+                                    app:drawableStartCompat="@drawable/ic_event_note_black_24dp"
+                                    />
+
+                                <TextView
+                                    android:id="@+id/textView5"
+                                    style="@style/nav_button"
+                                    android:text="@string/nav_reports_title"
+                                    android:visibility="gone"
+                                    app:drawableStartCompat="@drawable/ic_assignment_black_24dp"
+                                    />
+
+                                <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                    android:id="@+id/nav_profile_list_head_layout"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="@dimen/thumb_row_height"
+                                    >
+
+                                    <ImageView
+                                        android:id="@+id/nav_new_profile_button"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:contentDescription="@string/icon"
+                                        android:paddingStart="8dp"
+                                        android:paddingEnd="8dp"
+                                        android:visibility="gone"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toStartOf="@id/nav_profile_list_head_buttons"
+                                        app:layout_constraintStart_toEndOf="@id/nav_profiles_label"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        app:srcCompat="@drawable/ic_add_circle_white_24dp"
+                                        />
+
+                                    <LinearLayout
+                                        android:id="@+id/nav_profile_list_head_buttons"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="0dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal"
+                                        android:paddingStart="16dp"
+                                        android:paddingEnd="16dp"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        >
+
+                                        <ImageView
+                                            android:id="@+id/nav_profiles_cancel_edit"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="@drawable/ic_clear_accent_24dp"
+                                            android:contentDescription="@string/icon"
+                                            android:gravity="end|center_vertical"
+                                            android:paddingStart="8dp"
+                                            android:paddingEnd="8dp"
+                                            android:visibility="gone"
+                                            app:layout_constraintBottom_toBottomOf="parent"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            />
+
+                                        <ImageView
+                                            android:id="@+id/nav_profiles_start_edit"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:background="@drawable/ic_settings_black_24dp"
+                                            android:contentDescription="@string/icon"
+                                            android:gravity="end|center_vertical"
+                                            android:paddingStart="8dp"
+                                            android:paddingEnd="8dp"
+                                            app:layout_constraintBottom_toBottomOf="parent"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            />
+
+                                    </LinearLayout>
+
+                                    <TextView
+                                        android:id="@+id/nav_profiles_label"
+                                        style="@style/nav_button"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="0dp"
+                                        android:gravity="start|center_vertical"
+                                        android:text="@string/profiles"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+                                <LinearLayout
+                                    android:id="@+id/nav_profile_list_container"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:animateLayoutChanges="true"
+                                    android:nestedScrollingEnabled="false"
+                                    android:orientation="vertical"
+                                    >
+
+                                    <androidx.recyclerview.widget.RecyclerView
+                                        android:id="@+id/nav_profile_list"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:isScrollContainer="false"
+                                        android:nestedScrollingEnabled="false"
+                                        android:orientation="vertical"
+                                        >
+
+                                    </androidx.recyclerview.widget.RecyclerView>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </ScrollView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.navigation.NavigationView>
+        </androidx.drawerlayout.widget.DrawerLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </FrameLayout>

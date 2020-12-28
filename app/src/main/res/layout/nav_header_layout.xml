@@ -27,7 +27,7 @@
     android:orientation="horizontal"
     android:padding="@dimen/activity_vertical_margin"
     app:layout_constraintTop_toTopOf="parent"
-    tools:showIn="@layout/main_navigation">
+    >
 
     <include layout="@layout/nav_header_logo" />
 
@@ -37,7 +37,8 @@
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <TextView
             android:layout_width="match_parent"
