@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.renderscript.RSInvalidStateException;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -40,6 +42,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
@@ -152,8 +155,34 @@ public class NewTransactionFragment extends Fragment {
             String error = args.getString("error");
             if (error != null) {
                 Logger.debug("new-trans-f", String.format("Got error: %s", error));
-                Snackbar.make(list, error, Snackbar.LENGTH_LONG)
-                        .show();
+
+                Context context = getContext();
+                if (context != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    final Resources resources = context.getResources();
+                    final StringBuilder message = new StringBuilder();
+                    message.append(resources.getString(R.string.err_json_send_error_head));
+                    message.append("\n\n");
+                    message.append(error);
+                    if (mProfile.getApiVersion()
+                                .equals(API.auto))
+                        message.append(
+                                resources.getString(R.string.err_json_send_error_unsupported));
+                    else {
+                        message.append(resources.getString(R.string.err_json_send_error_tail));
+                        builder.setPositiveButton(R.string.btn_profile_options, (dialog, which) -> {
+                            Logger.debug("error", "will start profile editor");
+                            MobileLedgerProfile.startEditProfileActivity(context, mProfile);
+                        });
+                    }
+                    builder.setMessage(message);
+                    builder.create()
+                           .show();
+                }
+                else {
+                    Snackbar.make(list, error, Snackbar.LENGTH_LONG)
+                            .show();
+                }
                 keep = true;
             }
         }

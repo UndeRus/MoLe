@@ -17,4 +17,22 @@
 
 package net.ktnx.mobileledger.json;
 
-public class ApiNotSupportedException extends Throwable {}
+import androidx.annotation.Nullable;
+
+public class ApiNotSupportedException extends Throwable {
+    public ApiNotSupportedException() {
+    }
+    public ApiNotSupportedException(@Nullable String message) {
+        super(message);
+    }
+    public ApiNotSupportedException(@Nullable String message, @Nullable Throwable cause) {
+        super(message, cause);
+    }
+    public ApiNotSupportedException(@Nullable Throwable cause) {
+        super(cause);
+    }
+    public ApiNotSupportedException(@Nullable String message, @Nullable Throwable cause,
+                                    boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+}

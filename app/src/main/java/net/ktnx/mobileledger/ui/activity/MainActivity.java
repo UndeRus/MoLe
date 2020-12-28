@@ -57,7 +57,6 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
-import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.Colors;
@@ -231,12 +230,12 @@ public class MainActivity extends ProfileThemedActivity {
         }
 
         findViewById(R.id.btn_no_profiles_add).setOnClickListener(
-                v -> startEditProfileActivity(null));
+                v -> MobileLedgerProfile.startEditProfileActivity(this, null));
 
         findViewById(R.id.btn_add_transaction).setOnClickListener(this::fabNewTransactionClicked);
 
         findViewById(R.id.nav_new_profile_button).setOnClickListener(
-                v -> startEditProfileActivity(null));
+                v -> MobileLedgerProfile.startEditProfileActivity(this, null));
 
         findViewById(R.id.transaction_list_cancel_download).setOnClickListener(
                 this::onStopTransactionRefreshClick);
@@ -471,17 +470,6 @@ public class MainActivity extends ProfileThemedActivity {
 
         recreate();
     }
-    public void startEditProfileActivity(MobileLedgerProfile profile) {
-        Intent intent = new Intent(this, ProfileDetailActivity.class);
-        Bundle args = new Bundle();
-        if (profile != null) {
-            int index = Data.getProfileIndex(profile);
-            if (index != -1)
-                intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
-        }
-        intent.putExtras(args);
-        startActivity(intent, args);
-    }
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         startActivity(intent);
@@ -630,7 +618,7 @@ public class MainActivity extends ProfileThemedActivity {
                 builder.setMessage(error);
                 builder.setPositiveButton(R.string.btn_profile_options, (dialog, which) -> {
                     Logger.debug("error", "will start profile editor");
-                    startEditProfileActivity(profile);
+                    MobileLedgerProfile.startEditProfileActivity(this, profile);
                 });
                 builder.create()
                        .show();

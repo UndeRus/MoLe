@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import net.ktnx.mobileledger.json.API;
+import net.ktnx.mobileledger.json.ApiNotSupportedException;
 import net.ktnx.mobileledger.json.Gateway;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
@@ -73,7 +74,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         mProfile = profile;
         simulate = false;
     }
-    private boolean sendOK(API apiVersion) throws IOException {
+    private void sendOK(API apiVersion) throws IOException, ApiNotSupportedException {
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("PUT");
         http.setRequestProperty("Content-Type", "application/json");
@@ -82,9 +83,11 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         Gateway gateway = Gateway.forApiVersion(apiVersion);
         String body = gateway.transactionSaveRequest(transaction);
 
-        return sendRequest(http, body);
+        Logger.debug("network", "Sending using API " + apiVersion);
+        sendRequest(http, body);
     }
-    private boolean sendRequest(HttpURLConnection http, String body) throws IOException {
+    private void sendRequest(HttpURLConnection http, String body)
+            throws IOException, ApiNotSupportedException {
         if (simulate) {
             debug("network", "The request would be: " + body);
             try {
@@ -96,7 +99,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                 Logger.debug("network", ex.toString());
             }
 
-            return true;
+            return;
         }
 
         byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
@@ -124,16 +127,21 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     case 400:
                     case 405: {
                         BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
-                        String line;
+                        StringBuilder errorLines = new StringBuilder();
                         int count = 0;
                         while (count <= 5) {
-                            line = reader.readLine();
+                            String line = reader.readLine();
                             if (line == null)
                                 break;
                             Logger.debug("network", line);
+
+                            if (errorLines.length() != 0)
+                                errorLines.append("\n");
+
+                            errorLines.append(line);
                             count++;
                         }
-                        return false; // will cause a retry with another method
+                        throw new ApiNotSupportedException(errorLines.toString());
                     }
                     default:
                         BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
@@ -144,8 +152,6 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                 }
             }
         }
-
-        return true;
     }
     private boolean legacySendOK() throws IOException {
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
@@ -253,13 +259,18 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     boolean sendOK = false;
                     for (API ver : API.allVersions) {
                         Logger.debug("network", "Trying version " + ver);
-                        if (sendOK(ver)) {
+                        try {
+                            sendOK(ver);
                             sendOK = true;
                             Logger.debug("network", "Version " + ver + " request succeeded");
 
                             break;
                         }
+                        catch (ApiNotSupportedException e) {
+                            Logger.debug("network", "Version " + ver + " seems not supported");
+                        }
                     }
+
                     if (!sendOK) {
                         Logger.debug("network", "Trying HTML form emulation");
                         legacySendOkWithRetry();
@@ -277,7 +288,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                     throw new IllegalStateException("Unexpected API version: " + profileApiVersion);
             }
         }
-        catch (Exception e) {
+        catch (ApiNotSupportedException | Exception e) {
             e.printStackTrace();
             error = e.getMessage();
         }

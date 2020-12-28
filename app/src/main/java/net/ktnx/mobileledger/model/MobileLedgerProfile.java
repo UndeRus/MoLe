@@ -17,9 +17,12 @@
 
 package net.ktnx.mobileledger.model;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
@@ -29,6 +32,8 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.json.API;
+import net.ktnx.mobileledger.ui.activity.ProfileDetailActivity;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -160,6 +165,17 @@ public final class MobileLedgerProfile {
         finally {
             db.endTransaction();
         }
+    }
+    static public void startEditProfileActivity(Context context, MobileLedgerProfile profile) {
+        Intent intent = new Intent(context, ProfileDetailActivity.class);
+        Bundle args = new Bundle();
+        if (profile != null) {
+            int index = Data.getProfileIndex(profile);
+            if (index != -1)
+                intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
+        }
+        intent.putExtras(args);
+        context.startActivity(intent, args);
     }
     public HledgerVersion getDetectedVersion() {
         return detectedVersion;

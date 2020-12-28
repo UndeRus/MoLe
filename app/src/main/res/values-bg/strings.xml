@@ -162,6 +162,8 @@
     <string name="new_transaction_fab_description">Знак плюс</string>
     <string name="api_1_19_1">Версия 1.19.1</string>
     <string name="profile_server_version_title">Версия на сървъра</string>
-    <string name="err_json_parser_error">Грешка при разчитане на отговора от сървъра. Вероятно настроената врсия на протокола е грешна.</string>
+    <string name="err_json_parser_error">Грешка при разчитане на отговора от сървъра. Вероятно настроената врсия на протокола не се поддържа.</string>
     <string name="btn_profile_options">Настройка на профила</string>
+    <string name="err_json_send_error_head">Грешка при изпращане на движението към сървъра</string>
+    <string name="err_json_send_error_tail">Вероятно настроената версия на протокола не се поддържа.</string>
 </resources>
