@@ -1,4 +1,15 @@
 # Changes
+## [0.16.0] - 2020-12-28
+
+* NEW
+    + add support for latest JSON API (hledger-web 1.19.1)
+    + backend server version detection
+    + backend communication supports multiple JSON API versions
+* IMPROVEMENTS
+    + do database-related initialization in the background while the splash screen is shown
+* FIXES
+    + honour default currency in new transaction entry
+    + several crashes fixed
 
 ## [0.15.0] - 2020-09-20
 
