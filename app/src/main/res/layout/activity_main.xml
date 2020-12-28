@@ -100,7 +100,6 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/main_app_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -219,8 +218,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <com.google.android.material.navigation.NavigationView xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <com.google.android.material.navigation.NavigationView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/nav_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -311,7 +309,7 @@
                                     app:drawableStartCompat="@drawable/ic_assignment_black_24dp"
                                     />
 
-                                <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                <androidx.constraintlayout.widget.ConstraintLayout
                                     android:id="@+id/nav_profile_list_head_layout"
                                     android:layout_width="match_parent"
                                     android:layout_height="@dimen/thumb_row_height"
