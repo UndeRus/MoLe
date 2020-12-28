@@ -20,9 +20,8 @@ package net.ktnx.mobileledger.async;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-
+import net.ktnx.mobileledger.json.API;
+import net.ktnx.mobileledger.json.Gateway;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -74,35 +73,14 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         mProfile = profile;
         simulate = false;
     }
-    private boolean send_1_15_OK() throws IOException {
+    private boolean sendOK(API apiVersion) throws IOException {
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
         http.setRequestMethod("PUT");
         http.setRequestProperty("Content-Type", "application/json");
         http.setRequestProperty("Accept", "*/*");
 
-        net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction jsonTransaction =
-                net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.fromLedgerTransaction(
-                        transaction);
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer =
-                mapper.writerFor(net.ktnx.mobileledger.json.v1_15.ParsedLedgerTransaction.class);
-        String body = writer.writeValueAsString(jsonTransaction);
-
-        return sendRequest(http, body);
-    }
-    private boolean send_1_14_OK() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
-        http.setRequestMethod("PUT");
-        http.setRequestProperty("Content-Type", "application/json");
-        http.setRequestProperty("Accept", "*/*");
-
-        net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction jsonTransaction =
-                net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.fromLedgerTransaction(
-                        transaction);
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer =
-                mapper.writerFor(net.ktnx.mobileledger.json.v1_14.ParsedLedgerTransaction.class);
-        String body = writer.writeValueAsString(jsonTransaction);
+        Gateway gateway = Gateway.forApiVersion(apiVersion);
+        String body = gateway.transactionSaveRequest(transaction);
 
         return sendRequest(http, body);
     }
@@ -155,7 +133,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
                             Logger.debug("network", line);
                             count++;
                         }
-                        return false; // will cause a retry with the legacy method
+                        return false; // will cause a retry with another method
                     }
                     default:
                         BufferedReader reader = new BufferedReader(new InputStreamReader(resp));
@@ -269,36 +247,34 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         try {
             transaction = ledgerTransactions[0];
 
-            switch (mProfile.getApiVersion()) {
+            final API profileApiVersion = mProfile.getApiVersion();
+            switch (profileApiVersion) {
                 case auto:
-                    Logger.debug("network", "Trying version 1.5.");
-                    if (!send_1_15_OK()) {
-                        Logger.debug("network", "Version 1.5 request failed. Trying with 1.14");
-                        if (!send_1_14_OK()) {
-                            Logger.debug("network",
-                                    "Version 1.14 failed too. Trying HTML form emulation");
-                            legacySendOkWithRetry();
-                        }
-                        else {
-                            Logger.debug("network", "Version 1.14 request succeeded");
+                    boolean sendOK = false;
+                    for (API ver : API.allVersions) {
+                        Logger.debug("network", "Trying version " + ver);
+                        if (sendOK(ver)) {
+                            sendOK = true;
+                            Logger.debug("network", "Version " + ver + " request succeeded");
+
+                            break;
                         }
                     }
-                    else {
-                        Logger.debug("network", "Version 1.15 request succeeded");
+                    if (!sendOK) {
+                        Logger.debug("network", "Trying HTML form emulation");
+                        legacySendOkWithRetry();
                     }
                     break;
                 case html:
                     legacySendOkWithRetry();
                     break;
                 case v1_14:
-                    send_1_14_OK();
-                    break;
                 case v1_15:
-                    send_1_15_OK();
+                case v1_19_1:
+                    sendOK(profileApiVersion);
                     break;
                 default:
-                    throw new IllegalStateException(
-                            "Unexpected API version: " + mProfile.getApiVersion());
+                    throw new IllegalStateException("Unexpected API version: " + profileApiVersion);
             }
         }
         catch (Exception e) {
