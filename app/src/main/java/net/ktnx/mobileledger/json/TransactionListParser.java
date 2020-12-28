@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.json;
 
-import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 
 import java.io.IOException;
@@ -25,8 +24,8 @@ import java.io.InputStream;
 import java.text.ParseException;
 
 public abstract class TransactionListParser {
-    public static TransactionListParser forApiVersion(SendTransactionTask.API apiVersion,
-                                                      InputStream input) throws IOException {
+    public static TransactionListParser forApiVersion(API apiVersion, InputStream input)
+            throws IOException {
         switch (apiVersion) {
             case v1_14:
                 return new net.ktnx.mobileledger.json.v1_14.TransactionListParser(input);

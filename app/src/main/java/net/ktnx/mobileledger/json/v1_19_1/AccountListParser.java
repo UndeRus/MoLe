@@ -20,7 +20,7 @@ package net.ktnx.mobileledger.json.v1_19_1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
-import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.json.API;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ public class AccountListParser extends net.ktnx.mobileledger.json.AccountListPar
         iterator = reader.readValues(input);
     }
     @Override
-    public SendTransactionTask.API getApiVersion() {
-        return SendTransactionTask.API.v1_19_1;
+    public API getApiVersion() {
+        return API.v1_19_1;
     }
 }

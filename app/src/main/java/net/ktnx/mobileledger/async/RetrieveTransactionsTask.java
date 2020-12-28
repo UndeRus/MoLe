@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.err.HTTPException;
+import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.json.AccountListParser;
 import net.ktnx.mobileledger.json.ApiNotSupportedException;
 import net.ktnx.mobileledger.json.TransactionListParser;
@@ -386,11 +387,11 @@ public class RetrieveTransactionsTask extends
     }
     private List<LedgerAccount> retrieveAccountList()
             throws IOException, HTTPException, ApiNotSupportedException {
-        final SendTransactionTask.API apiVersion = profile.getApiVersion();
-        if (apiVersion.equals(SendTransactionTask.API.auto)) {
+        final API apiVersion = profile.getApiVersion();
+        if (apiVersion.equals(API.auto)) {
             return retrieveAccountListAnyVersion();
         }
-        else if (apiVersion.equals(SendTransactionTask.API.html)) {
+        else if (apiVersion.equals(API.html)) {
             Logger.debug("json",
                     "Declining using JSON API for /accounts with configured legacy API version");
             return null;
@@ -401,7 +402,7 @@ public class RetrieveTransactionsTask extends
     }
     private List<LedgerAccount> retrieveAccountListAnyVersion()
             throws HTTPException, ApiNotSupportedException {
-        for (SendTransactionTask.API ver : SendTransactionTask.API.allVersions) {
+        for (API ver : API.allVersions) {
             try {
                 return retrieveAccountListForVersion(ver);
             }
@@ -416,7 +417,7 @@ public class RetrieveTransactionsTask extends
 
         throw new RuntimeException("This should never be reached");
     }
-    private List<LedgerAccount> retrieveAccountListForVersion(SendTransactionTask.API version)
+    private List<LedgerAccount> retrieveAccountListForVersion(API version)
             throws IOException, HTTPException {
         HttpURLConnection http = NetworkUtil.prepareConnection(profile, "accounts");
         http.setAllowUserInteraction(false);
@@ -467,11 +468,11 @@ public class RetrieveTransactionsTask extends
     }
     private List<LedgerTransaction> retrieveTransactionList()
             throws ParseException, HTTPException, IOException, ApiNotSupportedException {
-        final SendTransactionTask.API apiVersion = profile.getApiVersion();
-        if (apiVersion.equals(SendTransactionTask.API.auto)) {
+        final API apiVersion = profile.getApiVersion();
+        if (apiVersion.equals(API.auto)) {
             return retrieveTransactionListAnyVersion();
         }
-        else if (apiVersion.equals(SendTransactionTask.API.html)) {
+        else if (apiVersion.equals(API.html)) {
             Logger.debug("json",
                     "Declining using JSON API for /accounts with configured legacy API version");
             return null;
@@ -483,7 +484,7 @@ public class RetrieveTransactionsTask extends
     }
     private List<LedgerTransaction> retrieveTransactionListAnyVersion()
             throws ApiNotSupportedException {
-        for (SendTransactionTask.API ver : SendTransactionTask.API.allVersions) {
+        for (API ver : API.allVersions) {
             try {
                 return retrieveTransactionListForVersion(ver);
             }
@@ -498,8 +499,8 @@ public class RetrieveTransactionsTask extends
 
         throw new RuntimeException("This should never be reached");
     }
-    private List<LedgerTransaction> retrieveTransactionListForVersion(
-            SendTransactionTask.API apiVersion) throws IOException, ParseException, HTTPException {
+    private List<LedgerTransaction> retrieveTransactionListForVersion(API apiVersion)
+            throws IOException, ParseException, HTTPException {
         Progress progress = new Progress();
         progress.setTotal(expectedPostingsCount);
 

@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.json;
 import com.fasterxml.jackson.databind.MappingIterator;
 
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
-import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.model.LedgerAccount;
 
 import java.io.IOException;
@@ -31,8 +30,8 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 abstract public class AccountListParser {
     protected MappingIterator<net.ktnx.mobileledger.json.ParsedLedgerAccount> iterator;
-    public static AccountListParser forApiVersion(SendTransactionTask.API version,
-                                                  InputStream input) throws IOException {
+    public static AccountListParser forApiVersion(API version, InputStream input)
+            throws IOException {
         switch (version) {
             case v1_14:
                 return new net.ktnx.mobileledger.json.v1_14.AccountListParser(input);
@@ -45,7 +44,7 @@ abstract public class AccountListParser {
         }
 
     }
-    public abstract SendTransactionTask.API getApiVersion();
+    public abstract API getApiVersion();
     public LedgerAccount nextAccount(RetrieveTransactionsTask task,
                                      HashMap<String, LedgerAccount> map) {
         if (!iterator.hasNext())

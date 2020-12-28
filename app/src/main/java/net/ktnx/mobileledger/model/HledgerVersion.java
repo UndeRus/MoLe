@@ -20,7 +20,7 @@ package net.ktnx.mobileledger.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.json.API;
 
 import java.util.Locale;
 
@@ -94,10 +94,10 @@ public class HledgerVersion {
         return ((this.major == major) && (this.minor >= minor)) || (this.major > major);
     }
     @org.jetbrains.annotations.Nullable
-    public SendTransactionTask.API getSuitableApiVersion() {
+    public API getSuitableApiVersion() {
         if (isPre_1_20_1)
             return null;
 
-        return SendTransactionTask.API.v1_19_1;
+        return API.v1_19_1;
     }
 }

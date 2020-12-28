@@ -46,7 +46,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
@@ -393,23 +393,23 @@ public class ProfileDetailFragment extends Fragment {
         PopupMenu menu = new PopupMenu(context, v);
         menu.inflate(R.menu.api_version);
         menu.setOnMenuItemClickListener(item -> {
-            SendTransactionTask.API apiVer;
+            API apiVer;
             switch (item.getItemId()) {
                 case R.id.api_version_menu_html:
-                    apiVer = SendTransactionTask.API.html;
+                    apiVer = API.html;
                     break;
                 case R.id.api_version_menu_1_19_1:
-                    apiVer = SendTransactionTask.API.v1_19_1;
+                    apiVer = API.v1_19_1;
                     break;
                 case R.id.api_version_menu_1_15:
-                    apiVer = SendTransactionTask.API.v1_15;
+                    apiVer = API.v1_15;
                     break;
                 case R.id.api_version_menu_1_14:
-                    apiVer = SendTransactionTask.API.v1_14;
+                    apiVer = API.v1_14;
                     break;
                 case R.id.api_version_menu_auto:
                 default:
-                    apiVer = SendTransactionTask.API.auto;
+                    apiVer = API.auto;
             }
             model.setApiVersion(apiVer);
             apiVersionText.setText(apiVer.getDescription(getResources()));

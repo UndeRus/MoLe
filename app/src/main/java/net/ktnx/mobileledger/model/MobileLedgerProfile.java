@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
-import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -59,7 +59,7 @@ public final class MobileLedgerProfile {
     private String authPassword;
     private int themeHue;
     private int orderNo = -1;
-    private SendTransactionTask.API apiVersion = SendTransactionTask.API.auto;
+    private API apiVersion = API.auto;
     private FutureDates futureDates = FutureDates.None;
     private boolean accountsLoaded;
     private boolean transactionsLoaded;
@@ -232,14 +232,14 @@ public final class MobileLedgerProfile {
         else
             this.defaultCommodity = String.valueOf(defaultCommodity);
     }
-    public SendTransactionTask.API getApiVersion() {
+    public API getApiVersion() {
         return apiVersion;
     }
-    public void setApiVersion(SendTransactionTask.API apiVersion) {
+    public void setApiVersion(API apiVersion) {
         this.apiVersion = apiVersion;
     }
     public void setApiVersion(int apiVersion) {
-        this.apiVersion = SendTransactionTask.API.valueOf(apiVersion);
+        this.apiVersion = API.valueOf(apiVersion);
     }
     public FutureDates getFutureDates() {
         return futureDates;

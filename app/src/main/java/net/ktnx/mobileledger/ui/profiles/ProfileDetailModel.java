@@ -24,7 +24,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
-import net.ktnx.mobileledger.async.SendTransactionTask;
+import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.HledgerVersion;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
@@ -53,8 +53,7 @@ public class ProfileDetailModel extends ViewModel {
     private final MutableLiveData<Boolean> showCommodityByDefault = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> showCommentsByDefault = new MutableLiveData<>(true);
     private final MutableLiveData<Boolean> useAuthentication = new MutableLiveData<>(false);
-    private final MutableLiveData<SendTransactionTask.API> apiVersion =
-            new MutableLiveData<>(SendTransactionTask.API.auto);
+    private final MutableLiveData<API> apiVersion = new MutableLiveData<>(API.auto);
     private final MutableLiveData<String> url = new MutableLiveData<>(null);
     private final MutableLiveData<String> authUserName = new MutableLiveData<>(null);
     private final MutableLiveData<String> authPassword = new MutableLiveData<>(null);
@@ -137,14 +136,14 @@ public class ProfileDetailModel extends ViewModel {
     void observeUseAuthentication(LifecycleOwner lfo, Observer<Boolean> o) {
         useAuthentication.observe(lfo, o);
     }
-    SendTransactionTask.API getApiVersion() {
+    API getApiVersion() {
         return apiVersion.getValue();
     }
-    void setApiVersion(SendTransactionTask.API newValue) {
+    void setApiVersion(API newValue) {
         if (newValue != apiVersion.getValue())
             apiVersion.setValue(newValue);
     }
-    void observeApiVersion(LifecycleOwner lfo, Observer<SendTransactionTask.API> o) {
+    void observeApiVersion(LifecycleOwner lfo, Observer<API> o) {
         apiVersion.observe(lfo, o);
     }
     HledgerVersion getDetectedVersion() { return detectedVersion.getValue(); }
@@ -254,7 +253,7 @@ public class ProfileDetailModel extends ViewModel {
             showCommentsByDefault.setValue(true);
             showCommodityByDefault.setValue(false);
             setFutureDates(MobileLedgerProfile.FutureDates.None);
-            setApiVersion(SendTransactionTask.API.auto);
+            setApiVersion(API.auto);
             useAuthentication.setValue(false);
             authUserName.setValue("");
             authPassword.setValue("");
