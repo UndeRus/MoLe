@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.text.Editable;
 import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
@@ -62,6 +63,11 @@ public class Misc {
     }
     public static String nullIsEmpty(String str) {
         return (str == null) ? "" : str;
+    }
+    public static String nullIsEmpty(Editable e) {
+        if (e == null)
+            return "";
+        return e.toString();
     }
     public static boolean equalStrings(String u, CharSequence text) {
         return nullIsEmpty(u).equals(text.toString());

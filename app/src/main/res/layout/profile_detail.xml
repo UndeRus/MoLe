@@ -307,7 +307,7 @@
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/preferred_accounts_accounts_filter_layout"
+                android:id="@+id/preferred_accounts_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -315,7 +315,7 @@
                 >
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/preferred_accounts_filter_filter"
+                    android:id="@+id/preferred_accounts_filter"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
