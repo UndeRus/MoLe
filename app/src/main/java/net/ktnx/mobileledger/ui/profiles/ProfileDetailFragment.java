@@ -360,22 +360,21 @@ public class ProfileDetailFragment extends Fragment {
         menu.inflate(R.menu.api_version);
         menu.setOnMenuItemClickListener(item -> {
             API apiVer;
-            switch (item.getItemId()) {
-                case R.id.api_version_menu_html:
-                    apiVer = API.html;
-                    break;
-                case R.id.api_version_menu_1_19_1:
-                    apiVer = API.v1_19_1;
-                    break;
-                case R.id.api_version_menu_1_15:
-                    apiVer = API.v1_15;
-                    break;
-                case R.id.api_version_menu_1_14:
-                    apiVer = API.v1_14;
-                    break;
-                case R.id.api_version_menu_auto:
-                default:
-                    apiVer = API.auto;
+            int itemId = item.getItemId();
+            if (itemId == R.id.api_version_menu_html) {
+                apiVer = API.html;
+            }
+            else if (itemId == R.id.api_version_menu_1_19_1) {
+                apiVer = API.v1_19_1;
+            }
+            else if (itemId == R.id.api_version_menu_1_15) {
+                apiVer = API.v1_15;
+            }
+            else if (itemId == R.id.api_version_menu_1_14) {
+                apiVer = API.v1_14;
+            }
+            else {
+                apiVer = API.auto;
             }
             model.setApiVersion(apiVer);
             binding.apiVersionText.setText(apiVer.getDescription(getResources()));
@@ -384,26 +383,31 @@ public class ProfileDetailFragment extends Fragment {
         menu.show();
     }
     private MobileLedgerProfile.FutureDates futureDatesSettingFromMenuItemId(int itemId) {
-        switch (itemId) {
-            case R.id.menu_future_dates_7:
-                return MobileLedgerProfile.FutureDates.OneWeek;
-            case R.id.menu_future_dates_14:
-                return MobileLedgerProfile.FutureDates.TwoWeeks;
-            case R.id.menu_future_dates_30:
-                return MobileLedgerProfile.FutureDates.OneMonth;
-            case R.id.menu_future_dates_60:
-                return MobileLedgerProfile.FutureDates.TwoMonths;
-            case R.id.menu_future_dates_90:
-                return MobileLedgerProfile.FutureDates.ThreeMonths;
-            case R.id.menu_future_dates_180:
-                return MobileLedgerProfile.FutureDates.SixMonths;
-            case R.id.menu_future_dates_365:
-                return MobileLedgerProfile.FutureDates.OneYear;
-            case R.id.menu_future_dates_all:
-                return MobileLedgerProfile.FutureDates.All;
-            default:
-                return MobileLedgerProfile.FutureDates.None;
+        if (itemId == R.id.menu_future_dates_7) {
+            return MobileLedgerProfile.FutureDates.OneWeek;
         }
+        else if (itemId == R.id.menu_future_dates_14) {
+            return MobileLedgerProfile.FutureDates.TwoWeeks;
+        }
+        else if (itemId == R.id.menu_future_dates_30) {
+            return MobileLedgerProfile.FutureDates.OneMonth;
+        }
+        else if (itemId == R.id.menu_future_dates_60) {
+            return MobileLedgerProfile.FutureDates.TwoMonths;
+        }
+        else if (itemId == R.id.menu_future_dates_90) {
+            return MobileLedgerProfile.FutureDates.ThreeMonths;
+        }
+        else if (itemId == R.id.menu_future_dates_180) {
+            return MobileLedgerProfile.FutureDates.SixMonths;
+        }
+        else if (itemId == R.id.menu_future_dates_365) {
+            return MobileLedgerProfile.FutureDates.OneYear;
+        }
+        else if (itemId == R.id.menu_future_dates_all) {
+            return MobileLedgerProfile.FutureDates.All;
+        }
+        return MobileLedgerProfile.FutureDates.None;
     }
     @NotNull
     private ProfileDetailModel getModel() {
