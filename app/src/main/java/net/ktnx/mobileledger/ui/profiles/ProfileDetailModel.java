@@ -24,6 +24,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.HledgerVersion;
@@ -126,7 +127,7 @@ public class ProfileDetailModel extends ViewModel {
     void observeShowCommodityByDefault(LifecycleOwner lfo, Observer<Boolean> o) {
         showCommodityByDefault.observe(lfo, o);
     }
-    Boolean getUseAuthentication() {
+    public Boolean getUseAuthentication() {
         return useAuthentication.getValue();
     }
     void setUseAuthentication(boolean newValue) {
@@ -154,7 +155,7 @@ public class ProfileDetailModel extends ViewModel {
     void observeDetectedVersion(LifecycleOwner lfo, Observer<HledgerVersion> o) {
         detectedVersion.observe(lfo, o);
     }
-    String getUrl() {
+    public String getUrl() {
         return url.getValue();
     }
     void setUrl(String newValue) {
@@ -168,7 +169,7 @@ public class ProfileDetailModel extends ViewModel {
     void observeUrl(LifecycleOwner lfo, Observer<String> o) {
         url.observe(lfo, o);
     }
-    String getAuthUserName() {
+    public String getAuthUserName() {
         return authUserName.getValue();
     }
     void setAuthUserName(String newValue) {
@@ -182,7 +183,7 @@ public class ProfileDetailModel extends ViewModel {
     void observeUserName(LifecycleOwner lfo, Observer<String> o) {
         authUserName.observe(lfo, o);
     }
-    String getAuthPassword() {
+    public String getAuthPassword() {
         return authPassword.getValue();
     }
     void setAuthPassword(String newValue) {
@@ -295,6 +296,7 @@ public class ProfileDetailModel extends ViewModel {
             this.model = model;
         }
         private HledgerVersion detectVersion() {
+            App.setAuthenticationDataFromProfileModel(model);
             HttpURLConnection http = null;
             try {
                 http = NetworkUtil.prepareConnection(model.getUrl(), "version",
@@ -332,6 +334,9 @@ public class ProfileDetailModel extends ViewModel {
             catch (IOException e) {
                 e.printStackTrace();
                 return null;
+            }
+            finally {
+                App.resetAuthenticationData();
             }
         }
         @Override

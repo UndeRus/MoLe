@@ -24,7 +24,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailModel;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
@@ -39,6 +39,7 @@ import java.util.Locale;
 
 public class App extends Application {
     public static App instance;
+    private static ProfileDetailModel profileModel;
     private MobileLedgerDatabase dbHelper;
     private boolean monthNamesPrepared = false;
     public static SQLiteDatabase getDatabase() {
@@ -50,6 +51,36 @@ public class App extends Application {
     public static void prepareMonthNames() {
         instance.prepareMonthNames(false);
     }
+    public static void setAuthenticationDataFromProfileModel(ProfileDetailModel model) {
+        profileModel = model;
+    }
+    public static void resetAuthenticationData() {
+        profileModel = null;
+    }
+    private String getAuthURL() {
+        if (profileModel != null)
+            return profileModel.getUrl();
+        return Data.getProfile()
+                   .getUrl();
+    }
+    private String getAuthUserName() {
+        if (profileModel != null)
+            return profileModel.getAuthUserName();
+        return Data.getProfile()
+                   .getAuthUserName();
+    }
+    private String getAuthPassword() {
+        if (profileModel != null)
+            return profileModel.getAuthPassword();
+        return Data.getProfile()
+                   .getAuthPassword();
+    }
+    private boolean getAuthEnabled() {
+        if (profileModel != null)
+            return profileModel.getUseAuthentication();
+        return Data.getProfile()
+                   .isAuthEnabled();
+    }
     @Override
     public void onCreate() {
         Logger.debug("flow", "App onCreate()");
@@ -59,16 +90,14 @@ public class App extends Application {
         Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                MobileLedgerProfile p = Data.getProfile();
-                if (p.isAuthEnabled()) {
+                if (getAuthEnabled()) {
                     try {
-                        final URL url = new URL(p.getUrl());
+                        final URL url = new URL(getAuthURL());
                         final String requestingHost = getRequestingHost();
                         final String expectedHost = url.getHost();
                         if (requestingHost.equalsIgnoreCase(expectedHost))
-                            return new PasswordAuthentication(p.getAuthUserName(),
-                                    p.getAuthPassword()
-                                     .toCharArray());
+                            return new PasswordAuthentication(getAuthUserName(),
+                                    getAuthPassword().toCharArray());
                         else
                             Log.w("http-auth",
                                     String.format("Requesting host [%s] differs from expected [%s]",
