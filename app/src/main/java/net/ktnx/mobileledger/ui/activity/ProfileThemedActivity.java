@@ -29,9 +29,18 @@ import net.ktnx.mobileledger.utils.Colors;
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
     protected MobileLedgerProfile mProfile;
+    private boolean themeSetUp = false;
+    private boolean mIgnoreProfileChange;
     protected void setupProfileColors() {
         final int themeHue = (mProfile == null) ? -1 : mProfile.getThemeHue();
+
         Colors.setupTheme(this, themeHue);
+
+        if (themeSetUp)
+            this.recreate();
+        themeSetUp = true;
+
+        Colors.profileThemeId = Data.retrieveCurrentThemeIdFromDb();
     }
     @Override
     protected void onStart() {
@@ -41,9 +50,15 @@ public class ProfileThemedActivity extends CrashReportingActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         initProfile();
         setupProfileColors();
+
+        mIgnoreProfileChange = true;
         Data.observeProfile(this, profile -> {
-            mProfile = profile;
-            setupProfileColors();
+            if (!mIgnoreProfileChange) {
+                mProfile = profile;
+                setupProfileColors();
+            }
+
+            mIgnoreProfileChange = false;
         });
 
         super.onCreate(savedInstanceState);

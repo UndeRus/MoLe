@@ -129,12 +129,6 @@ public class MainActivity extends ProfileThemedActivity {
         super.onDestroy();
     }
     @Override
-    protected void setupProfileColors() {
-        final int profileColor = Data.retrieveCurrentThemeIdFromDb();
-        Colors.setupTheme(this, profileColor);
-        Colors.profileThemeId = profileColor;
-    }
-    @Override
     protected void onResume() {
         super.onResume();
         fabShouldShow();
