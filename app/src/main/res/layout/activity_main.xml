@@ -147,51 +147,43 @@
                     app:popupTheme="@style/AppTheme.PopupOverlay"
                     />
 
+
                 <LinearLayout
-                    android:id="@+id/main_header"
+                    android:id="@+id/transaction_progress_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/toolbar"
                     >
 
-                    <LinearLayout
-                        android:id="@+id/transaction_progress_layout"
-                        android:layout_width="match_parent"
+                    <ProgressBar
+                        android:id="@+id/transaction_list_progress_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:visibility="gone"
-                        >
+                        android:layout_marginTop="-8dp"
+                        android:layout_marginBottom="-7dp"
+                        android:layout_weight="1"
+                        android:indeterminate="true"
+                        android:min="0"
+                        android:padding="0dp"
+                        android:progressTint="?colorPrimary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        />
 
-                        <ProgressBar
-                            android:id="@+id/transaction_list_progress_bar"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="-8dp"
-                            android:layout_marginBottom="-7dp"
-                            android:layout_weight="1"
-                            android:indeterminate="true"
-                            android:min="0"
-                            android:padding="0dp"
-                            android:progressTint="?colorPrimary"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            />
-
-                        <TextView
-                            android:id="@+id/transaction_list_cancel_download"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/ic_clear_accent_24dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            />
-                    </LinearLayout>
-
+                    <TextView
+                        android:id="@+id/transaction_list_cancel_download"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/ic_clear_accent_24dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        />
                 </LinearLayout>
 
                 <androidx.viewpager2.widget.ViewPager2
@@ -201,7 +193,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/main_header"
+                    app:layout_constraintTop_toBottomOf="@id/transaction_progress_layout"
                     >
 
                 </androidx.viewpager2.widget.ViewPager2>
@@ -212,7 +204,7 @@
                     android:background="@drawable/drop_shadow"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/main_header"
+                    app:layout_constraintTop_toBottomOf="@id/transaction_progress_layout"
                     />
 
 
