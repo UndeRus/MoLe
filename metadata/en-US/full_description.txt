@@ -6,7 +6,7 @@ MoLe (from "Mobile Ledger") is a convenient front-end to hledger-web, providing 
 
 Features:
 
-<ul><li>List of accounts with their current balance</li><li>Transaction list with filters</li><li>Input of new transactions</li><li>Currency/commodity support</li><li>Multiple back-ends, optionally with custom color</li><li>Supports http authentication (basic)</li></ul>
+<ul><li>Hierarchical list of accounts with their current balance</li><li>Transaction list with filters</li><li>Input of new transactions</li><li>Currency/commodity support</li><li>Per-transaction and per-posting comments</li><li>Multiple back-ends, optionally with custom color</li><li>Supports http authentication (basic)</li></ul>
 The development is still ongoing, here's a list of some of the planned features:
 
 <ul><li>Reports</li><li>More filters for the transaction list, search</li><li>Pre-filling of new transaction input from SMS (e.g. from your bank) or QR-code</li></ul>
