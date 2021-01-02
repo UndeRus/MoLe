@@ -144,22 +144,20 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 try {
                     final int pos = getAdapterPosition();
                     adapter.updateFocusedItem(pos);
-                    switch (id) {
-                        case R.id.account_row_acc_name:
-                            adapter.noteFocusIsOnAccount(pos);
-                            break;
-                        case R.id.account_row_acc_amounts:
-                            adapter.noteFocusIsOnAmount(pos);
-                            break;
-                        case R.id.comment:
-                            adapter.noteFocusIsOnComment(pos);
-                            break;
-                        case R.id.transaction_comment:
-                            adapter.noteFocusIsOnTransactionComment(pos);
-                            break;
-                        case R.id.new_transaction_description:
-                            adapter.noteFocusIsOnDescription(pos);
-                            break;
+                    if (id == R.id.account_row_acc_name) {
+                        adapter.noteFocusIsOnAccount(pos);
+                    }
+                    else if (id == R.id.account_row_acc_amounts) {
+                        adapter.noteFocusIsOnAmount(pos);
+                    }
+                    else if (id == R.id.comment) {
+                        adapter.noteFocusIsOnComment(pos);
+                    }
+                    else if (id == R.id.transaction_comment) {
+                        adapter.noteFocusIsOnTransactionComment(pos);
+                    }
+                    else if (id == R.id.new_transaction_description) {
+                        adapter.noteFocusIsOnDescription(pos);
                     }
                 }
                 finally {
