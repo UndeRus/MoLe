@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import android.database.Cursor;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +34,7 @@ import com.google.android.material.snackbar.Snackbar;
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
+import net.ktnx.mobileledger.databinding.NewTransactionRowBinding;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
@@ -55,8 +55,8 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItemHolder>
         implements DescriptionSelectedCallback {
     private final NewTransactionModel model;
-    private MobileLedgerProfile mProfile;
     private final ItemTouchHelper touchHelper;
+    private MobileLedgerProfile mProfile;
     private RecyclerView recyclerView;
     private int checkHoldCounter = 0;
     NewTransactionItemsAdapter(NewTransactionModel viewModel, MobileLedgerProfile profile) {
@@ -143,11 +143,11 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     @NonNull
     @Override
     public NewTransactionItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LinearLayout row = (LinearLayout) LayoutInflater.from(parent.getContext())
-                                                        .inflate(R.layout.new_transaction_row,
-                                                                parent, false);
+        NewTransactionRowBinding b =
+                NewTransactionRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent,
+                        false);
 
-        return new NewTransactionItemHolder(row, this);
+        return new NewTransactionItemHolder(b, this);
     }
     @Override
     public void onBindViewHolder(@NonNull NewTransactionItemHolder holder, int position) {

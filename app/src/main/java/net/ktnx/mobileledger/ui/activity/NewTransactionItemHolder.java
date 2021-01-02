@@ -24,11 +24,8 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -40,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
+import net.ktnx.mobileledger.databinding.NewTransactionRowBinding;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
@@ -63,18 +61,7 @@ import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
         implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
     private final String decimalDot;
-    private final TextView tvCurrency;
     private final Observer<Boolean> showCommentsObserver;
-    private final TextView tvTransactionComment;
-    private final TextView tvDate;
-    private final AutoCompleteTextView tvDescription;
-    private final TextView tvDummy;
-    private final AutoCompleteTextView tvAccount;
-    private final TextView tvComment;
-    private final EditText tvAmount;
-    private final ViewGroup lHead;
-    private final ViewGroup lAccount;
-    private final FrameLayout lPadding;
     private final MobileLedgerProfile mProfile;
     private final Observer<SimpleDate> dateObserver;
     private final Observer<String> descriptionObserver;
@@ -90,49 +77,34 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private final Observer<Boolean> showCurrencyObserver;
     private final Observer<String> commentObserver;
     private final Observer<Boolean> amountValidityObserver;
-    private final View tvCurrencyButton;
+    private final NewTransactionRowBinding b;
     private String decimalSeparator;
     private NewTransactionModel.Item item;
     private Date date;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     //TODO multiple amounts with different currencies per posting
-    NewTransactionItemHolder(@NonNull View itemView, NewTransactionItemsAdapter adapter) {
-        super(itemView);
-        lAccount = itemView.findViewById(R.id.ntr_account);
-        tvAccount = lAccount.findViewById(R.id.account_row_acc_name);
-        tvComment = lAccount.findViewById(R.id.comment);
-        tvTransactionComment = itemView.findViewById(R.id.transaction_comment);
-        new TextViewClearHelper().attachToTextView((EditText) tvComment);
-        tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
-        tvCurrency = itemView.findViewById(R.id.currency);
-        tvCurrencyButton = lAccount.findViewById(R.id.currencyButton);
-        tvDate = itemView.findViewById(R.id.new_transaction_date);
-        tvDescription = itemView.findViewById(R.id.new_transaction_description);
-        tvDummy = itemView.findViewById(R.id.dummy_text);
-        lHead = itemView.findViewById(R.id.ntr_data);
-        lPadding = itemView.findViewById(R.id.ntr_padding);
-        final View commentLayout = itemView.findViewById(R.id.comment_layout);
-        final View transactionCommentLayout =
-                itemView.findViewById(R.id.transaction_comment_layout);
+    NewTransactionItemHolder(@NonNull NewTransactionRowBinding b,
+                             NewTransactionItemsAdapter adapter) {
+        super(b.getRoot());
+        this.b = b;
+        new TextViewClearHelper().attachToTextView((EditText) b.comment);
 
-        tvDescription.setNextFocusForwardId(View.NO_ID);
-        tvAccount.setNextFocusForwardId(View.NO_ID);
-        tvAmount.setNextFocusForwardId(View.NO_ID); // magic!
+        b.newTransactionDescription.setNextFocusForwardId(View.NO_ID);
+        b.accountRowAccName.setNextFocusForwardId(View.NO_ID);
+        b.accountRowAccAmounts.setNextFocusForwardId(View.NO_ID); // magic!
 
-        tvDate.setOnClickListener(v -> pickTransactionDate());
+        b.newTransactionDate.setOnClickListener(v -> pickTransactionDate());
 
-        lAccount.findViewById(R.id.comment_button)
-                .setOnClickListener(v -> {
-                    tvComment.setVisibility(View.VISIBLE);
-                    tvComment.requestFocus();
-                });
+        b.accountCommentButton.setOnClickListener(v -> {
+            b.comment.setVisibility(View.VISIBLE);
+            b.comment.requestFocus();
+        });
 
-        transactionCommentLayout.findViewById(R.id.comment_button)
-                                .setOnClickListener(v -> {
-                                    tvTransactionComment.setVisibility(View.VISIBLE);
-                                    tvTransactionComment.requestFocus();
-                                });
+        b.transactionCommentButton.setOnClickListener(v -> {
+            b.transactionComment.setVisibility(View.VISIBLE);
+            b.transactionComment.requestFocus();
+        });
 
         mProfile = Data.getProfile();
 
@@ -166,22 +138,24 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             }
 
             if (id == R.id.comment) {
-                commentFocusChanged(tvComment, hasFocus);
+                commentFocusChanged(b.comment, hasFocus);
             }
             else if (id == R.id.transaction_comment) {
-                commentFocusChanged(tvTransactionComment, hasFocus);
+                commentFocusChanged(b.transactionComment, hasFocus);
             }
         };
 
-        tvDescription.setOnFocusChangeListener(focusMonitor);
-        tvAccount.setOnFocusChangeListener(focusMonitor);
-        tvAmount.setOnFocusChangeListener(focusMonitor);
-        tvComment.setOnFocusChangeListener(focusMonitor);
-        tvTransactionComment.setOnFocusChangeListener(focusMonitor);
+        b.newTransactionDescription.setOnFocusChangeListener(focusMonitor);
+        b.accountRowAccName.setOnFocusChangeListener(focusMonitor);
+        b.accountRowAccAmounts.setOnFocusChangeListener(focusMonitor);
+        b.comment.setOnFocusChangeListener(focusMonitor);
+        b.transactionComment.setOnFocusChangeListener(focusMonitor);
 
-        MLDB.hookAutocompletionAdapter(tvDescription.getContext(), tvDescription,
+        MLDB.hookAutocompletionAdapter(b.getRoot()
+                                        .getContext(), b.newTransactionDescription,
                 MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, adapter, mProfile);
-        MLDB.hookAutocompletionAdapter(tvAccount.getContext(), tvAccount, MLDB.ACCOUNTS_TABLE,
+        MLDB.hookAutocompletionAdapter(b.getRoot()
+                                        .getContext(), b.accountRowAccName, MLDB.ACCOUNTS_TABLE,
                 "name", true, this, mProfile);
 
         decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance()
@@ -231,13 +205,13 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     adapter.checkTransactionSubmittable();
             }
         };
-        tvDescription.addTextChangedListener(tw);
-        tvTransactionComment.addTextChangedListener(tw);
-        tvAccount.addTextChangedListener(tw);
-        tvComment.addTextChangedListener(tw);
-        tvAmount.addTextChangedListener(amountWatcher);
+        b.newTransactionDescription.addTextChangedListener(tw);
+        b.transactionComment.addTextChangedListener(tw);
+        b.accountRowAccName.addTextChangedListener(tw);
+        b.comment.addTextChangedListener(tw);
+        b.accountRowAccAmounts.addTextChangedListener(amountWatcher);
 
-        tvCurrencyButton.setOnClickListener(v -> {
+        b.currencyButton.setOnClickListener(v -> {
             CurrencySelectorFragment cpf = new CurrencySelectorFragment();
             cpf.showPositionAndPadding();
             cpf.setOnCurrencySelectedListener(c -> item.setCurrency(c));
@@ -250,7 +224,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 return;
             syncingData = true;
             try {
-                tvDate.setText(item.getFormattedDate());
+                b.newTransactionDate.setText(item.getFormattedDate());
             }
             finally {
                 syncingData = false;
@@ -261,18 +235,18 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 return;
             syncingData = true;
             try {
-                tvDescription.setText(description);
+                b.newTransactionDescription.setText(description);
             }
             finally {
                 syncingData = false;
             }
         };
         transactionCommentObserver = transactionComment -> {
-            final View focusedView = tvTransactionComment.findFocus();
-            tvTransactionComment.setTypeface(null,
-                    (focusedView == tvTransactionComment) ? Typeface.NORMAL : Typeface.ITALIC);
-            tvTransactionComment.setVisibility(
-                    ((focusedView != tvTransactionComment) && TextUtils.isEmpty(transactionComment))
+            final View focusedView = b.transactionComment.findFocus();
+            b.transactionComment.setTypeface(null,
+                    (focusedView == b.transactionComment) ? Typeface.NORMAL : Typeface.ITALIC);
+            b.transactionComment.setVisibility(
+                    ((focusedView != b.transactionComment) && TextUtils.isEmpty(transactionComment))
                     ? View.INVISIBLE : View.VISIBLE);
 
         };
@@ -282,17 +256,17 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             syncingData = true;
             try {
                 if (hint == null)
-                    tvAmount.setHint(R.string.zero_amount);
+                    b.accountRowAccAmounts.setHint(R.string.zero_amount);
                 else
-                    tvAmount.setHint(hint);
+                    b.accountRowAccAmounts.setHint(hint);
             }
             finally {
                 syncingData = false;
             }
         };
         editableObserver = this::setEditable;
-        commentFocusChanged(tvTransactionComment, false);
-        commentFocusChanged(tvComment, false);
+        commentFocusChanged(b.transactionComment, false);
+        commentFocusChanged(b.comment, false);
         focusedAccountObserver = index -> {
             if ((index == null) || !index.equals(getAdapterPosition()) || itemView.hasFocus())
                 return;
@@ -304,33 +278,33 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     //if (!tvDate.hasFocus()) tvDate.requestFocus();
                     switch (item.getFocusedElement()) {
                         case TransactionComment:
-                            tvTransactionComment.setVisibility(View.VISIBLE);
-                            tvTransactionComment.requestFocus();
+                            b.transactionComment.setVisibility(View.VISIBLE);
+                            b.transactionComment.requestFocus();
                             break;
                         case Description:
-                            boolean focused = tvDescription.requestFocus();
+                            boolean focused = b.newTransactionDescription.requestFocus();
 //                            tvDescription.dismissDropDown();
                             if (focused)
-                                Misc.showSoftKeyboard(
-                                        (NewTransactionActivity) tvDescription.getContext());
+                                Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
+                                                                                .getContext());
                             break;
                     }
                     break;
                 case transactionRow:
                     switch (item.getFocusedElement()) {
                         case Amount:
-                            tvAmount.requestFocus();
+                            b.accountRowAccAmounts.requestFocus();
                             break;
                         case Comment:
-                            tvComment.setVisibility(View.VISIBLE);
-                            tvComment.requestFocus();
+                            b.comment.setVisibility(View.VISIBLE);
+                            b.comment.requestFocus();
                             break;
                         case Account:
-                            boolean focused = tvAccount.requestFocus();
-                            tvAccount.dismissDropDown();
+                            boolean focused = b.accountRowAccName.requestFocus();
+                            b.accountRowAccName.dismissDropDown();
                             if (focused)
-                                Misc.showSoftKeyboard(
-                                        (NewTransactionActivity) tvAccount.getContext());
+                                Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
+                                                                                .getContext());
                             break;
                     }
 
@@ -358,9 +332,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                                                                                      .getAmount())
                                                                          : "unset") : "")));
             if (adapterPosition == count)
-                tvAmount.setImeOptions(EditorInfo.IME_ACTION_DONE);
+                b.accountRowAccAmounts.setImeOptions(EditorInfo.IME_ACTION_DONE);
             else
-                tvAmount.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+                b.accountRowAccAmounts.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         };
 
         currencyObserver = currency -> {
@@ -377,69 +351,68 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         showCurrencyObserver = showCurrency -> {
             if (showCurrency) {
-                tvCurrency.setVisibility(View.VISIBLE);
-                tvCurrencyButton.setVisibility(View.VISIBLE);
+                b.currency.setVisibility(View.VISIBLE);
+                b.currencyButton.setVisibility(View.VISIBLE);
                 String defaultCommodity = mProfile.getDefaultCommodity();
                 item.setCurrency(
                         (defaultCommodity == null) ? null : Currency.loadByName(defaultCommodity));
             }
             else {
-                tvCurrency.setVisibility(View.GONE);
-                tvCurrencyButton.setVisibility(View.GONE);
+                b.currency.setVisibility(View.GONE);
+                b.currencyButton.setVisibility(View.GONE);
                 item.setCurrency(null);
             }
         };
 
         commentObserver = comment -> {
-            final View focusedView = tvComment.findFocus();
-            tvComment.setTypeface(null,
-                    (focusedView == tvComment) ? Typeface.NORMAL : Typeface.ITALIC);
-            tvComment.setVisibility(
-                    ((focusedView != tvComment) && TextUtils.isEmpty(comment)) ? View.INVISIBLE
+            final View focusedView = b.comment.findFocus();
+            b.comment.setTypeface(null,
+                    (focusedView == b.comment) ? Typeface.NORMAL : Typeface.ITALIC);
+            b.comment.setVisibility(
+                    ((focusedView != b.comment) && TextUtils.isEmpty(comment)) ? View.INVISIBLE
                                                                                : View.VISIBLE);
         };
 
         showCommentsObserver = show -> {
-            final View amountLayout = itemView.findViewById(R.id.amount_layout);
             ConstraintLayout.LayoutParams amountLayoutParams =
-                    (ConstraintLayout.LayoutParams) amountLayout.getLayoutParams();
+                    (ConstraintLayout.LayoutParams) b.amountLayout.getLayoutParams();
             ConstraintLayout.LayoutParams accountParams =
-                    (ConstraintLayout.LayoutParams) tvAccount.getLayoutParams();
+                    (ConstraintLayout.LayoutParams) b.accountRowAccName.getLayoutParams();
             if (show) {
                 accountParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
                 accountParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
 
                 amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
-                amountLayoutParams.topToBottom = tvAccount.getId();
+                amountLayoutParams.topToBottom = b.accountRowAccName.getId();
 
-                commentLayout.setVisibility(View.VISIBLE);
+                b.commentLayout.setVisibility(View.VISIBLE);
             }
             else {
-                accountParams.endToStart = amountLayout.getId();
+                accountParams.endToStart = b.amountLayout.getId();
                 accountParams.endToEnd = ConstraintLayout.LayoutParams.UNSET;
 
                 amountLayoutParams.topToBottom = ConstraintLayout.LayoutParams.UNSET;
                 amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
 
-                commentLayout.setVisibility(View.GONE);
+                b.commentLayout.setVisibility(View.GONE);
             }
 
-            tvAccount.setLayoutParams(accountParams);
-            amountLayout.setLayoutParams(amountLayoutParams);
+            b.accountRowAccName.setLayoutParams(accountParams);
+            b.amountLayout.setLayoutParams(amountLayoutParams);
 
-            transactionCommentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+            b.transactionCommentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
         };
 
         amountValidityObserver = valid -> {
-            tvAmount.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            b.accountRowAccAmounts.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     valid ? 0 : R.drawable.ic_error_outline_black_24dp, 0, 0, 0);
-            tvAmount.setMinEms(valid ? 4 : 5);
+            b.accountRowAccAmounts.setMinEms(valid ? 4 : 5);
         };
     }
     private void commentFocusChanged(TextView textView, boolean hasFocus) {
         @ColorInt int textColor;
-        textColor = tvDummy.getTextColors()
-                           .getDefaultColor();
+        textColor = b.dummyText.getTextColors()
+                               .getDefaultColor();
         if (hasFocus) {
             textView.setTypeface(null, Typeface.NORMAL);
             textView.setHint(R.string.transaction_account_comment_hint);
@@ -459,9 +432,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     }
     private void updateCurrencyPositionAndPadding(Currency.Position position, boolean hasGap) {
         ConstraintLayout.LayoutParams amountLP =
-                (ConstraintLayout.LayoutParams) tvAmount.getLayoutParams();
+                (ConstraintLayout.LayoutParams) b.accountRowAccAmounts.getLayoutParams();
         ConstraintLayout.LayoutParams currencyLP =
-                (ConstraintLayout.LayoutParams) tvCurrency.getLayoutParams();
+                (ConstraintLayout.LayoutParams) b.currency.getLayoutParams();
 
         if (position == Currency.Position.before) {
             currencyLP.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
@@ -470,9 +443,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             amountLP.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
             amountLP.endToStart = ConstraintLayout.LayoutParams.UNSET;
             amountLP.startToStart = ConstraintLayout.LayoutParams.UNSET;
-            amountLP.startToEnd = tvCurrency.getId();
+            amountLP.startToEnd = b.currency.getId();
 
-            tvCurrency.setGravity(Gravity.END);
+            b.currency.setGravity(Gravity.END);
         }
         else {
             currencyLP.startToStart = ConstraintLayout.LayoutParams.UNSET;
@@ -481,49 +454,49 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             amountLP.startToStart = ConstraintLayout.LayoutParams.PARENT_ID;
             amountLP.startToEnd = ConstraintLayout.LayoutParams.UNSET;
             amountLP.endToEnd = ConstraintLayout.LayoutParams.UNSET;
-            amountLP.endToStart = tvCurrency.getId();
+            amountLP.endToStart = b.currency.getId();
 
-            tvCurrency.setGravity(Gravity.START);
+            b.currency.setGravity(Gravity.START);
         }
 
-        amountLP.resolveLayoutDirection(tvAmount.getLayoutDirection());
-        currencyLP.resolveLayoutDirection(tvCurrency.getLayoutDirection());
+        amountLP.resolveLayoutDirection(b.accountRowAccAmounts.getLayoutDirection());
+        currencyLP.resolveLayoutDirection(b.currency.getLayoutDirection());
 
-        tvAmount.setLayoutParams(amountLP);
-        tvCurrency.setLayoutParams(currencyLP);
+        b.accountRowAccAmounts.setLayoutParams(amountLP);
+        b.currency.setLayoutParams(currencyLP);
 
         // distance between the amount and the currency symbol
-        int gapSize = DimensionUtils.sp2px(tvCurrency.getContext(), 5);
+        int gapSize = DimensionUtils.sp2px(b.currency.getContext(), 5);
 
         if (position == Currency.Position.before) {
-            tvCurrency.setPaddingRelative(0, 0, hasGap ? gapSize : 0, 0);
+            b.currency.setPaddingRelative(0, 0, hasGap ? gapSize : 0, 0);
         }
         else {
-            tvCurrency.setPaddingRelative(hasGap ? gapSize : 0, 0, 0, 0);
+            b.currency.setPaddingRelative(hasGap ? gapSize : 0, 0, 0, 0);
         }
     }
     private void setCurrencyString(String currency) {
-        @ColorInt int textColor = tvDummy.getTextColors()
-                                         .getDefaultColor();
+        @ColorInt int textColor = b.dummyText.getTextColors()
+                                             .getDefaultColor();
         if ((currency == null) || currency.isEmpty()) {
-            tvCurrency.setText(R.string.currency_symbol);
+            b.currency.setText(R.string.currency_symbol);
             int alpha = (textColor >> 24) & 0xff;
             alpha = alpha * 3 / 4;
-            tvCurrency.setTextColor((alpha << 24) | (0x00ffffff & textColor));
+            b.currency.setTextColor((alpha << 24) | (0x00ffffff & textColor));
         }
         else {
-            tvCurrency.setText(currency);
-            tvCurrency.setTextColor(textColor);
+            b.currency.setText(currency);
+            b.currency.setTextColor(textColor);
         }
     }
     private void setCurrency(Currency currency) {
         setCurrencyString((currency == null) ? null : currency.getName());
     }
     private void setEditable(Boolean editable) {
-        tvDate.setEnabled(editable);
-        tvDescription.setEnabled(editable);
-        tvAccount.setEnabled(editable);
-        tvAmount.setEnabled(editable);
+        b.newTransactionDate.setEnabled(editable);
+        b.newTransactionDescription.setEnabled(editable);
+        b.accountRowAccName.setEnabled(editable);
+        b.accountRowAccAmounts.setEnabled(editable);
     }
     private void beginUpdates() {
         if (inUpdate)
@@ -556,17 +529,17 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         try {
             switch (item.getType()) {
                 case generalData:
-                    item.setDate(String.valueOf(tvDate.getText()));
-                    item.setDescription(String.valueOf(tvDescription.getText()));
-                    item.setTransactionComment(String.valueOf(tvTransactionComment.getText()));
+                    item.setDate(String.valueOf(b.newTransactionDate.getText()));
+                    item.setDescription(String.valueOf(b.newTransactionDescription.getText()));
+                    item.setTransactionComment(String.valueOf(b.transactionComment.getText()));
                     break;
                 case transactionRow:
                     final LedgerTransactionAccount account = item.getAccount();
-                    account.setAccountName(String.valueOf(tvAccount.getText()));
+                    account.setAccountName(String.valueOf(b.accountRowAccName.getText()));
 
-                    item.setComment(String.valueOf(tvComment.getText()));
+                    item.setComment(String.valueOf(b.comment.getText()));
 
-                    String amount = String.valueOf(tvAmount.getText());
+                    String amount = String.valueOf(b.accountRowAccAmounts.getText());
                     amount = amount.trim();
 
                     if (amount.isEmpty()) {
@@ -586,8 +559,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                             account.invalidateAmount();
                             item.invalidateAmount();
                         }
-                        final String curr = String.valueOf(tvCurrency.getText());
-                        if (curr.equals(tvCurrency.getContext()
+                        final String curr = String.valueOf(b.currency.getText());
+                        if (curr.equals(b.currency.getContext()
                                                   .getResources()
                                                   .getString(R.string.currency_symbol)) ||
                             curr.isEmpty())
@@ -614,9 +587,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         DatePickerFragment picker = new DatePickerFragment();
         picker.setFutureDates(mProfile.getFutureDates());
         picker.setOnDatePickedListener(this);
-        picker.setCurrentDateFromText(tvDate.getText());
-        picker.show(((NewTransactionActivity) tvDate.getContext()).getSupportFragmentManager(),
-                null);
+        picker.setCurrentDateFromText(b.newTransactionDate.getText());
+        picker.show(((NewTransactionActivity) b.getRoot()
+                                               .getContext()).getSupportFragmentManager(), null);
     }
     /**
      * setData
@@ -651,43 +624,43 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
             switch (item.getType()) {
                 case generalData:
-                    tvDate.setText(item.getFormattedDate());
-                    tvDescription.setText(item.getDescription());
-                    tvTransactionComment.setText(item.getTransactionComment());
-                    lHead.setVisibility(View.VISIBLE);
-                    lAccount.setVisibility(View.GONE);
-                    lPadding.setVisibility(View.GONE);
+                    b.newTransactionDate.setText(item.getFormattedDate());
+                    b.newTransactionDescription.setText(item.getDescription());
+                    b.transactionComment.setText(item.getTransactionComment());
+                    b.ntrData.setVisibility(View.VISIBLE);
+                    b.ntrAccount.setVisibility(View.GONE);
+                    b.ntrPadding.setVisibility(View.GONE);
                     setEditable(true);
                     break;
                 case transactionRow:
                     LedgerTransactionAccount acc = item.getAccount();
-                    tvAccount.setText(acc.getAccountName());
-                    tvComment.setText(acc.getComment());
+                    b.accountRowAccName.setText(acc.getAccountName());
+                    b.comment.setText(acc.getComment());
                     if (acc.isAmountSet()) {
-                        tvAmount.setText(String.format("%1.2f", acc.getAmount()));
+                        b.accountRowAccAmounts.setText(String.format("%1.2f", acc.getAmount()));
                     }
                     else {
-                        tvAmount.setText("");
+                        b.accountRowAccAmounts.setText("");
 //                        tvAmount.setHint(R.string.zero_amount);
                     }
-                    tvAmount.setHint(item.getAmountHint());
+                    b.accountRowAccAmounts.setHint(item.getAmountHint());
                     setCurrencyString(acc.getCurrency());
-                    lHead.setVisibility(View.GONE);
-                    lAccount.setVisibility(View.VISIBLE);
-                    lPadding.setVisibility(View.GONE);
+                    b.ntrData.setVisibility(View.GONE);
+                    b.ntrAccount.setVisibility(View.VISIBLE);
+                    b.ntrPadding.setVisibility(View.GONE);
                     setEditable(true);
                     break;
                 case bottomFiller:
-                    lHead.setVisibility(View.GONE);
-                    lAccount.setVisibility(View.GONE);
-                    lPadding.setVisibility(View.VISIBLE);
+                    b.ntrData.setVisibility(View.GONE);
+                    b.ntrAccount.setVisibility(View.GONE);
+                    b.ntrPadding.setVisibility(View.VISIBLE);
                     setEditable(false);
                     break;
             }
             if (this.item == null) { // was null or has changed
                 this.item = item;
-                final NewTransactionActivity activity =
-                        (NewTransactionActivity) tvDescription.getContext();
+                final NewTransactionActivity activity = (NewTransactionActivity) b.getRoot()
+                                                                                  .getContext();
 
                 if (!item.isBottomFiller()) {
                     item.observeEditableFlag(activity, editableObserver);
@@ -724,14 +697,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     @Override
     public void onDatePicked(int year, int month, int day) {
         item.setDate(new SimpleDate(year, month + 1, day));
-        boolean focused = tvDescription.requestFocus();
+        boolean focused = b.newTransactionDescription.requestFocus();
         if (focused)
-            Misc.showSoftKeyboard((NewTransactionActivity) tvAccount.getContext());
+            Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
+                                                            .getContext());
 
     }
     @Override
     public void descriptionSelected(String description) {
-        tvAccount.setText(description);
-        tvAmount.requestFocus(View.FOCUS_FORWARD);
+        b.accountRowAccName.setText(description);
+        b.accountRowAccAmounts.requestFocus(View.FOCUS_FORWARD);
     }
 }

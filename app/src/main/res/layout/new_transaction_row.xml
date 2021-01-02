@@ -93,7 +93,7 @@
             >
 
             <TextView
-                android:id="@+id/comment_button"
+                android:id="@+id/transaction_comment_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_comment_gray_24dp"
@@ -110,7 +110,7 @@
                 android:inputType="text"
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/comment_button"
+                app:layout_constraintStart_toEndOf="@id/transaction_comment_button"
                 app:layout_constraintTop_toTopOf="parent"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -149,7 +149,7 @@
             >
 
             <TextView
-                android:id="@id/comment_button"
+                android:id="@+id/account_comment_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ic_comment_gray_24dp"
@@ -166,7 +166,7 @@
                 android:inputType="text"
                 android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/comment_button"
+                app:layout_constraintStart_toEndOf="@id/account_comment_button"
                 app:layout_constraintTop_toTopOf="parent"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
