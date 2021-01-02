@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -90,6 +90,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private final Observer<Boolean> showCurrencyObserver;
     private final Observer<String> commentObserver;
     private final Observer<Boolean> amountValidityObserver;
+    private final View tvCurrencyButton;
     private String decimalSeparator;
     private NewTransactionModel.Item item;
     private Date date;
@@ -105,6 +106,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         new TextViewClearHelper().attachToTextView((EditText) tvComment);
         tvAmount = itemView.findViewById(R.id.account_row_acc_amounts);
         tvCurrency = itemView.findViewById(R.id.currency);
+        tvCurrencyButton = lAccount.findViewById(R.id.currencyButton);
         tvDate = itemView.findViewById(R.id.new_transaction_date);
         tvDescription = itemView.findViewById(R.id.new_transaction_description);
         tvDummy = itemView.findViewById(R.id.dummy_text);
@@ -237,7 +239,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         tvComment.addTextChangedListener(tw);
         tvAmount.addTextChangedListener(amountWatcher);
 
-        tvCurrency.setOnClickListener(v -> {
+        tvCurrencyButton.setOnClickListener(v -> {
             CurrencySelectorFragment cpf = new CurrencySelectorFragment();
             cpf.showPositionAndPadding();
             cpf.setOnCurrencySelectedListener(c -> item.setCurrency(c));
@@ -378,12 +380,14 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         showCurrencyObserver = showCurrency -> {
             if (showCurrency) {
                 tvCurrency.setVisibility(View.VISIBLE);
+                tvCurrencyButton.setVisibility(View.VISIBLE);
                 String defaultCommodity = mProfile.getDefaultCommodity();
                 item.setCurrency(
                         (defaultCommodity == null) ? null : Currency.loadByName(defaultCommodity));
             }
             else {
                 tvCurrency.setVisibility(View.GONE);
+                tvCurrencyButton.setVisibility(View.GONE);
                 item.setCurrency(null);
             }
         };
