@@ -61,7 +61,6 @@ import org.jetbrains.annotations.NotNull;
  */
 
 // TODO: offer to undo account remove-on-swipe
-// TODO: transaction-level comment
 
 public class NewTransactionFragment extends Fragment {
     private NewTransactionItemsAdapter listAdapter;
