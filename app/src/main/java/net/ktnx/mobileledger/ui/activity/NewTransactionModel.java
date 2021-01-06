@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -87,6 +87,9 @@ public class NewTransactionModel extends ViewModel {
     }
     public SimpleDate getDate() {
         return header.date.getValue();
+    }
+    public void setDate(SimpleDate date) {
+        header.date.setValue(date);
     }
     public String getDescription() {
         return header.description.getValue();
