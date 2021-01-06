@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -39,7 +39,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class MobileLedgerDatabase extends SQLiteOpenHelper {
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static final String DB_NAME = "MoLe.db";
-    private static final int LATEST_REVISION = 41;
+    private static final int LATEST_REVISION = 42;
     private static final String CREATE_DB_SQL = "create_db";
     private final Application mContext;
 

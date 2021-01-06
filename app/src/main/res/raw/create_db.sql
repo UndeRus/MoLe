@@ -28,4 +28,9 @@ create index idx_transaction_description on transactions(description);
 create table transaction_accounts(profile varchar not null, transaction_id integer not null, order_no integer not null, account_name varchar not null, currency varchar not null default '', amount decimal not null, comment varchar, generation integer default 0, constraint fk_transaction_accounts_acc foreign key(profile,account_name) references accounts(profile,name), constraint fk_transaction_accounts_trn foreign key(profile, transaction_id) references transactions(profile,id));
 create unique index un_transaction_accounts_order on transaction_accounts(profile, transaction_id, order_no);
 create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap boolean not null);
--- updated to revision 39
+
+create table patterns(id integer not null primary key, name varchar not null, position integer not null, regular_expression varchar not null, transaction_description varchar, transaction_comment varchar, date_year_match_group integer, date_month_match_group integer, date_day_match_group integer);
+create unique index un_patterns_id on patterns(id);
+create table pattern_accounts(id integer not null primary key, pattern_id integer not null, acc varchar, acc_match_group integer, currency integer, currency_match_group integer, amount decimal, amount_match_group integer, comment varchar, comment_match_group integer, constraint fk_pattern_account_pattern foreign key(pattern_id) references patterns(id), constraint fk_pattern_account_currency foreign key(currency) references currencies(id));
+create unique index un_pattern_accounts on pattern_accounts(id);
+-- updated to revision 42
