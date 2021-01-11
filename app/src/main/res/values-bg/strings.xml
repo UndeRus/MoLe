@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -166,4 +166,8 @@
     <string name="btn_profile_options">Настройка на профила</string>
     <string name="err_json_send_error_head">Грешка при изпращане на движението към сървъра</string>
     <string name="err_json_send_error_tail">Вероятно настроената версия на протокола не се поддържа.</string>
+    <string name="err_json_send_error_unsupported">Възможно е програмния интерфейс на сървъра да не се поддържа от MoLe</string>
+    <string name="scan_qr">Сканиране на QR код</string>
+    <string name="nav_patterns">Шаблони</string>
+    <string name="title_activity_patterns">Шаблони</string>
 </resources>

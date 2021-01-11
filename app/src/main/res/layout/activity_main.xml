@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -105,7 +105,7 @@
         android:layout_height="match_parent"
         android:background="?android:attr/colorBackground"
         android:orientation="vertical"
-        android:visibility="gone"
+        android:visibility="visible"
         >
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -403,6 +403,12 @@
                                 </LinearLayout>
 
                             </LinearLayout>
+                            <TextView
+                                android:id="@+id/nav_patterns"
+                                style="@style/nav_button"
+                                android:text="@string/nav_patterns"
+                                app:drawableStartCompat="@drawable/ic_baseline_auto_graph_24"
+                                />
 
                         </LinearLayout>
                     </ScrollView>

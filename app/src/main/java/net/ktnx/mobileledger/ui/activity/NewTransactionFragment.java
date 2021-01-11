@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,7 +17,9 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.renderscript.RSInvalidStateException;
@@ -29,6 +31,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -53,6 +57,9 @@ import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -65,6 +72,22 @@ import org.jetbrains.annotations.NotNull;
 public class NewTransactionFragment extends Fragment {
     private NewTransactionItemsAdapter listAdapter;
     private NewTransactionModel viewModel;
+    final ActivityResultLauncher<Void> scanQrLauncher =
+            registerForActivityResult(new ActivityResultContract<Void, String>() {
+                @NonNull
+                @Override
+                public Intent createIntent(@NonNull Context context, Void input) {
+                    final Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+                    intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+                    return intent;
+                }
+                @Override
+                public String parseResult(int resultCode, @Nullable Intent intent) {
+                    if (resultCode == Activity.RESULT_CANCELED)
+                        return null;
+                    return intent.getStringExtra("SCAN_RESULT");
+                }
+            }, this::onQrScanned);
     private FloatingActionButton fab;
     private OnNewTransactionFragmentInteractionListener mListener;
     private MobileLedgerProfile mProfile;
@@ -72,12 +95,66 @@ public class NewTransactionFragment extends Fragment {
         // Required empty public constructor
         setHasOptionsMenu(true);
     }
+    private void onQrScanned(String text) {
+        Logger.debug("qr", String.format("Got QR scan result [%s]", text));
+        Pattern p =
+                Pattern.compile("^(\\d+)\\*(\\d+)\\*(\\d+)-(\\d+)-(\\d+)\\*([:\\d]+)\\*([\\d.]+)$");
+        Matcher m = p.matcher(text);
+        if (m.matches()) {
+            float amount = Float.parseFloat(m.group(7));
+            viewModel.setDate(
+                    new SimpleDate(Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)),
+                            Integer.parseInt(m.group(5))));
+
+            if (viewModel.accountsInInitialState()) {
+                {
+                    NewTransactionModel.Item firstItem = viewModel.getItem(1);
+                    if (firstItem == null) {
+                        viewModel.addAccount(new LedgerTransactionAccount("разход:пазар"));
+                        listAdapter.notifyItemInserted(viewModel.items.size() - 1);
+                    }
+                    else {
+                        firstItem.setAccountName("разход:пазар");
+                        firstItem.getAccount()
+                                 .resetAmount();
+                        listAdapter.notifyItemChanged(1);
+                    }
+                }
+                {
+                    NewTransactionModel.Item secondItem = viewModel.getItem(2);
+                    if (secondItem == null) {
+                        viewModel.addAccount(
+                                new LedgerTransactionAccount("актив:кеш:дам", -amount, null, null));
+                        listAdapter.notifyItemInserted(viewModel.items.size() - 1);
+                    }
+                    else {
+                        secondItem.setAccountName("актив:кеш:дам");
+                        secondItem.getAccount()
+                                  .setAmount(-amount);
+                        listAdapter.notifyItemChanged(2);
+                    }
+                }
+            }
+            else {
+                viewModel.addAccount(new LedgerTransactionAccount("разход:пазар"));
+                viewModel.addAccount(
+                        new LedgerTransactionAccount("актив:кеш:дам", -amount, null, null));
+                listAdapter.notifyItemRangeInserted(viewModel.items.size() - 1, 2);
+            }
+
+            listAdapter.checkTransactionSubmittable();
+        }
+    }
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         final FragmentActivity activity = getActivity();
 
         inflater.inflate(R.menu.new_transaction_fragment, menu);
+
+        menu.findItem(R.id.scan_qr)
+            .setOnMenuItemClickListener(this::onScanQrAction);
+
         menu.findItem(R.id.action_reset_new_transaction_activity)
             .setOnMenuItemClickListener(item -> {
                 listAdapter.reset();
@@ -99,6 +176,16 @@ public class NewTransactionFragment extends Fragment {
         });
         if (activity != null)
             viewModel.showComments.observe(activity, toggleCommentsItem::setChecked);
+    }
+    private boolean onScanQrAction(MenuItem item) {
+        try {
+            scanQrLauncher.launch(null);
+        }
+        catch (Exception e) {
+            Logger.debug("qr", "Error launching QR scanner", e);
+        }
+
+        return true;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

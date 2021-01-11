@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -146,8 +146,7 @@ public class MainActivity extends ProfileThemedActivity {
         Data.backgroundTasksRunning.observe(this, this::onRetrieveRunningChanged);
 
         if (barDrawerToggle == null) {
-            barDrawerToggle = new ActionBarDrawerToggle(this, b.drawerLayout, b.toolbar,
-                    R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            barDrawerToggle = new ActionBarDrawerToggle(this, b.drawerLayout, b.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             b.drawerLayout.addDrawerListener(barDrawerToggle);
         }
         barDrawerToggle.syncState();
@@ -156,8 +155,7 @@ public class MainActivity extends ProfileThemedActivity {
             PackageInfo pi = getApplicationContext().getPackageManager()
                                                     .getPackageInfo(getPackageName(), 0);
             ((TextView) b.navUpper.findViewById(R.id.drawer_version_text)).setText(pi.versionName);
-            ((TextView) b.noProfilesLayout.findViewById(R.id.drawer_version_text)).setText(
-                    pi.versionName);
+            ((TextView) b.noProfilesLayout.findViewById(R.id.drawer_version_text)).setText(pi.versionName);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -200,13 +198,11 @@ public class MainActivity extends ProfileThemedActivity {
                      .setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
         }
 
-        b.btnNoProfilesAdd.setOnClickListener(
-                v -> MobileLedgerProfile.startEditProfileActivity(this, null));
+        b.btnNoProfilesAdd.setOnClickListener(v -> MobileLedgerProfile.startEditProfileActivity(this, null));
 
         b.btnAddTransaction.setOnClickListener(this::fabNewTransactionClicked);
 
-        b.navNewProfileButton.setOnClickListener(
-                v -> MobileLedgerProfile.startEditProfileActivity(this, null));
+        b.navNewProfileButton.setOnClickListener(v -> MobileLedgerProfile.startEditProfileActivity(this, null));
 
         b.transactionListCancelDownload.setOnClickListener(this::onStopTransactionRefreshClick);
 
@@ -251,10 +247,8 @@ public class MainActivity extends ProfileThemedActivity {
         b.navProfileList.setLayoutManager(llm);
 
         b.navProfilesStartEdit.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
-        b.navProfilesCancelEdit.setOnClickListener(
-                (v) -> mProfileListAdapter.flipEditingProfiles());
-        b.navProfileListHeadButtons.setOnClickListener(
-                (v) -> mProfileListAdapter.flipEditingProfiles());
+        b.navProfilesCancelEdit.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
+        b.navProfileListHeadButtons.setOnClickListener((v) -> mProfileListAdapter.flipEditingProfiles());
         if (drawerListener == null) {
             drawerListener = new DrawerLayout.SimpleDrawerListener() {
                 @Override
@@ -303,6 +297,11 @@ public class MainActivity extends ProfileThemedActivity {
         Data.lastUpdateAccountCount.observe(this, date -> refreshLastUpdateInfo());
         b.navAccountSummary.setOnClickListener(this::onAccountSummaryClicked);
         b.navLatestTransactions.setOnClickListener(this::onLatestTransactionsClicked);
+        b.navPatterns.setOnClickListener(this::onPatternsClick);
+    }
+    private void onPatternsClick(View view) {
+        Intent intent = new Intent(this, PatternsActivity.class);
+        startActivity(intent);
     }
     private void scheduleDataRetrievalIfStale(long lastUpdate) {
         long now = new Date().getTime();

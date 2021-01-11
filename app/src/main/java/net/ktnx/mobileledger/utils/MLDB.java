@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -199,8 +199,8 @@ public final class MLDB {
                     (parent, itemView, position, id) -> callback.descriptionSelected(
                             String.valueOf(view.getText())));
     }
-    public static void queryInBackground(@NonNull String statement, @NonNull String[] params,
-                                         @NonNull CallbackHelper callbackHelper) {
+    public static void queryInBackground(@NonNull String statement, String[] params,
+                                         @NonNull final CallbackHelper callbackHelper) {
         /* All callbacks are called in the new (asynchronous) thread! */
         Thread t = new Thread(() -> {
             callbackHelper.onStart();
