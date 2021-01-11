@@ -250,7 +250,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
 
                 activity.runOnUiThread(
                         () -> Snackbar.make(recyclerView, R.string.ignoring_preferred_account,
-                                Snackbar.LENGTH_LONG)
+                                Snackbar.LENGTH_INDEFINITE)
                                       .show());
 
                 MLDB.queryInBackground(broaderSql, new String[]{description},

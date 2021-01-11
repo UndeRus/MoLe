@@ -266,7 +266,7 @@ public class NewTransactionFragment extends Fragment {
                            .show();
                 }
                 else {
-                    Snackbar.make(list, error, Snackbar.LENGTH_LONG)
+                    Snackbar.make(list, error, Snackbar.LENGTH_INDEFINITE)
                             .show();
                 }
                 keep = true;

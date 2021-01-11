@@ -287,7 +287,7 @@ public class MainActivity extends ProfileThemedActivity {
                      if (error == null)
                          return;
 
-                     Snackbar.make(b.mainPager, error, Snackbar.LENGTH_LONG)
+                     Snackbar.make(b.mainPager, error, Snackbar.LENGTH_INDEFINITE)
                              .show();
                      mainModel.clearUpdateError();
                  });
