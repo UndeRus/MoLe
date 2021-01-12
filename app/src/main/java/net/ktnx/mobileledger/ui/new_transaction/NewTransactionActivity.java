@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.activity;
+package net.ktnx.mobileledger.ui.new_transaction;
 
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -30,10 +30,12 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.async.AsyncCrasher;
 import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.ui.activity.ProfileThemedActivity;
 
 import java.util.Objects;
 

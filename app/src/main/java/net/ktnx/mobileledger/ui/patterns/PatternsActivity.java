@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.activity;
+package net.ktnx.mobileledger.ui.patterns;
 
 import android.os.Bundle;
 import android.view.Menu;
@@ -28,8 +28,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.ActivityPatternsBinding;
-import net.ktnx.mobileledger.ui.patterns.PatternsModel;
-import net.ktnx.mobileledger.ui.patterns.PatternsRecyclerViewAdapter;
+import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 
 public class PatternsActivity extends CrashReportingActivity {
 

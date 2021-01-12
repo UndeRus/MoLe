@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -15,11 +15,11 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.activity;
+package net.ktnx.mobileledger.async;
 
 import android.os.AsyncTask;
 
-class AsyncCrasher extends AsyncTask<Void, Void, Void> {
+public class AsyncCrasher extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         throw new RuntimeException("Simulated crash");

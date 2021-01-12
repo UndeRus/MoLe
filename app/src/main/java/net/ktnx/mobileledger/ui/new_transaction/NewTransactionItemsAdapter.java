@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.activity;
+package net.ktnx.mobileledger.ui.new_transaction;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

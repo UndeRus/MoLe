@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/newTransactionFragment"
-        android:name="net.ktnx.mobileledger.ui.activity.NewTransactionFragment"
+        android:name="net.ktnx.mobileledger.ui.new_transaction.NewTransactionFragment"
         android:label="NewTransactionFragment"
         >
         <action

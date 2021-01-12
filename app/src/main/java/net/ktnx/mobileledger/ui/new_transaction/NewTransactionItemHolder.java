@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.activity;
+package net.ktnx.mobileledger.ui.new_transaction;
 
 import android.annotation.SuppressLint;
 import android.graphics.Typeface;
@@ -25,7 +25,6 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -56,7 +55,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
 
-import static net.ktnx.mobileledger.ui.activity.NewTransactionModel.ItemType;
+import static net.ktnx.mobileledger.ui.new_transaction.NewTransactionModel.ItemType;
 
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
         implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
@@ -88,7 +87,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                              NewTransactionItemsAdapter adapter) {
         super(b.getRoot());
         this.b = b;
-        new TextViewClearHelper().attachToTextView((EditText) b.comment);
+        new TextViewClearHelper().attachToTextView(b.comment);
 
         b.newTransactionDescription.setNextFocusForwardId(View.NO_ID);
         b.accountRowAccName.setNextFocusForwardId(View.NO_ID);

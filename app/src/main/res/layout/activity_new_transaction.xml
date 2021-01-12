@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.NewTransactionActivity"
+    tools:context=".ui.new_transaction.NewTransactionActivity"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
