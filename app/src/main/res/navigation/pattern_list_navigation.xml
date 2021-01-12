@@ -15,12 +15,15 @@
   ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_container"
-    android:name="androidx.navigation.fragment.NavHostFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:defaultNavHost="true"
-    app:navGraph="@navigation/pattern_list_navigation"
-    />
+    android:id="@+id/pattern_list_navigation.xml"
+    app:startDestination="@id/patternListFragment"
+    >
+
+    <fragment
+        android:id="@+id/patternListFragment"
+        android:name="net.ktnx.mobileledger.ui.patterns.PatternListFragment"
+        android:label="PatternListFragment"
+        />
+</navigation>

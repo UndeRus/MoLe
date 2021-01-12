@@ -19,10 +19,9 @@ package net.ktnx.mobileledger.ui.patterns;
 
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.View;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -30,8 +29,12 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.ActivityPatternsBinding;
 import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 
-public class PatternsActivity extends CrashReportingActivity {
+import java.util.Objects;
 
+public class PatternsActivity extends CrashReportingActivity
+        implements PatternListFragment.OnPatternListFragmentInteractionListener {
+    private ActivityPatternsBinding b;
+    private NavController navController;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -42,24 +45,28 @@ public class PatternsActivity extends CrashReportingActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityPatternsBinding b = ActivityPatternsBinding.inflate(getLayoutInflater());
-        setContentView(b.getRoot());
-        setSupportActionBar(b.toolbar);
-        b.toolbarLayout.setTitle(getTitle());
+        b = ActivityPatternsBinding.inflate(getLayoutInflater());
+        setContentView(b.fragmentContainer);
 
-        b.fab.setOnClickListener(this::fabClicked);
-
-        PatternsRecyclerViewAdapter modelAdapter = new PatternsRecyclerViewAdapter();
-
-        b.patternList.setAdapter(modelAdapter);
-        PatternsModel.retrievePatterns(modelAdapter);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(RecyclerView.VERTICAL);
-        b.patternList.setLayoutManager(llm);
+        NavHostFragment navHostFragment = (NavHostFragment) Objects.requireNonNull(
+                getSupportFragmentManager().findFragmentById(R.id.fragment_container));
+        navController = navHostFragment.getNavController();
     }
-    private void fabClicked(View view) {
-        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_INDEFINITE)
-                .setAction("Action", null)
-                .show();
+    @Override
+    public void onNewPattern() {
+//        navController.navigate
+        final Snackbar snackbar =
+                Snackbar.make(b.fragmentContainer, "New pattern action coming up soon",
+                        Snackbar.LENGTH_INDEFINITE);
+//        snackbar.setAction("Action", v -> snackbar.dismiss());
+        snackbar.show();
+    }
+    @Override
+    public void onEditPattern(int id) {
+        final Snackbar snackbar =
+                Snackbar.make(b.fragmentContainer, "One Edit pattern action coming up soon",
+                        Snackbar.LENGTH_INDEFINITE);
+//        snackbar.setAction("Action", v -> snackbar.dismiss());
+        snackbar.show();
     }
 }
