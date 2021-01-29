@@ -76,6 +76,10 @@ public class Currency {
         MobileLedgerProfile profile = Data.getProfile();
         return profile.loadCurrencyByName(name);
     }
+    public static Currency loadById(int id) {
+        MobileLedgerProfile profile = Data.getProfile();
+        return profile.loadCurrencyById(id);
+    }
     static public boolean equal(Currency left, Currency right) {
         if (left == null) {
             return right == null;
