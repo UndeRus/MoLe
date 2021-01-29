@@ -212,7 +212,7 @@ public class NewTransactionFragment extends QRScanAbleFragment {
                  });
 //        viewModel.checkTransactionSubmittable(listAdapter);
 
-        fab = activity.findViewById(R.id.fab);
+        fab = activity.findViewById(R.id.fabAdd);
         fab.setOnClickListener(v -> onFabPressed());
 
         boolean keep = false;
