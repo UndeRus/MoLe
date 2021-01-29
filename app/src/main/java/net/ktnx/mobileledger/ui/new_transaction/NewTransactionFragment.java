@@ -17,9 +17,7 @@
 
 package net.ktnx.mobileledger.ui.new_transaction;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.renderscript.RSInvalidStateException;
@@ -31,8 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -51,6 +47,7 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.QRScanAbleFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -69,25 +66,9 @@ import java.util.regex.Pattern;
 
 // TODO: offer to undo account remove-on-swipe
 
-public class NewTransactionFragment extends Fragment {
+public class NewTransactionFragment extends QRScanAbleFragment {
     private NewTransactionItemsAdapter listAdapter;
     private NewTransactionModel viewModel;
-    final ActivityResultLauncher<Void> scanQrLauncher =
-            registerForActivityResult(new ActivityResultContract<Void, String>() {
-                @NonNull
-                @Override
-                public Intent createIntent(@NonNull Context context, Void input) {
-                    final Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-                    intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-                    return intent;
-                }
-                @Override
-                public String parseResult(int resultCode, @Nullable Intent intent) {
-                    if (resultCode == Activity.RESULT_CANCELED)
-                        return null;
-                    return intent.getStringExtra("SCAN_RESULT");
-                }
-            }, this::onQrScanned);
     private FloatingActionButton fab;
     private OnNewTransactionFragmentInteractionListener mListener;
     private MobileLedgerProfile mProfile;
@@ -95,7 +76,7 @@ public class NewTransactionFragment extends Fragment {
         // Required empty public constructor
         setHasOptionsMenu(true);
     }
-    private void onQrScanned(String text) {
+    protected void onQrScanned(String text) {
         Logger.debug("qr", String.format("Got QR scan result [%s]", text));
         Pattern p =
                 Pattern.compile("^(\\d+)\\*(\\d+)\\*(\\d+)-(\\d+)-(\\d+)\\*([:\\d]+)\\*([\\d.]+)$");
