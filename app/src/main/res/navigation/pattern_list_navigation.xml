@@ -17,7 +17,8 @@
 
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/pattern_list_navigation.xml"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pattern_list_navigation"
     app:startDestination="@id/patternListFragment"
     >
 
@@ -25,5 +26,25 @@
         android:id="@+id/patternListFragment"
         android:name="net.ktnx.mobileledger.ui.patterns.PatternListFragment"
         android:label="PatternListFragment"
-        />
+        android:tag="patternListFragment"
+        >
+        <action
+            android:id="@+id/action_patternListFragment_to_patternDetailsFragment"
+            app:destination="@id/patternDetailsFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/patternDetailsFragment"
+        android:name="net.ktnx.mobileledger.ui.patterns.PatternDetailsFragment"
+        android:label="pattern_details_fragment"
+        android:tag="patternDetailsFragment"
+        tools:layout="@layout/pattern_details_fragment"
+        >
+        <action
+            android:id="@+id/action_patternDetailsFragment_to_patternListFragment"
+            app:destination="@id/patternListFragment"
+            />
+    </fragment>
 </navigation>

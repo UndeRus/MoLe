@@ -31,8 +31,8 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.FragmentPatternListBinding;
+import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,11 +73,8 @@ public class PatternListFragment extends Fragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Logger.debug("flow", "PatternListFragment.onCreateView()");
         b = FragmentPatternListBinding.inflate(inflater);
-
-        b.toolbarLayout.setTitle(getString(R.string.title_activity_patterns));
-
-        b.fab.setOnClickListener(this::fabClicked);
 
         PatternsRecyclerViewAdapter modelAdapter = new PatternsRecyclerViewAdapter();
 
@@ -129,7 +126,7 @@ public class PatternListFragment extends Fragment {
      */
     public interface OnPatternListFragmentInteractionListener {
         void onNewPattern();
-
+        void onSavePattern();
         void onEditPattern(int id);
     }
 }

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright © 2020 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:minWidth="60dp"
+    android:padding="@dimen/text_margin"
+    app:layout_constraintWidth_min="60dp"
+    >
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/text_margin"
+        android:text="@string/choose_pattern_detail_source_label"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:name="net.ktnx.mobileledger.ui.PatternDetailSourceSelectorFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintWidth_min="50dp"
+        app:layout_constraintHeight_min="150dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:minHeight="100dp"
+        app:layoutManager="LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/pattern_error"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label"
+        tools:context="net.ktnx.mobileledger.ui.CurrencySelectorFragment"
+        tools:listitem="@layout/fragment_pattern_detail_source_selector"
+        />
+    <TextView
+        android:id="@+id/pattern_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/literal_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/list"
+        />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/literal_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/text_margin"
+        android:text="@string/pattern_details_source_literal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

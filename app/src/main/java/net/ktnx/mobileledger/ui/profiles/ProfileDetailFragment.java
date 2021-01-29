@@ -205,7 +205,7 @@ public class ProfileDetailFragment extends Fragment {
                 resetDefaultCommodity();
         });
 
-        FloatingActionButton fab = context.findViewById(R.id.fab);
+        FloatingActionButton fab = context.findViewById(R.id.fabAdd);
         fab.setOnClickListener(v -> onSaveFabClicked());
 
         hookTextChangeSyncRoutine(binding.profileName, model::setProfileName);

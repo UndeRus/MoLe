@@ -17,9 +17,9 @@
 
 <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pattern_list"
+    android:id="@+id/pattern_details_recycler_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ff808000"
-    tools:context=".ui.patterns.PatternsActivity"
-    />
+    tools:context=".ui.patterns.PatternDetailsFragment"
+    >
+</androidx.recyclerview.widget.RecyclerView>

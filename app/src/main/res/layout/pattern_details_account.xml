@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright © 2021 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/pattern_details_item_account_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/text_margin"
+    >
+    <TextView
+        android:id="@+id/pattern_account_label"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="end"
+        android:paddingTop="@dimen/text_margin"
+        android:text="@string/pattern_details_account_row_label"
+        app:drawableBottomCompat="@drawable/dashed_border_8dp"
+        />
+    <TextView
+        android:id="@+id/pattern_account_name_source_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/text_margin"
+        android:text="@string/account_name_source_label"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_account_label"
+        />
+    <TextView
+        android:id="@+id/pattern_details_account_name_source"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minWidth="100dp"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_account_name_source_label"
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/pattern_details_account_name_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/text_margin"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_name_source"
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pattern_details_account_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/pattern_details_account_name_label"
+            android:inputType="text"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/pattern_account_comment_source_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+
+        android:paddingTop="@dimen/text_margin"
+        android:text="@string/account_comment_source_label"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_name_layout"
+        />
+    <TextView
+        android:id="@+id/pattern_details_account_comment_source"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minWidth="100dp"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_account_comment_source_label"
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/pattern_details_account_comment_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/text_margin"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_comment_source"
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pattern_details_account_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/pattern_details_account_comment_label"
+            android:inputType="text"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/pattern_account_amount_source_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:paddingTop="@dimen/text_margin"
+        android:text="@string/account_amount_source_label"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_comment_layout"
+        />
+    <TextView
+        android:id="@+id/pattern_details_account_amount_source"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_account_amount_source_label"
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/pattern_details_account_amount_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/text_margin"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_amount_source"
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pattern_details_account_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/pattern_details_account_amount_label"
+            android:inputType="number|numberDecimal|numberSigned"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
