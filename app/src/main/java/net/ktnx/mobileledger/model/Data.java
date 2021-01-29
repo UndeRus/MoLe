@@ -190,7 +190,10 @@ public final class Data {
         else
             currencySymbolPosition.setValue(Currency.Position.none);
     }
-
+    public static String formatNumber(float number) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(locale.getValue());
+        return formatter.format(number);
+    }
     public static void observeProfile(LifecycleOwner lifecycleOwner,
                                       Observer<MobileLedgerProfile> observer) {
         profile.observe(lifecycleOwner, observer);
