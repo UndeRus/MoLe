@@ -42,7 +42,7 @@ public interface PatternHeaderDAO {
     @Delete
     void delete(PatternHeader item);
 
-    @Query("SELECT * FROM patterns ORDER BY UPPER(name) NULLS FIRST")
+    @Query("SELECT * FROM patterns ORDER BY UPPER(name)")
     LiveData<List<PatternHeader>> getPatterns();
 
     @Query("SELECT * FROM patterns WHERE id = :id")
