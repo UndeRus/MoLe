@@ -237,6 +237,16 @@ abstract public class PatternDetailsItem {
         public void switchToLiteral() {
             literalValue = true;
         }
+        public String toString() {
+            if (literalValue)
+                if (value == null)
+                    return "<null>";
+                else
+                    return value.toString();
+            if (matchGroup > 0)
+                return "grp:" + matchGroup;
+            return "<null>";
+        }
     }
 
     public static class TYPE {
@@ -413,7 +423,8 @@ abstract public class PatternDetailsItem {
         @Override
         public String toString() {
             return super.toString() +
-                   String.format(" name[%s] pat[%s] test[%s]", name, pattern, testText);
+                   String.format(" name[%s] pat[%s] test[%s] tran[%s] com[%s]", name, pattern,
+                           testText, transactionDescription, transactionComment);
         }
         public String getTestText() {
             return testText;
