@@ -232,9 +232,9 @@ public final class Data {
     public static float parseNumber(String str) throws ParseException {
         ParsePosition pos = new ParsePosition(0);
         Number parsed = numberFormatter.parse(str);
-        if (parsed == null)
+        if (parsed == null || pos.getErrorIndex() > -1)
             throw new ParseException("Error parsing '" + str + "'", pos.getErrorIndex());
 
-        return (float) parsed;
+        return parsed.floatValue();
     }
 }
