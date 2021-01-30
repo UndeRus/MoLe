@@ -18,8 +18,11 @@
 package net.ktnx.mobileledger.ui.new_transaction;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.database.AbstractCursor;
 import android.os.Bundle;
+import android.os.ParcelFormatException;
 import android.renderscript.RSInvalidStateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,26 +37,36 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.PatternAccount;
+import net.ktnx.mobileledger.db.PatternHeader;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.QRScanAbleFragment;
+import net.ktnx.mobileledger.ui.patterns.PatternsActivity;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,55 +89,279 @@ public class NewTransactionFragment extends QRScanAbleFragment {
         // Required empty public constructor
         setHasOptionsMenu(true);
     }
+    private void startNewPatternActivity(String scanned) {
+        Intent intent = new Intent(requireContext(), PatternsActivity.class);
+        Bundle args = new Bundle();
+        args.putString(PatternsActivity.ARG_ADD_PATTERN, scanned);
+        requireContext().startActivity(intent, args);
+    }
+    private void alertNoPatternMatch(String scanned) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setCancelable(true)
+               .setMessage(R.string.no_pattern_matches)
+               .setPositiveButton(R.string.add_button,
+                       (dialog, which) -> startNewPatternActivity(scanned))
+               .create()
+               .show();
+    }
     protected void onQrScanned(String text) {
         Logger.debug("qr", String.format("Got QR scan result [%s]", text));
-        Pattern p =
-                Pattern.compile("^(\\d+)\\*(\\d+)\\*(\\d+)-(\\d+)-(\\d+)\\*([:\\d]+)\\*([\\d.]+)$");
-        Matcher m = p.matcher(text);
-        if (m.matches()) {
-            float amount = Float.parseFloat(m.group(7));
-            viewModel.setDate(
-                    new SimpleDate(Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)),
-                            Integer.parseInt(m.group(5))));
 
-            if (viewModel.accountsInInitialState()) {
-                {
-                    NewTransactionModel.Item firstItem = viewModel.getItem(1);
-                    if (firstItem == null) {
-                        viewModel.addAccount(new LedgerTransactionAccount("разход:пазар"));
-                        listAdapter.notifyItemInserted(viewModel.items.size() - 1);
-                    }
-                    else {
-                        firstItem.setAccountName("разход:пазар");
-                        firstItem.getAccount()
-                                 .resetAmount();
-                        listAdapter.notifyItemChanged(1);
-                    }
+        if (Misc.emptyIsNull(text) == null)
+            return;
+
+        LiveData<List<PatternHeader>> allPatterns = DB.get()
+                                                      .getPatternDAO()
+                                                      .getPatterns();
+        allPatterns.observe(getViewLifecycleOwner(), patternHeaders -> {
+            ArrayList<PatternHeader> matchingPatterns = new ArrayList<>();
+
+            for (PatternHeader ph : patternHeaders) {
+                String patternSource = ph.getRegularExpression();
+                if (Misc.emptyIsNull(patternSource) == null)
+                    continue;
+                try {
+                    Pattern pattern = Pattern.compile(patternSource);
+                    Matcher matcher = pattern.matcher(text);
+                    if (!matcher.matches())
+                        continue;
+
+                    Logger.debug("pattern",
+                            String.format("Pattern '%s' [%s] matches '%s'", ph.getName(),
+                                    patternSource, text));
+                    matchingPatterns.add(ph);
                 }
-                {
-                    NewTransactionModel.Item secondItem = viewModel.getItem(2);
-                    if (secondItem == null) {
-                        viewModel.addAccount(
-                                new LedgerTransactionAccount("актив:кеш:дам", -amount, null, null));
-                        listAdapter.notifyItemInserted(viewModel.items.size() - 1);
-                    }
-                    else {
-                        secondItem.setAccountName("актив:кеш:дам");
-                        secondItem.getAccount()
-                                  .setAmount(-amount);
-                        listAdapter.notifyItemChanged(2);
-                    }
+                catch (ParcelFormatException e) {
+                    // ignored
+                    Logger.debug("pattern",
+                            String.format("Error compiling regular expression '%s'", patternSource),
+                            e);
                 }
             }
-            else {
-                viewModel.addAccount(new LedgerTransactionAccount("разход:пазар"));
-                viewModel.addAccount(
-                        new LedgerTransactionAccount("актив:кеш:дам", -amount, null, null));
-                listAdapter.notifyItemRangeInserted(viewModel.items.size() - 1, 2);
-            }
 
-            listAdapter.checkTransactionSubmittable();
+            if (matchingPatterns.isEmpty())
+                alertNoPatternMatch(text);
+            else if (matchingPatterns.size() == 1)
+                applyPattern(matchingPatterns.get(0), text);
+            else
+                choosePattern(matchingPatterns, text);
+        });
+    }
+    private void choosePattern(ArrayList<PatternHeader> matchingPatterns, String matchedText) {
+        final String patternNameColumn = getString(R.string.pattern_name);
+        AbstractCursor cursor = new AbstractCursor() {
+            @Override
+            public int getCount() {
+                return matchingPatterns.size();
+            }
+            @Override
+            public String[] getColumnNames() {
+                return new String[]{patternNameColumn};
+            }
+            @Override
+            public String getString(int column) {
+                return matchingPatterns.get(getPosition())
+                                       .getName();
+            }
+            @Override
+            public short getShort(int column) {
+                return -1;
+            }
+            @Override
+            public int getInt(int column) {
+                return -1;
+            }
+            @Override
+            public long getLong(int column) {
+                return -1;
+            }
+            @Override
+            public float getFloat(int column) {
+                return -1;
+            }
+            @Override
+            public double getDouble(int column) {
+                return -1;
+            }
+            @Override
+            public boolean isNull(int column) {
+                return false;
+            }
+        };
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setCancelable(true)
+               .setTitle(R.string.choose_pattern_to_apply)
+               .setSingleChoiceItems(cursor, -1, patternNameColumn,
+                       (dialog, which) -> applyPattern(matchingPatterns.get(which), matchedText))
+               .create()
+               .show();
+    }
+    private void applyPattern(PatternHeader patternHeader, String text) {
+        Pattern pattern = Pattern.compile(patternHeader.getRegularExpression());
+
+        Matcher m = pattern.matcher(text);
+
+        if (!m.matches()) {
+            Snackbar.make(requireView(), R.string.pattern_does_not_match,
+                    BaseTransientBottomBar.LENGTH_INDEFINITE)
+                    .show();
+            return;
         }
+
+        SimpleDate transactionDate;
+        {
+            int day = extractIntFromMatches(m, patternHeader.getDateDayMatchGroup(),
+                    patternHeader.getDateDay());
+            int month = extractIntFromMatches(m, patternHeader.getDateMonthMatchGroup(),
+                    patternHeader.getDateMonth());
+            int year = extractIntFromMatches(m, patternHeader.getDateYearMatchGroup(),
+                    patternHeader.getDateYear());
+
+            SimpleDate today = SimpleDate.today();
+            if (year <= 0)
+                year = today.year;
+            if (month <= 0)
+                month = today.month;
+            if (day <= 0)
+                day = today.day;
+
+            transactionDate = new SimpleDate(year, month, day);
+
+            Logger.debug("pattern", "setting transaction date to " + transactionDate);
+        }
+
+        NewTransactionModel.Item head = viewModel.getItem(0);
+        head.ensureType(NewTransactionModel.ItemType.generalData);
+        final String transactionDescription =
+                extractStringFromMatches(m, patternHeader.getTransactionDescriptionMatchGroup(),
+                        patternHeader.getTransactionDescription());
+        head.setDescription(transactionDescription);
+        Logger.debug("pattern", "Setting transaction description to " + transactionDescription);
+        final String transactionComment =
+                extractStringFromMatches(m, patternHeader.getTransactionCommentMatchGroup(),
+                        patternHeader.getTransactionComment());
+        head.setTransactionComment(transactionComment);
+        Logger.debug("pattern", "Setting transaction comment to " + transactionComment);
+        head.setDate(transactionDate);
+        listAdapter.notifyItemChanged(0);
+
+        DB.get()
+          .getPatternDAO()
+          .getPatternWithAccounts(patternHeader.getId())
+          .observe(getViewLifecycleOwner(), entry -> {
+              int rowIndex = 0;
+              final boolean accountsInInitialState = viewModel.accountsInInitialState();
+              for (PatternAccount acc : entry.accounts) {
+                  rowIndex++;
+
+                  String accountName = extractStringFromMatches(m, acc.getAccountNameMatchGroup(),
+                          acc.getAccountName());
+                  String accountComment =
+                          extractStringFromMatches(m, acc.getAccountCommentMatchGroup(),
+                                  acc.getAccountComment());
+                  Float amount =
+                          extractFloatFromMatches(m, acc.getAmountMatchGroup(), acc.getAmount());
+
+                  if (accountsInInitialState) {
+                      NewTransactionModel.Item item = viewModel.getItem(rowIndex);
+                      if (item == null) {
+                          Logger.debug("pattern", String.format(Locale.US,
+                                  "Adding new account item [%s][c:%s][a:%s]", accountName,
+                                  accountComment, amount));
+                          final LedgerTransactionAccount ledgerAccount =
+                                  new LedgerTransactionAccount(accountName);
+                          ledgerAccount.setComment(accountComment);
+                          if (amount != null)
+                              ledgerAccount.setAmount(amount);
+                          // TODO currency
+                          viewModel.addAccount(ledgerAccount);
+                          listAdapter.notifyItemInserted(viewModel.items.size() - 1);
+                      }
+                      else {
+                          Logger.debug("pattern", String.format(Locale.US,
+                                  "Stamping account item #%d [%s][c:%s][a:%s]", rowIndex,
+                                  accountName, accountComment, amount));
+
+                          item.setAccountName(accountName);
+                          item.setComment(accountComment);
+                          if (amount != null)
+                              item.getAccount()
+                                  .setAmount(amount);
+
+                          listAdapter.notifyItemChanged(rowIndex);
+                      }
+                  }
+                  else {
+                      final LedgerTransactionAccount transactionAccount =
+                              new LedgerTransactionAccount(accountName);
+                      transactionAccount.setComment(accountComment);
+                      if (amount != null)
+                          transactionAccount.setAmount(amount);
+                      // TODO currency
+                      Logger.debug("pattern", String.format(Locale.US,
+                              "Adding trailing account item [%s][c:%s][a:%s]", accountName,
+                              accountComment, amount));
+
+                      viewModel.addAccount(transactionAccount);
+                      listAdapter.notifyItemInserted(viewModel.items.size() - 1);
+                  }
+              }
+
+              listAdapter.checkTransactionSubmittable();
+          });
+    }
+    private int extractIntFromMatches(Matcher m, Integer group, Integer literal) {
+        if (literal != null)
+            return literal;
+
+        if (group != null) {
+            int grp = group;
+            if (grp > 0 & grp <= m.groupCount())
+                try {
+                    return Integer.parseInt(m.group(grp));
+                }
+                catch (NumberFormatException e) {
+                    Snackbar.make(requireView(),
+                            "Error extracting transaction date: " + e.getMessage(),
+                            BaseTransientBottomBar.LENGTH_INDEFINITE)
+                            .show();
+                }
+        }
+
+        return 0;
+    }
+    private String extractStringFromMatches(Matcher m, Integer group, String literal) {
+        if (literal != null)
+            return literal;
+
+        if (group != null) {
+            int grp = group;
+            if (grp > 0 & grp <= m.groupCount())
+                return m.group(grp);
+        }
+
+        return null;
+    }
+    private Float extractFloatFromMatches(Matcher m, Integer group, Float literal) {
+        if (literal != null)
+            return literal;
+
+        if (group != null) {
+            int grp = group;
+            if (grp > 0 & grp <= m.groupCount())
+                try {
+                    return Float.valueOf(m.group(grp));
+                }
+                catch (NumberFormatException e) {
+                    Snackbar.make(requireView(),
+                            "Error extracting transaction amount: " + e.getMessage(),
+                            BaseTransientBottomBar.LENGTH_INDEFINITE)
+                            .show();
+                }
+        }
+
+        return null;
     }
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {

@@ -308,4 +308,8 @@
     <string name="unnamed_pattern">Pattern with no name</string>
     <string name="add_button_description">Add pattern</string>
     <string name="save_button_description">Save pattern</string>
+    <string name="no_pattern_matches">No pattern matches</string>
+    <string name="choose_pattern_to_apply">Choose pattern to apply</string>
+    <string name="pattern_name">Pattern name</string>
+    <string name="implementation_pending">Not implemented yet</string>
 </resources>

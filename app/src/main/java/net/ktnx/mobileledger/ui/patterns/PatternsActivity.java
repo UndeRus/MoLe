@@ -38,6 +38,7 @@ import java.util.Objects;
 
 public class PatternsActivity extends CrashReportingActivity
         implements PatternListFragment.OnPatternListFragmentInteractionListener {
+    public static final String ARG_ADD_PATTERN = "add-pattern";
     private ActivityPatternsBinding b;
     private NavController navController;
     @Override
