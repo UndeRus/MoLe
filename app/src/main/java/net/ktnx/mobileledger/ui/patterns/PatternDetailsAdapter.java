@@ -42,6 +42,7 @@ import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -454,6 +455,53 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
                 }
             };
             b.patternDetailsAccountComment.addTextChangedListener(accountCommentWatcher);
+
+            b.patternDetailsAccountAmount.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    PatternDetailsItem.AccountRow accRow = getItem();
+
+                    String str = String.valueOf(s);
+                    if (Misc.emptyIsNull(str) == null) {
+                        accRow.setAmount(null);
+                    }
+                    else {
+                        try {
+                            final float amount = Data.parseNumber(str);
+                            accRow.setAmount(amount);
+                            b.patternDetailsAccountAmountLayout.setError(null);
+
+                            Logger.debug(D_PATTERN_UI, String.format(Locale.US,
+                                    "Storing changed account amount %s [%4.2f]; accRow=%s", s,
+                                    amount, accRow));
+                        }
+                        catch (NumberFormatException | ParseException e) {
+                            b.patternDetailsAccountAmountLayout.setError("!");
+                        }
+                    }
+                }
+            });
+            b.patternDetailsAccountAmount.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus)
+                    return;
+
+                PatternDetailsItem.AccountRow accRow = getItem();
+                if (!accRow.hasLiteralAmount())
+                    return;
+                Float amt = accRow.getAmount();
+                if (amt == null)
+                    return;
+
+                b.patternDetailsAccountAmount.setText(Data.formatNumber(amt));
+            });
         }
         @Override
         void bind(PatternDetailsItem item) {
@@ -488,7 +536,9 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
                 b.patternDetailsAccountAmountSource.setText(
                         R.string.pattern_details_source_literal);
                 b.patternDetailsAccountAmount.setVisibility(View.VISIBLE);
-                b.patternDetailsAccountAmount.setText(Data.formatNumber(accRow.getAmount()));
+                Float amt = accRow.getAmount();
+                b.patternDetailsAccountAmount.setText((amt == null) ? null : String.format(
+                        Data.locale.getValue(), "%,4.2f", (accRow.getAmount())));
             }
             else {
                 b.patternDetailsAccountAmountSource.setText(
