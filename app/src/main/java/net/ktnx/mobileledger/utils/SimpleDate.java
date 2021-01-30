@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class SimpleDate implements Comparable<SimpleDate> {
     public final int year;
@@ -95,5 +96,8 @@ public class SimpleDate implements Comparable<SimpleDate> {
         final Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day);
         return calendar;
+    }
+    public String toString() {
+        return String.format(Locale.US, "%d-%02d-%02d", year, month, day);
     }
 }
