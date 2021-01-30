@@ -104,7 +104,7 @@ public class PatternsActivity extends CrashReportingActivity
                 new ViewModelProvider(viewModelStoreOwner).get(PatternDetailsViewModel.class);
         Logger.debug("flow", "PatternsActivity.onSavePattern(): model=" + model);
         model.onSavePattern();
-        navController.navigate(R.id.patternListFragment);
+        navController.navigateUp();
     }
     public NavController getNavController() {
         return navController;
