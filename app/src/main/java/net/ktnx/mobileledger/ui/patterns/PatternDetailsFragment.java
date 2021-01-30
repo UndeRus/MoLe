@@ -71,6 +71,13 @@ public class PatternDetailsFragment extends QRScanAbleFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        NavController controller = ((PatternsActivity) requireActivity()).getNavController();
+        final ViewModelStoreOwner viewModelStoreOwner =
+                controller.getViewModelStoreOwner(R.id.pattern_list_navigation);
+        mViewModel = new ViewModelProvider(viewModelStoreOwner).get(PatternDetailsViewModel.class);
+        mViewModel.setDefaultPatternName(getString(R.string.unnamed_pattern));
+        Logger.debug("flow", "PatternDetailsFragment.onCreateView(): model=" + mViewModel);
+
         b = PatternDetailsFragmentBinding.inflate(inflater);
         Context context = b.patternDetailsRecyclerView.getContext();
         if (mColumnCount <= 1) {
@@ -86,18 +93,8 @@ public class PatternDetailsFragment extends QRScanAbleFragment {
         b.patternDetailsRecyclerView.setAdapter(adapter);
         mViewModel.getItems(mPatternId)
                   .observe(getViewLifecycleOwner(), adapter::setItems);
-        return b.getRoot();
-    }
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        NavController controller = ((PatternsActivity) context).getNavController();
-        final ViewModelStoreOwner viewModelStoreOwner =
-                controller.getViewModelStoreOwner(R.id.pattern_list_navigation);
-        mViewModel = new ViewModelProvider(viewModelStoreOwner).get(PatternDetailsViewModel.class);
-        mViewModel.setDefaultPatternName(getString(R.string.unnamed_pattern));
-        Logger.debug("flow", "PatternDetailsFragment.onAttach(): model=" + mViewModel);
 
+        return b.getRoot();
     }
     @Override
     protected void onQrScanned(String text) {
