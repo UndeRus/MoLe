@@ -24,7 +24,7 @@ import net.ktnx.mobileledger.dao.CurrencyDAO;
 import net.ktnx.mobileledger.dao.PatternAccountDAO;
 import net.ktnx.mobileledger.dao.PatternHeaderDAO;
 
-@Database(version = 49, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
+@Database(version = 51, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
 abstract public class DB extends RoomDatabase {
     public abstract PatternHeaderDAO getPatternDAO();
     public abstract PatternAccountDAO getPatternAccountDAO();

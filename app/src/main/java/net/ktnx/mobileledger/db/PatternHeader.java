@@ -17,12 +17,11 @@ public class PatternHeader extends PatternBase {
     @ColumnInfo(name = "name")
     @NonNull
     private String name;
-    @ColumnInfo(name = "position")
-    @NonNull
-    private Long position;
     @NonNull
     @ColumnInfo(name = "regular_expression")
     private String regularExpression;
+    @ColumnInfo(name = "test_text")
+    private String testText;
     @ColumnInfo(name = "transaction_description")
     private String transactionDescription;
     @ColumnInfo(name = "transaction_description_match_group")
@@ -43,12 +42,17 @@ public class PatternHeader extends PatternBase {
     private Integer dateDay;
     @ColumnInfo(name = "date_day_match_group")
     private Integer dateDayMatchGroup;
-    public PatternHeader(@NotNull Long id, @NonNull String name, @NotNull Long position,
+    public PatternHeader(@NotNull Long id, @NonNull String name,
                          @NonNull String regularExpression) {
         this.id = id;
         this.name = name;
-        this.position = position;
         this.regularExpression = regularExpression;
+    }
+    public String getTestText() {
+        return testText;
+    }
+    public void setTestText(String testText) {
+        this.testText = testText;
     }
     public Integer getTransactionDescriptionMatchGroup() {
         return transactionDescriptionMatchGroup;
@@ -93,13 +97,6 @@ public class PatternHeader extends PatternBase {
     }
     public void setName(@NonNull String name) {
         this.name = name;
-    }
-    @NonNull
-    public Long getPosition() {
-        return position;
-    }
-    public void setPosition(@NonNull Long position) {
-        this.position = position;
     }
     @NonNull
     public String getRegularExpression() {
