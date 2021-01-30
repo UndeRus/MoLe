@@ -61,8 +61,17 @@ abstract public class PatternDetailsItem {
             header.setName(ph.getName());
             header.setPattern(ph.getRegularExpression());
             header.setTestText(ph.getTestText());
-            header.setTransactionDescription(ph.getTransactionDescription());
-            header.setTransactionComment(ph.getTransactionComment());
+
+            if (ph.getTransactionDescriptionMatchGroup() == null)
+                header.setTransactionDescription(ph.getTransactionDescription());
+            else
+                header.setTransactionDescriptionMatchGroup(ph.getTransactionDescriptionMatchGroup());
+
+            if (ph.getTransactionCommentMatchGroup() == null)
+                header.setTransactionComment(ph.getTransactionComment());
+            else
+                header.setTransactionCommentMatchGroup(ph.getTransactionCommentMatchGroup());
+
             header.setDateDayMatchGroup(ph.getDateDayMatchGroup());
             header.setDateMonthMatchGroup(ph.getDateMonthMatchGroup());
             header.setDateYearMatchGroup(ph.getDateYearMatchGroup());
@@ -528,13 +537,13 @@ abstract public class PatternDetailsItem {
         public int getTransactionDescriptionMatchGroup() {
             return transactionDescription.getMatchGroup();
         }
-        public void setTransactionDescriptionMatchGroup(short group) {
+        public void setTransactionDescriptionMatchGroup(int group) {
             transactionDescription.setMatchGroup(group);
         }
         public int getTransactionCommentMatchGroup() {
             return transactionComment.getMatchGroup();
         }
-        public void setTransactionCommentMatchGroup(short group) {
+        public void setTransactionCommentMatchGroup(int group) {
             transactionComment.setMatchGroup(group);
         }
         public void switchToLiteralDateYear() {
