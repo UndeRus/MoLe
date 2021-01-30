@@ -23,9 +23,11 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import net.ktnx.mobileledger.db.PatternHeader;
+import net.ktnx.mobileledger.db.PatternWithAccounts;
 
 import java.util.List;
 
@@ -46,8 +48,7 @@ public interface PatternHeaderDAO {
     @Query("SELECT * FROM patterns WHERE id = :id")
     LiveData<PatternHeader> getPattern(Long id);
 
-//    not useful for now
-//    @Transaction
-//    @Query("SELECT * FROM patterns")
-//    List<PatternWithAccounts> getPatternsWithAccounts();
+    @Transaction
+    @Query("SELECT * FROM patterns WHERE id = :id")
+    LiveData<PatternWithAccounts> getPatternWithAccounts(Long id);
 }

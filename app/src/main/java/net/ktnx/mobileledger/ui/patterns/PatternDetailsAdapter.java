@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.patterns;
 
-import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -39,11 +38,13 @@ import net.ktnx.mobileledger.model.PatternDetailsItem;
 import net.ktnx.mobileledger.ui.PatternDetailSourceSelectorFragment;
 import net.ktnx.mobileledger.ui.QRScanAbleFragment;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,18 +60,20 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
                                            @NonNull PatternDetailsItem newItem) {
                 if (oldItem.getType() != newItem.getType())
                     return false;
-                if (oldItem.getType() == PatternDetailsItem.Type.HEADER)
+                if (oldItem.getType()
+                           .equals(PatternDetailsItem.Type.HEADER))
                     return true;    // only one header item, ever
                 // the rest is comparing two account row items
                 return oldItem.asAccountRowItem()
                               .getId() == newItem.asAccountRowItem()
                                                  .getId();
             }
-            @SuppressLint("DiffUtilEquals")
             @Override
             public boolean areContentsTheSame(@NonNull PatternDetailsItem oldItem,
                                               @NonNull PatternDetailsItem newItem) {
-                if (oldItem.getType() == PatternDetailsItem.Type.HEADER) {
+                if (oldItem.getType()
+                           .equals(PatternDetailsItem.Type.HEADER))
+                {
                     PatternDetailsItem.Header oldHeader = oldItem.asHeaderItem();
                     PatternDetailsItem.Header newHeader = newItem.asHeaderItem();
 
@@ -87,6 +90,7 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
     }
     @Override
     public long getItemId(int position) {
+        // header item is always first and IDs id may duplicate some of the account IDs
         if (position == 0)
             return -1;
         PatternDetailsItem.AccountRow accRow = differ.getCurrentList()
@@ -142,9 +146,11 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
     public String getMatchGroupText(int groupNumber) {
         PatternDetailsItem.Header header = getHeader();
         Pattern p = header.getCompiledPattern();
-        if (p == null) return null;
+        if (p == null)
+            return null;
 
-        Matcher m = p.matcher(header.getTestText());
+        final String testText = Misc.nullIsEmpty(header.getTestText());
+        Matcher m = p.matcher(testText);
         if (m.matches() && m.groupCount() >= groupNumber)
             return m.group(groupNumber);
         else
@@ -161,121 +167,105 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
     private enum AccDetail {ACCOUNT, COMMENT, AMOUNT}
 
     public abstract static class ViewHolder extends RecyclerView.ViewHolder {
-        protected int updateInProgress = 0;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-        }
-        protected void startUpdate() {
-            updateInProgress++;
-        }
-        protected void finishUpdate() {
-            if (updateInProgress <= 0)
-                throw new IllegalStateException(
-                        "Unexpected updateInProgress value " + updateInProgress);
-
-            updateInProgress--;
         }
         abstract void bind(PatternDetailsItem item);
     }
 
     public class Header extends ViewHolder {
         private final PatternDetailsHeaderBinding b;
-        private final TextWatcher patternNameWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                Object tag = b.patternDetailsItemHead.getTag();
-                if (tag != null) {
-                    final PatternDetailsItem.Header header =
-                            ((PatternDetailsItem) tag).asHeaderItem();
+        public Header(@NonNull PatternDetailsHeaderBinding binding) {
+            super(binding.getRoot());
+            b = binding;
+
+            TextWatcher patternNameWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    final PatternDetailsItem.Header header = getItem();
                     Logger.debug(D_PATTERN_UI,
                             "Storing changed pattern name " + s + "; header=" + header);
                     header.setName(String.valueOf(s));
                 }
-            }
-        };
-        private final TextWatcher patternWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                Object tag = b.patternDetailsItemHead.getTag();
-                if (tag != null) {
-                    final PatternDetailsItem.Header header =
-                            ((PatternDetailsItem) tag).asHeaderItem();
+            };
+            b.patternName.addTextChangedListener(patternNameWatcher);
+            TextWatcher patternWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    final PatternDetailsItem.Header header = getItem();
                     Logger.debug(D_PATTERN_UI,
                             "Storing changed pattern " + s + "; header=" + header);
                     header.setPattern(String.valueOf(s));
                 }
-            }
-        };
-        private final TextWatcher testTextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                Object tag = b.patternDetailsItemHead.getTag();
-                if (tag != null) {
-                    final PatternDetailsItem.Header header =
-                            ((PatternDetailsItem) tag).asHeaderItem();
+            };
+            b.pattern.addTextChangedListener(patternWatcher);
+            TextWatcher testTextWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    final PatternDetailsItem.Header header = getItem();
                     Logger.debug(D_PATTERN_UI,
                             "Storing changed test text " + s + "; header=" + header);
                     header.setTestText(String.valueOf(s));
                 }
-            }
-        };
-        private final TextWatcher transactionDescriptionWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            };
+            b.testText.addTextChangedListener(testTextWatcher);
+            TextWatcher transactionDescriptionWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                PatternDetailsItem.Header header = ((PatternDetailsItem) Objects.requireNonNull(
-                        b.patternDetailsItemHead.getTag())).asHeaderItem();
-                Logger.debug(D_PATTERN_UI,
-                        "Storing changed transaction description " + s + "; header=" + header);
-                header.setTransactionDescription(String.valueOf(s));
-            }
-        };
-        private final TextWatcher transactionCommentWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    final PatternDetailsItem.Header header = getItem();
+                    Logger.debug(D_PATTERN_UI,
+                            "Storing changed transaction description " + s + "; header=" + header);
+                    header.setTransactionDescription(String.valueOf(s));
+                }
+            };
+            b.transactionDescription.addTextChangedListener(transactionDescriptionWatcher);
+            TextWatcher transactionCommentWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-            }
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-            }
-            @Override
-            public void afterTextChanged(Editable s) {
-                PatternDetailsItem.Header header = ((PatternDetailsItem) Objects.requireNonNull(
-                        b.patternDetailsItemHead.getTag())).asHeaderItem();
-                Logger.debug(D_PATTERN_UI,
-                        "Storing changed transaction description " + s + "; header=" + header);
-                header.setTransactionComment(String.valueOf(s));
-            }
-        };
-        public Header(@NonNull PatternDetailsHeaderBinding binding) {
-            super(binding.getRoot());
-            b = binding;
+                }
+                @Override
+                public void afterTextChanged(Editable s) {
+                    final PatternDetailsItem.Header header = getItem();
+                    Logger.debug(D_PATTERN_UI,
+                            "Storing changed transaction description " + s + "; header=" + header);
+                    header.setTransactionComment(String.valueOf(s));
+                }
+            };
+            b.transactionComment.addTextChangedListener(transactionCommentWatcher);
         }
-        Header(@NonNull View itemView) {
-            super(itemView);
-            throw new IllegalStateException("Should not be used");
+        @NotNull
+        private PatternDetailsItem.Header getItem() {
+            int pos = getAdapterPosition();
+            return differ.getCurrentList()
+                         .get(pos)
+                         .asHeaderItem();
         }
-        private void selectHeaderDetailSource(View v, PatternDetailsItem.Header header,
-                                              HeaderDetail detail) {
+        private void selectHeaderDetailSource(View v, HeaderDetail detail) {
+            PatternDetailsItem.Header header = getItem();
             Logger.debug(D_PATTERN_UI, "header is " + header);
             PatternDetailSourceSelectorFragment sel =
                     PatternDetailSourceSelectorFragment.newInstance(1, header.getPattern(),
@@ -332,117 +322,98 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
         @Override
         void bind(PatternDetailsItem item) {
             PatternDetailsItem.Header header = item.asHeaderItem();
-            startUpdate();
-            try {
-                Logger.debug(D_PATTERN_UI, "Binding to header " + header);
-                b.patternName.setText(header.getName());
-                b.pattern.setText(header.getPattern());
-                b.testText.setText(header.getTestText());
+            Logger.debug(D_PATTERN_UI, "Binding to header " + header);
 
-                if (header.hasLiteralDateYear()) {
-                    b.patternDetailsYearSource.setText(R.string.pattern_details_source_literal);
-                    b.patternDetailsDateYear.setText(String.valueOf(header.getDateYear()));
-                    b.patternDetailsDateYearLayout.setVisibility(View.VISIBLE);
-                }
-                else {
-                    b.patternDetailsDateYearLayout.setVisibility(View.GONE);
-                    b.patternDetailsYearSource.setText(String.format(Locale.US, "Group %d (%s)",
-                            header.getDateYearMatchGroup(), getMatchGroupText(
-                                    header.getDateYearMatchGroup())));
-                }
-                b.patternDetailsYearSourceLabel.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DATE_YEAR));
-                b.patternDetailsYearSource.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DATE_YEAR));
+            b.patternName.setText(header.getName());
+            b.pattern.setText(header.getPattern());
+            b.testText.setText(header.getTestText());
 
-                if (header.hasLiteralDateMonth()) {
-                    b.patternDetailsMonthSource.setText(R.string.pattern_details_source_literal);
-                    b.patternDetailsDateMonth.setText(String.valueOf(header.getDateMonth()));
-                    b.patternDetailsDateMonthLayout.setVisibility(View.VISIBLE);
-                }
-                else {
-                    b.patternDetailsDateMonthLayout.setVisibility(View.GONE);
-                    b.patternDetailsMonthSource.setText(String.format(Locale.US, "Group %d (%s)",
-                            header.getDateMonthMatchGroup(), getMatchGroupText(
-                                    header.getDateMonthMatchGroup())));
-                }
-                b.patternDetailsMonthSourceLabel.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DATE_MONTH));
-                b.patternDetailsMonthSource.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DATE_MONTH));
-
-                if (header.hasLiteralDateDay()) {
-                    b.patternDetailsDaySource.setText(R.string.pattern_details_source_literal);
-                    b.patternDetailsDateDay.setText(String.valueOf(header.getDateDay()));
-                    b.patternDetailsDateDayLayout.setVisibility(View.VISIBLE);
-                }
-                else {
-                    b.patternDetailsDateDayLayout.setVisibility(View.GONE);
-                    b.patternDetailsDaySource.setText(String.format(Locale.US, "Group %d (%s)",
-                            header.getDateDayMatchGroup(), getMatchGroupText(
-                                    header.getDateDayMatchGroup())));
-                }
-                b.patternDetailsDaySourceLabel.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DATE_DAY));
-                b.patternDetailsDaySource.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DATE_DAY));
-
-                if (header.hasLiteralTransactionDescription()) {
-                    b.patternTransactionDescriptionSource.setText(
-                            R.string.pattern_details_source_literal);
-                    b.transactionDescription.setText(header.getTransactionDescription());
-                    b.transactionDescriptionLayout.setVisibility(View.VISIBLE);
-                }
-                else {
-                    b.transactionDescriptionLayout.setVisibility(View.GONE);
-                    b.patternTransactionDescriptionSource.setText(
-                            String.format(Locale.US, "Group %d (%s)",
-                                    header.getTransactionDescriptionMatchGroup(), getMatchGroupText(
-                                            header.getTransactionDescriptionMatchGroup())));
-
-                }
-                b.patternTransactionDescriptionSourceLabel.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DESCRIPTION));
-                b.patternTransactionDescriptionSource.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.DESCRIPTION));
-
-                if (header.hasLiteralTransactionComment()) {
-                    b.patternTransactionCommentSource.setText(
-                            R.string.pattern_details_source_literal);
-                    b.transactionComment.setText(header.getTransactionComment());
-                    b.transactionCommentLayout.setVisibility(View.VISIBLE);
-                }
-                else {
-                    b.transactionCommentLayout.setVisibility(View.GONE);
-                    b.patternTransactionCommentSource.setText(
-                            String.format(Locale.US, "Group %d (%s)",
-                                    header.getTransactionCommentMatchGroup(),
-                                    getMatchGroupText(header.getTransactionCommentMatchGroup())));
-
-                }
-                b.patternTransactionCommentSourceLabel.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.COMMENT));
-                b.patternTransactionCommentSource.setOnClickListener(
-                        v -> selectHeaderDetailSource(v, header, HeaderDetail.COMMENT));
-
-                b.patternDetailsHeadScanQrButton.setOnClickListener(this::scanTestQR);
-
-                final Object prevTag = b.patternDetailsItemHead.getTag();
-                if (!(prevTag instanceof PatternDetailsItem)) {
-                    Logger.debug(D_PATTERN_UI, "Hooked text change listeners");
-
-                    b.patternName.addTextChangedListener(patternNameWatcher);
-                    b.pattern.addTextChangedListener(patternWatcher);
-                    b.testText.addTextChangedListener(testTextWatcher);
-                    b.transactionDescription.addTextChangedListener(transactionDescriptionWatcher);
-                    b.transactionComment.addTextChangedListener(transactionCommentWatcher);
-                }
-
-                b.patternDetailsItemHead.setTag(item);
+            if (header.hasLiteralDateYear()) {
+                b.patternDetailsYearSource.setText(R.string.pattern_details_source_literal);
+                b.patternDetailsDateYear.setText(String.valueOf(header.getDateYear()));
+                b.patternDetailsDateYearLayout.setVisibility(View.VISIBLE);
             }
-            finally {
-                finishUpdate();
+            else {
+                b.patternDetailsDateYearLayout.setVisibility(View.GONE);
+                b.patternDetailsYearSource.setText(
+                        String.format(Locale.US, "Group %d (%s)", header.getDateYearMatchGroup(),
+                                getMatchGroupText(header.getDateYearMatchGroup())));
             }
+            b.patternDetailsYearSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+            b.patternDetailsYearSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+
+            if (header.hasLiteralDateMonth()) {
+                b.patternDetailsMonthSource.setText(R.string.pattern_details_source_literal);
+                b.patternDetailsDateMonth.setText(String.valueOf(header.getDateMonth()));
+                b.patternDetailsDateMonthLayout.setVisibility(View.VISIBLE);
+            }
+            else {
+                b.patternDetailsDateMonthLayout.setVisibility(View.GONE);
+                b.patternDetailsMonthSource.setText(
+                        String.format(Locale.US, "Group %d (%s)", header.getDateMonthMatchGroup(),
+                                getMatchGroupText(header.getDateMonthMatchGroup())));
+            }
+            b.patternDetailsMonthSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
+            b.patternDetailsMonthSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
+
+            if (header.hasLiteralDateDay()) {
+                b.patternDetailsDaySource.setText(R.string.pattern_details_source_literal);
+                b.patternDetailsDateDay.setText(String.valueOf(header.getDateDay()));
+                b.patternDetailsDateDayLayout.setVisibility(View.VISIBLE);
+            }
+            else {
+                b.patternDetailsDateDayLayout.setVisibility(View.GONE);
+                b.patternDetailsDaySource.setText(
+                        String.format(Locale.US, "Group %d (%s)", header.getDateDayMatchGroup(),
+                                getMatchGroupText(header.getDateDayMatchGroup())));
+            }
+            b.patternDetailsDaySourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+            b.patternDetailsDaySource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+
+            if (header.hasLiteralTransactionDescription()) {
+                b.patternTransactionDescriptionSource.setText(
+                        R.string.pattern_details_source_literal);
+                b.transactionDescription.setText(header.getTransactionDescription());
+                b.transactionDescriptionLayout.setVisibility(View.VISIBLE);
+            }
+            else {
+                b.transactionDescriptionLayout.setVisibility(View.GONE);
+                b.patternTransactionDescriptionSource.setText(
+                        String.format(Locale.US, "Group %d (%s)",
+                                header.getTransactionDescriptionMatchGroup(),
+                                getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
+
+            }
+            b.patternTransactionDescriptionSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+            b.patternTransactionDescriptionSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+
+            if (header.hasLiteralTransactionComment()) {
+                b.patternTransactionCommentSource.setText(R.string.pattern_details_source_literal);
+                b.transactionComment.setText(header.getTransactionComment());
+                b.transactionCommentLayout.setVisibility(View.VISIBLE);
+            }
+            else {
+                b.transactionCommentLayout.setVisibility(View.GONE);
+                b.patternTransactionCommentSource.setText(String.format(Locale.US, "Group %d (%s)",
+                        header.getTransactionCommentMatchGroup(),
+                        getMatchGroupText(header.getTransactionCommentMatchGroup())));
+
+            }
+            b.patternTransactionCommentSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
+            b.patternTransactionCommentSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
+
+            b.patternDetailsHeadScanQrButton.setOnClickListener(this::scanTestQR);
+
         }
         private void scanTestQR(View view) {
             QRScanAbleFragment.triggerQRScan();
@@ -454,10 +425,35 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
         public AccountRow(@NonNull PatternDetailsAccountBinding binding) {
             super(binding.getRoot());
             b = binding;
-        }
-        AccountRow(@NonNull View itemView) {
-            super(itemView);
-            throw new IllegalStateException("Should not be used");
+
+            TextWatcher accountNameWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    PatternDetailsItem.AccountRow accRow = getItem();
+                    Logger.debug(D_PATTERN_UI,
+                            "Storing changed account name " + s + "; accRow=" + accRow);
+                    accRow.setAccountName(String.valueOf(s));
+                }
+            };
+            b.patternDetailsAccountName.addTextChangedListener(accountNameWatcher);
+            TextWatcher accountCommentWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                @Override
+                public void afterTextChanged(Editable s) {
+                    PatternDetailsItem.AccountRow accRow = getItem();
+                    Logger.debug(D_PATTERN_UI,
+                            "Storing changed account comment " + s + "; accRow=" + accRow);
+                    accRow.setAccountComment(String.valueOf(s));
+                }
+            };
+            b.patternDetailsAccountComment.addTextChangedListener(accountCommentWatcher);
         }
         @Override
         void bind(PatternDetailsItem item) {
@@ -502,20 +498,25 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
             }
 
             b.patternAccountNameSourceLabel.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, accRow, AccDetail.ACCOUNT));
+                    v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
             b.patternDetailsAccountNameSource.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, accRow, AccDetail.ACCOUNT));
+                    v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
             b.patternAccountCommentSourceLabel.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, accRow, AccDetail.COMMENT));
+                    v -> selectAccountRowDetailSource(v, AccDetail.COMMENT));
             b.patternDetailsAccountCommentSource.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, accRow, AccDetail.COMMENT));
+                    v -> selectAccountRowDetailSource(v, AccDetail.COMMENT));
             b.patternAccountAmountSourceLabel.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, accRow, AccDetail.AMOUNT));
+                    v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
             b.patternDetailsAccountAmountSource.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, accRow, AccDetail.AMOUNT));
+                    v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
         }
-        private void selectAccountRowDetailSource(View v, PatternDetailsItem.AccountRow accRow,
-                                                  AccDetail detail) {
+        private @NotNull PatternDetailsItem.AccountRow getItem() {
+            return differ.getCurrentList()
+                         .get(getAdapterPosition())
+                         .asAccountRowItem();
+        }
+        private void selectAccountRowDetailSource(View v, AccDetail detail) {
+            PatternDetailsItem.AccountRow accRow = getItem();
             final PatternDetailsItem.Header header = getHeader();
             Logger.debug(D_PATTERN_UI, "header is " + header);
             PatternDetailSourceSelectorFragment sel =

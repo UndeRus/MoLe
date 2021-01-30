@@ -82,23 +82,19 @@ public class PatternsActivity extends CrashReportingActivity
 
         b.toolbarLayout.setTitle(getString(R.string.title_activity_patterns));
 
-        b.fabAdd.setOnClickListener(v -> onNewPattern());
+        b.fabAdd.setOnClickListener(v -> onEditPattern(null));
         b.fabSave.setOnClickListener(v -> onSavePattern());
     }
     @Override
-    public void onNewPattern() {
-        navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment);
-//        final Snackbar snackbar =
-//                Snackbar.make(b.fragmentContainer, "New pattern action coming up soon",
-//                        Snackbar.LENGTH_INDEFINITE);
-//        snackbar.setAction("Action", v -> snackbar.dismiss());
-//        snackbar.show();
-    }
-    @Override
-    public void onEditPattern(int id) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(PatternDetailsFragment.ARG_PATTERN_ID, id);
-        navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment, bundle);
+    public void onEditPattern(Long id) {
+        if (id == null){
+            navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment);
+        }
+        else{
+            Bundle bundle = new Bundle();
+            bundle.putLong(PatternDetailsFragment.ARG_PATTERN_ID, id);
+            navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment, bundle);
+        }
     }
     @Override
     public void onSavePattern() {

@@ -44,7 +44,7 @@ public class PatternDetailsFragment extends QRScanAbleFragment {
     PatternDetailsFragmentBinding b;
     private PatternDetailsViewModel mViewModel;
     private int mColumnCount = 1;
-    private int mPatternId = PatternDetailsViewModel.NEW_PATTERN;
+    private Long mPatternId;
     public PatternDetailsFragment() {
     }
     public static PatternDetailsFragment newInstance(int columnCount, int patternId) {
@@ -63,9 +63,10 @@ public class PatternDetailsFragment extends QRScanAbleFragment {
         final Bundle args = getArguments();
         if (args != null) {
             mColumnCount = args.getInt(ARG_COLUMN_COUNT, 1);
-            mPatternId = args.getInt(ARG_PATTERN_ID, PatternDetailsViewModel.NEW_PATTERN);
+            mPatternId = args.getLong(ARG_PATTERN_ID, -1);
+            if (mPatternId == -1)
+                mPatternId = null;
         }
-        mViewModel.setPatternId(mPatternId);
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -83,7 +84,7 @@ public class PatternDetailsFragment extends QRScanAbleFragment {
 
         PatternDetailsAdapter adapter = new PatternDetailsAdapter();
         b.patternDetailsRecyclerView.setAdapter(adapter);
-        mViewModel.getItems()
+        mViewModel.getItems(mPatternId)
                   .observe(getViewLifecycleOwner(), adapter::setItems);
         return b.getRoot();
     }
@@ -101,7 +102,8 @@ public class PatternDetailsFragment extends QRScanAbleFragment {
     @Override
     protected void onQrScanned(String text) {
         Logger.debug("PatDet_fr", String.format("Got scanned text '%s'", text));
-        mViewModel.setTestText(text);
+        if (text != null)
+            mViewModel.setTestText(text);
     }
     public void onSavePattern() {
         mViewModel.onSavePattern();

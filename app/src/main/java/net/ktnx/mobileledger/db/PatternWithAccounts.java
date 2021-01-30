@@ -15,24 +15,20 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.db;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
-import net.ktnx.mobileledger.databinding.PatternLayoutBinding;
-import net.ktnx.mobileledger.db.PatternHeader;
+import java.util.List;
 
-class PatternViewHolder extends RecyclerView.ViewHolder {
-    final PatternLayoutBinding b;
-    public PatternViewHolder(@NonNull PatternLayoutBinding binding) {
-        super(binding.getRoot());
-        b = binding;
-    }
-    public void bindToItem(PatternHeader item) {
-        b.patternName.setText(item.getName());
-        b.editButon.setOnClickListener(v -> {
-            ((PatternsActivity) v.getContext()).onEditPattern(item.getId());
-        });
+public class PatternWithAccounts {
+    @Embedded
+    public PatternHeader header;
+    @Relation(parentColumn = "id", entityColumn = "pattern_id")
+    public List<PatternAccount> accounts;
+
+    public Long getId() {
+        return header.getId();
     }
 }

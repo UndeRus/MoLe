@@ -73,6 +73,9 @@ public class PatternAccount extends PatternBase {
     public void setPosition(@NonNull Long position) {
         this.position = position;
     }
+    public void setPosition(int position) {
+        this.position = (long) position;
+    }
     public Integer getAccountNameMatchGroup() {
         return accountNameMatchGroup;
     }

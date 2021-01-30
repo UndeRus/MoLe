@@ -26,6 +26,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import org.jetbrains.annotations.Contract;
+
 public class Misc {
     public static boolean isZero(float f) {
         return (f < 0.005) && (f > -0.005);
@@ -80,5 +82,19 @@ public class Misc {
             return null;
 
         return string.trim();
+    }
+    @Contract(value = "null, null -> true; null, !null -> false; !null, null -> false", pure = true)
+    public static boolean equalIntegers(Integer a, Integer b) {
+        if ( a == null && b == null) return true;
+        if (a == null || b == null) return false;
+
+        return a.equals(b);
+    }
+    @Contract(value = "null, null -> true; null, !null -> false; !null, null -> false", pure = true)
+    public static boolean equalLongs(Long a, Long b) {
+        if ( a == null && b == null) return true;
+        if (a == null || b == null) return false;
+
+        return a.equals(b);
     }
 }

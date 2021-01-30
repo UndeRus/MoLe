@@ -36,13 +36,11 @@ import java.util.regex.PatternSyntaxException;
 
 abstract public class PatternDetailsItem {
     private final Type type;
-    protected long id;
-    protected long position;
+    protected Long id;
+    protected Long position;
 
-    protected PatternDetailsItem(Type type, long id, long position) {
+    protected PatternDetailsItem(Type type) {
         this.type = type;
-        this.id = (id <= 0) ? -position - 2 : id;
-        this.position = position;
     }
     @Contract(" -> new")
     public static @NotNull PatternDetailsItem.Header createHeader() {
@@ -51,17 +49,18 @@ abstract public class PatternDetailsItem {
     public static @NotNull PatternDetailsItem.Header createHeader(Header origin) {
         return new Header(origin);
     }
-    @Contract("_ -> new")
-    public static @NotNull PatternDetailsItem.AccountRow createAccountRow(long position) {
-        return new AccountRow(-1, position);
+    @Contract("-> new")
+    public static @NotNull PatternDetailsItem.AccountRow createAccountRow() {
+        return new AccountRow();
     }
     public static PatternDetailsItem fromRoomObject(PatternBase p) {
         if (p instanceof PatternHeader) {
             PatternHeader ph = (PatternHeader) p;
             Header header = createHeader();
+            header.setId(ph.getId());
             header.setName(ph.getName());
             header.setPattern(ph.getRegularExpression());
-            header.setTestText(null);
+            header.setTestText(ph.getTestText());
             header.setTransactionDescription(ph.getTransactionDescription());
             header.setTransactionComment(ph.getTransactionComment());
             header.setDateDayMatchGroup(ph.getDateDayMatchGroup());
@@ -72,27 +71,30 @@ abstract public class PatternDetailsItem {
         }
         else if (p instanceof PatternAccount) {
             PatternAccount pa = (PatternAccount) p;
-            AccountRow acc = createAccountRow(pa.getPosition());
+            AccountRow acc = createAccountRow();
+            acc.setId(pa.getId());
 
-            if (Misc.emptyIsNull(pa.getAccountName()) != null)
-                acc.setAccountName(pa.getAccountName());
+            if (pa.getAccountNameMatchGroup() == null)
+                acc.setAccountName(Misc.nullIsEmpty(pa.getAccountName()));
             else
                 acc.setAccountNameMatchGroup(pa.getAccountNameMatchGroup());
 
-            if (Misc.emptyIsNull(pa.getAccountComment()) == null)
-                acc.setAccountCommentMatchGroup(pa.getAccountCommentMatchGroup());
+            if (pa.getAccountCommentMatchGroup() == null)
+                acc.setAccountComment(Misc.nullIsEmpty(pa.getAccountComment()));
             else
-                acc.setAccountComment(pa.getAccountComment());
+                acc.setAccountCommentMatchGroup(pa.getAccountCommentMatchGroup());
 
-            if (pa.getCurrency() == null) {
+            if (pa.getCurrencyMatchGroup() == null) {
+                final Integer currencyId = pa.getCurrency();
+                if (currencyId != null && currencyId > 0)
+                    acc.setCurrency(Currency.loadById(currencyId));
+            }
+            else
                 acc.setCurrencyMatchGroup(pa.getCurrencyMatchGroup());
-            }
-            else {
-                acc.setCurrency(Currency.loadById(pa.getCurrency()));
-            }
 
-            if (pa.getAmount() == null)
-                acc.setAmountMatchGroup(pa.getAmountMatchGroup());
+            final Integer amountMatchGroup = pa.getAmountMatchGroup();
+            if (amountMatchGroup != null && amountMatchGroup > 0)
+                acc.setAmountMatchGroup(amountMatchGroup);
             else
                 acc.setAmount(pa.getAmount());
 
@@ -128,13 +130,16 @@ abstract public class PatternDetailsItem {
     public long getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+    public void setId(int id) {
+        this.id = (long) id;
     }
     public long getPosition() {
         return position;
     }
-    public void setPosition(int position) {
+    public void setPosition(Long position) {
         this.position = position;
     }
     abstract public String getProblem(@NonNull Resources r, int patternGroupCount);
@@ -166,18 +171,18 @@ abstract public class PatternDetailsItem {
             matchGroup = origin.matchGroup;
         }
         @NonNull
-        public static PossiblyMatchedValue<Integer> withLiteralInt(int initialValue) {
+        public static PossiblyMatchedValue<Integer> withLiteralInt(Integer initialValue) {
             PossiblyMatchedValue<Integer> result = new PossiblyMatchedValue<>();
             result.setValue(initialValue);
             return result;
         }
         @NonNull
-        public static PossiblyMatchedValue<Float> withLiteralFloat(float initialValue) {
+        public static PossiblyMatchedValue<Float> withLiteralFloat(Float initialValue) {
             PossiblyMatchedValue<Float> result = new PossiblyMatchedValue<>();
             result.setValue(initialValue);
             return result;
         }
-        public static PossiblyMatchedValue<Short> withLiteralShort(short initialValue) {
+        public static PossiblyMatchedValue<Short> withLiteralShort(Short initialValue) {
             PossiblyMatchedValue<Short> result = new PossiblyMatchedValue<>();
             result.setValue(initialValue);
             return result;
@@ -212,8 +217,11 @@ abstract public class PatternDetailsItem {
         public boolean equals(PossiblyMatchedValue<T> other) {
             if (!other.literalValue == literalValue)
                 return false;
-            if (literalValue)
+            if (literalValue) {
+                if (value == null)
+                    return other.value == null;
                 return value.equals(other.value);
+            }
             else
                 return matchGroup == other.matchGroup;
         }
@@ -235,8 +243,8 @@ abstract public class PatternDetailsItem {
         private final PossiblyMatchedValue<Float> amount =
                 PossiblyMatchedValue.withLiteralFloat(0f);
         private final PossiblyMatchedValue<Currency> currency = new PossiblyMatchedValue<>();
-        private AccountRow(long id, long position) {
-            super(Type.ACCOUNT_ITEM, id, position);
+        private AccountRow() {
+            super(Type.ACCOUNT_ITEM);
         }
         public int getAccountCommentMatchGroup() {
             return accountComment.getMatchGroup();
@@ -284,10 +292,10 @@ abstract public class PatternDetailsItem {
         public void setAmountMatchGroup(int group) {
             amount.setMatchGroup(group);
         }
-        public float getAmount() {
+        public Float getAmount() {
             return amount.getValue();
         }
-        public void setAmount(float amount) {
+        public void setAmount(Float amount) {
             this.amount.setValue(amount);
         }
         public String getProblem(@NonNull Resources r, int patternGroupCount) {
@@ -316,7 +324,7 @@ abstract public class PatternDetailsItem {
             accountComment.switchToLiteral();
         }
         public PatternAccount toDBO(@NonNull Long patternId) {
-            PatternAccount result = new PatternAccount((id <= 0L) ? null : id, patternId, position);
+            PatternAccount result = new PatternAccount(id, patternId, position);
 
             if (accountName.hasLiteralValue())
                 result.setAccountName(accountName.getValue());
@@ -347,17 +355,15 @@ abstract public class PatternDetailsItem {
                 PossiblyMatchedValue.withLiteralString("");
         private PossiblyMatchedValue<String> transactionComment =
                 PossiblyMatchedValue.withLiteralString("");
-        private PossiblyMatchedValue<Short> dateYear =
-                PossiblyMatchedValue.withLiteralShort((short) 0);
-        private PossiblyMatchedValue<Short> dateMonth =
-                PossiblyMatchedValue.withLiteralShort((short) 0);
-        private PossiblyMatchedValue<Short> dateDay =
-                PossiblyMatchedValue.withLiteralShort((short) 0);
+        private PossiblyMatchedValue<Integer> dateYear = PossiblyMatchedValue.withLiteralInt(null);
+        private PossiblyMatchedValue<Integer> dateMonth = PossiblyMatchedValue.withLiteralInt(null);
+        private PossiblyMatchedValue<Integer> dateDay = PossiblyMatchedValue.withLiteralInt(null);
         private Header() {
-            super(Type.HEADER, -1, -1);
+            super(Type.HEADER);
         }
         public Header(Header origin) {
             this();
+            id = origin.id;
             name = origin.name;
             testText = origin.testText;
             setPattern(origin.pattern);
@@ -418,22 +424,22 @@ abstract public class PatternDetailsItem {
         public void setTransactionComment(String transactionComment) {
             this.transactionComment.setValue(transactionComment);
         }
-        public short getDateYear() {
+        public Integer getDateYear() {
             return dateYear.getValue();
         }
-        public void setDateYear(short dateYear) {
+        public void setDateYear(Integer dateYear) {
             this.dateYear.setValue(dateYear);
         }
-        public short getDateMonth() {
+        public Integer getDateMonth() {
             return dateMonth.getValue();
         }
-        public void setDateMonth(short dateMonth) {
+        public void setDateMonth(Integer dateMonth) {
             this.dateMonth.setValue(dateMonth);
         }
-        public short getDateDay() {
+        public Integer getDateDay() {
             return dateDay.getValue();
         }
-        public void setDateDay(short dateDay) {
+        public void setDateDay(Integer dateDay) {
             this.dateDay.setValue(dateDay);
         }
         public int getDateYearMatchGroup() {
@@ -539,8 +545,11 @@ abstract public class PatternDetailsItem {
         }
         public void switchToLiteralDateDay() { dateDay.switchToLiteral(); }
         public PatternHeader toDBO() {
-            PatternHeader result =
-                    new PatternHeader((id <= 0) ? null : id, name, position, pattern);
+            PatternHeader result = new PatternHeader(id, name, pattern);
+
+            if (Misc.emptyIsNull(testText) != null)
+                result.setTestText(testText);
+
             if (transactionDescription.hasLiteralValue())
                 result.setTransactionDescription(transactionDescription.getValue());
             else
@@ -550,6 +559,21 @@ abstract public class PatternDetailsItem {
                 result.setTransactionComment(transactionComment.getValue());
             else
                 result.setTransactionCommentMatchGroup(transactionComment.getMatchGroup());
+
+            if (dateYear.hasLiteralValue())
+                result.setDateYear(dateYear.getValue());
+            else
+                result.setDateYearMatchGroup(dateYear.getMatchGroup());
+
+            if (dateMonth.hasLiteralValue())
+                result.setDateMonth(dateMonth.getValue());
+            else
+                result.setDateMonthMatchGroup(dateMonth.getMatchGroup());
+
+            if (dateDay.hasLiteralValue())
+                result.setDateDay(dateDay.getValue());
+            else
+                result.setDateDayMatchGroup(dateDay.getMatchGroup());
 
             return result;
         }

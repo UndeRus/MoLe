@@ -1,10 +1,13 @@
 package net.ktnx.mobileledger.db;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+
+import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -134,5 +137,28 @@ public class PatternHeader extends PatternBase {
     }
     public void setDateDayMatchGroup(Integer dateDayMatchGroup) {
         this.dateDayMatchGroup = dateDayMatchGroup;
+    }
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == null)
+            return false;
+        if (!(obj instanceof PatternHeader))
+            return false;
+
+        PatternHeader o = (PatternHeader) obj;
+
+        return Misc.equalLongs(id, o.id) && Misc.equalStrings(name, o.name) &&
+               Misc.equalStrings(regularExpression, o.regularExpression) &&
+               Misc.equalStrings(transactionDescription, o.transactionDescription) &&
+               Misc.equalStrings(transactionComment, o.transactionComment) &&
+               Misc.equalIntegers(transactionDescriptionMatchGroup,
+                       o.transactionDescriptionMatchGroup) &&
+               Misc.equalIntegers(transactionCommentMatchGroup, o.transactionCommentMatchGroup) &&
+               Misc.equalIntegers(dateDay, o.dateDay) &&
+               Misc.equalIntegers(dateDayMatchGroup, o.dateDayMatchGroup) &&
+               Misc.equalIntegers(dateMonth, o.dateMonth) &&
+               Misc.equalIntegers(dateMonthMatchGroup, o.dateMonthMatchGroup) &&
+               Misc.equalIntegers(dateYear, o.dateYear) &&
+               Misc.equalIntegers(dateYearMatchGroup, o.dateYearMatchGroup);
     }
 }

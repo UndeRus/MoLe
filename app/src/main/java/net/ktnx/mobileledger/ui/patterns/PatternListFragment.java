@@ -28,13 +28,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ktnx.mobileledger.dao.PatternHeaderDAO;
 import net.ktnx.mobileledger.databinding.FragmentPatternListBinding;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.PatternHeader;
 import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,7 +85,10 @@ public class PatternListFragment extends Fragment {
         PatternsRecyclerViewAdapter modelAdapter = new PatternsRecyclerViewAdapter();
 
         b.patternList.setAdapter(modelAdapter);
-        PatternsModel.retrievePatterns(modelAdapter);
+        PatternHeaderDAO pDao = DB.get()
+                                  .getPatternDAO();
+        LiveData<List<PatternHeader>> patterns = pDao.getPatterns();
+        patterns.observe(getViewLifecycleOwner(), list -> {modelAdapter.setPatterns(list);});
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(RecyclerView.VERTICAL);
         b.patternList.setLayoutManager(llm);
@@ -112,7 +121,7 @@ public class PatternListFragment extends Fragment {
         if (mListener == null)
             return;
 
-        mListener.onNewPattern();
+        mListener.onEditPattern(null);
     }
     /**
      * This interface must be implemented by activities that contain this
@@ -125,8 +134,8 @@ public class PatternListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnPatternListFragmentInteractionListener {
-        void onNewPattern();
         void onSavePattern();
-        void onEditPattern(int id);
+
+        void onEditPattern(Long id);
     }
 }

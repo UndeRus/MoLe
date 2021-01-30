@@ -18,14 +18,30 @@
 package net.ktnx.mobileledger.db;
 
 import androidx.room.Database;
+import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
 import net.ktnx.mobileledger.dao.PatternAccountDAO;
 import net.ktnx.mobileledger.dao.PatternHeaderDAO;
+import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 @Database(version = 51, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
 abstract public class DB extends RoomDatabase {
+    private static DB instance;
+    public static DB get() {
+        if (instance != null)
+            return instance;
+        synchronized (DB.class) {
+            if (instance != null)
+                return instance;
+
+            return instance =
+                    Room.databaseBuilder(App.instance, DB.class, MobileLedgerDatabase.DB_NAME)
+                        .build();
+        }
+    }
     public abstract PatternHeaderDAO getPatternDAO();
     public abstract PatternAccountDAO getPatternAccountDAO();
     public abstract CurrencyDAO getCurrencyDAO();

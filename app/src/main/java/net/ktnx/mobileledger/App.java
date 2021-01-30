@@ -23,9 +23,6 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import androidx.room.Room;
-
-import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailModel;
 import net.ktnx.mobileledger.utils.Globals;
@@ -45,21 +42,11 @@ public class App extends Application {
     private static ProfileDetailModel profileModel;
     private MobileLedgerDatabase dbHelper;
     private boolean monthNamesPrepared = false;
-    private DB roomDatabase;
     public static SQLiteDatabase getDatabase() {
         if (instance == null)
             throw new RuntimeException("Application not created yet");
 
         return instance.getDB();
-    }
-    public static DB getRoomDB() {
-        if (instance == null)
-            throw new RuntimeException("Application not created yet");
-
-        return instance.getRoomDatabase();
-    }
-    public DB getRoomDatabase(){
-        return roomDatabase;
     }
     public static void prepareMonthNames() {
         instance.prepareMonthNames(false);
@@ -99,8 +86,6 @@ public class App extends Application {
         Logger.debug("flow", "App onCreate()");
         instance = this;
         super.onCreate();
-        roomDatabase = Room.databaseBuilder(this, DB.class, MobileLedgerDatabase.DB_NAME)
-                              .build();
         Data.refreshCurrencyData(Locale.getDefault());
         Authenticator.setDefault(new Authenticator() {
             @Override

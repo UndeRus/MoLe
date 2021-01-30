@@ -26,26 +26,26 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.databinding.PatternLayoutBinding;
-import net.ktnx.mobileledger.model.PatternEntry;
+import net.ktnx.mobileledger.db.PatternHeader;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 public class PatternsRecyclerViewAdapter extends RecyclerView.Adapter<PatternViewHolder> {
-    private final AsyncListDiffer<PatternEntry> listDiffer;
+    private final AsyncListDiffer<PatternHeader> listDiffer;
     public PatternsRecyclerViewAdapter() {
-        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<PatternEntry>() {
+        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<PatternHeader>() {
             @Override
-            public boolean areItemsTheSame(@NotNull PatternEntry oldItem,
-                                           @NotNull PatternEntry newItem) {
-                return oldItem.getId() == newItem.getId();
+            public boolean areItemsTheSame(@NotNull PatternHeader oldItem,
+                                           @NotNull PatternHeader newItem) {
+                return oldItem.getId()
+                              .equals(newItem.getId());
             }
             @Override
-            public boolean areContentsTheSame(@NotNull PatternEntry oldItem,
-                                              @NotNull PatternEntry newItem) {
-                return Objects.equals(oldItem.getName(), newItem.getName());
+            public boolean areContentsTheSame(@NotNull PatternHeader oldItem,
+                                              @NotNull PatternHeader newItem) {
+                return oldItem.equals(newItem);
             }
         });
     }
@@ -68,7 +68,7 @@ public class PatternsRecyclerViewAdapter extends RecyclerView.Adapter<PatternVie
         return listDiffer.getCurrentList()
                          .size();
     }
-    public void setPatterns(List<PatternEntry> newList) {
+    public void setPatterns(List<PatternHeader> newList) {
         listDiffer.submitList(newList);
     }
 }
