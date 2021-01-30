@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -35,6 +35,8 @@ import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +69,7 @@ public final class Data {
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
+    private static NumberFormat numberFormatter;
 
     static {
         locale.setValue(Locale.getDefault());
@@ -189,10 +192,22 @@ public final class Data {
         }
         else
             currencySymbolPosition.setValue(Currency.Position.none);
+
+        NumberFormat newNumberFormatter = NumberFormat.getNumberInstance();
+        newNumberFormatter.setParseIntegerOnly(false);
+        newNumberFormatter.setGroupingUsed(true);
+        newNumberFormatter.setGroupingUsed(true);
+        newNumberFormatter.setMinimumIntegerDigits(1);
+        newNumberFormatter.setMinimumFractionDigits(2);
+
+        numberFormatter = newNumberFormatter;
     }
-    public static String formatNumber(float number) {
+    public static String formatCurrency(float number) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(locale.getValue());
         return formatter.format(number);
+    }
+    public static String formatNumber(float number) {
+        return numberFormatter.format(number);
     }
     public static void observeProfile(LifecycleOwner lifecycleOwner,
                                       Observer<MobileLedgerProfile> observer) {
@@ -213,5 +228,13 @@ public final class Data {
 
     public static void removeProfileObservers(LifecycleOwner owner) {
         profile.removeObservers(owner);
+    }
+    public static float parseNumber(String str) throws ParseException {
+        ParsePosition pos = new ParsePosition(0);
+        Number parsed = numberFormatter.parse(str);
+        if (parsed == null)
+            throw new ParseException("Error parsing '" + str + "'", pos.getErrorIndex());
+
+        return (float) parsed;
     }
 }
