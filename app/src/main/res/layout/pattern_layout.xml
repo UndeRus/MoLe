@@ -35,6 +35,7 @@
         android:id="@+id/edit_button"
         android:layout_width="@dimen/toolbar_height"
         android:layout_height="@dimen/toolbar_height"
+        android:backgroundTint="?colorSurface"
         android:contentDescription="@string/edit_button_description"
         android:src="@drawable/ic_mode_edit_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
