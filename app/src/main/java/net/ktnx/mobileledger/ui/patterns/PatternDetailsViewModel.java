@@ -170,9 +170,9 @@ public class PatternDetailsViewModel extends ViewModel {
                     paDAO.update(dbAccount);
 
                 Logger.debug("pattern-db", String.format(Locale.US,
-                        "Stored pattern account %d, account=%s, comment=%s, item=%s",
+                        "Stored pattern account %d, account=%s, comment=%s, neg=%s, item=%s",
                         dbAccount.getId(), dbAccount.getAccountName(),
-                        dbAccount.getAccountComment(), accRowItem));
+                        dbAccount.getAccountComment(), dbAccount.getNegateAmount(), accRowItem));
             }
         });
     }

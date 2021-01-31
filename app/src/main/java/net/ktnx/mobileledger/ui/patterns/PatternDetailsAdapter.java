@@ -502,6 +502,9 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
 
                 b.patternDetailsAccountAmount.setText(Data.formatNumber(amt));
             });
+
+            b.negateAmountSwitch.setOnCheckedChangeListener(
+                    (buttonView, isChecked) -> getItem().setNegateAmount(isChecked));
         }
         @Override
         void bind(PatternDetailsItem item) {
@@ -539,12 +542,15 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
                 Float amt = accRow.getAmount();
                 b.patternDetailsAccountAmount.setText((amt == null) ? null : String.format(
                         Data.locale.getValue(), "%,4.2f", (accRow.getAmount())));
+                b.negateAmountSwitch.setVisibility(View.GONE);
             }
             else {
                 b.patternDetailsAccountAmountSource.setText(
                         String.format(Locale.US, "Group %d (%s)", accRow.getAmountMatchGroup(),
                                 getMatchGroupText(accRow.getAmountMatchGroup())));
                 b.patternDetailsAccountAmountLayout.setVisibility(View.GONE);
+                b.negateAmountSwitch.setVisibility(View.VISIBLE);
+                b.negateAmountSwitch.setChecked(accRow.isNegateAmount());
             }
 
             b.patternAccountNameSourceLabel.setOnClickListener(

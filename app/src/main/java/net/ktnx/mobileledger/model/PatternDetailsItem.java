@@ -114,8 +114,11 @@ abstract public class PatternDetailsItem {
                 acc.setCurrencyMatchGroup(pa.getCurrencyMatchGroup());
 
             final Integer amountMatchGroup = pa.getAmountMatchGroup();
-            if (amountMatchGroup != null && amountMatchGroup > 0)
+            if (amountMatchGroup != null && amountMatchGroup > 0) {
                 acc.setAmountMatchGroup(amountMatchGroup);
+                final Boolean negateAmount = pa.getNegateAmount();
+                acc.setNegateAmount(negateAmount != null && negateAmount);
+            }
             else
                 acc.setAmount(pa.getAmount());
 
@@ -274,8 +277,15 @@ abstract public class PatternDetailsItem {
         private final PossiblyMatchedValue<Float> amount =
                 PossiblyMatchedValue.withLiteralFloat(0f);
         private final PossiblyMatchedValue<Currency> currency = new PossiblyMatchedValue<>();
+        private boolean negateAmount;
         private AccountRow() {
             super(Type.ACCOUNT_ITEM);
+        }
+        public boolean isNegateAmount() {
+            return negateAmount;
+        }
+        public void setNegateAmount(boolean negateAmount) {
+            this.negateAmount = negateAmount;
         }
         public int getAccountCommentMatchGroup() {
             return accountComment.getMatchGroup();
@@ -343,7 +353,7 @@ abstract public class PatternDetailsItem {
         }
         public boolean equalContents(AccountRow o) {
             return amount.equals(o.amount) && accountName.equals(o.accountName) &&
-                   accountComment.equals(o.accountComment);
+                   accountComment.equals(o.accountComment) && negateAmount == o.negateAmount;
         }
         public void switchToLiteralAmount() {
             amount.switchToLiteral();
@@ -367,10 +377,14 @@ abstract public class PatternDetailsItem {
             else
                 result.setAccountCommentMatchGroup(accountComment.getMatchGroup());
 
-            if (amount.hasLiteralValue())
+            if (amount.hasLiteralValue()) {
                 result.setAmount(amount.getValue());
-            else
+                result.setNegateAmount(null);
+            }
+            else {
                 result.setAmountMatchGroup(amount.getMatchGroup());
+                result.setNegateAmount(negateAmount ? true : null);
+            }
 
             return result;
         }
