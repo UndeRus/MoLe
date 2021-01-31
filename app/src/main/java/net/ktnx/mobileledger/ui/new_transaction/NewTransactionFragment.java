@@ -56,7 +56,7 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.QRScanAbleFragment;
+import net.ktnx.mobileledger.ui.QRScanCapableFragment;
 import net.ktnx.mobileledger.ui.patterns.PatternsActivity;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -79,7 +79,7 @@ import java.util.regex.Pattern;
 
 // TODO: offer to undo account remove-on-swipe
 
-public class NewTransactionFragment extends QRScanAbleFragment {
+public class NewTransactionFragment extends QRScanCapableFragment {
     private NewTransactionItemsAdapter listAdapter;
     private NewTransactionModel viewModel;
     private FloatingActionButton fab;

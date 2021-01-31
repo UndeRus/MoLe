@@ -36,7 +36,7 @@ import net.ktnx.mobileledger.db.PatternBase;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.PatternDetailsItem;
 import net.ktnx.mobileledger.ui.PatternDetailSourceSelectorFragment;
-import net.ktnx.mobileledger.ui.QRScanAbleFragment;
+import net.ktnx.mobileledger.ui.QRScanCapableFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
@@ -417,7 +417,7 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
 
         }
         private void scanTestQR(View view) {
-            QRScanAbleFragment.triggerQRScan();
+            QRScanCapableFragment.triggerQRScan();
         }
     }
 

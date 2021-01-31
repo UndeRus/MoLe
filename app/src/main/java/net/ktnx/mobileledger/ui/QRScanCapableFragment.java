@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
-public abstract class QRScanAbleFragment extends Fragment {
+public abstract class QRScanCapableFragment extends Fragment {
     private static final MutableLiveData<Integer> qrScanTrigger = new MutableLiveData<>();
     protected final ActivityResultLauncher<Void> scanQrLauncher = QR.registerLauncher(this, this::onQrScanned);
     public static void triggerQRScan() {

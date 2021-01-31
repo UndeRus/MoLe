@@ -35,10 +35,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.PatternDetailsFragmentBinding;
-import net.ktnx.mobileledger.ui.QRScanAbleFragment;
+import net.ktnx.mobileledger.ui.QRScanCapableFragment;
 import net.ktnx.mobileledger.utils.Logger;
 
-public class PatternDetailsFragment extends QRScanAbleFragment {
+public class PatternDetailsFragment extends QRScanCapableFragment {
     static final String ARG_PATTERN_ID = "pattern-id";
     private static final String ARG_COLUMN_COUNT = "column-count";
     PatternDetailsFragmentBinding b;
