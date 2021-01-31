@@ -61,6 +61,8 @@ public class PatternAccount extends PatternBase {
     private String accountComment;
     @ColumnInfo(name = "comment_match_group")
     private Integer accountCommentMatchGroup;
+    @ColumnInfo(name = "negate_amount")
+    private Boolean negateAmount;
     public PatternAccount(@NotNull Long id, @NonNull Long patternId, @NonNull Long position) {
         this.id = id;
         this.patternId = patternId;
@@ -71,6 +73,12 @@ public class PatternAccount extends PatternBase {
     }
     public void setId(Long id) {
         this.id = id;
+    }
+    public Boolean getNegateAmount() {
+        return negateAmount;
+    }
+    public void setNegateAmount(Boolean negateAmount) {
+        this.negateAmount = negateAmount;
     }
     public @NotNull Long getPatternId() {
         return patternId;

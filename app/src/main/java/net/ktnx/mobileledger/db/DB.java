@@ -30,7 +30,7 @@ import net.ktnx.mobileledger.dao.PatternAccountDAO;
 import net.ktnx.mobileledger.dao.PatternHeaderDAO;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
-@Database(version = 52, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
+@Database(version = 53, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
 abstract public class DB extends RoomDatabase {
     private static DB instance;
     public static DB get() {
@@ -56,6 +56,12 @@ abstract public class DB extends RoomDatabase {
                                 finally {
                                     db.endTransaction();
                                 }
+                            }
+                        }, new Migration(52, 53) {
+                            @Override
+                            public void migrate(@NonNull SupportSQLiteDatabase db) {
+                                db.execSQL(
+                                        "alter table pattern_accounts add negate_amount boolean;");
                             }
                         }
                         })

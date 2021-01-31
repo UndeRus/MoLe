@@ -262,6 +262,8 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                                   acc.getAccountComment());
                   Float amount =
                           extractFloatFromMatches(m, acc.getAmountMatchGroup(), acc.getAmount());
+                  if (amount != null && acc.getNegateAmount())
+                      amount = -amount;
 
                   if (accountsInInitialState) {
                       NewTransactionModel.Item item = viewModel.getItem(rowIndex);
