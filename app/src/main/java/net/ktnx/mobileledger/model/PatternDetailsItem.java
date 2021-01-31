@@ -65,16 +65,28 @@ abstract public class PatternDetailsItem {
             if (ph.getTransactionDescriptionMatchGroup() == null)
                 header.setTransactionDescription(ph.getTransactionDescription());
             else
-                header.setTransactionDescriptionMatchGroup(ph.getTransactionDescriptionMatchGroup());
+                header.setTransactionDescriptionMatchGroup(
+                        ph.getTransactionDescriptionMatchGroup());
 
             if (ph.getTransactionCommentMatchGroup() == null)
                 header.setTransactionComment(ph.getTransactionComment());
             else
                 header.setTransactionCommentMatchGroup(ph.getTransactionCommentMatchGroup());
 
-            header.setDateDayMatchGroup(ph.getDateDayMatchGroup());
-            header.setDateMonthMatchGroup(ph.getDateMonthMatchGroup());
-            header.setDateYearMatchGroup(ph.getDateYearMatchGroup());
+            if (ph.getDateDayMatchGroup() == null)
+                header.setDateDay(ph.getDateDay());
+            else
+                header.setDateDayMatchGroup(ph.getDateDayMatchGroup());
+
+            if (ph.getDateMonthMatchGroup() == null)
+                header.setDateMonth(ph.getDateMonth());
+            else
+                header.setDateMonthMatchGroup(ph.getDateMonthMatchGroup());
+
+            if (ph.getDateYearMatchGroup() == null)
+                header.setDateYear(ph.getDateYear());
+            else
+                header.setDateYearMatchGroup(ph.getDateYearMatchGroup());
 
             return header;
         }
