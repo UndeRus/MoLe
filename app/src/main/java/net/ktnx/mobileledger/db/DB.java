@@ -17,9 +17,12 @@
 
 package net.ktnx.mobileledger.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
@@ -27,7 +30,7 @@ import net.ktnx.mobileledger.dao.PatternAccountDAO;
 import net.ktnx.mobileledger.dao.PatternHeaderDAO;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
-@Database(version = 51, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
+@Database(version = 52, entities = {PatternHeader.class, PatternAccount.class, Currency.class})
 abstract public class DB extends RoomDatabase {
     private static DB instance;
     public static DB get() {
@@ -39,10 +42,29 @@ abstract public class DB extends RoomDatabase {
 
             return instance =
                     Room.databaseBuilder(App.instance, DB.class, MobileLedgerDatabase.DB_NAME)
+                        .addMigrations(new Migration[]{new Migration(51, 52) {
+                            @Override
+                            public void migrate(@NonNull SupportSQLiteDatabase db) {
+                                db.beginTransaction();
+                                try {
+                                    db.execSQL("create index fk_pattern_accounts_pattern on " +
+                                               "pattern_accounts(pattern_id);");
+                                    db.execSQL("create index fk_pattern_accounts_currency on " +
+                                               "pattern_accounts(currency);");
+                                    db.setTransactionSuccessful();
+                                }
+                                finally {
+                                    db.endTransaction();
+                                }
+                            }
+                        }
+                        })
                         .build();
         }
     }
     public abstract PatternHeaderDAO getPatternDAO();
+
     public abstract PatternAccountDAO getPatternAccountDAO();
+
     public abstract CurrencyDAO getCurrencyDAO();
 }
