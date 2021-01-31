@@ -28,9 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 @Entity(tableName = "pattern_accounts",
         indices = {@Index(name = "un_pattern_accounts", unique = true, value = "id"),
-                   @Index(name = "fk_pattern_accounts_pattern", unique = false,
-                          value = "pattern_id"),
-                   @Index(name = "fk_pattern_accounts_currency", unique = false, value = "currency")
+                   @Index(name = "fk_pattern_accounts_pattern", value = "pattern_id"),
+                   @Index(name = "fk_pattern_accounts_currency", value = "currency")
         }, foreignKeys = {@ForeignKey(childColumns = "pattern_id", parentColumns = "id",
                                       entity = PatternHeader.class),
                           @ForeignKey(childColumns = "currency", parentColumns = "id",
