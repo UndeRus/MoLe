@@ -31,7 +31,7 @@ class PatternViewHolder extends RecyclerView.ViewHolder {
     }
     public void bindToItem(PatternHeader item) {
         b.patternName.setText(item.getName());
-        b.editButon.setOnClickListener(v -> {
+        b.editButton.setOnClickListener(v -> {
             ((PatternsActivity) v.getContext()).onEditPattern(item.getId());
         });
     }

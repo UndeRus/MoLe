@@ -27,12 +27,12 @@
         android:layout_marginStart="@dimen/text_margin"
         android:layout_marginEnd="@dimen/text_margin"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/edit_buton"
+        app:layout_constraintEnd_toStartOf="@id/edit_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
     <ImageButton
-        android:id="@+id/edit_buton"
+        android:id="@+id/edit_button"
         android:layout_width="@dimen/toolbar_height"
         android:layout_height="@dimen/toolbar_height"
         android:contentDescription="@string/edit_button_description"
