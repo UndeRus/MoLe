@@ -312,4 +312,6 @@
     <string name="choose_pattern_to_apply">Choose pattern to apply</string>
     <string name="pattern_name">Pattern name</string>
     <string name="implementation_pending">Not implemented yet</string>
+    <string name="title_edit_pattern">Edit pattern</string>
+    <string name="title_new_pattern">New pattern</string>
 </resources>

@@ -20,13 +20,10 @@ package net.ktnx.mobileledger.ui.patterns;
 import android.os.Bundle;
 import android.view.Menu;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 
 import net.ktnx.mobileledger.R;
@@ -64,22 +61,17 @@ public class PatternsActivity extends CrashReportingActivity
                 getSupportFragmentManager().findFragmentById(R.id.fragment_container));
         navController = navHostFragment.getNavController();
 
-        navController.addOnDestinationChangedListener(
-                new NavController.OnDestinationChangedListener() {
-                    @Override
-                    public void onDestinationChanged(@NonNull NavController controller,
-                                                     @NonNull NavDestination destination,
-                                                     @Nullable Bundle arguments) {
-                        if (destination.getId() == R.id.patternListFragment) {
-                            b.fabAdd.show();
-                            b.fabSave.hide();
-                        }
-                        if (destination.getId() == R.id.patternDetailsFragment) {
-                            b.fabAdd.hide();
-                            b.fabSave.show();
-                        }
-                    }
-                });
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.patternListFragment) {
+                b.fabAdd.show();
+                b.fabSave.hide();
+                b.toolbarLayout.setTitle(getString(R.string.title_activity_patterns));
+            }
+            if (destination.getId() == R.id.patternDetailsFragment) {
+                b.fabAdd.hide();
+                b.fabSave.show();
+            }
+        });
 
         b.toolbarLayout.setTitle(getString(R.string.title_activity_patterns));
 
@@ -88,13 +80,16 @@ public class PatternsActivity extends CrashReportingActivity
     }
     @Override
     public void onEditPattern(Long id) {
-        if (id == null){
+        if (id == null) {
             navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment);
+            b.toolbarLayout.setTitle(getString(R.string.title_new_pattern));
         }
-        else{
+        else {
             Bundle bundle = new Bundle();
             bundle.putLong(PatternDetailsFragment.ARG_PATTERN_ID, id);
-            navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment, bundle);
+            navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment,
+                    bundle);
+            b.toolbarLayout.setTitle(getString(R.string.title_edit_pattern));
         }
     }
     @Override
