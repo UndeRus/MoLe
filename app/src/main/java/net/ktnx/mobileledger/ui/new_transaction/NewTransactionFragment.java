@@ -148,7 +148,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         });
     }
     private void choosePattern(ArrayList<PatternHeader> matchingPatterns, String matchedText) {
-        final String patternNameColumn = getString(R.string.pattern_name);
+        final String patternNameColumn = "name";
         AbstractCursor cursor = new AbstractCursor() {
             @Override
             public int getCount() {
@@ -156,44 +156,54 @@ public class NewTransactionFragment extends QRScanCapableFragment {
             }
             @Override
             public String[] getColumnNames() {
-                return new String[]{patternNameColumn};
+                return new String[]{"_id", patternNameColumn};
             }
             @Override
             public String getString(int column) {
+                if (column == 0)
+                    return String.valueOf(getPosition());
                 return matchingPatterns.get(getPosition())
                                        .getName();
             }
             @Override
             public short getShort(int column) {
+                if (column == 0)
+                    return (short) getPosition();
                 return -1;
             }
             @Override
             public int getInt(int column) {
-                return -1;
+                return getShort(column);
             }
             @Override
             public long getLong(int column) {
-                return -1;
+                return getShort(column);
             }
             @Override
             public float getFloat(int column) {
-                return -1;
+                return getShort(column);
             }
             @Override
             public double getDouble(int column) {
-                return -1;
+                return getShort(column);
             }
             @Override
             public boolean isNull(int column) {
                 return false;
+            }
+            @Override
+            public int getColumnCount() {
+                return 2;
             }
         };
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setCancelable(true)
                .setTitle(R.string.choose_pattern_to_apply)
-               .setSingleChoiceItems(cursor, -1, patternNameColumn,
-                       (dialog, which) -> applyPattern(matchingPatterns.get(which), matchedText))
+               .setSingleChoiceItems(cursor, -1, patternNameColumn, (dialog, which) -> {
+                   applyPattern(matchingPatterns.get(which), matchedText);
+                   dialog.dismiss();
+               })
                .create()
                .show();
     }
