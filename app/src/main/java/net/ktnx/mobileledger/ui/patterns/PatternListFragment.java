@@ -88,7 +88,7 @@ public class PatternListFragment extends Fragment {
         PatternHeaderDAO pDao = DB.get()
                                   .getPatternDAO();
         LiveData<List<PatternHeader>> patterns = pDao.getPatterns();
-        patterns.observe(getViewLifecycleOwner(), list -> {modelAdapter.setPatterns(list);});
+        patterns.observe(getViewLifecycleOwner(), modelAdapter::setPatterns);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(RecyclerView.VERTICAL);
         b.patternList.setLayoutManager(llm);
@@ -116,12 +116,6 @@ public class PatternListFragment extends Fragment {
             }
         };
         getLifecycle().addObserver(observer);
-    }
-    private void fabClicked(View view) {
-        if (mListener == null)
-            return;
-
-        mListener.onEditPattern(null);
     }
     /**
      * This interface must be implemented by activities that contain this
