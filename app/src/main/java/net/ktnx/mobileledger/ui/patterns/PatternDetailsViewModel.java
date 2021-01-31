@@ -55,7 +55,7 @@ public class PatternDetailsViewModel extends ViewModel {
         ArrayList<PatternDetailsItem> newList = new ArrayList<>();
         final PatternDetailsItem.Header header = PatternDetailsItem.createHeader();
         header.setName(mDefaultPatternName);
-        header.setId(1);
+        header.setId(0);
         newList.add(header);
 
         while (newList.size() < 3) {
@@ -143,6 +143,7 @@ public class PatternDetailsViewModel extends ViewModel {
                                            .getPatternDAO();
             PatternHeader dbHeader = modelHeader.toDBO();
             if (newPattern) {
+                dbHeader.setId(null);
                 dbHeader.setId(mPatternId = headerDAO.insert(dbHeader));
             }
             else
@@ -161,8 +162,10 @@ public class PatternDetailsViewModel extends ViewModel {
                 PatternAccount dbAccount = accRowItem.toDBO(dbHeader.getId());
                 dbAccount.setPatternId(mPatternId);
                 dbAccount.setPosition(i);
-                if (newPattern)
+                if (newPattern) {
+                    dbAccount.setId(null);
                     dbAccount.setId(paDAO.insert(dbAccount));
+                }
                 else
                     paDAO.update(dbAccount);
 
