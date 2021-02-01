@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.patterns;
 
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.lifecycle.ViewModelProvider;
@@ -78,6 +79,20 @@ public class PatternsActivity extends CrashReportingActivity
         b.fabAdd.setOnClickListener(v -> onEditPattern(null));
         b.fabSave.setOnClickListener(v -> onSavePattern());
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (navController.getCurrentDestination()
+                             .getId() == R.id.patternDetailsFragment)
+                navController.popBackStack();
+            else
+                finish();
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     public void onEditPattern(Long id) {
         if (id == null) {
