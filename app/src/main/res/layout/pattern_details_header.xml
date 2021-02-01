@@ -172,7 +172,7 @@
         android:id="@+id/pattern_details_date_year_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_date_month_layout"
+        app:layout_constraintEnd_toEndOf="@id/pattern_details_year_source"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
@@ -188,8 +188,8 @@
         android:id="@+id/pattern_details_date_month_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_date_day_layout"
-        app:layout_constraintStart_toEndOf="@id/pattern_details_date_year_layout"
+        app:layout_constraintEnd_toEndOf="@id/pattern_details_month_source"
+        app:layout_constraintStart_toStartOf="@id/pattern_details_month_source"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
@@ -206,7 +206,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/barrier_before_description"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/pattern_details_date_month_layout"
+        app:layout_constraintStart_toStartOf="@id/pattern_details_day_source"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
