@@ -331,7 +331,9 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
 
             if (header.hasLiteralDateYear()) {
                 b.patternDetailsYearSource.setText(R.string.pattern_details_source_literal);
-                b.patternDetailsDateYear.setText(String.valueOf(header.getDateYear()));
+                final Integer dateYear = header.getDateYear();
+                b.patternDetailsDateYear.setText(
+                        (dateYear == null) ? null : String.valueOf(dateYear));
                 b.patternDetailsDateYearLayout.setVisibility(View.VISIBLE);
             }
             else {
@@ -347,7 +349,9 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
 
             if (header.hasLiteralDateMonth()) {
                 b.patternDetailsMonthSource.setText(R.string.pattern_details_source_literal);
-                b.patternDetailsDateMonth.setText(String.valueOf(header.getDateMonth()));
+                final Integer dateMonth = header.getDateMonth();
+                b.patternDetailsDateMonth.setText(
+                        (dateMonth == null) ? null : String.valueOf(dateMonth));
                 b.patternDetailsDateMonthLayout.setVisibility(View.VISIBLE);
             }
             else {
@@ -363,7 +367,8 @@ class PatternDetailsAdapter extends RecyclerView.Adapter<PatternDetailsAdapter.V
 
             if (header.hasLiteralDateDay()) {
                 b.patternDetailsDaySource.setText(R.string.pattern_details_source_literal);
-                b.patternDetailsDateDay.setText(String.valueOf(header.getDateDay()));
+                final Integer dateDay = header.getDateDay();
+                b.patternDetailsDateDay.setText((dateDay == null) ? null : String.valueOf(dateDay));
                 b.patternDetailsDateDayLayout.setVisibility(View.VISIBLE);
             }
             else {
