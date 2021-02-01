@@ -135,7 +135,7 @@
         android:id="@+id/pattern_details_year_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="literal"
+        android:text="@string/pattern_details_source_literal"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/pattern_details_month_source"
         app:layout_constraintStart_toStartOf="parent"
