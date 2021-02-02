@@ -29,7 +29,7 @@ import net.ktnx.mobileledger.db.TemplateAccount;
 import java.util.List;
 
 @Dao
-public interface PatternAccountDAO {
+public interface TemplateAccountDAO {
     @Insert
     Long insert(TemplateAccount item);
 
@@ -39,10 +39,10 @@ public interface PatternAccountDAO {
     @Delete
     void delete(TemplateAccount item);
 
-    @Query("SELECT * FROM pattern_accounts WHERE pattern_id=:pattern_id")
-    LiveData<List<TemplateAccount>> getPatternAccounts(Long pattern_id);
+    @Query("SELECT * FROM template_accounts WHERE template_id=:template_id")
+    LiveData<List<TemplateAccount>> getTemplateAccounts(Long template_id);
 
-    @Query("SELECT * FROM pattern_accounts WHERE id = :id")
+    @Query("SELECT * FROM template_accounts WHERE id = :id")
     LiveData<TemplateAccount> getPatternAccountById(Long id);
 
 //    not useful for now

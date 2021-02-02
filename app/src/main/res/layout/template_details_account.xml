@@ -28,7 +28,7 @@
         android:layout_height="match_parent"
         android:gravity="end"
         android:paddingTop="@dimen/text_margin"
-        android:text="@string/pattern_details_account_row_label"
+        android:text="@string/template_details_account_row_label"
         app:drawableBottomCompat="@drawable/dashed_border_8dp"
         />
     <TextView
@@ -66,7 +66,7 @@
             android:id="@+id/template_details_account_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_details_account_name_label"
+            android:hint="@string/template_details_account_name_label"
             android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -107,7 +107,7 @@
             android:id="@+id/template_details_account_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_details_account_comment_label"
+            android:hint="@string/template_details_account_comment_label"
             android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -154,7 +154,7 @@
             android:id="@+id/template_details_account_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_details_account_amount_label"
+            android:hint="@string/template_details_account_amount_label"
             android:inputType="number|numberDecimal|numberSigned"
             />
     </com.google.android.material.textfield.TextInputLayout>

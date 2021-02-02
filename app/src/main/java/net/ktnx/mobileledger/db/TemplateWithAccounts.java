@@ -22,10 +22,10 @@ import androidx.room.Relation;
 
 import java.util.List;
 
-public class PatternWithAccounts {
+public class TemplateWithAccounts {
     @Embedded
     public TemplateHeader header;
-    @Relation(parentColumn = "id", entityColumn = "pattern_id")
+    @Relation(parentColumn = "id", entityColumn = "template_id")
     public List<TemplateAccount> accounts;
 
     public Long getId() {

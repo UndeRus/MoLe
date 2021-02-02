@@ -406,7 +406,7 @@
                             <TextView
                                 android:id="@+id/nav_patterns"
                                 style="@style/nav_button"
-                                android:text="@string/nav_patterns"
+                                android:text="@string/nav_templates"
                                 app:drawableStartCompat="@drawable/ic_baseline_auto_graph_24"
                                 />
 

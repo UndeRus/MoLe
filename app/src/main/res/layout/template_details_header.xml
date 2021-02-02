@@ -34,7 +34,7 @@
             android:id="@+id/template_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_name_label"
+            android:hint="@string/template_name_label"
             android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -51,7 +51,7 @@
             android:id="@+id/pattern"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_details_pattern_label"
+            android:hint="@string/template_details_pattern_label"
             android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -68,7 +68,7 @@
             android:id="@+id/test_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_details_test_text_label"
+            android:hint="@string/template_details_test_text_label"
             android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
@@ -91,21 +91,21 @@
         android:layout_height="wrap_content"
         android:gravity="end"
         android:paddingTop="@dimen/text_margin"
-        android:text="@string/pattern_transaction_parameters_label"
+        android:text="@string/template_transaction_parameters_label"
         app:layout_constraintTop_toBottomOf="@id/test_text_layout"
         />
     <TextView
         android:id="@+id/pattern_transaction_date_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/pattern_details_date_label"
+        android:text="@string/template_details_date_label"
         app:layout_constraintTop_toBottomOf="@id/transaction_parameters_label"
         />
     <TextView
         android:id="@+id/template_details_year_source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/pattern_details_date_year_source_label"
+        android:text="@string/template_details_date_year_source_label"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/template_details_month_source_label"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +115,7 @@
         android:id="@+id/template_details_month_source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/pattern_details_date_month_source_label"
+        android:text="@string/template_details_date_month_source_label"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/template_details_day_source_label"
         app:layout_constraintStart_toEndOf="@id/template_details_year_source_label"
@@ -125,7 +125,7 @@
         android:id="@+id/template_details_day_source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/pattern_details_date_day_source_label"
+        android:text="@string/template_details_date_day_source_label"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/template_details_month_source_label"

@@ -98,7 +98,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
     private void alertNoPatternMatch(String scanned) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setCancelable(true)
-               .setMessage(R.string.no_pattern_matches)
+               .setMessage(R.string.no_template_matches)
                .setPositiveButton(R.string.add_button,
                        (dialog, which) -> startNewPatternActivity(scanned))
                .create()
@@ -112,7 +112,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
 
         LiveData<List<TemplateHeader>> allPatterns = DB.get()
                                                        .getPatternDAO()
-                                                       .getPatterns();
+                                                       .getTemplates();
         allPatterns.observe(getViewLifecycleOwner(), patternHeaders -> {
             ArrayList<TemplateHeader> matchingPatterns = new ArrayList<>();
 
@@ -199,7 +199,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setCancelable(true)
-               .setTitle(R.string.choose_pattern_to_apply)
+               .setTitle(R.string.choose_template_to_apply)
                .setSingleChoiceItems(cursor, -1, patternNameColumn, (dialog, which) -> {
                    applyPattern(matchingPatterns.get(which), matchedText);
                    dialog.dismiss();
@@ -258,7 +258,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
 
         DB.get()
           .getPatternDAO()
-          .getPatternWithAccounts(patternHeader.getId())
+          .getTemplateWithAccounts(patternHeader.getId())
           .observe(getViewLifecycleOwner(), entry -> {
               int rowIndex = 0;
               final boolean accountsInInitialState = viewModel.accountsInInitialState();

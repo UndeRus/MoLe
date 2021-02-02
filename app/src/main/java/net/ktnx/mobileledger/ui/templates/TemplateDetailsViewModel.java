@@ -24,12 +24,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
-import net.ktnx.mobileledger.dao.PatternAccountDAO;
-import net.ktnx.mobileledger.dao.PatternHeaderDAO;
+import net.ktnx.mobileledger.dao.TemplateAccountDAO;
+import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.db.DB;
-import net.ktnx.mobileledger.db.PatternWithAccounts;
 import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.db.TemplateWithAccounts;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
 import net.ktnx.mobileledger.utils.Logger;
 
@@ -96,11 +96,11 @@ public class TemplateDetailsViewModel extends ViewModel {
         }
 
         DB db = DB.get();
-        LiveData<PatternWithAccounts> dbList = db.getPatternDAO()
-                                                 .getPatternWithAccounts(mPatternId);
-        Observer<PatternWithAccounts> observer = new Observer<PatternWithAccounts>() {
+        LiveData<TemplateWithAccounts> dbList = db.getPatternDAO()
+                                                  .getTemplateWithAccounts(mPatternId);
+        Observer<TemplateWithAccounts> observer = new Observer<TemplateWithAccounts>() {
             @Override
-            public void onChanged(PatternWithAccounts src) {
+            public void onChanged(TemplateWithAccounts src) {
                 ArrayList<TemplateDetailsItem> l = new ArrayList<>();
 
                 TemplateDetailsItem header = TemplateDetailsItem.fromRoomObject(src.header);
@@ -139,8 +139,8 @@ public class TemplateDetailsViewModel extends ViewModel {
 
             TemplateDetailsItem.Header modelHeader = list.get(0)
                                                          .asHeaderItem();
-            PatternHeaderDAO headerDAO = DB.get()
-                                           .getPatternDAO();
+            TemplateHeaderDAO headerDAO = DB.get()
+                                            .getPatternDAO();
             TemplateHeader dbHeader = modelHeader.toDBO();
             if (newPattern) {
                 dbHeader.setId(null);
@@ -154,13 +154,13 @@ public class TemplateDetailsViewModel extends ViewModel {
                             modelHeader));
 
 
-            PatternAccountDAO paDAO = DB.get()
-                                        .getPatternAccountDAO();
+            TemplateAccountDAO paDAO = DB.get()
+                                         .getPatternAccountDAO();
             for (int i = 1; i < list.size(); i++) {
                 final TemplateDetailsItem.AccountRow accRowItem = list.get(i)
                                                                       .asAccountRowItem();
                 TemplateAccount dbAccount = accRowItem.toDBO(dbHeader.getId());
-                dbAccount.setPatternId(mPatternId);
+                dbAccount.setTemplateId(mPatternId);
                 dbAccount.setPosition(i);
                 if (newPattern) {
                     dbAccount.setId(null);

@@ -32,7 +32,7 @@ import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ktnx.mobileledger.dao.PatternHeaderDAO;
+import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.databinding.FragmentTemplateListBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateHeader;
@@ -85,9 +85,9 @@ public class TemplateListFragment extends Fragment {
         TemplatesRecyclerViewAdapter modelAdapter = new TemplatesRecyclerViewAdapter();
 
         b.templateList.setAdapter(modelAdapter);
-        PatternHeaderDAO pDao = DB.get()
-                                  .getPatternDAO();
-        LiveData<List<TemplateHeader>> templates = pDao.getPatterns();
+        TemplateHeaderDAO pDao = DB.get()
+                                   .getPatternDAO();
+        LiveData<List<TemplateHeader>> templates = pDao.getTemplates();
         templates.observe(getViewLifecycleOwner(), modelAdapter::setTemplates);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(RecyclerView.VERTICAL);

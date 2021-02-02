@@ -25,13 +25,13 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
-import net.ktnx.mobileledger.db.PatternWithAccounts;
 import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.db.TemplateWithAccounts;
 
 import java.util.List;
 
 @Dao
-public interface PatternHeaderDAO {
+public interface TemplateHeaderDAO {
     @Insert()
     long insert(TemplateHeader item);
 
@@ -41,13 +41,13 @@ public interface PatternHeaderDAO {
     @Delete
     void delete(TemplateHeader item);
 
-    @Query("SELECT * FROM patterns ORDER BY UPPER(name)")
-    LiveData<List<TemplateHeader>> getPatterns();
+    @Query("SELECT * FROM templates ORDER BY UPPER(name)")
+    LiveData<List<TemplateHeader>> getTemplates();
 
-    @Query("SELECT * FROM patterns WHERE id = :id")
-    LiveData<TemplateHeader> getPattern(Long id);
+    @Query("SELECT * FROM templates WHERE id = :id")
+    LiveData<TemplateHeader> getTemplate(Long id);
 
     @Transaction
-    @Query("SELECT * FROM patterns WHERE id = :id")
-    LiveData<PatternWithAccounts> getPatternWithAccounts(Long id);
+    @Query("SELECT * FROM templates WHERE id = :id")
+    LiveData<TemplateWithAccounts> getTemplateWithAccounts(Long id);
 }

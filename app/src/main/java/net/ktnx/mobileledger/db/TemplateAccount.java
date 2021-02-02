@@ -26,22 +26,21 @@ import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName = "pattern_accounts",
-        indices = {@Index(name = "un_pattern_accounts", unique = true, value = "id"),
-                   @Index(name = "fk_pattern_accounts_pattern", value = "pattern_id"),
-                   @Index(name = "fk_pattern_accounts_currency", value = "currency")
-        }, foreignKeys = {@ForeignKey(childColumns = "pattern_id", parentColumns = "id",
+@Entity(tableName = "template_accounts",
+        indices = {@Index(name = "fk_template_accounts_template", value = "template_id"),
+                   @Index(name = "fk_template_accounts_currency", value = "currency")
+        }, foreignKeys = {@ForeignKey(childColumns = "template_id", parentColumns = "id",
                                       entity = TemplateHeader.class),
                           @ForeignKey(childColumns = "currency", parentColumns = "id",
                                       entity = Currency.class)
 })
 public class TemplateAccount extends TemplateBase {
-    @NonNull
-    @ColumnInfo(name = "pattern_id")
-    private Long patternId;
     @PrimaryKey(autoGenerate = true)
     @NotNull
     private Long id;
+    @NonNull
+    @ColumnInfo(name = "template_id")
+    private Long templateId;
     @ColumnInfo(name = "acc")
     private String accountName;
     @ColumnInfo(name = "position")
@@ -63,9 +62,9 @@ public class TemplateAccount extends TemplateBase {
     private Integer accountCommentMatchGroup;
     @ColumnInfo(name = "negate_amount")
     private Boolean negateAmount;
-    public TemplateAccount(@NotNull Long id, @NonNull Long patternId, @NonNull Long position) {
+    public TemplateAccount(@NotNull Long id, @NonNull Long templateId, @NonNull Long position) {
         this.id = id;
-        this.patternId = patternId;
+        this.templateId = templateId;
         this.position = position;
     }
     public Long getId() {
@@ -80,11 +79,11 @@ public class TemplateAccount extends TemplateBase {
     public void setNegateAmount(Boolean negateAmount) {
         this.negateAmount = negateAmount;
     }
-    public @NotNull Long getPatternId() {
-        return patternId;
+    public @NotNull Long getTemplateId() {
+        return templateId;
     }
-    public void setPatternId(@NonNull Long patternId) {
-        this.patternId = patternId;
+    public void setTemplateId(@NonNull Long templateId) {
+        this.templateId = templateId;
     }
     @NonNull
     public String getAccountName() {

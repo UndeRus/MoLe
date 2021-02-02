@@ -21,15 +21,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName = "patterns",
-        indices = {@Index(name = "un_patterns_id", value = "id", unique = true)})
+@Entity(tableName = "templates")
 public class TemplateHeader extends TemplateBase {
     @PrimaryKey(autoGenerate = true)
     @NonNull
