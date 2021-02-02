@@ -73,6 +73,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_add_white_24dp"
         android:contentDescription="@string/add_button_description"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -83,6 +84,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_save_white_24dp"
         android:contentDescription="@string/save_button_description"
+        app:layout_behavior="@string/hide_bottom_view_on_scroll_behavior"
         />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
