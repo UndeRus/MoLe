@@ -82,8 +82,9 @@ public class PatternsActivity extends CrashReportingActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            if (navController.getCurrentDestination()
-                             .getId() == R.id.patternDetailsFragment)
+            final NavDestination currentDestination = navController.getCurrentDestination();
+            if (currentDestination != null &&
+                currentDestination.getId() == R.id.patternDetailsFragment)
                 navController.popBackStack();
             else
                 finish();
