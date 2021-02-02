@@ -121,6 +121,13 @@ abstract public class DB extends RoomDatabase {
                             }
                         }
                         })
+                        .addCallback(new Callback() {
+                            @Override
+                            public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                                super.onOpen(db);
+                                db.execSQL("PRAGMA foreign_keys = ON");
+                            }
+                        })
                         .build();
         }
     }
