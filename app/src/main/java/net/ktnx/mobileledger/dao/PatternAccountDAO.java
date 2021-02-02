@@ -24,26 +24,26 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import net.ktnx.mobileledger.db.PatternAccount;
+import net.ktnx.mobileledger.db.TemplateAccount;
 
 import java.util.List;
 
 @Dao
 public interface PatternAccountDAO {
     @Insert
-    Long insert(PatternAccount item);
+    Long insert(TemplateAccount item);
 
     @Update
-    void update(PatternAccount... items);
+    void update(TemplateAccount... items);
 
     @Delete
-    void delete(PatternAccount item);
+    void delete(TemplateAccount item);
 
     @Query("SELECT * FROM pattern_accounts WHERE pattern_id=:pattern_id")
-    LiveData<List<PatternAccount>> getPatternAccounts(Long pattern_id);
+    LiveData<List<TemplateAccount>> getPatternAccounts(Long pattern_id);
 
     @Query("SELECT * FROM pattern_accounts WHERE id = :id")
-    LiveData<PatternAccount> getPatternAccountById(Long id);
+    LiveData<TemplateAccount> getPatternAccountById(Long id);
 
 //    not useful for now
 //    @Transaction

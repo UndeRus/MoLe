@@ -32,8 +32,8 @@
         android:supportsRtl="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".ui.patterns.PatternsActivity"
-            android:label="@string/title_activity_patterns"
+            android:name=".ui.templates.TemplatesActivity"
+            android:label="@string/title_activity_templates"
             android:theme="@style/AppTheme.default" />
         <activity
             android:name=".ui.activity.SplashActivity"

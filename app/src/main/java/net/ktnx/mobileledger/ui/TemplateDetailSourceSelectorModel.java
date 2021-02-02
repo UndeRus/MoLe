@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -20,15 +20,15 @@ package net.ktnx.mobileledger.ui;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import net.ktnx.mobileledger.model.PatternDetailSource;
+import net.ktnx.mobileledger.model.TemplateDetailSource;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PatternDetailSourceSelectorModel extends ViewModel {
-    public final MutableLiveData<List<PatternDetailSource>> groups = new MutableLiveData<>();
+public class TemplateDetailSourceSelectorModel extends ViewModel {
+    public final MutableLiveData<List<TemplateDetailSource>> groups = new MutableLiveData<>();
     private OnSourceSelectedListener selectionListener;
-    public PatternDetailSourceSelectorModel() {
+    public TemplateDetailSourceSelectorModel() {
     }
     void setOnSourceSelectedListener(OnSourceSelectedListener listener) {
         selectionListener = listener;
@@ -40,7 +40,7 @@ public class PatternDetailSourceSelectorModel extends ViewModel {
         if (selectionListener != null)
             selectionListener.onSourceSelected(literal, group);
     }
-    public void setSourcesList(ArrayList<PatternDetailSource> mSources) {
+    public void setSourcesList(ArrayList<TemplateDetailSource> mSources) {
         groups.setValue(mSources);
     }
 }

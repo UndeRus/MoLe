@@ -24,9 +24,9 @@ import java.util.List;
 
 public class PatternWithAccounts {
     @Embedded
-    public PatternHeader header;
+    public TemplateHeader header;
     @Relation(parentColumn = "id", entityColumn = "pattern_id")
-    public List<PatternAccount> accounts;
+    public List<TemplateAccount> accounts;
 
     public Long getId() {
         return header.getId();

@@ -22,26 +22,26 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import java.io.Serializable;
 
-public class PatternDetailSource implements Serializable {
-    public static final DiffUtil.ItemCallback<PatternDetailSource> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<PatternDetailSource>() {
+public class TemplateDetailSource implements Serializable {
+    public static final DiffUtil.ItemCallback<TemplateDetailSource> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<TemplateDetailSource>() {
                 @Override
-                public boolean areItemsTheSame(@NonNull PatternDetailSource oldItem,
-                                               @NonNull PatternDetailSource newItem) {
+                public boolean areItemsTheSame(@NonNull TemplateDetailSource oldItem,
+                                               @NonNull TemplateDetailSource newItem) {
                     return oldItem.groupNumber == newItem.groupNumber;
                 }
                 @Override
-                public boolean areContentsTheSame(@NonNull PatternDetailSource oldItem,
-                                                  @NonNull PatternDetailSource newItem) {
+                public boolean areContentsTheSame(@NonNull TemplateDetailSource oldItem,
+                                                  @NonNull TemplateDetailSource newItem) {
                     return oldItem.matchedText.equals(newItem.matchedText);
                 }
             };
 
     private short groupNumber;
     private String matchedText;
-    public PatternDetailSource() {
+    public TemplateDetailSource() {
     }
-    public PatternDetailSource(short groupNumber, String matchedText) {
+    public TemplateDetailSource(short groupNumber, String matchedText) {
         this.groupNumber = groupNumber;
         this.matchedText = matchedText;
     }

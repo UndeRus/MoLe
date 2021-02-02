@@ -179,7 +179,7 @@
     <string name="err_json_send_error_unsupported">Perhaps the API of the backend server is not supported by MoLe</string>
     <string name="scan_qr">Scan QR code</string>
     <string name="nav_patterns">Patterns</string>
-    <string name="title_activity_patterns">Patterns</string>
+    <string name="title_activity_templates">Patterns</string>
     <string name="pattern_regex_hint">Pattern (regular expression)</string>
     <string name="help_menu_item_title">Help</string>
     <string name="edit_button_description">Edit button</string>
@@ -194,19 +194,19 @@
     <string name="pattern_details_account_name_label">Account name</string>
     <string name="pattern_details_account_row_label">Transaction account details</string>
     <string name="account_name_source_label">Account name source</string>
-    <string name="pattern_details_source_literal">literal</string>
+    <string name="template_details_source_literal">literal</string>
     <string name="account_comment_source_label">Account comment source</string>
     <string name="account_amount_source_label">Amount source</string>
     <string name="pattern_details_account_comment_label">Account comment</string>
     <string name="pattern_details_account_amount_label">Amount</string>
-    <string name="choose_pattern_detail_source_label">Pattern match group</string>
+    <string name="choose_template_detail_source_label">Pattern match group</string>
     <string name="missing_pattern_error">Missing pattern</string>
     <string name="missing_test_text">Missing test text</string>
     <string name="pattern_without_groups">Pattern has no capturing groups</string>
     <string name="pattern_does_not_match">Pattern doesn\'t match the test text</string>
     <string name="pattern_transaction_parameters_label">Transaction parameters</string>
-    <string name="pattern_transaction_description_hint">Transaction description</string>
-    <string name="pattern_transaction_comment_hint">Transaction comment</string>
+    <string name="template_transaction_description_hint">Transaction description</string>
+    <string name="template_transaction_comment_hint">Transaction comment</string>
     <string name="transaction_description_source_label">Transaction description source</string>
     <string name="transaction_comment_source_label">Transaction comment source</string>
     <string name="pattern_details_date_label">Transaction date</string>
@@ -223,6 +223,6 @@
     <string name="choose_pattern_to_apply">Choose pattern to apply</string>
     <string name="pattern_name">Pattern name</string>
     <string name="implementation_pending">Not implemented yet</string>
-    <string name="title_edit_pattern">Edit pattern</string>
-    <string name="title_new_pattern">New pattern</string>
+    <string name="title_edit_template">Edit pattern</string>
+    <string name="title_new_template">New pattern</string>
 </resources>

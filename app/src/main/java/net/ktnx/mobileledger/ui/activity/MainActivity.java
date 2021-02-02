@@ -55,8 +55,8 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.new_transaction.NewTransactionActivity;
-import net.ktnx.mobileledger.ui.patterns.PatternsActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
+import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
@@ -302,7 +302,7 @@ public class MainActivity extends ProfileThemedActivity {
         b.navPatterns.setOnClickListener(this::onPatternsClick);
     }
     private void onPatternsClick(View view) {
-        Intent intent = new Intent(this, PatternsActivity.class);
+        Intent intent = new Intent(this, TemplatesActivity.class);
         startActivity(intent);
     }
     private void scheduleDataRetrievalIfStale(long lastUpdate) {

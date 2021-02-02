@@ -31,7 +31,7 @@
         app:layout_constraintTop_toTopOf="parent"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_name"
+            android:id="@+id/template_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/pattern_name_label"
@@ -60,7 +60,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceListItem"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_head_scan_qr_button"
+        app:layout_constraintEnd_toStartOf="@id/template_details_head_scan_qr_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pattern_layout"
         >
@@ -73,7 +73,7 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
     <ImageButton
-        android:id="@+id/pattern_details_head_scan_qr_button"
+        android:id="@+id/template_details_head_scan_qr_button"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:background="@android:color/transparent"
@@ -102,82 +102,82 @@
         app:layout_constraintTop_toBottomOf="@id/transaction_parameters_label"
         />
     <TextView
-        android:id="@+id/pattern_details_year_source_label"
+        android:id="@+id/template_details_year_source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/pattern_details_date_year_source_label"
         android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_month_source_label"
+        app:layout_constraintEnd_toStartOf="@id/template_details_month_source_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pattern_transaction_date_label"
         />
     <TextView
-        android:id="@+id/pattern_details_month_source_label"
+        android:id="@+id/template_details_month_source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/pattern_details_date_month_source_label"
         android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_day_source_label"
-        app:layout_constraintStart_toEndOf="@id/pattern_details_year_source_label"
+        app:layout_constraintEnd_toStartOf="@id/template_details_day_source_label"
+        app:layout_constraintStart_toEndOf="@id/template_details_year_source_label"
         app:layout_constraintTop_toBottomOf="@id/pattern_transaction_date_label"
         />
     <TextView
-        android:id="@+id/pattern_details_day_source_label"
+        android:id="@+id/template_details_day_source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/pattern_details_date_day_source_label"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/pattern_details_month_source_label"
+        app:layout_constraintStart_toEndOf="@id/template_details_month_source_label"
         app:layout_constraintTop_toBottomOf="@id/pattern_transaction_date_label"
         />
     <TextView
-        android:id="@+id/pattern_details_year_source"
+        android:id="@+id/template_details_year_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/pattern_details_source_literal"
+        android:text="@string/template_details_source_literal"
         android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_month_source"
+        app:layout_constraintEnd_toStartOf="@id/template_details_month_source"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_day_source_label"
+        app:layout_constraintTop_toBottomOf="@id/template_details_day_source_label"
         />
     <TextView
-        android:id="@+id/pattern_details_month_source"
+        android:id="@+id/template_details_month_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
         android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/pattern_details_day_source"
-        app:layout_constraintStart_toEndOf="@id/pattern_details_year_source"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_month_source_label"
+        app:layout_constraintEnd_toStartOf="@id/template_details_day_source"
+        app:layout_constraintStart_toEndOf="@id/template_details_year_source"
+        app:layout_constraintTop_toBottomOf="@id/template_details_month_source_label"
         />
     <TextView
-        android:id="@+id/pattern_details_day_source"
+        android:id="@+id/template_details_day_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text=""
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/pattern_details_month_source"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_day_source_label"
+        app:layout_constraintStart_toEndOf="@id/template_details_month_source"
+        app:layout_constraintTop_toBottomOf="@id/template_details_day_source_label"
         />
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_before_date_inputs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="pattern_details_year_source,pattern_details_month_source,pattern_details_day_source"
+        app:constraint_referenced_ids="template_details_year_source,template_details_month_source,template_details_day_source"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pattern_details_date_year_layout"
+        android:id="@+id/template_details_date_year_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/pattern_details_year_source"
+        app:layout_constraintEnd_toEndOf="@id/template_details_year_source"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_details_date_year"
+            android:id="@+id/template_details_date_year"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -185,15 +185,15 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pattern_details_date_month_layout"
+        android:id="@+id/template_details_date_month_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="@id/pattern_details_month_source"
-        app:layout_constraintStart_toStartOf="@id/pattern_details_month_source"
+        app:layout_constraintEnd_toEndOf="@id/template_details_month_source"
+        app:layout_constraintStart_toStartOf="@id/template_details_month_source"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_details_date_month"
+            android:id="@+id/template_details_date_month"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -201,16 +201,16 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pattern_details_date_day_layout"
+        android:id="@+id/template_details_date_day_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/barrier_before_description"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/pattern_details_day_source"
+        app:layout_constraintStart_toStartOf="@id/template_details_day_source"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_details_date_day"
+            android:id="@+id/template_details_date_day"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
@@ -223,12 +223,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="pattern_details_date_day_layout,pattern_details_date_month_layout,pattern_details_date_year_layout"
+        app:constraint_referenced_ids="template_details_date_day_layout,template_details_date_month_layout,template_details_date_year_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
     <TextView
-        android:id="@+id/pattern_transaction_description_source_label"
+        android:id="@+id/template_transaction_description_source_label"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/text_margin"
@@ -239,30 +239,30 @@
         app:layout_constraintTop_toBottomOf="@id/barrier_before_description"
         />
     <TextView
-        android:id="@+id/pattern_transaction_description_source"
+        android:id="@+id/template_transaction_description_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minWidth="100dp"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_transaction_description_source_label"
+        app:layout_constraintTop_toBottomOf="@id/template_transaction_description_source_label"
         />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/transaction_description_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/pattern_transaction_description_source"
+        app:layout_constraintTop_toBottomOf="@id/template_transaction_description_source"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/transaction_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_transaction_description_hint"
+            android:hint="@string/template_transaction_description_hint"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <TextView
-        android:id="@+id/pattern_transaction_comment_source_label"
+        android:id="@+id/template_transaction_comment_source_label"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/text_margin"
@@ -273,26 +273,26 @@
         app:layout_constraintTop_toBottomOf="@id/transaction_description_layout"
         />
     <TextView
-        android:id="@+id/pattern_transaction_comment_source"
+        android:id="@+id/template_transaction_comment_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minWidth="100dp"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_transaction_comment_source_label"
+        app:layout_constraintTop_toBottomOf="@id/template_transaction_comment_source_label"
         />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/transaction_comment_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/pattern_transaction_comment_source"
+        app:layout_constraintTop_toBottomOf="@id/template_transaction_comment_source"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/transaction_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pattern_transaction_comment_hint"
+            android:hint="@string/template_transaction_comment_hint"
             />
     </com.google.android.material.textfield.TextInputLayout>
 

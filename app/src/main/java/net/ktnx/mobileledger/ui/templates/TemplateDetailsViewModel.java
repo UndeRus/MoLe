@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.ui.templates;
 
 import android.os.AsyncTask;
 
@@ -27,10 +27,10 @@ import androidx.lifecycle.ViewModel;
 import net.ktnx.mobileledger.dao.PatternAccountDAO;
 import net.ktnx.mobileledger.dao.PatternHeaderDAO;
 import net.ktnx.mobileledger.db.DB;
-import net.ktnx.mobileledger.db.PatternAccount;
-import net.ktnx.mobileledger.db.PatternHeader;
 import net.ktnx.mobileledger.db.PatternWithAccounts;
-import net.ktnx.mobileledger.model.PatternDetailsItem;
+import net.ktnx.mobileledger.db.TemplateAccount;
+import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.model.TemplateDetailsItem;
 import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class PatternDetailsViewModel extends ViewModel {
-    private final MutableLiveData<List<PatternDetailsItem>> items =
+public class TemplateDetailsViewModel extends ViewModel {
+    private final MutableLiveData<List<TemplateDetailsItem>> items =
             new MutableLiveData<>(Collections.emptyList());
     private Long mPatternId;
     private String mDefaultPatternName;
@@ -52,14 +52,14 @@ public class PatternDetailsViewModel extends ViewModel {
     }
 
     public void resetItems() {
-        ArrayList<PatternDetailsItem> newList = new ArrayList<>();
-        final PatternDetailsItem.Header header = PatternDetailsItem.createHeader();
+        ArrayList<TemplateDetailsItem> newList = new ArrayList<>();
+        final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
         header.setName(mDefaultPatternName);
         header.setId(0);
         newList.add(header);
 
         while (newList.size() < 3) {
-            final PatternDetailsItem.AccountRow aRow = PatternDetailsItem.createAccountRow();
+            final TemplateDetailsItem.AccountRow aRow = TemplateDetailsItem.createAccountRow();
             aRow.setId(newList.size() + 1);
             newList.add(aRow);
         }
@@ -67,24 +67,24 @@ public class PatternDetailsViewModel extends ViewModel {
         items.setValue(newList);
     }
     private void checkItemConsistency() {
-        ArrayList<PatternDetailsItem> newList = new ArrayList<>(items.getValue());
+        ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
         boolean changes = false;
         if (newList.size() < 1) {
-            final PatternDetailsItem.Header header = PatternDetailsItem.createHeader();
+            final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
             header.setName(mDefaultPatternName);
             newList.add(header);
             changes = true;
         }
 
         while (newList.size() < 3) {
-            newList.add(PatternDetailsItem.createAccountRow());
+            newList.add(TemplateDetailsItem.createAccountRow());
             changes = true;
         }
 
         if (changes)
             items.setValue(newList);
     }
-    public LiveData<List<PatternDetailsItem>> getItems(Long patternId) {
+    public LiveData<List<TemplateDetailsItem>> getItems(Long patternId) {
         if (patternId != null && patternId <= 0)
             throw new IllegalArgumentException("Pattern ID " + patternId + " is invalid");
 
@@ -101,15 +101,15 @@ public class PatternDetailsViewModel extends ViewModel {
         Observer<PatternWithAccounts> observer = new Observer<PatternWithAccounts>() {
             @Override
             public void onChanged(PatternWithAccounts src) {
-                ArrayList<PatternDetailsItem> l = new ArrayList<>();
+                ArrayList<TemplateDetailsItem> l = new ArrayList<>();
 
-                PatternDetailsItem header = PatternDetailsItem.fromRoomObject(src.header);
+                TemplateDetailsItem header = TemplateDetailsItem.fromRoomObject(src.header);
                 l.add(header);
-                for (PatternAccount acc : src.accounts) {
-                    l.add(PatternDetailsItem.fromRoomObject(acc));
+                for (TemplateAccount acc : src.accounts) {
+                    l.add(TemplateDetailsItem.fromRoomObject(acc));
                 }
 
-                for (PatternDetailsItem i : l) {
+                for (TemplateDetailsItem i : l) {
                     Logger.debug("patterns-db", "Loaded pattern item " + i);
                 }
                 items.postValue(l);
@@ -122,26 +122,26 @@ public class PatternDetailsViewModel extends ViewModel {
         return items;
     }
     public void setTestText(String text) {
-        List<PatternDetailsItem> list = new ArrayList<>(items.getValue());
-        PatternDetailsItem.Header header = new PatternDetailsItem.Header(list.get(0)
-                                                                             .asHeaderItem());
+        List<TemplateDetailsItem> list = new ArrayList<>(items.getValue());
+        TemplateDetailsItem.Header header = new TemplateDetailsItem.Header(list.get(0)
+                                                                               .asHeaderItem());
         header.setTestText(text);
         list.set(0, header);
 
         items.setValue(list);
     }
-    public void onSavePattern() {
+    public void onSaveTemplate() {
         Logger.debug("flow", "PatternDetailsViewModel.onSavePattern(); model=" + this);
-        final List<PatternDetailsItem> list = Objects.requireNonNull(items.getValue());
+        final List<TemplateDetailsItem> list = Objects.requireNonNull(items.getValue());
 
         AsyncTask.execute(() -> {
             boolean newPattern = mPatternId == null || mPatternId <= 0;
 
-            PatternDetailsItem.Header modelHeader = list.get(0)
-                                                        .asHeaderItem();
+            TemplateDetailsItem.Header modelHeader = list.get(0)
+                                                         .asHeaderItem();
             PatternHeaderDAO headerDAO = DB.get()
                                            .getPatternDAO();
-            PatternHeader dbHeader = modelHeader.toDBO();
+            TemplateHeader dbHeader = modelHeader.toDBO();
             if (newPattern) {
                 dbHeader.setId(null);
                 dbHeader.setId(mPatternId = headerDAO.insert(dbHeader));
@@ -157,9 +157,9 @@ public class PatternDetailsViewModel extends ViewModel {
             PatternAccountDAO paDAO = DB.get()
                                         .getPatternAccountDAO();
             for (int i = 1; i < list.size(); i++) {
-                final PatternDetailsItem.AccountRow accRowItem = list.get(i)
-                                                                     .asAccountRowItem();
-                PatternAccount dbAccount = accRowItem.toDBO(dbHeader.getId());
+                final TemplateDetailsItem.AccountRow accRowItem = list.get(i)
+                                                                      .asAccountRowItem();
+                TemplateAccount dbAccount = accRowItem.toDBO(dbHeader.getId());
                 dbAccount.setPatternId(mPatternId);
                 dbAccount.setPosition(i);
                 if (newPattern) {

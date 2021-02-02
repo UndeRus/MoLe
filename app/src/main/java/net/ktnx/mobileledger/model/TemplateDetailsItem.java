@@ -22,9 +22,9 @@ import android.content.res.Resources;
 import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.db.PatternAccount;
-import net.ktnx.mobileledger.db.PatternBase;
-import net.ktnx.mobileledger.db.PatternHeader;
+import net.ktnx.mobileledger.db.TemplateAccount;
+import net.ktnx.mobileledger.db.TemplateBase;
+import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.Contract;
@@ -34,28 +34,28 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-abstract public class PatternDetailsItem {
+abstract public class TemplateDetailsItem {
     private final Type type;
     protected Long id;
     protected Long position;
 
-    protected PatternDetailsItem(Type type) {
+    protected TemplateDetailsItem(Type type) {
         this.type = type;
     }
     @Contract(" -> new")
-    public static @NotNull PatternDetailsItem.Header createHeader() {
+    public static @NotNull TemplateDetailsItem.Header createHeader() {
         return new Header();
     }
-    public static @NotNull PatternDetailsItem.Header createHeader(Header origin) {
+    public static @NotNull TemplateDetailsItem.Header createHeader(Header origin) {
         return new Header(origin);
     }
     @Contract("-> new")
-    public static @NotNull PatternDetailsItem.AccountRow createAccountRow() {
+    public static @NotNull TemplateDetailsItem.AccountRow createAccountRow() {
         return new AccountRow();
     }
-    public static PatternDetailsItem fromRoomObject(PatternBase p) {
-        if (p instanceof PatternHeader) {
-            PatternHeader ph = (PatternHeader) p;
+    public static TemplateDetailsItem fromRoomObject(TemplateBase p) {
+        if (p instanceof TemplateHeader) {
+            TemplateHeader ph = (TemplateHeader) p;
             Header header = createHeader();
             header.setId(ph.getId());
             header.setName(ph.getName());
@@ -90,8 +90,8 @@ abstract public class PatternDetailsItem {
 
             return header;
         }
-        else if (p instanceof PatternAccount) {
-            PatternAccount pa = (PatternAccount) p;
+        else if (p instanceof TemplateAccount) {
+            TemplateAccount pa = (TemplateAccount) p;
             AccountRow acc = createAccountRow();
             acc.setId(pa.getId());
 
@@ -269,7 +269,7 @@ abstract public class PatternDetailsItem {
         public static final int accountItem = 1;
     }
 
-    public static class AccountRow extends PatternDetailsItem {
+    public static class AccountRow extends TemplateDetailsItem {
         private final PossiblyMatchedValue<String> accountName =
                 PossiblyMatchedValue.withLiteralString("");
         private final PossiblyMatchedValue<String> accountComment =
@@ -364,8 +364,8 @@ abstract public class PatternDetailsItem {
         public void switchToLiteralAccountComment() {
             accountComment.switchToLiteral();
         }
-        public PatternAccount toDBO(@NonNull Long patternId) {
-            PatternAccount result = new PatternAccount(id, patternId, position);
+        public TemplateAccount toDBO(@NonNull Long patternId) {
+            TemplateAccount result = new TemplateAccount(id, patternId, position);
 
             if (accountName.hasLiteralValue())
                 result.setAccountName(accountName.getValue());
@@ -390,7 +390,7 @@ abstract public class PatternDetailsItem {
         }
     }
 
-    public static class Header extends PatternDetailsItem {
+    public static class Header extends TemplateDetailsItem {
         private String pattern = "";
         private String testText = "";
         private Pattern compiledPattern;
@@ -590,8 +590,8 @@ abstract public class PatternDetailsItem {
             dateMonth.switchToLiteral();
         }
         public void switchToLiteralDateDay() { dateDay.switchToLiteral(); }
-        public PatternHeader toDBO() {
-            PatternHeader result = new PatternHeader(id, name, pattern);
+        public TemplateHeader toDBO() {
+            TemplateHeader result = new TemplateHeader(id, name, pattern);
 
             if (Misc.emptyIsNull(testText) != null)
                 result.setTestText(testText);

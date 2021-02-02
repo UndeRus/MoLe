@@ -32,7 +32,7 @@
         app:drawableBottomCompat="@drawable/dashed_border_8dp"
         />
     <TextView
-        android:id="@+id/pattern_account_name_source_label"
+        android:id="@+id/template_account_name_source_label"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/text_margin"
@@ -43,27 +43,27 @@
         app:layout_constraintTop_toBottomOf="@id/pattern_account_label"
         />
     <TextView
-        android:id="@+id/pattern_details_account_name_source"
+        android:id="@+id/template_details_account_name_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minWidth="100dp"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_account_name_source_label"
+        app:layout_constraintTop_toBottomOf="@id/template_account_name_source_label"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pattern_details_account_name_layout"
+        android:id="@+id/template_details_account_name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_name_source"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_name_source"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_details_account_name"
+            android:id="@+id/template_details_account_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/pattern_details_account_name_label"
@@ -72,7 +72,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
-        android:id="@+id/pattern_account_comment_source_label"
+        android:id="@+id/template_account_comment_source_label"
         android:layout_width="0dp"
         android:layout_height="match_parent"
 
@@ -81,30 +81,30 @@
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_name_layout"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_name_layout"
         />
     <TextView
-        android:id="@+id/pattern_details_account_comment_source"
+        android:id="@+id/template_details_account_comment_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minWidth="100dp"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_account_comment_source_label"
+        app:layout_constraintTop_toBottomOf="@id/template_account_comment_source_label"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pattern_details_account_comment_layout"
+        android:id="@+id/template_details_account_comment_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_comment_source"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_comment_source"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_details_account_comment"
+            android:id="@+id/template_details_account_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/pattern_details_account_comment_label"
@@ -113,7 +113,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
-        android:id="@+id/pattern_account_amount_source_label"
+        android:id="@+id/template_account_amount_source_label"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/text_margin"
@@ -121,37 +121,37 @@
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toStartOf="@id/negate_amount_switch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_comment_layout"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_comment_layout"
         />
     <TextView
-        android:id="@+id/pattern_details_account_amount_source"
+        android:id="@+id/template_details_account_amount_source"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceListItemSecondary"
         app:layout_constraintEnd_toStartOf="@id/negate_amount_switch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_account_amount_source_label"
+        app:layout_constraintTop_toBottomOf="@id/template_account_amount_source_label"
         />
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/negate_amount_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/pattern_details_account_amount_source"
+        app:layout_constraintBottom_toBottomOf="@id/template_details_account_amount_source"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/pattern_account_amount_source_label"
+        app:layout_constraintTop_toTopOf="@id/template_account_amount_source_label"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/pattern_details_account_amount_layout"
+        android:id="@+id/template_details_account_amount_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_details_account_amount_source"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_amount_source"
         >
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/pattern_details_account_amount"
+            android:id="@+id/template_details_account_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/pattern_details_account_amount_label"

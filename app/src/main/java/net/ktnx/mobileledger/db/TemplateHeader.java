@@ -1,3 +1,20 @@
+/*
+ * Copyright © 2021 Damyan Ivanov.
+ * This file is part of MoLe.
+ * MoLe is free software: you can distribute it and/or modify it
+ * under the term of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your opinion), any later version.
+ *
+ * MoLe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License terms for details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package net.ktnx.mobileledger.db;
 
 import androidx.annotation.NonNull;
@@ -13,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Entity(tableName = "patterns",
         indices = {@Index(name = "un_patterns_id", value = "id", unique = true)})
-public class PatternHeader extends PatternBase {
+public class TemplateHeader extends TemplateBase {
     @PrimaryKey(autoGenerate = true)
     @NonNull
     private Long id;
@@ -45,8 +62,8 @@ public class PatternHeader extends PatternBase {
     private Integer dateDay;
     @ColumnInfo(name = "date_day_match_group")
     private Integer dateDayMatchGroup;
-    public PatternHeader(@NotNull Long id, @NonNull String name,
-                         @NonNull String regularExpression) {
+    public TemplateHeader(@NotNull Long id, @NonNull String name,
+                          @NonNull String regularExpression) {
         this.id = id;
         this.name = name;
         this.regularExpression = regularExpression;
@@ -142,10 +159,10 @@ public class PatternHeader extends PatternBase {
     public boolean equals(@Nullable Object obj) {
         if (obj == null)
             return false;
-        if (!(obj instanceof PatternHeader))
+        if (!(obj instanceof TemplateHeader))
             return false;
 
-        PatternHeader o = (PatternHeader) obj;
+        TemplateHeader o = (TemplateHeader) obj;
 
         return Misc.equalLongs(id, o.id) && Misc.equalStrings(name, o.name) &&
                Misc.equalStrings(regularExpression, o.regularExpression) &&

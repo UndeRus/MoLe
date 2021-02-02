@@ -49,15 +49,15 @@ import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.db.DB;
-import net.ktnx.mobileledger.db.PatternAccount;
-import net.ktnx.mobileledger.db.PatternHeader;
+import net.ktnx.mobileledger.db.TemplateAccount;
+import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.QRScanCapableFragment;
-import net.ktnx.mobileledger.ui.patterns.PatternsActivity;
+import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -90,9 +90,9 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         setHasOptionsMenu(true);
     }
     private void startNewPatternActivity(String scanned) {
-        Intent intent = new Intent(requireContext(), PatternsActivity.class);
+        Intent intent = new Intent(requireContext(), TemplatesActivity.class);
         Bundle args = new Bundle();
-        args.putString(PatternsActivity.ARG_ADD_PATTERN, scanned);
+        args.putString(TemplatesActivity.ARG_ADD_TEMPLATE, scanned);
         requireContext().startActivity(intent, args);
     }
     private void alertNoPatternMatch(String scanned) {
@@ -110,13 +110,13 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         if (Misc.emptyIsNull(text) == null)
             return;
 
-        LiveData<List<PatternHeader>> allPatterns = DB.get()
-                                                      .getPatternDAO()
-                                                      .getPatterns();
+        LiveData<List<TemplateHeader>> allPatterns = DB.get()
+                                                       .getPatternDAO()
+                                                       .getPatterns();
         allPatterns.observe(getViewLifecycleOwner(), patternHeaders -> {
-            ArrayList<PatternHeader> matchingPatterns = new ArrayList<>();
+            ArrayList<TemplateHeader> matchingPatterns = new ArrayList<>();
 
-            for (PatternHeader ph : patternHeaders) {
+            for (TemplateHeader ph : patternHeaders) {
                 String patternSource = ph.getRegularExpression();
                 if (Misc.emptyIsNull(patternSource) == null)
                     continue;
@@ -147,7 +147,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                 choosePattern(matchingPatterns, text);
         });
     }
-    private void choosePattern(ArrayList<PatternHeader> matchingPatterns, String matchedText) {
+    private void choosePattern(ArrayList<TemplateHeader> matchingPatterns, String matchedText) {
         final String patternNameColumn = "name";
         AbstractCursor cursor = new AbstractCursor() {
             @Override
@@ -207,7 +207,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                .create()
                .show();
     }
-    private void applyPattern(PatternHeader patternHeader, String text) {
+    private void applyPattern(TemplateHeader patternHeader, String text) {
         Pattern pattern = Pattern.compile(patternHeader.getRegularExpression());
 
         Matcher m = pattern.matcher(text);
@@ -262,7 +262,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
           .observe(getViewLifecycleOwner(), entry -> {
               int rowIndex = 0;
               final boolean accountsInInitialState = viewModel.accountsInInitialState();
-              for (PatternAccount acc : entry.accounts) {
+              for (TemplateAccount acc : entry.accounts) {
                   rowIndex++;
 
                   String accountName = extractStringFromMatches(m, acc.getAccountNameMatchGroup(),

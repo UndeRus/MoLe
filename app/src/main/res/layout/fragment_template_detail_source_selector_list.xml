@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/text_margin"
-        android:text="@string/choose_pattern_detail_source_label"
+        android:text="@string/choose_template_detail_source_label"
         android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@id/list"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,15 +50,15 @@
         android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:minHeight="100dp"
         app:layoutManager="LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/pattern_error"
+        app:layout_constraintBottom_toTopOf="@id/template_error"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/label"
         tools:context="net.ktnx.mobileledger.ui.CurrencySelectorFragment"
-        tools:listitem="@layout/fragment_pattern_detail_source_selector"
+        tools:listitem="@layout/fragment_template_detail_source_selector"
         />
     <TextView
-        android:id="@+id/pattern_error"
+        android:id="@+id/template_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/literal_button"
@@ -71,7 +71,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/text_margin"
-        android:text="@string/pattern_details_source_literal"
+        android:text="@string/template_details_source_literal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />

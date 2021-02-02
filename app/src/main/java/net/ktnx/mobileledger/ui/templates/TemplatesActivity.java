@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.ui.templates;
 
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,31 +25,32 @@ import androidx.appcompat.app.ActionBar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.databinding.ActivityPatternsBinding;
+import net.ktnx.mobileledger.databinding.ActivityTemplatesBinding;
 import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.Objects;
 
-public class PatternsActivity extends CrashReportingActivity
-        implements PatternListFragment.OnPatternListFragmentInteractionListener {
-    public static final String ARG_ADD_PATTERN = "add-pattern";
-    private ActivityPatternsBinding b;
+public class TemplatesActivity extends CrashReportingActivity
+        implements TemplateListFragment.OnTemplateListFragmentInteractionListener {
+    public static final String ARG_ADD_TEMPLATE = "add-template";
+    private ActivityTemplatesBinding b;
     private NavController navController;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.pattern_list_menu, menu);
+        getMenuInflater().inflate(R.menu.template_list_menu, menu);
 
         return true;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        b = ActivityPatternsBinding.inflate(getLayoutInflater());
+        b = ActivityTemplatesBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
         setSupportActionBar(b.toolbar);
         // Show the Up button in the action bar.
@@ -63,28 +64,28 @@ public class PatternsActivity extends CrashReportingActivity
         navController = navHostFragment.getNavController();
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.patternListFragment) {
+            if (destination.getId() == R.id.templateListFragment) {
                 b.fabAdd.show();
                 b.fabSave.hide();
-                b.toolbarLayout.setTitle(getString(R.string.title_activity_patterns));
+                b.toolbarLayout.setTitle(getString(R.string.title_activity_templates));
             }
-            if (destination.getId() == R.id.patternDetailsFragment) {
+            if (destination.getId() == R.id.templateDetailsFragment) {
                 b.fabAdd.hide();
                 b.fabSave.show();
             }
         });
 
-        b.toolbarLayout.setTitle(getString(R.string.title_activity_patterns));
+        b.toolbarLayout.setTitle(getString(R.string.title_activity_templates));
 
-        b.fabAdd.setOnClickListener(v -> onEditPattern(null));
-        b.fabSave.setOnClickListener(v -> onSavePattern());
+        b.fabAdd.setOnClickListener(v -> onEditTemplate(null));
+        b.fabSave.setOnClickListener(v -> onSaveTemplate());
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             final NavDestination currentDestination = navController.getCurrentDestination();
             if (currentDestination != null &&
-                currentDestination.getId() == R.id.patternDetailsFragment)
+                currentDestination.getId() == R.id.templateDetailsFragment)
                 navController.popBackStack();
             else
                 finish();
@@ -95,27 +96,27 @@ public class PatternsActivity extends CrashReportingActivity
     }
 
     @Override
-    public void onEditPattern(Long id) {
+    public void onEditTemplate(Long id) {
         if (id == null) {
-            navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment);
-            b.toolbarLayout.setTitle(getString(R.string.title_new_pattern));
+            navController.navigate(R.id.action_templateListFragment_to_templateDetailsFragment);
+            b.toolbarLayout.setTitle(getString(R.string.title_new_template));
         }
         else {
             Bundle bundle = new Bundle();
-            bundle.putLong(PatternDetailsFragment.ARG_PATTERN_ID, id);
-            navController.navigate(R.id.action_patternListFragment_to_patternDetailsFragment,
+            bundle.putLong(TemplateDetailsFragment.ARG_TEMPLATE_ID, id);
+            navController.navigate(R.id.action_templateListFragment_to_templateDetailsFragment,
                     bundle);
-            b.toolbarLayout.setTitle(getString(R.string.title_edit_pattern));
+            b.toolbarLayout.setTitle(getString(R.string.title_edit_template));
         }
     }
     @Override
-    public void onSavePattern() {
+    public void onSaveTemplate() {
         final ViewModelStoreOwner viewModelStoreOwner =
-                navController.getViewModelStoreOwner(R.id.pattern_list_navigation);
-        PatternDetailsViewModel model =
-                new ViewModelProvider(viewModelStoreOwner).get(PatternDetailsViewModel.class);
-        Logger.debug("flow", "PatternsActivity.onSavePattern(): model=" + model);
-        model.onSavePattern();
+                navController.getViewModelStoreOwner(R.id.template_list_navigation);
+        TemplateDetailsViewModel model =
+                new ViewModelProvider(viewModelStoreOwner).get(TemplateDetailsViewModel.class);
+        Logger.debug("flow", "TemplatesActivity.onSavePattern(): model=" + model);
+        model.onSaveTemplate();
         navController.navigateUp();
     }
     public NavController getNavController() {

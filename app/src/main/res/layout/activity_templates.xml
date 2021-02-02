@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.patterns.PatternsActivity"
+    tools:context=".ui.templates.TemplatesActivity"
     >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -61,7 +61,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:defaultNavHost="true"
-            app:navGraph="@navigation/pattern_list_navigation"
+            app:navGraph="@navigation/template_list_navigation"
             />
     </androidx.core.widget.NestedScrollView>
 

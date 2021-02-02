@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -23,29 +23,29 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ktnx.mobileledger.databinding.FragmentPatternDetailSourceSelectorBinding;
-import net.ktnx.mobileledger.model.PatternDetailSource;
+import net.ktnx.mobileledger.databinding.FragmentTemplateDetailSourceSelectorBinding;
+import net.ktnx.mobileledger.model.TemplateDetailSource;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link PatternDetailSource} and makes a call
+ * {@link RecyclerView.Adapter} that can display a {@link TemplateDetailSource} and makes a call
  * to the
  * specified {@link OnSourceSelectedListener}.
  */
-public class PatternDetailSourceSelectorRecyclerViewAdapter extends
-        ListAdapter<PatternDetailSource,
-                PatternDetailSourceSelectorRecyclerViewAdapter.ViewHolder> {
+public class TemplateDetailSourceSelectorRecyclerViewAdapter extends
+        ListAdapter<TemplateDetailSource,
+                TemplateDetailSourceSelectorRecyclerViewAdapter.ViewHolder> {
 
     private OnSourceSelectedListener sourceSelectedListener;
-    public PatternDetailSourceSelectorRecyclerViewAdapter() {
-        super(PatternDetailSource.DIFF_CALLBACK);
+    public TemplateDetailSourceSelectorRecyclerViewAdapter() {
+        super(TemplateDetailSource.DIFF_CALLBACK);
     }
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
-        FragmentPatternDetailSourceSelectorBinding b =
-                FragmentPatternDetailSourceSelectorBinding.inflate(
+        FragmentTemplateDetailSourceSelectorBinding b =
+                FragmentTemplateDetailSourceSelectorBinding.inflate(
                         LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(b);
     }
@@ -60,7 +60,7 @@ public class PatternDetailSourceSelectorRecyclerViewAdapter extends
     public void resetSourceSelectedListener() {
         sourceSelectedListener = null;
     }
-    public void notifySourceSelected(PatternDetailSource item) {
+    public void notifySourceSelected(TemplateDetailSource item) {
         if (null != sourceSelectedListener)
             sourceSelectedListener.onSourceSelected(false, item.getGroupNumber());
     }
@@ -69,10 +69,10 @@ public class PatternDetailSourceSelectorRecyclerViewAdapter extends
             sourceSelectedListener.onSourceSelected(true, (short) -1);
     }
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private final FragmentPatternDetailSourceSelectorBinding b;
-        private PatternDetailSource mItem;
+        private final FragmentTemplateDetailSourceSelectorBinding b;
+        private TemplateDetailSource mItem;
 
-        ViewHolder(FragmentPatternDetailSourceSelectorBinding binding) {
+        ViewHolder(FragmentTemplateDetailSourceSelectorBinding binding) {
             super(binding.getRoot());
             b = binding;
 
@@ -86,7 +86,7 @@ public class PatternDetailSourceSelectorRecyclerViewAdapter extends
             return super.toString() + " " + b.groupNumber.getText() + ": '" +
                    b.matchedText.getText() + "'";
         }
-        void bindTo(PatternDetailSource item) {
+        void bindTo(TemplateDetailSource item) {
             mItem = item;
             b.groupNumber.setText(String.valueOf(item.getGroupNumber()));
             b.matchedText.setText(item.getMatchedText());

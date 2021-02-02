@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.ui.templates;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -25,41 +25,41 @@ import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ktnx.mobileledger.databinding.PatternLayoutBinding;
-import net.ktnx.mobileledger.db.PatternHeader;
+import net.ktnx.mobileledger.databinding.TemplateListTemplateItemBinding;
+import net.ktnx.mobileledger.db.TemplateHeader;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class PatternsRecyclerViewAdapter extends RecyclerView.Adapter<PatternViewHolder> {
-    private final AsyncListDiffer<PatternHeader> listDiffer;
-    public PatternsRecyclerViewAdapter() {
-        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<PatternHeader>() {
+public class TemplatesRecyclerViewAdapter extends RecyclerView.Adapter<TemplateViewHolder> {
+    private final AsyncListDiffer<TemplateHeader> listDiffer;
+    public TemplatesRecyclerViewAdapter() {
+        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<TemplateHeader>() {
             @Override
-            public boolean areItemsTheSame(@NotNull PatternHeader oldItem,
-                                           @NotNull PatternHeader newItem) {
+            public boolean areItemsTheSame(@NotNull TemplateHeader oldItem,
+                                           @NotNull TemplateHeader newItem) {
                 return oldItem.getId()
                               .equals(newItem.getId());
             }
             @Override
-            public boolean areContentsTheSame(@NotNull PatternHeader oldItem,
-                                              @NotNull PatternHeader newItem) {
+            public boolean areContentsTheSame(@NotNull TemplateHeader oldItem,
+                                              @NotNull TemplateHeader newItem) {
                 return oldItem.equals(newItem);
             }
         });
     }
     @NonNull
     @Override
-    public PatternViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        PatternLayoutBinding b =
-                PatternLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent,
-                        false);
+    public TemplateViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        TemplateListTemplateItemBinding b =
+                TemplateListTemplateItemBinding.inflate(LayoutInflater.from(parent.getContext()),
+                        parent, false);
 
-        return new PatternViewHolder(b);
+        return new TemplateViewHolder(b);
     }
     @Override
-    public void onBindViewHolder(@NonNull PatternViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TemplateViewHolder holder, int position) {
         holder.bindToItem(listDiffer.getCurrentList()
                                     .get(position));
     }
@@ -68,7 +68,7 @@ public class PatternsRecyclerViewAdapter extends RecyclerView.Adapter<PatternVie
         return listDiffer.getCurrentList()
                          .size();
     }
-    public void setPatterns(List<PatternHeader> newList) {
+    public void setTemplates(List<TemplateHeader> newList) {
         listDiffer.submitList(newList);
     }
 }

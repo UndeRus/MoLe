@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.ui.templates;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -33,9 +33,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.dao.PatternHeaderDAO;
-import net.ktnx.mobileledger.databinding.FragmentPatternListBinding;
+import net.ktnx.mobileledger.databinding.FragmentTemplateListBinding;
 import net.ktnx.mobileledger.db.DB;
-import net.ktnx.mobileledger.db.PatternHeader;
+import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,25 +44,25 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PatternListFragment#newInstance} factory method to
+ * Use the {@link TemplateListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PatternListFragment extends Fragment {
-    private FragmentPatternListBinding b;
-    private OnPatternListFragmentInteractionListener mListener;
+public class TemplateListFragment extends Fragment {
+    private FragmentTemplateListBinding b;
+    private OnTemplateListFragmentInteractionListener mListener;
 
-    public PatternListFragment() {
+    public TemplateListFragment() {
         // Required empty public constructor
     }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment PatternListFragment.
+     * @return A new instance of fragment TemplateListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PatternListFragment newInstance() {
-        PatternListFragment fragment = new PatternListFragment();
+    public static TemplateListFragment newInstance() {
+        TemplateListFragment fragment = new TemplateListFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -80,25 +80,25 @@ public class PatternListFragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Logger.debug("flow", "PatternListFragment.onCreateView()");
-        b = FragmentPatternListBinding.inflate(inflater);
+        b = FragmentTemplateListBinding.inflate(inflater);
 
-        PatternsRecyclerViewAdapter modelAdapter = new PatternsRecyclerViewAdapter();
+        TemplatesRecyclerViewAdapter modelAdapter = new TemplatesRecyclerViewAdapter();
 
-        b.patternList.setAdapter(modelAdapter);
+        b.templateList.setAdapter(modelAdapter);
         PatternHeaderDAO pDao = DB.get()
                                   .getPatternDAO();
-        LiveData<List<PatternHeader>> patterns = pDao.getPatterns();
-        patterns.observe(getViewLifecycleOwner(), modelAdapter::setPatterns);
+        LiveData<List<TemplateHeader>> templates = pDao.getPatterns();
+        templates.observe(getViewLifecycleOwner(), modelAdapter::setTemplates);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(RecyclerView.VERTICAL);
-        b.patternList.setLayoutManager(llm);
+        b.templateList.setLayoutManager(llm);
         return b.getRoot();
     }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof OnPatternListFragmentInteractionListener) {
-            mListener = (OnPatternListFragmentInteractionListener) context;
+        if (context instanceof OnTemplateListFragmentInteractionListener) {
+            mListener = (OnTemplateListFragmentInteractionListener) context;
         }
         else {
             throw new RuntimeException(
@@ -127,9 +127,9 @@ public class PatternListFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnPatternListFragmentInteractionListener {
-        void onSavePattern();
+    public interface OnTemplateListFragmentInteractionListener {
+        void onSaveTemplate();
 
-        void onEditPattern(Long id);
+        void onEditTemplate(Long id);
     }
 }

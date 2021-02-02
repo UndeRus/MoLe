@@ -31,11 +31,11 @@ import org.jetbrains.annotations.NotNull;
                    @Index(name = "fk_pattern_accounts_pattern", value = "pattern_id"),
                    @Index(name = "fk_pattern_accounts_currency", value = "currency")
         }, foreignKeys = {@ForeignKey(childColumns = "pattern_id", parentColumns = "id",
-                                      entity = PatternHeader.class),
+                                      entity = TemplateHeader.class),
                           @ForeignKey(childColumns = "currency", parentColumns = "id",
                                       entity = Currency.class)
 })
-public class PatternAccount extends PatternBase {
+public class TemplateAccount extends TemplateBase {
     @NonNull
     @ColumnInfo(name = "pattern_id")
     private Long patternId;
@@ -63,7 +63,7 @@ public class PatternAccount extends PatternBase {
     private Integer accountCommentMatchGroup;
     @ColumnInfo(name = "negate_amount")
     private Boolean negateAmount;
-    public PatternAccount(@NotNull Long id, @NonNull Long patternId, @NonNull Long position) {
+    public TemplateAccount(@NotNull Long id, @NonNull Long patternId, @NonNull Long position) {
         this.id = id;
         this.patternId = patternId;
         this.position = position;

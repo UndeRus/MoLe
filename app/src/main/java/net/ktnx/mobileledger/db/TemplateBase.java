@@ -17,4 +17,4 @@
 
 package net.ktnx.mobileledger.db;
 
-public class PatternBase {}
+public class TemplateBase {}

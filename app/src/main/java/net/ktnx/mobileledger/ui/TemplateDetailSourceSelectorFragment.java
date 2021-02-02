@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -33,8 +33,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.databinding.FragmentPatternDetailSourceSelectorListBinding;
-import net.ktnx.mobileledger.model.PatternDetailSource;
+import net.ktnx.mobileledger.databinding.FragmentTemplateDetailSourceSelectorListBinding;
+import net.ktnx.mobileledger.model.TemplateDetailSource;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
  * Activities containing this fragment MUST implement the {@link OnSourceSelectedListener}
  * interface.
  */
-public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
+public class TemplateDetailSourceSelectorFragment extends AppCompatDialogFragment
         implements OnSourceSelectedListener {
 
     public static final int DEFAULT_COLUMN_COUNT = 1;
@@ -56,8 +56,8 @@ public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
     public static final String ARG_PATTERN = "pattern";
     public static final String ARG_TEST_TEXT = "test-text";
     private int mColumnCount = DEFAULT_COLUMN_COUNT;
-    private ArrayList<PatternDetailSource> mSources;
-    private PatternDetailSourceSelectorModel model;
+    private ArrayList<TemplateDetailSource> mSources;
+    private TemplateDetailSourceSelectorModel model;
     private OnSourceSelectedListener onSourceSelectedListener;
     private @StringRes
     int mPatternProblem;
@@ -66,16 +66,16 @@ public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public PatternDetailSourceSelectorFragment() {
+    public TemplateDetailSourceSelectorFragment() {
     }
     @SuppressWarnings("unused")
-    public static PatternDetailSourceSelectorFragment newInstance() {
+    public static TemplateDetailSourceSelectorFragment newInstance() {
         return newInstance(DEFAULT_COLUMN_COUNT, null, null);
     }
-    public static PatternDetailSourceSelectorFragment newInstance(int columnCount,
-                                                                  @Nullable String pattern,
-                                                                  @Nullable String testText) {
-        PatternDetailSourceSelectorFragment fragment = new PatternDetailSourceSelectorFragment();
+    public static TemplateDetailSourceSelectorFragment newInstance(int columnCount,
+                                                                   @Nullable String pattern,
+                                                                   @Nullable String testText) {
+        TemplateDetailSourceSelectorFragment fragment = new TemplateDetailSourceSelectorFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         if (pattern != null)
@@ -103,14 +103,14 @@ public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
                 else {
                     Pattern pattern = Pattern.compile(patternText);
                     Matcher matcher = pattern.matcher(testText);
-                    Logger.debug("patterns",
+                    Logger.debug("templates",
                             String.format("Trying to match pattern '%s' against text '%s'",
                                     patternText, testText));
                     if (matcher.matches()) {
                         if (matcher.groupCount() >= 0) {
-                            ArrayList<PatternDetailSource> list = new ArrayList<>();
+                            ArrayList<TemplateDetailSource> list = new ArrayList<>();
                             for (short g = 1; g <= matcher.groupCount(); g++) {
-                                list.add(new PatternDetailSource(g, matcher.group(g)));
+                                list.add(new TemplateDetailSource(g, matcher.group(g)));
                             }
                             mSources = list;
                         }
@@ -130,11 +130,11 @@ public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Context context = requireContext();
         Dialog csd = new Dialog(context);
-        FragmentPatternDetailSourceSelectorListBinding b =
-                FragmentPatternDetailSourceSelectorListBinding.inflate(
+        FragmentTemplateDetailSourceSelectorListBinding b =
+                FragmentTemplateDetailSourceSelectorListBinding.inflate(
                         LayoutInflater.from(context));
         csd.setContentView(b.getRoot());
-        csd.setTitle(R.string.choose_pattern_detail_source_label);
+        csd.setTitle(R.string.choose_template_detail_source_label);
 
         if (mSources != null && !mSources.isEmpty()) {
             RecyclerView recyclerView = b.list;
@@ -145,13 +145,13 @@ public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
             else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            model = new ViewModelProvider(this).get(PatternDetailSourceSelectorModel.class);
+            model = new ViewModelProvider(this).get(TemplateDetailSourceSelectorModel.class);
             if (onSourceSelectedListener != null)
                 model.setOnSourceSelectedListener(onSourceSelectedListener);
             model.setSourcesList(mSources);
 
-            PatternDetailSourceSelectorRecyclerViewAdapter adapter =
-                    new PatternDetailSourceSelectorRecyclerViewAdapter();
+            TemplateDetailSourceSelectorRecyclerViewAdapter adapter =
+                    new TemplateDetailSourceSelectorRecyclerViewAdapter();
             model.groups.observe(this, adapter::submitList);
 
             recyclerView.setAdapter(adapter);
@@ -159,8 +159,8 @@ public class PatternDetailSourceSelectorFragment extends AppCompatDialogFragment
         }
         else {
             b.list.setVisibility(View.GONE);
-            b.patternError.setText(mPatternProblem);
-            b.patternError.setVisibility(View.VISIBLE);
+            b.templateError.setText(mPatternProblem);
+            b.templateError.setVisibility(View.VISIBLE);
         }
 
         b.literalButton.setOnClickListener(v -> onSourceSelected(true, (short) -1));

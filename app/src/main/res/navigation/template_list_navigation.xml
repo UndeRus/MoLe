@@ -18,33 +18,33 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pattern_list_navigation"
-    app:startDestination="@id/patternListFragment"
+    android:id="@+id/template_list_navigation"
+    app:startDestination="@id/templateListFragment"
     >
 
     <fragment
-        android:id="@+id/patternListFragment"
-        android:name="net.ktnx.mobileledger.ui.patterns.PatternListFragment"
-        android:label="PatternListFragment"
-        android:tag="patternListFragment"
+        android:id="@+id/templateListFragment"
+        android:name="net.ktnx.mobileledger.ui.templates.TemplateListFragment"
+        android:label="TemplateListFragment"
+        android:tag="templateListFragment"
         >
         <action
-            android:id="@+id/action_patternListFragment_to_patternDetailsFragment"
-            app:destination="@id/patternDetailsFragment"
+            android:id="@+id/action_templateListFragment_to_templateDetailsFragment"
+            app:destination="@id/templateDetailsFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left"
             />
     </fragment>
     <fragment
-        android:id="@+id/patternDetailsFragment"
-        android:name="net.ktnx.mobileledger.ui.patterns.PatternDetailsFragment"
+        android:id="@+id/templateDetailsFragment"
+        android:name="net.ktnx.mobileledger.ui.templates.TemplateDetailsFragment"
         android:label="pattern_details_fragment"
         android:tag="patternDetailsFragment"
-        tools:layout="@layout/pattern_details_fragment"
+        tools:layout="@layout/template_details_fragment"
         >
         <action
-            android:id="@+id/action_patternDetailsFragment_to_patternListFragment"
-            app:destination="@id/patternListFragment"
+            android:id="@+id/action_templateDetailsFragment_to_templateListFragment"
+            app:destination="@id/templateListFragment"
             />
     </fragment>
 </navigation>

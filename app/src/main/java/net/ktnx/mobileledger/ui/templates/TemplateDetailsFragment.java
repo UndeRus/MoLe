@@ -15,7 +15,7 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.ui.templates;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -34,25 +34,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.databinding.PatternDetailsFragmentBinding;
+import net.ktnx.mobileledger.databinding.TemplateDetailsFragmentBinding;
 import net.ktnx.mobileledger.ui.QRScanCapableFragment;
 import net.ktnx.mobileledger.utils.Logger;
 
-public class PatternDetailsFragment extends QRScanCapableFragment {
-    static final String ARG_PATTERN_ID = "pattern-id";
+public class TemplateDetailsFragment extends QRScanCapableFragment {
+    static final String ARG_TEMPLATE_ID = "pattern-id";
     private static final String ARG_COLUMN_COUNT = "column-count";
-    PatternDetailsFragmentBinding b;
-    private PatternDetailsViewModel mViewModel;
+    TemplateDetailsFragmentBinding b;
+    private TemplateDetailsViewModel mViewModel;
     private int mColumnCount = 1;
     private Long mPatternId;
-    public PatternDetailsFragment() {
+    public TemplateDetailsFragment() {
     }
-    public static PatternDetailsFragment newInstance(int columnCount, int patternId) {
-        final PatternDetailsFragment fragment = new PatternDetailsFragment();
+    public static TemplateDetailsFragment newInstance(int columnCount, int patternId) {
+        final TemplateDetailsFragment fragment = new TemplateDetailsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         if (patternId > 0)
-            args.putInt(ARG_PATTERN_ID, patternId);
+            args.putInt(ARG_TEMPLATE_ID, patternId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,7 +63,7 @@ public class PatternDetailsFragment extends QRScanCapableFragment {
         final Bundle args = getArguments();
         if (args != null) {
             mColumnCount = args.getInt(ARG_COLUMN_COUNT, 1);
-            mPatternId = args.getLong(ARG_PATTERN_ID, -1);
+            mPatternId = args.getLong(ARG_TEMPLATE_ID, -1);
             if (mPatternId == -1)
                 mPatternId = null;
         }
@@ -71,14 +71,14 @@ public class PatternDetailsFragment extends QRScanCapableFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        NavController controller = ((PatternsActivity) requireActivity()).getNavController();
+        NavController controller = ((TemplatesActivity) requireActivity()).getNavController();
         final ViewModelStoreOwner viewModelStoreOwner =
-                controller.getViewModelStoreOwner(R.id.pattern_list_navigation);
-        mViewModel = new ViewModelProvider(viewModelStoreOwner).get(PatternDetailsViewModel.class);
+                controller.getViewModelStoreOwner(R.id.template_list_navigation);
+        mViewModel = new ViewModelProvider(viewModelStoreOwner).get(TemplateDetailsViewModel.class);
         mViewModel.setDefaultPatternName(getString(R.string.unnamed_pattern));
         Logger.debug("flow", "PatternDetailsFragment.onCreateView(): model=" + mViewModel);
 
-        b = PatternDetailsFragmentBinding.inflate(inflater);
+        b = TemplateDetailsFragmentBinding.inflate(inflater);
         Context context = b.patternDetailsRecyclerView.getContext();
         if (mColumnCount <= 1) {
             b.patternDetailsRecyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -89,7 +89,7 @@ public class PatternDetailsFragment extends QRScanCapableFragment {
         }
 
 
-        PatternDetailsAdapter adapter = new PatternDetailsAdapter();
+        TemplateDetailsAdapter adapter = new TemplateDetailsAdapter();
         b.patternDetailsRecyclerView.setAdapter(adapter);
         mViewModel.getItems(mPatternId)
                   .observe(getViewLifecycleOwner(), adapter::setItems);
@@ -103,7 +103,7 @@ public class PatternDetailsFragment extends QRScanCapableFragment {
             mViewModel.setTestText(text);
     }
     public void onSavePattern() {
-        mViewModel.onSavePattern();
+        mViewModel.onSaveTemplate();
         final Snackbar snackbar = Snackbar.make(b.getRoot(),
                 "One Save pattern action coming up soon in a fragment near you",
                 Snackbar.LENGTH_INDEFINITE);

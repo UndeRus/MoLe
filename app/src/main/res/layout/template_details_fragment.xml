@@ -20,6 +20,6 @@
     android:id="@+id/pattern_details_recycler_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.patterns.PatternDetailsFragment"
+    tools:context=".ui.templates.TemplateDetailsFragment"
     >
 </androidx.recyclerview.widget.RecyclerView>

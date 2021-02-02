@@ -15,24 +15,24 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.ui.patterns;
+package net.ktnx.mobileledger.ui.templates;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ktnx.mobileledger.databinding.PatternLayoutBinding;
-import net.ktnx.mobileledger.db.PatternHeader;
+import net.ktnx.mobileledger.databinding.TemplateListTemplateItemBinding;
+import net.ktnx.mobileledger.db.TemplateHeader;
 
-class PatternViewHolder extends RecyclerView.ViewHolder {
-    final PatternLayoutBinding b;
-    public PatternViewHolder(@NonNull PatternLayoutBinding binding) {
+class TemplateViewHolder extends RecyclerView.ViewHolder {
+    final TemplateListTemplateItemBinding b;
+    public TemplateViewHolder(@NonNull TemplateListTemplateItemBinding binding) {
         super(binding.getRoot());
         b = binding;
     }
-    public void bindToItem(PatternHeader item) {
-        b.patternName.setText(item.getName());
+    public void bindToItem(TemplateHeader item) {
+        b.templateName.setText(item.getName());
         b.editButton.setOnClickListener(v -> {
-            ((PatternsActivity) v.getContext()).onEditPattern(item.getId());
+            ((TemplatesActivity) v.getContext()).onEditTemplate(item.getId());
         });
     }
 }

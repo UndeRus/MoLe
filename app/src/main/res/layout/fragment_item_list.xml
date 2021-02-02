@@ -26,6 +26,6 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".ui.patterns.TestItemFragment"
-    tools:listitem="@layout/pattern_details_header"
+    tools:context=".ui.templates.TestItemFragment"
+    tools:listitem="@layout/template_details_header"
     />
