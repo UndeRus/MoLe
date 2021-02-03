@@ -200,6 +200,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setCancelable(true)
                .setTitle(R.string.choose_template_to_apply)
+               .setIcon(R.drawable.ic_baseline_auto_graph_24)
                .setSingleChoiceItems(cursor, -1, patternNameColumn, (dialog, which) -> {
                    applyPattern(matchingPatterns.get(which), matchedText);
                    dialog.dismiss();
