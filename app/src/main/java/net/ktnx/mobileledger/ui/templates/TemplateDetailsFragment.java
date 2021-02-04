@@ -102,12 +102,4 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
         if (text != null)
             mViewModel.setTestText(text);
     }
-    public void onSavePattern() {
-        mViewModel.onSaveTemplate();
-        final Snackbar snackbar = Snackbar.make(b.getRoot(),
-                "One Save pattern action coming up soon in a fragment near you",
-                Snackbar.LENGTH_INDEFINITE);
-//        snackbar.setAction("Action", v -> snackbar.dismiss());
-        snackbar.show();
-    }
 }
