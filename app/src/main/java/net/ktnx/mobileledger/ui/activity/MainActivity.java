@@ -17,6 +17,9 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.TimeInterpolator;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.ShortcutInfo;
@@ -29,6 +32,7 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
@@ -78,6 +82,8 @@ public class MainActivity extends ProfileThemedActivity {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
+    private static final boolean FAB_HIDDEN = false;
+    private static final boolean FAB_SHOWN = true;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
@@ -88,6 +94,9 @@ public class MainActivity extends ProfileThemedActivity {
     private MobileLedgerProfile profile;
     private MainModel mainModel;
     private ActivityMainBinding b;
+    private int fabVerticalOffset;
+    private ViewPropertyAnimator fabSlideAnimator;
+    private boolean wantedFabState = FAB_SHOWN;
     @Override
     protected void onStart() {
         super.onStart();
@@ -630,13 +639,58 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void fabShouldShow() {
-        if ((profile != null) && profile.isPostingPermitted() && !b.drawerLayout.isOpen())
-            b.btnAddTransaction.show();
+        if (fabVerticalOffset <= 0) {
+            int top = b.btnAddTransaction.getTop();
+            int parentHeight = b.mainAppLayout.getHeight();
+            fabVerticalOffset = parentHeight - top;
+        }
+        if ((profile != null) && profile.isPostingPermitted() && !b.drawerLayout.isOpen()) {
+            fabShow();
+        }
         else
             fabHide();
     }
+    private void fabShow() {
+        if (wantedFabState == FAB_SHOWN)
+            return;
+
+//        b.btnAddTransaction.show();
+        if (this.fabSlideAnimator != null) {
+            this.fabSlideAnimator.cancel();
+            b.btnAddTransaction.clearAnimation();
+        }
+
+        wantedFabState = FAB_SHOWN;
+        slideFabTo(b.btnAddTransaction, 0, 200L,
+                com.google.android.material.animation.AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR);
+    }
     public void fabHide() {
-        b.btnAddTransaction.hide();
+        if (wantedFabState == FAB_HIDDEN)
+            return;
+
+        if (fabVerticalOffset <= 0)
+            return;
+
+//        b.btnAddTransaction.hide();
+        if (this.fabSlideAnimator != null) {
+            this.fabSlideAnimator.cancel();
+            b.btnAddTransaction.clearAnimation();
+        }
+
+        wantedFabState = FAB_HIDDEN;
+        slideFabTo(b.btnAddTransaction, fabVerticalOffset, 150L,
+                com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR);
+    }
+    private void slideFabTo(View view, int target, long duration, TimeInterpolator interpolator) {
+        fabSlideAnimator = view.animate()
+                               .translationY((float) target)
+                               .setInterpolator(interpolator)
+                               .setDuration(duration)
+                               .setListener(new AnimatorListenerAdapter() {
+                                   public void onAnimationEnd(Animator animation) {
+                                       fabSlideAnimator = null;
+                                   }
+                               });
     }
 
     public static class SectionsPagerAdapter extends FragmentStateAdapter {
