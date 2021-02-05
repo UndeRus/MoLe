@@ -30,7 +30,7 @@ import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
-@Database(version = 54, entities = {TemplateHeader.class, TemplateAccount.class, Currency.class})
+@Database(version = 55, entities = {TemplateHeader.class, TemplateAccount.class, Currency.class})
 abstract public class DB extends RoomDatabase {
     private static DB instance;
     public static DB get() {
@@ -118,6 +118,41 @@ abstract public class DB extends RoomDatabase {
                                            "template_accounts(currency)");
                                 db.execSQL("drop table pattern_accounts");
                                 db.execSQL("drop table patterns");
+                            }
+                        }, new Migration(54, 55) {
+                            @Override
+                            public void migrate(@NonNull SupportSQLiteDatabase db) {
+                                db.execSQL(
+                                        "CREATE TABLE template_accounts_new (id INTEGER PRIMARY " +
+                                        "KEY " +
+                                        "AUTOINCREMENT NOT NULL, template_id INTEGER NOT NULL, " +
+                                        "acc TEXT, position INTEGER NOT NULL, acc_match_group " +
+                                        "INTEGER, currency INTEGER, currency_match_group INTEGER," +
+                                        " amount REAL, amount_match_group INTEGER, comment TEXT, " +
+                                        "comment_match_group INTEGER, negate_amount INTEGER, " +
+                                        "FOREIGN KEY(template_id) REFERENCES templates(id) ON " +
+                                        "UPDATE RESTRICT ON DELETE CASCADE , FOREIGN KEY" +
+                                        "(currency) REFERENCES currencies(id) ON UPDATE RESTRICT" +
+                                        " ON DELETE RESTRICT)");
+                                db.execSQL(
+                                        "insert into template_accounts_new(id, template_id, acc, " +
+                                        "position, acc_match_group, currency, " +
+                                        "currency_match_group, amount, amount_match_group, " +
+                                        "amount, amount_match_group, comment, " +
+                                        "comment_match_group, negate_amount) select id, " +
+                                        "template_id, acc, position, acc_match_group, " +
+                                        "currency, " +
+                                        "currency_match_group, amount, amount_match_group, " +
+                                        "amount, amount_match_group, comment, " +
+                                        "comment_match_group, negate_amount from " +
+                                        "template_accounts");
+                                db.execSQL("drop table template_accounts");
+                                db.execSQL("alter table template_accounts_new rename to " +
+                                           "template_accounts");
+                                db.execSQL("create index fk_template_accounts_template on " +
+                                           "template_accounts(template_id)");
+                                db.execSQL("create index fk_template_accounts_currency on " +
+                                           "template_accounts(currency)");
                             }
                         }
                         })

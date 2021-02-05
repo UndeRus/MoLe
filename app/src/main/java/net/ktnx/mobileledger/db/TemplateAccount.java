@@ -30,9 +30,11 @@ import org.jetbrains.annotations.NotNull;
         indices = {@Index(name = "fk_template_accounts_template", value = "template_id"),
                    @Index(name = "fk_template_accounts_currency", value = "currency")
         }, foreignKeys = {@ForeignKey(childColumns = "template_id", parentColumns = "id",
-                                      entity = TemplateHeader.class),
+                                      entity = TemplateHeader.class, onDelete = ForeignKey.CASCADE,
+                                      onUpdate = ForeignKey.RESTRICT),
                           @ForeignKey(childColumns = "currency", parentColumns = "id",
-                                      entity = Currency.class)
+                                      entity = Currency.class, onDelete = ForeignKey.RESTRICT,
+                                      onUpdate = ForeignKey.RESTRICT)
 })
 public class TemplateAccount extends TemplateBase {
     @PrimaryKey(autoGenerate = true)
