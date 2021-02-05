@@ -154,8 +154,8 @@ public class TemplateDetailsViewModel extends ViewModel {
                             modelHeader));
 
 
-            TemplateAccountDAO paDAO = DB.get()
-                                         .getPatternAccountDAO();
+            TemplateAccountDAO taDAO = DB.get()
+                                         .getTemplateAccountDAO();
             for (int i = 1; i < list.size(); i++) {
                 final TemplateDetailsItem.AccountRow accRowItem = list.get(i)
                                                                       .asAccountRowItem();
@@ -164,10 +164,10 @@ public class TemplateDetailsViewModel extends ViewModel {
                 dbAccount.setPosition(i);
                 if (newPattern) {
                     dbAccount.setId(null);
-                    dbAccount.setId(paDAO.insert(dbAccount));
+                    dbAccount.setId(taDAO.insert(dbAccount));
                 }
                 else
-                    paDAO.update(dbAccount);
+                    taDAO.update(dbAccount);
 
                 Logger.debug("pattern-db", String.format(Locale.US,
                         "Stored pattern account %d, account=%s, comment=%s, neg=%s, item=%s",
