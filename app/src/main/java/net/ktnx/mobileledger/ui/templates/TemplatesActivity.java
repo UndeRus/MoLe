@@ -18,9 +18,9 @@
 package net.ktnx.mobileledger.ui.templates;
 
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
@@ -28,25 +28,32 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.databinding.ActivityTemplatesBinding;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.TemplateWithAccounts;
 import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.Objects;
 
 public class TemplatesActivity extends CrashReportingActivity
-        implements TemplateListFragment.OnTemplateListFragmentInteractionListener {
+        implements TemplateListFragment.OnTemplateListFragmentInteractionListener,
+        TemplateDetailsFragment.InteractionListener {
     public static final String ARG_ADD_TEMPLATE = "add-template";
     private ActivityTemplatesBinding b;
     private NavController navController;
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.template_list_menu, menu);
-
-        return true;
-    }
+    //    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        super.onCreateOptionsMenu(menu);
+//        getMenuInflater().inflate(R.menu.template_list_menu, menu);
+//
+//        return true;
+//    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,5 +128,24 @@ public class TemplatesActivity extends CrashReportingActivity
     }
     public NavController getNavController() {
         return navController;
+    }
+    @Override
+    public void onDeleteTemplate(@NonNull Long templateId) {
+        Objects.requireNonNull(templateId);
+        TemplateHeaderDAO dao = DB.get()
+                                  .getTemplateDAO();
+
+        dao.getTemplateWitAccountsAsync(templateId, template -> {
+            TemplateWithAccounts copy = TemplateWithAccounts.from(template);
+            dao.deleteAsync(template.header, () -> {
+                navController.popBackStack(R.id.templateListFragment, false);
+
+                Snackbar.make(b.getRoot(), String.format(
+                        TemplatesActivity.this.getString(R.string.template_xxx_deleted),
+                        template.header.getName()), BaseTransientBottomBar.LENGTH_LONG)
+                        .setAction(R.string.action_undo, v -> dao.insertAsync(copy, null))
+                        .show();
+            });
+        });
     }
 }

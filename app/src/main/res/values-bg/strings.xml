@@ -215,4 +215,6 @@
     <string name="template_details_source_literal">ръчно въвеждане</string>
     <string name="account_comment_source_label">Източник на бележка към сметката</string>
     <string name="account_amount_source_label">Източник на името на сметката</string>
+    <string name="template_xxx_deleted">Макетът „%s“ е изтрит</string>
+    <string name="action_undo">Връщане</string>
 </resources>

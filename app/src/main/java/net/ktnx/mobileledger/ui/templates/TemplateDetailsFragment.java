@@ -20,6 +20,9 @@ package net.ktnx.mobileledger.ui.templates;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,8 +34,6 @@ import androidx.navigation.NavController;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsFragmentBinding;
 import net.ktnx.mobileledger.ui.QRScanCapableFragment;
@@ -41,11 +42,17 @@ import net.ktnx.mobileledger.utils.Logger;
 public class TemplateDetailsFragment extends QRScanCapableFragment {
     static final String ARG_TEMPLATE_ID = "pattern-id";
     private static final String ARG_COLUMN_COUNT = "column-count";
-    TemplateDetailsFragmentBinding b;
+    private TemplateDetailsFragmentBinding b;
     private TemplateDetailsViewModel mViewModel;
     private int mColumnCount = 1;
     private Long mPatternId;
+    private InteractionListener interactionListener;
     public TemplateDetailsFragment() {
+    }
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.template_details_menu, menu);
     }
     public static TemplateDetailsFragment newInstance(int columnCount, int patternId) {
         final TemplateDetailsFragment fragment = new TemplateDetailsFragment();
@@ -55,6 +62,19 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
             args.putInt(ARG_TEMPLATE_ID, patternId);
         fragment.setArguments(args);
         return fragment;
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.delete_template) {
+            signalDeleteTemplateInteraction();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    private void signalDeleteTemplateInteraction() {
+        if (interactionListener != null)
+            interactionListener.onDeleteTemplate(mPatternId);
     }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,10 +87,18 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
             if (mPatternId == -1)
                 mPatternId = null;
         }
+
+        setHasOptionsMenu(mPatternId != null);
     }
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        if (!(getActivity() instanceof InteractionListener))
+            throw new IllegalStateException(
+                    "Containing activity must implement TemplateDetailsFragment" +
+                    ".InteractionListener");
+        interactionListener = (InteractionListener) getActivity();
+
         NavController controller = ((TemplatesActivity) requireActivity()).getNavController();
         final ViewModelStoreOwner viewModelStoreOwner =
                 controller.getViewModelStoreOwner(R.id.template_list_navigation);
@@ -101,5 +129,8 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
         Logger.debug("PatDet_fr", String.format("Got scanned text '%s'", text));
         if (text != null)
             mViewModel.setTestText(text);
+    }
+    interface InteractionListener {
+        void onDeleteTemplate(@NonNull Long templateId);
     }
 }

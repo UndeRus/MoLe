@@ -225,4 +225,6 @@
     <string name="implementation_pending">Not implemented yet</string>
     <string name="title_edit_template">Edit template</string>
     <string name="title_new_template">New template</string>
+    <string name="template_xxx_deleted">Template \'%s\' deleted</string>
+    <string name="action_undo">Undo</string>
 </resources>
