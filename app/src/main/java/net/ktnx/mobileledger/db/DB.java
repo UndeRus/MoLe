@@ -166,7 +166,7 @@ abstract public class DB extends RoomDatabase {
                         .build();
         }
     }
-    public abstract TemplateHeaderDAO getPatternDAO();
+    public abstract TemplateHeaderDAO getTemplateDAO();
 
     public abstract TemplateAccountDAO getPatternAccountDAO();
 

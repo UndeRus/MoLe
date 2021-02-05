@@ -86,7 +86,7 @@ public class TemplateListFragment extends Fragment {
 
         b.templateList.setAdapter(modelAdapter);
         TemplateHeaderDAO pDao = DB.get()
-                                   .getPatternDAO();
+                                   .getTemplateDAO();
         LiveData<List<TemplateHeader>> templates = pDao.getTemplates();
         templates.observe(getViewLifecycleOwner(), modelAdapter::setTemplates);
         LinearLayoutManager llm = new LinearLayoutManager(getContext());

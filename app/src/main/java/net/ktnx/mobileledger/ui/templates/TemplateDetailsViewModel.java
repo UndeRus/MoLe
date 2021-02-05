@@ -96,7 +96,7 @@ public class TemplateDetailsViewModel extends ViewModel {
         }
 
         DB db = DB.get();
-        LiveData<TemplateWithAccounts> dbList = db.getPatternDAO()
+        LiveData<TemplateWithAccounts> dbList = db.getTemplateDAO()
                                                   .getTemplateWithAccounts(mPatternId);
         Observer<TemplateWithAccounts> observer = new Observer<TemplateWithAccounts>() {
             @Override
@@ -140,7 +140,7 @@ public class TemplateDetailsViewModel extends ViewModel {
             TemplateDetailsItem.Header modelHeader = list.get(0)
                                                          .asHeaderItem();
             TemplateHeaderDAO headerDAO = DB.get()
-                                            .getPatternDAO();
+                                            .getTemplateDAO();
             TemplateHeader dbHeader = modelHeader.toDBO();
             if (newPattern) {
                 dbHeader.setId(null);

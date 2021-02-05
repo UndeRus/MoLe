@@ -111,7 +111,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
             return;
 
         LiveData<List<TemplateHeader>> allPatterns = DB.get()
-                                                       .getPatternDAO()
+                                                       .getTemplateDAO()
                                                        .getTemplates();
         allPatterns.observe(getViewLifecycleOwner(), patternHeaders -> {
             ArrayList<TemplateHeader> matchingPatterns = new ArrayList<>();
@@ -258,7 +258,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         listAdapter.notifyItemChanged(0);
 
         DB.get()
-          .getPatternDAO()
+          .getTemplateDAO()
           .getTemplateWithAccounts(patternHeader.getId())
           .observe(getViewLifecycleOwner(), entry -> {
               int rowIndex = 0;
