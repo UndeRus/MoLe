@@ -144,10 +144,10 @@ public class TemplateDetailsViewModel extends ViewModel {
             TemplateHeader dbHeader = modelHeader.toDBO();
             if (newPattern) {
                 dbHeader.setId(null);
-                dbHeader.setId(mPatternId = headerDAO.insert(dbHeader));
+                dbHeader.setId(mPatternId = headerDAO.insertSync(dbHeader));
             }
             else
-                headerDAO.update(dbHeader);
+                headerDAO.updateSync(dbHeader);
 
             Logger.debug("pattern-db",
                     String.format(Locale.US, "Stored pattern header %d, item=%s", dbHeader.getId(),
@@ -164,10 +164,10 @@ public class TemplateDetailsViewModel extends ViewModel {
                 dbAccount.setPosition(i);
                 if (newPattern) {
                     dbAccount.setId(null);
-                    dbAccount.setId(taDAO.insert(dbAccount));
+                    dbAccount.setId(taDAO.insertSync(dbAccount));
                 }
                 else
-                    taDAO.update(dbAccount);
+                    taDAO.updateSync(dbAccount);
 
                 Logger.debug("pattern-db", String.format(Locale.US,
                         "Stored pattern account %d, account=%s, comment=%s, neg=%s, item=%s",

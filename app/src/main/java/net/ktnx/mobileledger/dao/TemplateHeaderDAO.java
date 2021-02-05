@@ -17,7 +17,14 @@
 
 package net.ktnx.mobileledger.dao;
 
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -25,29 +32,97 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
 
 import java.util.List;
 
 @Dao
-public interface TemplateHeaderDAO {
+public abstract class TemplateHeaderDAO {
     @Insert()
-    long insert(TemplateHeader item);
+    public abstract long insertSync(TemplateHeader item);
+
+    public void insertAsync(@NonNull TemplateHeader item, @Nullable Runnable callback) {
+        AsyncTask.execute(() -> {
+            insertSync(item);
+            if (callback != null) {
+                new Handler(Looper.getMainLooper()).post(callback);
+            }
+        });
+    }
 
     @Update
-    void update(TemplateHeader... items);
+    public abstract void updateSync(TemplateHeader... items);
 
     @Delete
-    void delete(TemplateHeader item);
+    public abstract void deleteSync(TemplateHeader item);
+
+    public void deleteAsync(@NonNull TemplateHeader item, @NonNull Runnable callback) {
+        AsyncTask.execute(() -> {
+            deleteSync(item);
+            new Handler(Looper.getMainLooper()).post(callback);
+        });
+    }
 
     @Query("SELECT * FROM templates ORDER BY UPPER(name)")
-    LiveData<List<TemplateHeader>> getTemplates();
+    public abstract LiveData<List<TemplateHeader>> getTemplates();
 
     @Query("SELECT * FROM templates WHERE id = :id")
-    LiveData<TemplateHeader> getTemplate(Long id);
+    public abstract LiveData<TemplateHeader> getTemplate(Long id);
+
+    public void getTemplateAsync(@NonNull Long id,
+                                 @NonNull AsyncResultCallback<TemplateHeader> callback) {
+        LiveData<TemplateHeader> resultReceiver = getTemplate(id);
+        resultReceiver.observeForever(new Observer<TemplateHeader>() {
+            @Override
+            public void onChanged(TemplateHeader h) {
+                if (h == null)
+                    return;
+
+                resultReceiver.removeObserver(this);
+                callback.onResult(h);
+            }
+        });
+    }
 
     @Transaction
     @Query("SELECT * FROM templates WHERE id = :id")
-    LiveData<TemplateWithAccounts> getTemplateWithAccounts(Long id);
+    public abstract LiveData<TemplateWithAccounts> getTemplateWithAccounts(Long id);
+
+    @Transaction
+    public void insertSync(TemplateWithAccounts templateWithAccounts) {
+        long template_id = insertSync(templateWithAccounts.header);
+        for (TemplateAccount acc : templateWithAccounts.accounts) {
+            acc.setTemplateId(template_id);
+            DB.get()
+              .getTemplateAccountDAO()
+              .insertSync(acc);
+        }
+    }
+
+    public void getTemplateWitAccountsAsync(@NonNull Long id, @NonNull
+            AsyncResultCallback<TemplateWithAccounts> callback) {
+        LiveData<TemplateWithAccounts> resultReceiver = getTemplateWithAccounts(id);
+        resultReceiver.observeForever(new Observer<TemplateWithAccounts>() {
+            @Override
+            public void onChanged(TemplateWithAccounts result) {
+                if (result == null)
+                    return;
+
+                resultReceiver.removeObserver(this);
+                callback.onResult(result);
+            }
+        });
+    }
+    public void insertAsync(@NonNull TemplateWithAccounts item, @Nullable Runnable callback) {
+        AsyncTask.execute(() -> {
+            insertSync(item);
+            if (callback != null) {
+                new Handler(Looper.getMainLooper()).post(callback);
+            }
+        });
+    }
+
 }

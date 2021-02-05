@@ -31,22 +31,17 @@ import java.util.List;
 @Dao
 public interface TemplateAccountDAO {
     @Insert
-    Long insert(TemplateAccount item);
+    Long insertSync(TemplateAccount item);
 
     @Update
-    void update(TemplateAccount... items);
+    void updateSync(TemplateAccount... items);
 
     @Delete
-    void delete(TemplateAccount item);
+    void deleteSync(TemplateAccount item);
 
     @Query("SELECT * FROM template_accounts WHERE template_id=:template_id")
     LiveData<List<TemplateAccount>> getTemplateAccounts(Long template_id);
 
     @Query("SELECT * FROM template_accounts WHERE id = :id")
     LiveData<TemplateAccount> getPatternAccountById(Long id);
-
-//    not useful for now
-//    @Transaction
-//    @Query("SELECT * FROM patterns")
-//    List<PatternWithAccounts> getPatternsWithAccounts();
 }
