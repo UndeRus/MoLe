@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.db;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateWithAccounts {
@@ -28,6 +29,16 @@ public class TemplateWithAccounts {
     @Relation(parentColumn = "id", entityColumn = "template_id")
     public List<TemplateAccount> accounts;
 
+    public static TemplateWithAccounts from(TemplateWithAccounts o) {
+        TemplateWithAccounts result = new TemplateWithAccounts();
+        result.header = new TemplateHeader(o.header);
+        result.accounts = new ArrayList<>();
+        for (TemplateAccount acc : o.accounts) {
+            result.accounts.add(new TemplateAccount(acc));
+        }
+
+        return result;
+    }
     public Long getId() {
         return header.getId();
     }

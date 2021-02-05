@@ -66,6 +66,22 @@ public class TemplateHeader extends TemplateBase {
         this.name = name;
         this.regularExpression = regularExpression;
     }
+    public TemplateHeader(TemplateHeader origin) {
+        id = origin.id;
+        name = origin.name;
+        regularExpression = origin.regularExpression;
+        testText = origin.testText;
+        transactionDescription = origin.transactionDescription;
+        transactionDescriptionMatchGroup = origin.transactionDescriptionMatchGroup;
+        transactionComment = origin.transactionComment;
+        transactionCommentMatchGroup = origin.transactionCommentMatchGroup;
+        dateYear = origin.dateYear;
+        dateYearMatchGroup = origin.dateYearMatchGroup;
+        dateMonth = origin.dateMonth;
+        dateMonthMatchGroup = origin.dateMonthMatchGroup;
+        dateDay = origin.dateDay;
+        dateDayMatchGroup = origin.dateDayMatchGroup;
+    }
     public String getTestText() {
         return testText;
     }

@@ -69,6 +69,20 @@ public class TemplateAccount extends TemplateBase {
         this.templateId = templateId;
         this.position = position;
     }
+    public TemplateAccount(TemplateAccount o) {
+        id = o.id;
+        templateId = o.templateId;
+        accountName = o.accountName;
+        position = o.position;
+        accountNameMatchGroup = o.accountNameMatchGroup;
+        currency = o.currency;
+        currencyMatchGroup = o.currencyMatchGroup;
+        amount = o.amount;
+        amountMatchGroup = o.amountMatchGroup;
+        accountComment = o.accountComment;
+        accountCommentMatchGroup = o.accountCommentMatchGroup;
+        negateAmount = o.negateAmount;
+    }
     public Long getId() {
         return id;
     }
