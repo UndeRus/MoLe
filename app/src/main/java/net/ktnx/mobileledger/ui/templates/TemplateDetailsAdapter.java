@@ -166,6 +166,16 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
 
                 final int fromPosition = viewHolder.getAdapterPosition();
                 final int toPosition = target.getAdapterPosition();
+                if (fromPosition == toPosition) {
+                    Logger.debug("drag", String.format(Locale.US,
+                            "Ignoring request to move an account from position %d to %d",
+                            fromPosition, toPosition));
+                    return false;
+                }
+
+                Logger.debug("drag",
+                        String.format(Locale.US, "Moving account from %d to %d", fromPosition,
+                                toPosition));
                 mModel.moveItem(fromPosition, toPosition);
 
                 return true;
