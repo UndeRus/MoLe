@@ -210,7 +210,7 @@
     <string name="template_details_amount_label">Сума</string>
     <string name="template_details_test_text_label">Примерен текст</string>
     <string name="template_details_account_name_label">Сметка</string>
-    <string name="template_details_account_row_label">Данни за сметка</string>
+    <string name="template_details_account_row_label">Данни за сметка №%d</string>
     <string name="account_name_source_label">Източник на името на сметката</string>
     <string name="template_details_source_literal">ръчно въвеждане</string>
     <string name="account_comment_source_label">Източник на бележка към сметката</string>

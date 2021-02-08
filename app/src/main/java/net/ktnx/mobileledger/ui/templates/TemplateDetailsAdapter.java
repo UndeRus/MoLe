@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.templates;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -669,11 +670,14 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         }
         @Override
         void bind(TemplateDetailsItem item) {
-            String groupNoText = b.getRoot()
-                                  .getResources()
-                                  .getString(R.string.template_item_match_group_source);
+            final Resources resources = b.getRoot()
+                                         .getResources();
+                String groupNoText = resources.getString(R.string.template_item_match_group_source);
 
             TemplateDetailsItem.AccountRow accRow = item.asAccountRowItem();
+            b.patternAccountLabel.setText(String.format(Locale.US,
+                    resources.getString(R.string.template_details_account_row_label),
+                    accRow.getPosition()));
             if (accRow.hasLiteralAccountName()) {
                 b.templateDetailsAccountNameLayout.setVisibility(View.VISIBLE);
                 b.templateDetailsAccountName.setText(accRow.getAccountName());
