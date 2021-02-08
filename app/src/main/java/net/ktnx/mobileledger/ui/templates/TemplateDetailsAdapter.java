@@ -99,7 +99,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
             @Override
             public float getMoveThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-                return 0.1f;
+                return 0.5f;
             }
             @Override
             public boolean isLongPressDragEnabled() {
