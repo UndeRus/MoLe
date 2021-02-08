@@ -173,6 +173,8 @@ public class TemplateDetailsViewModel extends ViewModel {
 
                 TemplateDetailsItem header = TemplateDetailsItem.fromRoomObject(src.header);
                 l.add(header);
+                Collections.sort(src.accounts,
+                        (o1, o2) -> Long.compare(o1.getPosition(), o2.getPosition()));
                 for (TemplateAccount acc : src.accounts) {
                     l.add(TemplateDetailsItem.fromRoomObject(acc));
                 }
