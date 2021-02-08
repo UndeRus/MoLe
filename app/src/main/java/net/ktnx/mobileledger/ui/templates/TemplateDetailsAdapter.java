@@ -622,6 +622,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed account name " + s + "; accRow=" + accRow);
                     accRow.setAccountName(String.valueOf(s));
+
+                    mModel.applyList(null);
                 }
             };
             b.templateDetailsAccountName.addTextChangedListener(accountNameWatcher);
@@ -644,6 +646,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed account comment " + s + "; accRow=" + accRow);
                     accRow.setAccountComment(String.valueOf(s));
+
+                    mModel.applyList(null);
                 }
             };
             b.templateDetailsAccountComment.addTextChangedListener(accountCommentWatcher);
@@ -651,11 +655,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             b.templateDetailsAccountAmount.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                 }
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 }
                 @Override
                 public void afterTextChanged(Editable s) {
@@ -682,6 +684,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                             b.templateDetailsAccountAmountLayout.setError("!");
                         }
                     }
+
+                    mModel.applyList(null);
                 }
             });
             b.templateDetailsAccountAmount.setOnFocusChangeListener((v, hasFocus) -> {
