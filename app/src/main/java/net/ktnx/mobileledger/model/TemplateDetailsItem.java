@@ -226,6 +226,11 @@ abstract public class TemplateDetailsItem {
             result.setValue(initialValue);
             return result;
         }
+        public void copyFrom(@NonNull PossiblyMatchedValue<T> origin) {
+            literalValue = origin.literalValue;
+            value = origin.value;
+            matchGroup = origin.matchGroup;
+        }
         public T getValue() {
             if (!literalValue)
                 throw new IllegalStateException("Value is not literal");
@@ -287,8 +292,18 @@ abstract public class TemplateDetailsItem {
                 PossiblyMatchedValue.withLiteralFloat(null);
         private final PossiblyMatchedValue<Currency> currency = new PossiblyMatchedValue<>();
         private boolean negateAmount;
-        private AccountRow() {
+        public AccountRow() {
             super(Type.ACCOUNT_ITEM);
+        }
+        public AccountRow(AccountRow origin) {
+            super(Type.ACCOUNT_ITEM);
+            id = origin.id;
+            position = origin.position;
+            accountName.copyFrom(origin.accountName);
+            accountComment.copyFrom(origin.accountComment);
+            amount.copyFrom(origin.amount);
+            currency.copyFrom(origin.currency);
+            negateAmount = origin.negateAmount;
         }
         public boolean isNegateAmount() {
             return negateAmount;
