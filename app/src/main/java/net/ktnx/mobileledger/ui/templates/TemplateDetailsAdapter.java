@@ -734,6 +734,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                                              .getResources();
                 String groupNoText = resources.getString(R.string.template_item_match_group_source);
 
+                Logger.debug("drag", String.format(Locale.US, "Binding account id %d, pos %d at %d",
+                        item.getId(), item.getPosition(), getAdapterPosition()));
                 TemplateDetailsItem.AccountRow accRow = item.asAccountRowItem();
                 b.patternAccountLabel.setText(String.format(Locale.US,
                         resources.getString(R.string.template_details_account_row_label),
