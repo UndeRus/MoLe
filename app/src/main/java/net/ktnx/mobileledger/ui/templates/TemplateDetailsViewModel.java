@@ -173,6 +173,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 ArrayList<TemplateDetailsItem> l = new ArrayList<>();
 
                 TemplateDetailsItem header = TemplateDetailsItem.fromRoomObject(src.header);
+                Logger.debug("tmpl-db", "Got header template item with id of " + header.getId());
                 l.add(header);
                 Collections.sort(src.accounts,
                         (o1, o2) -> Long.compare(o1.getPosition(), o2.getPosition()));
@@ -181,7 +182,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 }
 
                 for (TemplateDetailsItem i : l) {
-                    Logger.debug("patterns-db", "Loaded pattern item " + i);
+                    Logger.debug("tmpl-db", "Loaded pattern item " + i);
                 }
                 applyList(l, true);
                 itemsLoaded = true;
