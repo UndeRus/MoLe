@@ -32,11 +32,13 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateBase;
 import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -376,8 +378,15 @@ abstract public class TemplateDetailsItem {
             return accountComment.hasLiteralValue();
         }
         public boolean equalContents(AccountRow o) {
+            if (position != o.position) {
+                Logger.debug("cmpAcc",
+                        String.format(Locale.US, "[%d] != [%d]: pos %d != pos %d", getId(),
+                                o.getId(), position, o.position));
+                return false;
+            }
             return amount.equals(o.amount) && accountName.equals(o.accountName) &&
-                   accountComment.equals(o.accountComment) && negateAmount == o.negateAmount;
+                   position == o.position && accountComment.equals(o.accountComment) &&
+                   negateAmount == o.negateAmount;
         }
         public void switchToLiteralAmount() {
             amount.switchToLiteral();
