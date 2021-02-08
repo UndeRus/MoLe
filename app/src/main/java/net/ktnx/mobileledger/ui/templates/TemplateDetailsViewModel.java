@@ -316,8 +316,12 @@ public class TemplateDetailsViewModel extends ViewModel {
         items.setValue(newList);
     }
     public void removeItem(int position) {
-        ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
+        Logger.debug("tmpl", "Removing item at position " + position);
+        ArrayList<TemplateDetailsItem> newList = copyItems();
         newList.remove(position);
+        for (int i = position; i < newList.size(); i++)
+            newList.get(i)
+                   .setPosition(i);
         applyList(newList);
     }
 }
