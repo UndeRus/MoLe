@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsAccountBinding;
 import net.ktnx.mobileledger.databinding.TemplateDetailsHeaderBinding;
@@ -242,6 +243,14 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                      .size();
     }
     public void setItems(List<TemplateDetailsItem> items) {
+        if (BuildConfig.DEBUG) {
+            Logger.debug("tmpl", "Got new list");
+            for (int i = 1; i < items.size(); i++) {
+                final TemplateDetailsItem item = items.get(i);
+                Logger.debug("tmpl",
+                        String.format(Locale.US, "  %d: id %d, pos %d", i, item.getId(), item.getPosition()));
+            }
+        }
         differ.submitList(items);
     }
     public String getMatchGroupText(int groupNumber) {
