@@ -184,6 +184,21 @@ public class TemplateDetailsViewModel extends ViewModel {
             taDAO.finishSave(mPatternId);
         });
     }
+    private ArrayList<TemplateDetailsItem> copyItems() {
+        List<TemplateDetailsItem> oldList = items.getValue();
+        ArrayList<TemplateDetailsItem> result = new ArrayList<>(oldList.size());
+
+        for (TemplateDetailsItem item : oldList) {
+            if (item instanceof TemplateDetailsItem.Header)
+                result.add(new TemplateDetailsItem.Header(item.asHeaderItem()));
+            else if (item instanceof TemplateDetailsItem.AccountRow)
+                result.add(new TemplateDetailsItem.AccountRow(item.asAccountRowItem()));
+            else
+                throw new RuntimeException("Unexpected item " + item);
+        }
+
+        return result;
+    }
     public void moveItem(int sourcePos, int targetPos) {
         ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
         TemplateDetailsItem item = newList.remove(sourcePos);
