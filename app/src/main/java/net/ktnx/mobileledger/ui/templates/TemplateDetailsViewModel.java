@@ -24,6 +24,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.db.DB;
@@ -265,9 +266,53 @@ public class TemplateDetailsViewModel extends ViewModel {
         return result;
     }
     public void moveItem(int sourcePos, int targetPos) {
-        ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
-        TemplateDetailsItem item = newList.remove(sourcePos);
-        newList.add(targetPos, item);
+        final List<TemplateDetailsItem> newList = copyItems();
+
+        if (BuildConfig.DEBUG) {
+            Logger.debug("drag", "Before move:");
+            for (int i = 1; i < newList.size(); i++) {
+                final TemplateDetailsItem item = newList.get(i);
+                Logger.debug("drag",
+                        String.format(Locale.US, "  %d: id %d, pos %d", i, item.getId(),
+                                item.getPosition()));
+            }
+        }
+
+        {
+            TemplateDetailsItem item = newList.remove(sourcePos);
+            newList.add(targetPos, item);
+        }
+
+        // adjust affected items' positions
+        {
+            int startPos, endPos;
+            if (sourcePos < targetPos) {
+                // moved down
+                startPos = sourcePos;
+                endPos = targetPos;
+            }
+            else {
+                // moved up
+                startPos = targetPos;
+                endPos = sourcePos;
+            }
+
+            for (int i = startPos; i <= endPos; i++) {
+                newList.get(i)
+                       .setPosition(i);
+            }
+        }
+
+        if (BuildConfig.DEBUG) {
+            Logger.debug("drag", "After move:");
+            for (int i = 1; i < newList.size(); i++) {
+                final TemplateDetailsItem item = newList.get(i);
+                Logger.debug("drag",
+                        String.format(Locale.US, "  %d: id %d, pos %d", i, item.getId(),
+                                item.getPosition()));
+            }
+        }
+
         items.setValue(newList);
     }
     public void removeItem(int position) {
