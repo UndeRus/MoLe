@@ -27,16 +27,14 @@
         android:id="@+id/pattern_account_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="end"
+        android:clickable="false"
         android:text="@string/template_details_account_row_label"
         android:textAppearance="?attr/textAppearanceListItem"
         app:drawableBottomCompat="@drawable/dashed_border_8dp"
         app:drawableStartCompat="@drawable/ic_baseline_drag_handle_24"
         app:layout_constraintBottom_toTopOf="@id/template_account_name_source_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintTop_toTopOf="parent"
-        android:clickable="false"
         />
     <TextView
         android:id="@+id/template_account_name_source_label"
