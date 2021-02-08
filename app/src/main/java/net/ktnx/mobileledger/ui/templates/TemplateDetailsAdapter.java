@@ -38,7 +38,6 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsAccountBinding;
 import net.ktnx.mobileledger.databinding.TemplateDetailsHeaderBinding;
 import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
-import net.ktnx.mobileledger.db.TemplateBase;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
 import net.ktnx.mobileledger.ui.QRScanCapableFragment;
@@ -49,7 +48,6 @@ import net.ktnx.mobileledger.utils.Misc;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -242,14 +240,6 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
     public int getItemCount() {
         return differ.getCurrentList()
                      .size();
-    }
-    public void setTemplateItems(List<TemplateBase> items) {
-        ArrayList<TemplateDetailsItem> list = new ArrayList<>();
-        for (TemplateBase p : items) {
-            TemplateDetailsItem item = TemplateDetailsItem.fromRoomObject(p);
-            list.add(item);
-        }
-        setItems(list);
     }
     public void setItems(List<TemplateDetailsItem> items) {
         differ.submitList(items);
