@@ -102,6 +102,7 @@ abstract public class TemplateDetailsItem {
             TemplateAccount pa = (TemplateAccount) p;
             AccountRow acc = createAccountRow();
             acc.setId(pa.getId());
+            acc.setPosition(pa.getPosition());
 
             if (pa.getAccountNameMatchGroup() == null)
                 acc.setAccountName(Misc.nullIsEmpty(pa.getAccountName()));
