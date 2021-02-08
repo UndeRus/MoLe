@@ -47,7 +47,7 @@ import java.util.regex.PatternSyntaxException;
 abstract public class TemplateDetailsItem {
     private final Type type;
     protected Long id;
-    protected Long position;
+    protected long position;
 
     protected TemplateDetailsItem(Type type) {
         this.type = type;
@@ -174,7 +174,7 @@ abstract public class TemplateDetailsItem {
     public long getPosition() {
         return position;
     }
-    public void setPosition(Long position) {
+    public void setPosition(long position) {
         this.position = position;
     }
     abstract public String getProblem(@NonNull Resources r, int patternGroupCount);
