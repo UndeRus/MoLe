@@ -278,6 +278,12 @@ abstract public class TemplateDetailsItem {
                 return "grp:" + matchGroup;
             return "<null>";
         }
+        public boolean isEmpty() {
+            if (literalValue)
+                return value == null || Misc.emptyIsNull(value.toString()) == null;
+
+            return matchGroup > 0;
+        }
     }
 
     public static class TYPE {
@@ -420,6 +426,9 @@ abstract public class TemplateDetailsItem {
             }
 
             return result;
+        }
+        public boolean isEmpty() {
+            return accountName.isEmpty() && accountComment.isEmpty() && amount.isEmpty();
         }
     }
 
