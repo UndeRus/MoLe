@@ -44,11 +44,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TemplateDetailsViewModel extends ViewModel {
     private final MutableLiveData<List<TemplateDetailsItem>> items =
             new MutableLiveData<>(Collections.emptyList());
+    private final AtomicInteger syntheticItemId = new AtomicInteger(0);
     private Long mPatternId;
     private String mDefaultPatternName;
     private boolean itemsLoaded = false;
-    private final AtomicInteger syntheticItemId = new AtomicInteger(0);
-
     public String getDefaultPatternName() {
         return mDefaultPatternName;
     }
