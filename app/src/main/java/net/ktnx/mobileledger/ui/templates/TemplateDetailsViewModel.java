@@ -66,7 +66,7 @@ public class TemplateDetailsViewModel extends ViewModel {
         if (list.size() < 1) {
             final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
             header.setName(mDefaultPatternName);
-            header.setId(genItemId());
+            header.setId(0);
             list.add(header);
             changes = true;
         }

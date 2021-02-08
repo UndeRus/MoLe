@@ -193,7 +193,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
     public long getItemId(int position) {
         // header item is always first and IDs id may duplicate some of the account IDs
         if (position == 0)
-            return -1;
+            return 0;
         TemplateDetailsItem.AccountRow accRow = differ.getCurrentList()
                                                       .get(position)
                                                       .asAccountRowItem();
