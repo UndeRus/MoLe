@@ -274,8 +274,22 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         abstract void bind(TemplateDetailsItem item);
     }
 
-    public class Header extends ViewHolder {
+    private abstract static class BaseItem extends ViewHolder {
+        boolean updatePropagationDisabled = false;
+        BaseItem(@NonNull View itemView) {
+            super(itemView);
+        }
+        void disableUpdatePropagation() {
+            updatePropagationDisabled = true;
+        }
+        void enableUpdatePropagation() {
+            updatePropagationDisabled = false;
+        }
+    }
+
+    public class Header extends BaseItem {
         private final TemplateDetailsHeaderBinding b;
+        boolean updatePropagationDisabled = false;
         public Header(@NonNull TemplateDetailsHeaderBinding binding) {
             super(binding.getRoot());
             b = binding;
@@ -287,6 +301,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     final TemplateDetailsItem.Header header = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed template name " + s + "; header=" + header);
@@ -302,6 +319,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     final TemplateDetailsItem.Header header = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed pattern " + s + "; header=" + header);
@@ -319,6 +339,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     final TemplateDetailsItem.Header header = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed test text " + s + "; header=" + header);
@@ -335,10 +358,12 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 }
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 }
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     final TemplateDetailsItem.Header header = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed transaction description " + s + "; header=" + header);
@@ -349,14 +374,15 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             TextWatcher transactionCommentWatcher = new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
                 }
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 }
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     final TemplateDetailsItem.Header header = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed transaction description " + s + "; header=" + header);
@@ -432,107 +458,114 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             TemplateDetailsItem.Header header = item.asHeaderItem();
             Logger.debug(D_TEMPLATE_UI, "Binding to header " + header);
 
-            String groupNoText = b.getRoot()
-                                  .getResources()
-                                  .getString(R.string.template_item_match_group_source);
+            disableUpdatePropagation();
+            try {
+                String groupNoText = b.getRoot()
+                                      .getResources()
+                                      .getString(R.string.template_item_match_group_source);
 
-            b.templateName.setText(header.getName());
-            b.pattern.setText(header.getPattern());
-            b.testText.setText(header.getTestText());
+                b.templateName.setText(header.getName());
+                b.pattern.setText(header.getPattern());
+                b.testText.setText(header.getTestText());
 
-            if (header.hasLiteralDateYear()) {
-                b.templateDetailsYearSource.setText(R.string.template_details_source_literal);
-                final Integer dateYear = header.getDateYear();
-                b.templateDetailsDateYear.setText(
-                        (dateYear == null) ? null : String.valueOf(dateYear));
-                b.templateDetailsDateYearLayout.setVisibility(View.VISIBLE);
-            }
-            else {
-                b.templateDetailsDateYearLayout.setVisibility(View.GONE);
-                b.templateDetailsYearSource.setText(
-                        String.format(Locale.US, groupNoText, header.getDateYearMatchGroup(),
-                                getMatchGroupText(header.getDateYearMatchGroup())));
-            }
-            b.templateDetailsYearSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
-            b.templateDetailsYearSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+                if (header.hasLiteralDateYear()) {
+                    b.templateDetailsYearSource.setText(R.string.template_details_source_literal);
+                    final Integer dateYear = header.getDateYear();
+                    b.templateDetailsDateYear.setText(
+                            (dateYear == null) ? null : String.valueOf(dateYear));
+                    b.templateDetailsDateYearLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.templateDetailsDateYearLayout.setVisibility(View.GONE);
+                    b.templateDetailsYearSource.setText(
+                            String.format(Locale.US, groupNoText, header.getDateYearMatchGroup(),
+                                    getMatchGroupText(header.getDateYearMatchGroup())));
+                }
+                b.templateDetailsYearSourceLabel.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+                b.templateDetailsYearSource.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
 
-            if (header.hasLiteralDateMonth()) {
-                b.templateDetailsMonthSource.setText(R.string.template_details_source_literal);
-                final Integer dateMonth = header.getDateMonth();
-                b.templateDetailsDateMonth.setText(
-                        (dateMonth == null) ? null : String.valueOf(dateMonth));
-                b.templateDetailsDateMonthLayout.setVisibility(View.VISIBLE);
-            }
-            else {
-                b.templateDetailsDateMonthLayout.setVisibility(View.GONE);
-                b.templateDetailsMonthSource.setText(
-                        String.format(Locale.US, groupNoText, header.getDateMonthMatchGroup(),
-                                getMatchGroupText(header.getDateMonthMatchGroup())));
-            }
-            b.templateDetailsMonthSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
-            b.templateDetailsMonthSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
+                if (header.hasLiteralDateMonth()) {
+                    b.templateDetailsMonthSource.setText(R.string.template_details_source_literal);
+                    final Integer dateMonth = header.getDateMonth();
+                    b.templateDetailsDateMonth.setText(
+                            (dateMonth == null) ? null : String.valueOf(dateMonth));
+                    b.templateDetailsDateMonthLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.templateDetailsDateMonthLayout.setVisibility(View.GONE);
+                    b.templateDetailsMonthSource.setText(
+                            String.format(Locale.US, groupNoText, header.getDateMonthMatchGroup(),
+                                    getMatchGroupText(header.getDateMonthMatchGroup())));
+                }
+                b.templateDetailsMonthSourceLabel.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
+                b.templateDetailsMonthSource.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
 
-            if (header.hasLiteralDateDay()) {
-                b.templateDetailsDaySource.setText(R.string.template_details_source_literal);
-                final Integer dateDay = header.getDateDay();
-                b.templateDetailsDateDay.setText(
-                        (dateDay == null) ? null : String.valueOf(dateDay));
-                b.templateDetailsDateDayLayout.setVisibility(View.VISIBLE);
-            }
-            else {
-                b.templateDetailsDateDayLayout.setVisibility(View.GONE);
-                b.templateDetailsDaySource.setText(
-                        String.format(Locale.US, groupNoText, header.getDateDayMatchGroup(),
-                                getMatchGroupText(header.getDateDayMatchGroup())));
-            }
-            b.templateDetailsDaySourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
-            b.templateDetailsDaySource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+                if (header.hasLiteralDateDay()) {
+                    b.templateDetailsDaySource.setText(R.string.template_details_source_literal);
+                    final Integer dateDay = header.getDateDay();
+                    b.templateDetailsDateDay.setText(
+                            (dateDay == null) ? null : String.valueOf(dateDay));
+                    b.templateDetailsDateDayLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.templateDetailsDateDayLayout.setVisibility(View.GONE);
+                    b.templateDetailsDaySource.setText(
+                            String.format(Locale.US, groupNoText, header.getDateDayMatchGroup(),
+                                    getMatchGroupText(header.getDateDayMatchGroup())));
+                }
+                b.templateDetailsDaySourceLabel.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+                b.templateDetailsDaySource.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
 
-            if (header.hasLiteralTransactionDescription()) {
-                b.templateTransactionDescriptionSource.setText(
-                        R.string.template_details_source_literal);
-                b.transactionDescription.setText(header.getTransactionDescription());
-                b.transactionDescriptionLayout.setVisibility(View.VISIBLE);
+                if (header.hasLiteralTransactionDescription()) {
+                    b.templateTransactionDescriptionSource.setText(
+                            R.string.template_details_source_literal);
+                    b.transactionDescription.setText(header.getTransactionDescription());
+                    b.transactionDescriptionLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.transactionDescriptionLayout.setVisibility(View.GONE);
+                    b.templateTransactionDescriptionSource.setText(
+                            String.format(Locale.US, groupNoText,
+                                    header.getTransactionDescriptionMatchGroup(), getMatchGroupText(
+                                            header.getTransactionDescriptionMatchGroup())));
+
+                }
+                b.templateTransactionDescriptionSourceLabel.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+                b.templateTransactionDescriptionSource.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+
+                if (header.hasLiteralTransactionComment()) {
+                    b.templateTransactionCommentSource.setText(
+                            R.string.template_details_source_literal);
+                    b.transactionComment.setText(header.getTransactionComment());
+                    b.transactionCommentLayout.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.transactionCommentLayout.setVisibility(View.GONE);
+                    b.templateTransactionCommentSource.setText(String.format(Locale.US, groupNoText,
+                            header.getTransactionCommentMatchGroup(),
+                            getMatchGroupText(header.getTransactionCommentMatchGroup())));
+
+                }
+                b.templateTransactionCommentSourceLabel.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
+                b.templateTransactionCommentSource.setOnClickListener(
+                        v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
+
+                b.templateDetailsHeadScanQrButton.setOnClickListener(this::scanTestQR);
+
+                checkPatternError(header);
             }
-            else {
-                b.transactionDescriptionLayout.setVisibility(View.GONE);
-                b.templateTransactionDescriptionSource.setText(String.format(Locale.US, groupNoText,
-                        header.getTransactionDescriptionMatchGroup(),
-                        getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
-
+            finally {
+                enableUpdatePropagation();
             }
-            b.templateTransactionDescriptionSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
-            b.templateTransactionDescriptionSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
-
-            if (header.hasLiteralTransactionComment()) {
-                b.templateTransactionCommentSource.setText(
-                        R.string.template_details_source_literal);
-                b.transactionComment.setText(header.getTransactionComment());
-                b.transactionCommentLayout.setVisibility(View.VISIBLE);
-            }
-            else {
-                b.transactionCommentLayout.setVisibility(View.GONE);
-                b.templateTransactionCommentSource.setText(String.format(Locale.US, groupNoText,
-                        header.getTransactionCommentMatchGroup(),
-                        getMatchGroupText(header.getTransactionCommentMatchGroup())));
-
-            }
-            b.templateTransactionCommentSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
-            b.templateTransactionCommentSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
-
-            b.templateDetailsHeadScanQrButton.setOnClickListener(this::scanTestQR);
-
-            checkPatternError(header);
         }
         private void checkPatternError(TemplateDetailsItem.Header item) {
             if (item.getPatternError() != null) {
@@ -560,7 +593,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         }
     }
 
-    public class AccountRow extends ViewHolder {
+    public class AccountRow extends BaseItem {
         private final TemplateDetailsAccountBinding b;
         public AccountRow(@NonNull TemplateDetailsAccountBinding binding) {
             super(binding.getRoot());
@@ -573,6 +606,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     TemplateDetailsItem.AccountRow accRow = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed account name " + s + "; accRow=" + accRow);
@@ -592,6 +628,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 public void onTextChanged(CharSequence s, int start, int before, int count) {}
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     TemplateDetailsItem.AccountRow accRow = getItem();
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed account comment " + s + "; accRow=" + accRow);
@@ -611,6 +650,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 }
                 @Override
                 public void afterTextChanged(Editable s) {
+                    if (updatePropagationDisabled)
+                        return;
+
                     TemplateDetailsItem.AccountRow accRow = getItem();
 
                     String str = String.valueOf(s);
@@ -648,6 +690,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             });
 
             b.negateAmountSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (updatePropagationDisabled)
+                    return;
+
                 getItem().setNegateAmount(isChecked);
                 b.templateDetailsNegateAmountText.setText(
                         isChecked ? R.string.template_account_change_amount_sign
@@ -670,77 +715,84 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         }
         @Override
         void bind(TemplateDetailsItem item) {
-            final Resources resources = b.getRoot()
-                                         .getResources();
+            disableUpdatePropagation();
+            try {
+                final Resources resources = b.getRoot()
+                                             .getResources();
                 String groupNoText = resources.getString(R.string.template_item_match_group_source);
 
-            TemplateDetailsItem.AccountRow accRow = item.asAccountRowItem();
-            b.patternAccountLabel.setText(String.format(Locale.US,
-                    resources.getString(R.string.template_details_account_row_label),
-                    accRow.getPosition()));
-            if (accRow.hasLiteralAccountName()) {
-                b.templateDetailsAccountNameLayout.setVisibility(View.VISIBLE);
-                b.templateDetailsAccountName.setText(accRow.getAccountName());
-                b.templateDetailsAccountNameSource.setText(
-                        R.string.template_details_source_literal);
-            }
-            else {
-                b.templateDetailsAccountNameLayout.setVisibility(View.GONE);
-                b.templateDetailsAccountNameSource.setText(
-                        String.format(Locale.US, groupNoText, accRow.getAccountNameMatchGroup(),
-                                getMatchGroupText(accRow.getAccountNameMatchGroup())));
-            }
+                TemplateDetailsItem.AccountRow accRow = item.asAccountRowItem();
+                b.patternAccountLabel.setText(String.format(Locale.US,
+                        resources.getString(R.string.template_details_account_row_label),
+                        accRow.getPosition()));
+                if (accRow.hasLiteralAccountName()) {
+                    b.templateDetailsAccountNameLayout.setVisibility(View.VISIBLE);
+                    b.templateDetailsAccountName.setText(accRow.getAccountName());
+                    b.templateDetailsAccountNameSource.setText(
+                            R.string.template_details_source_literal);
+                }
+                else {
+                    b.templateDetailsAccountNameLayout.setVisibility(View.GONE);
+                    b.templateDetailsAccountNameSource.setText(
+                            String.format(Locale.US, groupNoText, accRow.getAccountNameMatchGroup(),
+                                    getMatchGroupText(accRow.getAccountNameMatchGroup())));
+                }
 
-            if (accRow.hasLiteralAccountComment()) {
-                b.templateDetailsAccountCommentLayout.setVisibility(View.VISIBLE);
-                b.templateDetailsAccountComment.setText(accRow.getAccountComment());
-                b.templateDetailsAccountCommentSource.setText(
-                        R.string.template_details_source_literal);
-            }
-            else {
-                b.templateDetailsAccountCommentLayout.setVisibility(View.GONE);
-                b.templateDetailsAccountCommentSource.setText(
-                        String.format(Locale.US, groupNoText, accRow.getAccountCommentMatchGroup(),
-                                getMatchGroupText(accRow.getAccountCommentMatchGroup())));
-            }
+                if (accRow.hasLiteralAccountComment()) {
+                    b.templateDetailsAccountCommentLayout.setVisibility(View.VISIBLE);
+                    b.templateDetailsAccountComment.setText(accRow.getAccountComment());
+                    b.templateDetailsAccountCommentSource.setText(
+                            R.string.template_details_source_literal);
+                }
+                else {
+                    b.templateDetailsAccountCommentLayout.setVisibility(View.GONE);
+                    b.templateDetailsAccountCommentSource.setText(
+                            String.format(Locale.US, groupNoText,
+                                    accRow.getAccountCommentMatchGroup(),
+                                    getMatchGroupText(accRow.getAccountCommentMatchGroup())));
+                }
 
-            if (accRow.hasLiteralAmount()) {
-                b.templateDetailsAccountAmountSource.setText(
-                        R.string.template_details_source_literal);
-                b.templateDetailsAccountAmount.setVisibility(View.VISIBLE);
-                Float amt = accRow.getAmount();
-                b.templateDetailsAccountAmount.setText((amt == null) ? null : String.format(
-                        Data.locale.getValue(), "%,4.2f", (accRow.getAmount())));
-                b.negateAmountSwitch.setVisibility(View.GONE);
-                b.templateDetailsNegateAmountLabel.setVisibility(View.GONE);
-                b.templateDetailsNegateAmountText.setVisibility(View.GONE);
-            }
-            else {
-                b.templateDetailsAccountAmountSource.setText(
-                        String.format(Locale.US, groupNoText, accRow.getAmountMatchGroup(),
-                                getMatchGroupText(accRow.getAmountMatchGroup())));
-                b.templateDetailsAccountAmountLayout.setVisibility(View.GONE);
-                b.negateAmountSwitch.setVisibility(View.VISIBLE);
-                b.negateAmountSwitch.setChecked(accRow.isNegateAmount());
-                b.templateDetailsNegateAmountText.setText(
-                        accRow.isNegateAmount() ? R.string.template_account_change_amount_sign
-                                                : R.string.template_account_keep_amount_sign);
-                b.templateDetailsNegateAmountLabel.setVisibility(View.VISIBLE);
-                b.templateDetailsNegateAmountText.setVisibility(View.VISIBLE);
-            }
+                if (accRow.hasLiteralAmount()) {
+                    b.templateDetailsAccountAmountSource.setText(
+                            R.string.template_details_source_literal);
+                    b.templateDetailsAccountAmount.setVisibility(View.VISIBLE);
+                    Float amt = accRow.getAmount();
+                    b.templateDetailsAccountAmount.setText((amt == null) ? null : String.format(
+                            Data.locale.getValue(), "%,4.2f", (accRow.getAmount())));
+                    b.negateAmountSwitch.setVisibility(View.GONE);
+                    b.templateDetailsNegateAmountLabel.setVisibility(View.GONE);
+                    b.templateDetailsNegateAmountText.setVisibility(View.GONE);
+                }
+                else {
+                    b.templateDetailsAccountAmountSource.setText(
+                            String.format(Locale.US, groupNoText, accRow.getAmountMatchGroup(),
+                                    getMatchGroupText(accRow.getAmountMatchGroup())));
+                    b.templateDetailsAccountAmountLayout.setVisibility(View.GONE);
+                    b.negateAmountSwitch.setVisibility(View.VISIBLE);
+                    b.negateAmountSwitch.setChecked(accRow.isNegateAmount());
+                    b.templateDetailsNegateAmountText.setText(
+                            accRow.isNegateAmount() ? R.string.template_account_change_amount_sign
+                                                    : R.string.template_account_keep_amount_sign);
+                    b.templateDetailsNegateAmountLabel.setVisibility(View.VISIBLE);
+                    b.templateDetailsNegateAmountText.setVisibility(View.VISIBLE);
+                }
 
-            b.templateAccountNameSourceLabel.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
-            b.templateDetailsAccountNameSource.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
-            b.templateAccountCommentSourceLabel.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, AccDetail.COMMENT));
-            b.templateDetailsAccountCommentSource.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, AccDetail.COMMENT));
-            b.templateAccountAmountSourceLabel.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
-            b.templateDetailsAccountAmountSource.setOnClickListener(
-                    v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
+                b.templateAccountNameSourceLabel.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
+                b.templateDetailsAccountNameSource.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
+                b.templateAccountCommentSourceLabel.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.COMMENT));
+                b.templateDetailsAccountCommentSource.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.COMMENT));
+                b.templateAccountAmountSourceLabel.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
+                b.templateDetailsAccountAmountSource.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
+            }
+            finally {
+                enableUpdatePropagation();
+            }
         }
         private @NotNull TemplateDetailsItem.AccountRow getItem() {
             return differ.getCurrentList()
