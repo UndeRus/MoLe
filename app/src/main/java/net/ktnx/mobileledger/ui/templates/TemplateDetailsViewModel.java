@@ -56,31 +56,94 @@ public class TemplateDetailsViewModel extends ViewModel {
     }
 
     public void resetItems() {
-        checkItemConsistency(new ArrayList<>());
+        applyList(new ArrayList<>());
     }
-    public void checkItemConsistency(List<TemplateDetailsItem> list) {
-        if (list == null)
-            list = new ArrayList<>(items.getValue());
+    public void applyList(List<TemplateDetailsItem> srcList) {
+        applyList(srcList, false);
+    }
+    public void applyList(List<TemplateDetailsItem> srcList, boolean async) {
+        boolean changes;
+        if (srcList == null) {
+            srcList = new ArrayList<>(items.getValue());
+            changes = false;
+        }
+        else
+            changes = true;
 
-        boolean changes = false;
-        if (list.size() < 1) {
+        srcList = Collections.unmodifiableList(srcList);
+
+        {
+            Logger.debug("tmpl", "Considering old list");
+            for (TemplateDetailsItem item : srcList)
+                Logger.debug("tmpl", String.format(Locale.US, " id %d pos %d", item.getId(),
+                        item.getPosition()));
+        }
+
+        ArrayList<TemplateDetailsItem> newList = new ArrayList<>();
+
+        boolean hasEmptyItem = false;
+
+        if (srcList.size() < 1) {
             final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
             header.setName(mDefaultPatternName);
             header.setId(0);
-            list.add(header);
+            newList.add(header);
             changes = true;
         }
+        else {
+            newList.add(srcList.get(0));
+        }
 
-        while (list.size() < 3) {
+        for (int i = 1; i < srcList.size(); i++) {
+            final TemplateDetailsItem.AccountRow accRow = srcList.get(i)
+                                                                 .asAccountRowItem();
+            if (accRow.isEmpty()) {
+                // it is normal to have two empty rows if they are at the
+                // top (position 1 and 2)
+                if (!hasEmptyItem || i < 3) {
+                    accRow.setPosition(newList.size());
+                    newList.add(accRow);
+                }
+                else
+                    changes = true; // row skipped
+
+                hasEmptyItem = true;
+            }
+            else {
+                accRow.setPosition(newList.size());
+                newList.add(accRow);
+            }
+        }
+
+        while (newList.size() < 3) {
             final TemplateDetailsItem.AccountRow accountRow =
                     TemplateDetailsItem.createAccountRow();
             accountRow.setId(genItemId());
-            list.add(accountRow);
+            accountRow.setPosition(newList.size());
+            newList.add(accountRow);
+            changes = true;
+            hasEmptyItem = true;
+        }
+
+        if (!hasEmptyItem) {
+            final TemplateDetailsItem.AccountRow accountRow =
+                    TemplateDetailsItem.createAccountRow();
+            accountRow.setId(genItemId());
+            accountRow.setPosition(newList.size());
+            newList.add(accountRow);
             changes = true;
         }
 
-        if (changes)
-            items.setValue(list);
+        if (changes) {
+            Logger.debug("tmpl", "Changes detected, applying new list");
+
+            if (async)
+                items.postValue(newList);
+            else
+                items.setValue(newList);
+        }
+        else
+            Logger.debug("tmpl", "No changes, ignoring new list");
     }
     public int genItemId() {
         return syntheticItemId.decrementAndGet();
@@ -117,7 +180,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 for (TemplateDetailsItem i : l) {
                     Logger.debug("patterns-db", "Loaded pattern item " + i);
                 }
-                items.postValue(l);
+                applyList(l, true);
                 itemsLoaded = true;
 
                 dbList.removeObserver(this);
@@ -208,7 +271,6 @@ public class TemplateDetailsViewModel extends ViewModel {
     public void removeItem(int position) {
         ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
         newList.remove(position);
-        checkItemConsistency(newList);
-        items.setValue(newList);
+        applyList(newList);
     }
 }
