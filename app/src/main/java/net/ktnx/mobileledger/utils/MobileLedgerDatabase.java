@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -87,7 +89,10 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 
+            Pattern continuation = Pattern.compile("\\\\\\s*$");
+
             String line;
+            String sqlStatement = null;
             int line_no = 1;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("--")) {
@@ -98,8 +103,20 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
                     line_no++;
                     continue;
                 }
+                if (sqlStatement == null)
+                    sqlStatement = line;
+                else
+                    sqlStatement = sqlStatement.concat(line);
+
+                Matcher m = continuation.matcher(line);
+                if (m.matches()) {
+                    line_no++;
+                    continue;
+                }
+
                 try {
-                    db.execSQL(line);
+                    db.execSQL(sqlStatement);
+                    sqlStatement = null;
                 }
                 catch (Exception e) {
                     throw new RuntimeException(
@@ -107,6 +124,10 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
                 }
                 line_no++;
             }
+
+            if (sqlStatement != null)
+                throw new RuntimeException(
+                        String.format("Error applying %s: EOF after continuation", rev_file));
 
             db.setTransactionSuccessful();
         }
