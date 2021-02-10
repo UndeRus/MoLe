@@ -29,10 +29,9 @@ create table transaction_accounts(profile varchar not null, transaction_id integ
 create unique index un_transaction_accounts_order on transaction_accounts(profile, transaction_id, order_no);
 create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap integer not null);
 
-create table patterns(id INTEGER not null primary key, name TEXT not null, regular_expression TEXT not null, test_text TEXT, transaction_description TEXT, transaction_description_match_group INTEGER, transaction_comment TEXT, transaction_comment_match_group INTEGER, date_year INTEGER, date_year_match_group INTEGER, date_month INTEGER, date_month_match_group INTEGER, date_day INTEGER, date_day_match_group INTEGER);
-create unique index un_patterns_id on patterns(id);
-create table pattern_accounts(id INTEGER not null primary key, pattern_id INTEGER not null, position INTEGER not null, acc TEXT, acc_match_group INTEGER, currency INTEGER, currency_match_group INTEGER, amount REAL, amount_match_group INTEGER, negate_amount INTEGER, comment TEXT, comment_match_group INTEGER, constraint fk_pattern_account_pattern foreign key(pattern_id) references patterns(id), constraint fk_pattern_account_currency foreign key(currency) references currencies(id));
-create unique index un_pattern_accounts on pattern_accounts(id);
-create index fk_pattern_accounts_pattern on pattern_accounts(pattern_id);
-create index fk_pattern_accounts_currency on pattern_accounts(currency);
--- updated to revision 53
+CREATE TABLE templates (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT NOT NULL, regular_expression TEXT NOT NULL, test_text TEXT, transaction_description TEXT, transaction_description_match_group INTEGER, transaction_comment TEXT, transaction_comment_match_group INTEGER, date_year INTEGER, date_year_match_group INTEGER, date_month INTEGER, date_month_match_group INTEGER, date_day INTEGER, date_day_match_group INTEGER);
+CREATE TABLE template_accounts(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, template_id INTEGER NOT NULL, acc TEXT, position INTEGER NOT NULL, acc_match_group INTEGER, currency INTEGER, currency_match_group INTEGER, amount REAL, amount_match_group INTEGER, comment TEXT, comment_match_group INTEGER, negate_amount INTEGER, FOREIGN KEY(template_id) REFERENCES templates(id) ON UPDATE RESTRICT ON DELETE CASCADE, FOREIGN KEY(currency) REFERENCES currencies(id) ON UPDATE RESTRICT ON DELETE RESTRICT);
+create index fk_template_accounts_template on template_accounts(template_id);
+create index fk_template_accounts_currency on template_accounts(currency);
+
+-- updated to revision 55

@@ -72,9 +72,6 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
             applyRevision(db, i);
     }
     private void applyRevision(SQLiteDatabase db, int rev_no) {
-        if (rev_no == 55)
-            return;
-
         String rev_file = String.format(Locale.US, "sql_%d", rev_no);
 
         applyRevisionFile(db, rev_file);
