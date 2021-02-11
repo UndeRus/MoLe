@@ -13,8 +13,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 alter table patterns add transaction_description_match_group short;
 alter table patterns add transaction_comment_match_group short;
 alter table patterns add date_year short;
 alter table patterns add date_month short;
 alter table patterns add date_day short;
+
+COMMIT TRANSACTION;

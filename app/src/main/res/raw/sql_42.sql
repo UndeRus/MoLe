@@ -13,7 +13,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 create table patterns(id integer not null primary key, name varchar not null, position integer not null, regular_expression varchar not null, transaction_description varchar, transaction_comment varchar, date_year_match_group integer, date_month_match_group integer, date_day_match_group integer);
 create unique index un_patterns_id on patterns(id);
 create table pattern_accounts(id integer not null primary key, pattern_id integer not null, acc varchar, acc_match_group integer, currency integer, currency_match_group integer, amount decimal, amount_match_group integer, comment varchar, comment_match_group integer, constraint fk_pattern_account_pattern foreign key(pattern_id) references patterns(id), constraint fk_pattern_account_currency foreign key(currency) references currencies(id));
 create unique index un_pattern_accounts on pattern_accounts(id);
+
+COMMIT TRANSACTION;

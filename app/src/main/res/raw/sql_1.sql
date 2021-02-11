@@ -13,5 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 alter table accounts add keep boolean;
 alter table account_values add keep boolean;
+
+COMMIT TRANSACTION;

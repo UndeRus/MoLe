@@ -15,9 +15,13 @@
 
 pragma foreign_keys=off;
 
+BEGIN TRANSACTION;
+
 create table currencies_new(id integer not null primary key, name varchar not null, position varchar not null, has_gap integer not null);
 insert into currencies_new(id, name, position, has_gap) select id, name, position, has_gap from currencies;
 
 drop table currencies;
 
 alter table currencies_new rename to currencies;
+
+COMMIT TRANSACTION;

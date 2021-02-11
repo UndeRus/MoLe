@@ -12,8 +12,13 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 CREATE TABLE transaction_accounts_new(profile varchar not null, transaction_id integer not null, account_name varchar not null, currency varchar not null default '', amount decimal not null, comment varchar, generation integer default 0, order_no integer not null default 0, constraint fk_transaction_accounts_acc foreign key(profile,account_name) references accounts(profile,name), constraint fk_transaction_accounts_trn foreign key(profile, transaction_id) references transactions(profile,id));
 insert into transaction_accounts_new(profile, transaction_id, account_name, currency, amount, comment, generation, order_no) select profile, transaction_id, account_name, currency, amount, comment, generation, order_no from transaction_accounts;
 drop table transaction_accounts;
 alter table transaction_accounts_new rename to transaction_accounts;
 create unique index un_transaction_accounts_order on transaction_accounts(profile, transaction_id, order_no);
+
+COMMIT TRANSACTION;

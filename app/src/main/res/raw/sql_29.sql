@@ -12,4 +12,9 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 create index idx_transaction_description on transactions(description);
+
+COMMIT TRANSACTION;

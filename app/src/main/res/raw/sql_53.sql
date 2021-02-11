@@ -13,5 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
 
 alter table pattern_accounts add negate_amount INTEGER;
+
+COMMIT TRANSACTION;

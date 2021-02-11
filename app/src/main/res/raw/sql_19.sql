@@ -13,5 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 alter table accounts add expanded default 1;
 update accounts set expanded = 1;
+
+COMMIT TRANSACTION;

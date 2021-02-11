@@ -13,4 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 alter table profiles add future_dates integer;
+
+COMMIT TRANSACTION;

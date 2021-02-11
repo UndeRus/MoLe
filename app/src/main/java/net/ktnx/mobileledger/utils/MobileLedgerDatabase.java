@@ -83,7 +83,6 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
         int res_id = rm.getIdentifier(rev_file, "raw", mContext.getPackageName());
         if (res_id == 0)
             throw new SQLException(String.format(Locale.US, "No resource for %s", rev_file));
-        db.beginTransaction();
         try (InputStream res = rm.openRawResource(res_id)) {
             debug("db", "Applying " + rev_file);
             InputStreamReader isr = new InputStreamReader(res);
@@ -129,14 +128,10 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
                 throw new RuntimeException(
                         String.format("Error applying %s: EOF after continuation", rev_file));
 
-            db.setTransactionSuccessful();
         }
         catch (IOException e) {
             Log.e("db", String.format("Error opening raw resource for %s", rev_file));
             e.printStackTrace();
-        }
-        finally {
-            db.endTransaction();
         }
     }
 }

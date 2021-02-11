@@ -12,7 +12,12 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 alter table accounts add generation integer default 0;
 alter table account_values add generation integer default 0;
 alter table transactions add generation integer default 0;
 alter table transaction_accounts add generation integer default 0;
+
+COMMIT TRANSACTION;

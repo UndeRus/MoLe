@@ -13,6 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 delete from options where profile is null and name='last_scrape';
 create table new_options(profile varchar not null, name varchar not null, value varchar);
 
@@ -23,3 +25,5 @@ create table options(profile varchar not null, name varchar not null, value varc
 create unique index un_options on options(profile,name);
 insert into options(profile,name,value) select profile,name,value from new_options;
 drop table new_options;
+
+COMMIT TRANSACTION;

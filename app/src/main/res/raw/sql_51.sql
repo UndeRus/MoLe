@@ -12,7 +12,10 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
 pragma foreign_keys=off;
+
+BEGIN TRANSACTION;
 
 create table patterns_new(id INTEGER not null primary key, name TEXT not null, regular_expression TEXT not null, transaction_description TEXT, transaction_description_match_group INTEGER, transaction_comment TEXT, transaction_comment_match_group INTEGER, date_year INTEGER, date_year_match_group INTEGER, date_month INTEGER, date_month_match_group INTEGER, date_day INTEGER, date_day_match_group INTEGER);
 
@@ -22,3 +25,7 @@ drop table patterns;
 
 alter table patterns_new rename to patterns;
 create unique index un_patterns_id on patterns(id);
+
+COMMIT TRANSACTION;
+
+pragma foreign_keys = ON;

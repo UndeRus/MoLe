@@ -12,6 +12,9 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 alter table transactions add year integer not null default 0;
 alter table transactions add month integer not null default 0;
 alter table transactions add day integer not null default 0;
@@ -25,3 +28,5 @@ create table transactions_2(profile varchar not null, id integer not null, data_
 insert into transactions_2(profile, id, data_hash, year, month, day, description, comment, keep) select profile, id, data_hash, year, month, day, description, comment, keep from transactions;
 drop table transactions;
 alter table transactions_2 rename to transactions;
+
+COMMIT TRANSACTION;

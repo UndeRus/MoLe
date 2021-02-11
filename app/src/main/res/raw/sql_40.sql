@@ -13,5 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 pragma foreign_keys=off;
+BEGIN TRANSACTION;
+
 delete from transaction_accounts where not exists (select 1 from accounts a where a.profile=transaction_accounts.profile and a.name=transaction_accounts.account_name);
 delete from transaction_accounts where not exists (select 1 from transactions t where t.profile=transaction_accounts.profile and t.id=transaction_accounts.transaction_id);
+
+COMMIT TRANSACTION;

@@ -12,6 +12,11 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 alter table transaction_accounts add order_no integer not null default 0;
 update transaction_accounts set order_no = rowid;
 create unique index un_transaction_accounts_order on transaction_accounts(profile, transaction_id, order_no);
+
+COMMIT TRANSACTION;

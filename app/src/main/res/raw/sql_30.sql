@@ -12,4 +12,9 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 delete from options where profile <> '-' and not exists (select 1 from profiles p where p.uuid=options.profile);
+
+COMMIT TRANSACTION;

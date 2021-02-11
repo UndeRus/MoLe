@@ -13,4 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 create table description_history(description varchar not null primary key, keep boolean);
+
+COMMIT TRANSACTION;

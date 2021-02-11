@@ -12,7 +12,12 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 create table accounts_new(profile varchar not null, name varchar not null, name_upper varchar not null, keep boolean not null default 0, level integer not null, parent_name varchar, expanded default 1, amounts_expanded boolean default 0);
 insert into accounts_new(profile, name, name_upper, keep, level, parent_name, expanded, amounts_expanded) select profile, name, name_upper, keep, level, parent_name, expanded, amounts_expanded from accounts;
 drop table accounts;
 alter table accounts_new rename to accounts;
+
+COMMIT TRANSACTION;

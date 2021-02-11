@@ -13,4 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 alter table profiles add show_commodity_by_default boolean default 0;
+
+COMMIT TRANSACTION;

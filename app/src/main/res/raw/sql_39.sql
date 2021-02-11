@@ -12,8 +12,13 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 create table description_history_new(description varchar not null primary key, description_upper varchar, generation integer default 0);
 insert into description_history_new(description, description_upper) select description, description_upper from description_history;
 drop table description_history;
 alter table description_history_new rename to description_history;
 create unique index un_description_history on description_history(description_upper);
+
+COMMIT TRANSACTION;

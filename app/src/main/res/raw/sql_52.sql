@@ -13,5 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 create index if not exists fk_pattern_accounts_pattern on pattern_accounts(pattern_id);
 create index if not exists fk_pattern_accounts_currency on pattern_accounts(currency);
+
+COMMIT TRANSACTION;

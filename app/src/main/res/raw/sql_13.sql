@@ -13,6 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 delete from options where name='transaction_list_last_update';
 delete from options where name='last_refresh';
 alter table options add profile varchar;
@@ -35,3 +37,5 @@ create unique index un_transactions_id on transactions(id);
 create unique index un_transactions_data_hash on transactions(data_hash);
 --
 create table transaction_accounts(profile varchar not null, transaction_id integer not null, account_name varchar not null, currency varchar not null default '', amount decimal not null, constraint fk_transaction_accounts_acc foreign key(profile,account_name) references accounts(profile,account_name), constraint fk_transaction_accounts_trn foreign key(transaction_id) references transactions(id));
+
+COMMIT TRANSACTION;

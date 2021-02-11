@@ -12,4 +12,9 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 update profiles set show_comments_by_default = 1;
+
+COMMIT TRANSACTION;

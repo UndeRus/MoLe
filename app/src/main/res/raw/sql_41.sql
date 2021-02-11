@@ -12,6 +12,11 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+
+BEGIN TRANSACTION;
+
 alter table profiles add detected_version_pre_1_19 boolean;
 alter table profiles add detected_version_major integer;
 alter table profiles add detected_version_minor integer;
+
+COMMIT TRANSACTION;

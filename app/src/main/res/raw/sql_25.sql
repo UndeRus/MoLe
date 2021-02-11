@@ -13,4 +13,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap boolean not null);
+
+COMMIT TRANSACTION;

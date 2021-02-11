@@ -13,5 +13,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
+BEGIN TRANSACTION;
+
 alter table profiles add theme integer default -1;
 update profiles set theme = -1;
+
+COMMIT TRANSACTION;
