@@ -1,4 +1,4 @@
--- Copyright © 2020 Damyan Ivanov.
+-- Copyright © 2021 Damyan Ivanov.
 -- This file is part of MoLe.
 -- MoLe is free software: you can distribute it and/or modify it
 -- under the term of the GNU General Public License as published by
