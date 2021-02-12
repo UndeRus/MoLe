@@ -78,13 +78,14 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
 
         applyRevisionFile(db, rev_file);
     }
-    private void applyRevisionFile(SQLiteDatabase db, String rev_file) {
+    private void applyRevisionFile(SQLiteDatabase db, String revFile) {
         final Resources rm = mContext.getResources();
-        int res_id = rm.getIdentifier(rev_file, "raw", mContext.getPackageName());
+        int res_id = rm.getIdentifier(revFile, "raw", mContext.getPackageName());
         if (res_id == 0)
-            throw new SQLException(String.format(Locale.US, "No resource for %s", rev_file));
+            throw new SQLException(String.format(Locale.US, "No resource for %s", revFile));
+
         try (InputStream res = rm.openRawResource(res_id)) {
-            debug("db", "Applying " + rev_file);
+            debug("db", "Applying " + revFile);
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 
@@ -92,26 +93,29 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
 
             String line;
             String sqlStatement = null;
-            int line_no = 1;
+            boolean eolPending;
+            int lineNo = 0;
             while ((line = reader.readLine()) != null) {
-                if (line.startsWith("--")) {
-                    line_no++;
+                lineNo++;
+                if (line.startsWith("--"))
                     continue;
-                }
-                if (line.isEmpty()) {
-                    line_no++;
+                if (line.isEmpty())
                     continue;
+
+                Matcher m = continuation.matcher(line);
+                eolPending = false;
+                if (m.find()) {
+                    line = m.replaceFirst("");
+                    eolPending = true;
                 }
+
                 if (sqlStatement == null)
                     sqlStatement = line;
                 else
                     sqlStatement = sqlStatement.concat(line);
 
-                Matcher m = continuation.matcher(line);
-                if (m.matches()) {
-                    line_no++;
+                if (eolPending)
                     continue;
-                }
 
                 try {
                     db.execSQL(sqlStatement);
@@ -119,19 +123,19 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
                 }
                 catch (Exception e) {
                     throw new RuntimeException(
-                            String.format("Error applying %s, line %d", rev_file, line_no), e);
+                            String.format("Error applying %s, line %d, statement: %s", revFile,
+                                    lineNo, sqlStatement), e);
                 }
-                line_no++;
             }
 
             if (sqlStatement != null)
                 throw new RuntimeException(
-                        String.format("Error applying %s: EOF after continuation", rev_file));
+                        String.format("Error applying %s: EOF after continuation", revFile));
 
         }
         catch (IOException e) {
-            Log.e("db", String.format("Error opening raw resource for %s", rev_file));
-            e.printStackTrace();
+            throw new RuntimeException(String.format("Error opening raw resource for %s", revFile),
+                    e);
         }
     }
 }
