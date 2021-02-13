@@ -218,4 +218,5 @@
     <string name="template_xxx_deleted">Макетът „%1$s“ е изтрит</string>
     <string name="action_undo">Връщане</string>
     <string name="pattern_match_result">Резултат от прилагането на шаблона</string>
+    <string name="template_item_match_group_source">Група %1$d (%2$s)</string>
 </resources>

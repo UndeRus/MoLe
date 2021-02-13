@@ -334,6 +334,10 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             TemplateDetailsItem.Header header = item.asHeaderItem();
             Logger.debug(D_TEMPLATE_UI, "Binding to header " + header);
 
+            String groupNoText = b.getRoot()
+                                  .getResources()
+                                  .getString(R.string.template_item_match_group_source);
+
             b.templateName.setText(header.getName());
             b.pattern.setText(header.getPattern());
             b.testText.setText(header.getTestText());
@@ -348,12 +352,13 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             else {
                 b.templateDetailsDateYearLayout.setVisibility(View.GONE);
                 b.templateDetailsYearSource.setText(
-                        String.format(Locale.US, "Group %d (%s)", header.getDateYearMatchGroup(),
+                        String.format(Locale.US, groupNoText, header.getDateYearMatchGroup(),
                                 getMatchGroupText(header.getDateYearMatchGroup())));
             }
-            b.templateDetailsYearSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
-            b.templateDetailsYearSource.setOnClickListener(v -> selectHeaderDetailSource(v,
-                    HeaderDetail.DATE_YEAR));
+            b.templateDetailsYearSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+            b.templateDetailsYearSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
 
             if (header.hasLiteralDateMonth()) {
                 b.templateDetailsMonthSource.setText(R.string.template_details_source_literal);
@@ -365,7 +370,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             else {
                 b.templateDetailsDateMonthLayout.setVisibility(View.GONE);
                 b.templateDetailsMonthSource.setText(
-                        String.format(Locale.US, "Group %d (%s)", header.getDateMonthMatchGroup(),
+                        String.format(Locale.US, groupNoText, header.getDateMonthMatchGroup(),
                                 getMatchGroupText(header.getDateMonthMatchGroup())));
             }
             b.templateDetailsMonthSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v,
@@ -382,7 +387,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             else {
                 b.templateDetailsDateDayLayout.setVisibility(View.GONE);
                 b.templateDetailsDaySource.setText(
-                        String.format(Locale.US, "Group %d (%s)", header.getDateDayMatchGroup(),
+                        String.format(Locale.US, groupNoText, header.getDateDayMatchGroup(),
                                 getMatchGroupText(header.getDateDayMatchGroup())));
             }
             b.templateDetailsDaySourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
@@ -395,9 +400,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             }
             else {
                 b.transactionDescriptionLayout.setVisibility(View.GONE);
-                b.templateTransactionDescriptionSource.setText(
-                        String.format(Locale.US, "Group %d (%s)",
-                                header.getTransactionDescriptionMatchGroup(), getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
+                b.templateTransactionDescriptionSource.setText(String.format(Locale.US, groupNoText,
+                        header.getTransactionDescriptionMatchGroup(),
+                        getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
 
             }
             b.templateTransactionDescriptionSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
@@ -410,7 +415,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             }
             else {
                 b.transactionCommentLayout.setVisibility(View.GONE);
-                b.templateTransactionCommentSource.setText(String.format(Locale.US, "Group %d (%s)",
+                b.templateTransactionCommentSource.setText(String.format(Locale.US, groupNoText,
                         header.getTransactionCommentMatchGroup(),
                         getMatchGroupText(header.getTransactionCommentMatchGroup())));
 
@@ -542,6 +547,10 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         }
         @Override
         void bind(TemplateDetailsItem item) {
+            String groupNoText = b.getRoot()
+                                  .getResources()
+                                  .getString(R.string.template_item_match_group_source);
+
             TemplateDetailsItem.AccountRow accRow = item.asAccountRowItem();
             if (accRow.hasLiteralAccountName()) {
                 b.templateDetailsAccountNameLayout.setVisibility(View.VISIBLE);
@@ -552,7 +561,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             else {
                 b.templateDetailsAccountNameLayout.setVisibility(View.GONE);
                 b.templateDetailsAccountNameSource.setText(
-                        String.format(Locale.US, "Group %d (%s)", accRow.getAccountNameMatchGroup(),
+                        String.format(Locale.US, groupNoText, accRow.getAccountNameMatchGroup(),
                                 getMatchGroupText(accRow.getAccountNameMatchGroup())));
             }
 
@@ -565,8 +574,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             else {
                 b.templateDetailsAccountCommentLayout.setVisibility(View.GONE);
                 b.templateDetailsAccountCommentSource.setText(
-                        String.format(Locale.US, "Group %d (%s)",
-                                accRow.getAccountCommentMatchGroup(),
+                        String.format(Locale.US, groupNoText, accRow.getAccountCommentMatchGroup(),
                                 getMatchGroupText(accRow.getAccountCommentMatchGroup())));
             }
 
@@ -581,7 +589,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             }
             else {
                 b.templateDetailsAccountAmountSource.setText(
-                        String.format(Locale.US, "Group %d (%s)", accRow.getAmountMatchGroup(),
+                        String.format(Locale.US, groupNoText, accRow.getAmountMatchGroup(),
                                 getMatchGroupText(accRow.getAmountMatchGroup())));
                 b.templateDetailsAccountAmountLayout.setVisibility(View.GONE);
                 b.negateAmountSwitch.setVisibility(View.VISIBLE);
