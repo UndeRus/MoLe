@@ -206,6 +206,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:hint="@string/date_year_hint"
+            android:inputType="number"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
@@ -222,6 +223,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:hint="@string/date_month_hint"
+            android:inputType="number"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
@@ -239,6 +241,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:hint="@string/date_day_hint"
+            android:inputType="number"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <androidx.constraintlayout.widget.Barrier
