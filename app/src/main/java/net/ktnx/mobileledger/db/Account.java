@@ -93,4 +93,9 @@ public class Account {
     public void setGeneration(int generation) {
         this.generation = generation;
     }
+    @NonNull
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
