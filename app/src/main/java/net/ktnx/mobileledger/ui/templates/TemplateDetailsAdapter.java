@@ -373,15 +373,16 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         String.format(Locale.US, groupNoText, header.getDateMonthMatchGroup(),
                                 getMatchGroupText(header.getDateMonthMatchGroup())));
             }
-            b.templateDetailsMonthSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v,
-                    HeaderDetail.DATE_MONTH));
-            b.templateDetailsMonthSource.setOnClickListener(v -> selectHeaderDetailSource(v,
-                    HeaderDetail.DATE_MONTH));
+            b.templateDetailsMonthSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
+            b.templateDetailsMonthSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
 
             if (header.hasLiteralDateDay()) {
                 b.templateDetailsDaySource.setText(R.string.template_details_source_literal);
                 final Integer dateDay = header.getDateDay();
-                b.templateDetailsDateDay.setText((dateDay == null) ? null : String.valueOf(dateDay));
+                b.templateDetailsDateDay.setText(
+                        (dateDay == null) ? null : String.valueOf(dateDay));
                 b.templateDetailsDateDayLayout.setVisibility(View.VISIBLE);
             }
             else {
@@ -390,11 +391,14 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         String.format(Locale.US, groupNoText, header.getDateDayMatchGroup(),
                                 getMatchGroupText(header.getDateDayMatchGroup())));
             }
-            b.templateDetailsDaySourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
-            b.templateDetailsDaySource.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+            b.templateDetailsDaySourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+            b.templateDetailsDaySource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
 
             if (header.hasLiteralTransactionDescription()) {
-                b.templateTransactionDescriptionSource.setText(R.string.template_details_source_literal);
+                b.templateTransactionDescriptionSource.setText(
+                        R.string.template_details_source_literal);
                 b.transactionDescription.setText(header.getTransactionDescription());
                 b.transactionDescriptionLayout.setVisibility(View.VISIBLE);
             }
@@ -405,11 +409,14 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
 
             }
-            b.templateTransactionDescriptionSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
-            b.templateTransactionDescriptionSource.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+            b.templateTransactionDescriptionSourceLabel.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+            b.templateTransactionDescriptionSource.setOnClickListener(
+                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
 
             if (header.hasLiteralTransactionComment()) {
-                b.templateTransactionCommentSource.setText(R.string.template_details_source_literal);
+                b.templateTransactionCommentSource.setText(
+                        R.string.template_details_source_literal);
                 b.transactionComment.setText(header.getTransactionComment());
                 b.transactionCommentLayout.setVisibility(View.VISIBLE);
             }
