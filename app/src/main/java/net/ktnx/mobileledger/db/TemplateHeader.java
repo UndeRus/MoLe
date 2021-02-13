@@ -192,4 +192,10 @@ public class TemplateHeader extends TemplateBase {
                Misc.equalIntegers(dateYear, o.dateYear) &&
                Misc.equalIntegers(dateYearMatchGroup, o.dateYearMatchGroup);
     }
+    public TemplateHeader createDuplicate() {
+        TemplateHeader dup = new TemplateHeader(this);
+        dup.id = null;
+
+        return dup;
+    }
 }

@@ -42,4 +42,14 @@ public class TemplateWithAccounts {
     public Long getId() {
         return header.getId();
     }
+    public TemplateWithAccounts createDuplicate() {
+        TemplateWithAccounts result = new TemplateWithAccounts();
+        result.header = header.createDuplicate();
+        result.accounts = new ArrayList<>();
+        for (TemplateAccount acc : accounts) {
+            result.accounts.add(acc.createDuplicate());
+        }
+
+        return result;
+    }
 }

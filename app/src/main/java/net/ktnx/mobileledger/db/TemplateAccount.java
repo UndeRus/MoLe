@@ -160,4 +160,11 @@ public class TemplateAccount extends TemplateBase {
     public void setAccountCommentMatchGroup(Integer accountCommentMatchGroup) {
         this.accountCommentMatchGroup = accountCommentMatchGroup;
     }
+    public TemplateAccount createDuplicate() {
+        TemplateAccount dup = new TemplateAccount(this);
+        dup.id = null;
+        dup.templateId = null;
+
+        return dup;
+    }
 }

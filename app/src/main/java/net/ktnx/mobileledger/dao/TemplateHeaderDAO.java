@@ -89,7 +89,11 @@ public abstract class TemplateHeaderDAO {
 
     @Transaction
     @Query("SELECT * FROM templates WHERE id = :id")
-    public abstract LiveData<TemplateWithAccounts> getTemplateWithAccounts(Long id);
+    public abstract LiveData<TemplateWithAccounts> getTemplateWithAccounts(@NonNull Long id);
+
+    @Transaction
+    @Query("SELECT * FROM templates WHERE id = :id")
+    public abstract TemplateWithAccounts getTemplateWithAccountsSync(@NonNull Long id);
 
     @Transaction
     public void insertSync(TemplateWithAccounts templateWithAccounts) {
@@ -122,6 +126,23 @@ public abstract class TemplateHeaderDAO {
             if (callback != null) {
                 new Handler(Looper.getMainLooper()).post(callback);
             }
+        });
+    }
+    public void duplicateTemplateWitAccounts(@NonNull Long id, @Nullable
+            AsyncResultCallback<TemplateWithAccounts> callback) {
+        AsyncTask.execute(() -> {
+            TemplateWithAccounts src = getTemplateWithAccountsSync(id);
+            TemplateWithAccounts dup = src.createDuplicate();
+            dup.header.setName(dup.header.getName());
+            dup.header.setId(insertSync(dup.header));
+            TemplateAccountDAO accDao = DB.get()
+                                          .getTemplateAccountDAO();
+            for (TemplateAccount dupAcc : dup.accounts) {
+                dupAcc.setTemplateId(dup.header.getId());
+                dupAcc.setId(accDao.insertSync(dupAcc));
+            }
+            if (callback != null)
+                new Handler(Looper.getMainLooper()).post(() -> callback.onResult(dup));
         });
     }
 
