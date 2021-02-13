@@ -227,4 +227,5 @@
     <string name="title_new_template">New template</string>
     <string name="template_xxx_deleted">Template \'%s\' deleted</string>
     <string name="action_undo">Undo</string>
+    <string name="pattern_match_result">Pattern match result</string>
 </resources>

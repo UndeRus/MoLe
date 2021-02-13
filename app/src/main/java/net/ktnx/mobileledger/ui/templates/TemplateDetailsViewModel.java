@@ -44,6 +44,7 @@ public class TemplateDetailsViewModel extends ViewModel {
             new MutableLiveData<>(Collections.emptyList());
     private Long mPatternId;
     private String mDefaultPatternName;
+
     public String getDefaultPatternName() {
         return mDefaultPatternName;
     }

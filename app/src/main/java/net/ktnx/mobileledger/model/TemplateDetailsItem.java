@@ -18,6 +18,13 @@
 package net.ktnx.mobileledger.model;
 
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 
 import androidx.annotation.NonNull;
 
@@ -30,6 +37,8 @@ import net.ktnx.mobileledger.utils.Misc;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -393,9 +402,9 @@ abstract public class TemplateDetailsItem {
     public static class Header extends TemplateDetailsItem {
         private String pattern = "";
         private String testText = "";
+        private String name = "";
         private Pattern compiledPattern;
         private String patternError;
-        private String name = "";
         private PossiblyMatchedValue<String> transactionDescription =
                 PossiblyMatchedValue.withLiteralString("");
         private PossiblyMatchedValue<String> transactionComment =
@@ -403,6 +412,7 @@ abstract public class TemplateDetailsItem {
         private PossiblyMatchedValue<Integer> dateYear = PossiblyMatchedValue.withLiteralInt(null);
         private PossiblyMatchedValue<Integer> dateMonth = PossiblyMatchedValue.withLiteralInt(null);
         private PossiblyMatchedValue<Integer> dateDay = PossiblyMatchedValue.withLiteralInt(null);
+        private SpannableString testMatch;
         private Header() {
             super(Type.HEADER);
         }
@@ -411,6 +421,7 @@ abstract public class TemplateDetailsItem {
             id = origin.id;
             name = origin.name;
             testText = origin.testText;
+            testMatch = origin.testMatch;
             setPattern(origin.pattern);
 
             transactionDescription = new PossiblyMatchedValue<>(origin.transactionDescription);
@@ -419,6 +430,11 @@ abstract public class TemplateDetailsItem {
             dateYear = new PossiblyMatchedValue<>(origin.dateYear);
             dateMonth = new PossiblyMatchedValue<>(origin.dateMonth);
             dateDay = new PossiblyMatchedValue<>(origin.dateDay);
+        }
+        private static StyleSpan capturedSpan() { return new StyleSpan(Typeface.BOLD); }
+        private static UnderlineSpan matchedSpan() { return new UnderlineSpan(); }
+        private static ForegroundColorSpan notMatchedSpan() {
+            return new ForegroundColorSpan(Color.GRAY);
         }
         public String getName() {
             return name;
@@ -431,18 +447,17 @@ abstract public class TemplateDetailsItem {
         }
         public void setPattern(String pattern) {
             this.pattern = pattern;
-            if (pattern != null) {
-                try {
-                    this.compiledPattern = Pattern.compile(pattern);
-                    this.patternError = null;
-                }
-                catch (PatternSyntaxException e) {
-                    this.compiledPattern = null;
-                    this.patternError = e.getMessage();
-                }
+            try {
+                this.compiledPattern = Pattern.compile(pattern);
+                checkPatternMatch();
             }
-            else {
-                patternError = "Missing pattern";
+            catch (PatternSyntaxException ex) {
+                patternError = ex.getDescription();
+                compiledPattern = null;
+
+                testMatch = new SpannableString(testText);
+                testMatch.setSpan(notMatchedSpan(), 0, testText.length() - 1,
+                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
         }
         @NonNull
@@ -457,6 +472,8 @@ abstract public class TemplateDetailsItem {
         }
         public void setTestText(String testText) {
             this.testText = testText;
+
+            checkPatternMatch();
         }
         public String getTransactionDescription() {
             return transactionDescription.getValue();
@@ -551,7 +568,9 @@ abstract public class TemplateDetailsItem {
                 return true;
 
             return Misc.equalStrings(name, o.name) && Misc.equalStrings(pattern, o.pattern) &&
-                   Misc.equalStrings(testText, o.testText);
+                   Misc.equalStrings(testText, o.testText) &&
+                   Misc.equalStrings(patternError, o.patternError) &&
+                   Objects.equals(testMatch, o.testMatch);
         }
         public String getMatchGroupText(int group) {
             if (compiledPattern != null && testText != null) {
@@ -622,6 +641,61 @@ abstract public class TemplateDetailsItem {
                 result.setDateDayMatchGroup(dateDay.getMatchGroup());
 
             return result;
+        }
+        public SpannableString getTestMatch() {
+            return testMatch;
+        }
+        public void checkPatternMatch() {
+            patternError = null;
+            testMatch = null;
+
+            if (pattern != null) {
+                try {
+                    if (Misc.emptyIsNull(testText) != null) {
+                        SpannableString ss = new SpannableString(testText);
+                        Matcher m = compiledPattern.matcher(testText);
+                        if (m.find()) {
+                            ArrayList<String> notMatched = new ArrayList<>();
+                            if (m.start() > 0)
+                                ss.setSpan(notMatchedSpan(), 0, m.start(),
+                                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            if (m.end() < testText.length() - 1)
+                                ss.setSpan(notMatchedSpan(), m.end(), testText.length() - 1,
+                                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+                            ss.setSpan(matchedSpan(), m.start(0), m.end(0),
+                                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+                            if (m.groupCount() > 0) {
+                                for (int g = 1; g <= m.groupCount(); g++) {
+                                    ss.setSpan(capturedSpan(), m.start(g), m.end(g),
+                                            Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                                }
+                            }
+                        }
+                        else {
+                            patternError = "Pattern does not match";
+                            ss.setSpan(new ForegroundColorSpan(Color.GRAY), 0,
+                                    testText.length() - 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        }
+
+                        testMatch = ss;
+                    }
+                }
+                catch (PatternSyntaxException e) {
+                    this.compiledPattern = null;
+                    this.patternError = e.getMessage();
+                }
+            }
+            else {
+                patternError = "Missing pattern";
+            }
+        }
+        public String getPatternError() {
+            return patternError;
+        }
+        public SpannableString testMatch() {
+            return testMatch;
         }
     }
 }

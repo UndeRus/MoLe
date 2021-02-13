@@ -217,4 +217,5 @@
     <string name="account_amount_source_label">Източник на името на сметката</string>
     <string name="template_xxx_deleted">Макетът „%s“ е изтрит</string>
     <string name="action_undo">Връщане</string>
+    <string name="pattern_match_result">Резултат от прилагането на шаблона</string>
 </resources>

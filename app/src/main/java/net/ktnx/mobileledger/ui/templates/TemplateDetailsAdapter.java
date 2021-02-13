@@ -196,6 +196,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 }
             };
             b.templateName.addTextChangedListener(templateNameWatcher);
+
             TextWatcher patternWatcher = new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -207,9 +208,12 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed pattern " + s + "; header=" + header);
                     header.setPattern(String.valueOf(s));
+
+                    checkPatternError(header);
                 }
             };
             b.pattern.addTextChangedListener(patternWatcher);
+
             TextWatcher testTextWatcher = new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -221,9 +225,12 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     Logger.debug(D_TEMPLATE_UI,
                             "Storing changed test text " + s + "; header=" + header);
                     header.setTestText(String.valueOf(s));
+
+                    checkPatternError(header);
                 }
             };
             b.testText.addTextChangedListener(testTextWatcher);
+
             TextWatcher transactionDescriptionWatcher = new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -344,10 +351,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         String.format(Locale.US, "Group %d (%s)", header.getDateYearMatchGroup(),
                                 getMatchGroupText(header.getDateYearMatchGroup())));
             }
-            b.templateDetailsYearSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
-            b.templateDetailsYearSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+            b.templateDetailsYearSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
+            b.templateDetailsYearSource.setOnClickListener(v -> selectHeaderDetailSource(v,
+                    HeaderDetail.DATE_YEAR));
 
             if (header.hasLiteralDateMonth()) {
                 b.templateDetailsMonthSource.setText(R.string.template_details_source_literal);
@@ -362,16 +368,15 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         String.format(Locale.US, "Group %d (%s)", header.getDateMonthMatchGroup(),
                                 getMatchGroupText(header.getDateMonthMatchGroup())));
             }
-            b.templateDetailsMonthSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
-            b.templateDetailsMonthSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
+            b.templateDetailsMonthSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v,
+                    HeaderDetail.DATE_MONTH));
+            b.templateDetailsMonthSource.setOnClickListener(v -> selectHeaderDetailSource(v,
+                    HeaderDetail.DATE_MONTH));
 
             if (header.hasLiteralDateDay()) {
                 b.templateDetailsDaySource.setText(R.string.template_details_source_literal);
                 final Integer dateDay = header.getDateDay();
-                b.templateDetailsDateDay.setText(
-                        (dateDay == null) ? null : String.valueOf(dateDay));
+                b.templateDetailsDateDay.setText((dateDay == null) ? null : String.valueOf(dateDay));
                 b.templateDetailsDateDayLayout.setVisibility(View.VISIBLE);
             }
             else {
@@ -380,14 +385,11 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         String.format(Locale.US, "Group %d (%s)", header.getDateDayMatchGroup(),
                                 getMatchGroupText(header.getDateDayMatchGroup())));
             }
-            b.templateDetailsDaySourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
-            b.templateDetailsDaySource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+            b.templateDetailsDaySourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
+            b.templateDetailsDaySource.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
 
             if (header.hasLiteralTransactionDescription()) {
-                b.templateTransactionDescriptionSource.setText(
-                        R.string.template_details_source_literal);
+                b.templateTransactionDescriptionSource.setText(R.string.template_details_source_literal);
                 b.transactionDescription.setText(header.getTransactionDescription());
                 b.transactionDescriptionLayout.setVisibility(View.VISIBLE);
             }
@@ -395,18 +397,14 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 b.transactionDescriptionLayout.setVisibility(View.GONE);
                 b.templateTransactionDescriptionSource.setText(
                         String.format(Locale.US, "Group %d (%s)",
-                                header.getTransactionDescriptionMatchGroup(),
-                                getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
+                                header.getTransactionDescriptionMatchGroup(), getMatchGroupText(header.getTransactionDescriptionMatchGroup())));
 
             }
-            b.templateTransactionDescriptionSourceLabel.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
-            b.templateTransactionDescriptionSource.setOnClickListener(
-                    v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+            b.templateTransactionDescriptionSourceLabel.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
+            b.templateTransactionDescriptionSource.setOnClickListener(v -> selectHeaderDetailSource(v, HeaderDetail.DESCRIPTION));
 
             if (header.hasLiteralTransactionComment()) {
-                b.templateTransactionCommentSource.setText(
-                        R.string.template_details_source_literal);
+                b.templateTransactionCommentSource.setText(R.string.template_details_source_literal);
                 b.transactionComment.setText(header.getTransactionComment());
                 b.transactionCommentLayout.setVisibility(View.VISIBLE);
             }
@@ -423,6 +421,28 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
 
             b.templateDetailsHeadScanQrButton.setOnClickListener(this::scanTestQR);
+
+            checkPatternError(header);
+        }
+        private void checkPatternError(TemplateDetailsItem.Header item) {
+            if (item.getPatternError() != null) {
+                b.patternLayout.setError(item.getPatternError());
+                b.patternHintTitle.setVisibility(View.GONE);
+                b.patternHintText.setVisibility(View.GONE);
+            }
+            else {
+                b.patternLayout.setError(null);
+                if (item.testMatch() != null) {
+                    b.patternHintText.setText(item.testMatch());
+                    b.patternHintTitle.setVisibility(View.VISIBLE);
+                    b.patternHintText.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.patternLayout.setError(null);
+                    b.patternHintTitle.setVisibility(View.GONE);
+                    b.patternHintText.setVisibility(View.GONE);
+                }
+            }
 
         }
         private void scanTestQR(View view) {

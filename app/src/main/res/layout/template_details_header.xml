@@ -43,6 +43,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="?attr/textAppearanceListItem"
+        app:endIconMode="clear_text"
+        app:layout_constraintBottom_toTopOf="@id/pattern_hint_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pattern_name_layout"
@@ -55,6 +57,28 @@
             android:inputType="text"
             />
     </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/pattern_hint_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/pattern_match_result"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+        app:layout_constraintBottom_toTopOf="@+id/pattern_hint_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_layout"
+        />
+    <TextView
+        android:id="@+id/pattern_hint_text"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/text_margin"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+        app:layout_constraintBottom_toTopOf="@+id/test_text_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pattern_hint_title"
+        />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/test_text_layout"
         android:layout_width="0dp"
@@ -62,7 +86,7 @@
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toStartOf="@id/template_details_head_scan_qr_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pattern_layout"
+        app:layout_constraintTop_toBottomOf="@id/pattern_hint_text"
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/test_text"

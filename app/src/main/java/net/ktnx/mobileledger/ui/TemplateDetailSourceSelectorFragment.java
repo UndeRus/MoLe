@@ -106,7 +106,7 @@ public class TemplateDetailSourceSelectorFragment extends AppCompatDialogFragmen
                     Logger.debug("templates",
                             String.format("Trying to match pattern '%s' against text '%s'",
                                     patternText, testText));
-                    if (matcher.matches()) {
+                    if (matcher.find()) {
                         if (matcher.groupCount() >= 0) {
                             ArrayList<TemplateDetailSource> list = new ArrayList<>();
                             for (short g = 1; g <= matcher.groupCount(); g++) {
@@ -159,7 +159,8 @@ public class TemplateDetailSourceSelectorFragment extends AppCompatDialogFragmen
         }
         else {
             b.list.setVisibility(View.GONE);
-            b.templateError.setText(mPatternProblem);
+            b.templateError.setText(
+                    (mPatternProblem != 0) ? mPatternProblem : R.string.pattern_without_groups);
             b.templateError.setVisibility(View.VISIBLE);
         }
 
