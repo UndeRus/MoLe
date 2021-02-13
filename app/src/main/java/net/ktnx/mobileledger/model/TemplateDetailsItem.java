@@ -275,7 +275,7 @@ abstract public class TemplateDetailsItem {
         private final PossiblyMatchedValue<String> accountComment =
                 PossiblyMatchedValue.withLiteralString("");
         private final PossiblyMatchedValue<Float> amount =
-                PossiblyMatchedValue.withLiteralFloat(0f);
+                PossiblyMatchedValue.withLiteralFloat(null);
         private final PossiblyMatchedValue<Currency> currency = new PossiblyMatchedValue<>();
         private boolean negateAmount;
         private AccountRow() {
