@@ -172,7 +172,7 @@
     <string name="new_transaction_fab_description">Plus icon</string>
     <string name="api_1_19_1">Version 1.19.1</string>
     <string name="profile_server_version_title">Server version</string>
-    <string name="err_json_parser_error">Error parsing packend JSON response. Perhaps the configured API version doesn\'t match</string>
+    <string name="err_json_parser_error">Error parsing backend JSON response. Perhaps the configured API version doesn\'t match</string>
     <string name="btn_profile_options">Configure profile</string>
     <string name="err_json_send_error_head">Error storing transaction on backend server</string>
     <string name="err_json_send_error_tail">A mismatch in the configured API version could be causing this</string>
