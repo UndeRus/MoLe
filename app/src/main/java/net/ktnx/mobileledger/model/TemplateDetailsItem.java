@@ -37,7 +37,6 @@ import net.ktnx.mobileledger.utils.Misc;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -655,7 +654,6 @@ abstract public class TemplateDetailsItem {
                         SpannableString ss = new SpannableString(testText);
                         Matcher m = compiledPattern.matcher(testText);
                         if (m.find()) {
-                            ArrayList<String> notMatched = new ArrayList<>();
                             if (m.start() > 0)
                                 ss.setSpan(notMatchedSpan(), 0, m.start(),
                                         Spanned.SPAN_INCLUSIVE_INCLUSIVE);
