@@ -101,7 +101,12 @@ public class TemplatesActivity extends CrashReportingActivity
         }
         return super.onOptionsItemSelected(item);
     }
-
+    @Override
+    public void onDuplicateTemplate(long id) {
+        DB.get()
+          .getTemplateDAO()
+          .duplicateTemplateWitAccounts(id, null);
+    }
     @Override
     public void onEditTemplate(Long id) {
         if (id == null) {

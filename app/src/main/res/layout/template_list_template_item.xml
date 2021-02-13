@@ -25,21 +25,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/text_margin"
-        android:layout_marginEnd="@dimen/text_margin"
+        android:gravity="center_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/edit_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-    <ImageButton
-        android:id="@+id/edit_button"
-        android:layout_width="@dimen/toolbar_height"
-        android:layout_height="@dimen/toolbar_height"
-        android:backgroundTint="?colorSurface"
-        android:contentDescription="@string/edit_button_description"
-        android:src="@drawable/ic_mode_edit_black_24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:minHeight="@dimen/thumb_row_height"
+        android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

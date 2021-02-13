@@ -131,5 +131,7 @@ public class TemplateListFragment extends Fragment {
         void onSaveTemplate();
 
         void onEditTemplate(Long id);
+
+        void onDuplicateTemplate(long id);
     }
 }

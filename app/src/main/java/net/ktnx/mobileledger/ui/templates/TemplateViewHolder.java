@@ -18,8 +18,10 @@
 package net.ktnx.mobileledger.ui.templates;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateListTemplateItemBinding;
 import net.ktnx.mobileledger.db.TemplateHeader;
 
@@ -31,8 +33,30 @@ class TemplateViewHolder extends RecyclerView.ViewHolder {
     }
     public void bindToItem(TemplateHeader item) {
         b.templateName.setText(item.getName());
-        b.editButton.setOnClickListener(v -> {
-            ((TemplatesActivity) v.getContext()).onEditTemplate(item.getId());
+        b.templateName.setOnClickListener(
+                v -> ((TemplatesActivity) v.getContext()).onEditTemplate(item.getId()));
+        b.templateName.setOnLongClickListener((v) -> {
+            TemplatesActivity activity = (TemplatesActivity) v.getContext();
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            final String templateName = item.getName();
+            builder.setTitle(templateName);
+            builder.setItems(R.array.templates_ctx_menu, (dialog, which) -> {
+                if (which == 0) { // edit
+                    activity.onEditTemplate(item.getId());
+                }
+                else if (which == 1) { // duplicate
+                    activity.onDuplicateTemplate(item.getId());
+                }
+                else if (which == 2) { // delete
+                    activity.onDeleteTemplate(item.getId());
+                }
+                else {
+                    throw new RuntimeException(String.format("Unknown menu item id (%d)", which));
+                }
+                dialog.dismiss();
+            });
+            builder.show();
+            return true;
         });
     }
 }
