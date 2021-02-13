@@ -32,19 +32,20 @@ import java.util.List;
 @Dao
 public abstract class AccountDAO extends BaseDAO<Account> {
     @Insert
-    abstract void insertSync(Account item);
+    public abstract void insertSync(Account item);
 
     @Update
-    abstract void updateSync(Account item);
+    public abstract void updateSync(Account item);
 
     @Delete
-    abstract void deleteSync(Account item);
+    public abstract void deleteSync(Account item);
 
     @Query("SELECT * FROM accounts")
-    abstract LiveData<List<Account>> getAll();
+    public abstract LiveData<List<Account>> getAll();
 
     @Query("SELECT * FROM accounts WHERE profile = :profileUUID AND name = :accountName")
-    abstract LiveData<Account> getByName(@NonNull String profileUUID, @NonNull String accountName);
+    public abstract LiveData<Account> getByName(@NonNull String profileUUID,
+                                                @NonNull String accountName);
 
 //    not useful for now
 //    @Transaction
