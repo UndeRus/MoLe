@@ -22,6 +22,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsAccountBinding;
 import net.ktnx.mobileledger.databinding.TemplateDetailsHeaderBinding;
+import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
 import net.ktnx.mobileledger.db.TemplateBase;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
@@ -448,6 +450,11 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 }
             };
             b.templateDetailsAccountName.addTextChangedListener(accountNameWatcher);
+            b.templateDetailsAccountName.setAdapter(new AccountAutocompleteAdapter(b.getRoot()
+                                                                                    .getContext()));
+            b.templateDetailsAccountName.setOnItemClickListener(
+                    (parent, view, position, id) -> b.templateDetailsAccountName.setText(
+                            ((TextView) view).getText()));
             TextWatcher accountCommentWatcher = new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

@@ -23,6 +23,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.RoomWarnings;
 import androidx.room.Update;
 
 import net.ktnx.mobileledger.db.Account;
@@ -51,4 +52,40 @@ public abstract class AccountDAO extends BaseDAO<Account> {
 //    @Transaction
 //    @Query("SELECT * FROM patterns")
 //    List<PatternWithAccounts> getPatternsWithAccounts();
+
+    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+           "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
+           "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
+           "               ELSE 9 END AS ordering " + "FROM accounts " +
+           "WHERE profile=:profileUUID AND name_upper LIKE '%%'||:term||'%%' " +
+           "ORDER BY ordering, name_upper, rowid ")
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    public abstract LiveData<List<Account>> lookupInProfileByName(@NonNull String profileUUID,
+                                                                  @NonNull String term);
+
+    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+           "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
+           "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
+           "               ELSE 9 END AS ordering " + "FROM accounts " +
+           "WHERE profile=:profileUUID AND name_upper LIKE '%%'||:term||'%%' " +
+           "ORDER BY ordering, name_upper, rowid ")
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    public abstract List<Account> lookupInProfileByNameSync(@NonNull String profileUUID,
+                                                            @NonNull String term);
+
+    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+           "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
+           "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
+           "               ELSE 9 END AS ordering " + "FROM accounts " +
+           "WHERE name_upper LIKE '%%'||:term||'%%' " + "ORDER BY ordering, name_upper, rowid ")
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    public abstract LiveData<List<Account>> lookupByName(@NonNull String term);
+
+    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+           "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
+           "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
+           "               ELSE 9 END AS ordering " + "FROM accounts " +
+           "WHERE name_upper LIKE '%%'||:term||'%%' " + "ORDER BY ordering, name_upper, rowid ")
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
+    public abstract List<Account> lookupByNameSync(@NonNull String term);
 }
