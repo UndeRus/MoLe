@@ -44,6 +44,7 @@ public class TemplateDetailsViewModel extends ViewModel {
             new MutableLiveData<>(Collections.emptyList());
     private Long mPatternId;
     private String mDefaultPatternName;
+    private boolean itemsLoaded = false;
 
     public String getDefaultPatternName() {
         return mDefaultPatternName;
@@ -86,6 +87,9 @@ public class TemplateDetailsViewModel extends ViewModel {
             items.setValue(newList);
     }
     public LiveData<List<TemplateDetailsItem>> getItems(Long patternId) {
+        if (itemsLoaded && Objects.equals(patternId, this.mPatternId))
+            return items;
+
         if (patternId != null && patternId <= 0)
             throw new IllegalArgumentException("Pattern ID " + patternId + " is invalid");
 
@@ -93,6 +97,7 @@ public class TemplateDetailsViewModel extends ViewModel {
 
         if (mPatternId == null) {
             resetItems();
+            itemsLoaded = true;
             return items;
         }
 
@@ -114,6 +119,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                     Logger.debug("patterns-db", "Loaded pattern item " + i);
                 }
                 items.postValue(l);
+                itemsLoaded = true;
 
                 dbList.removeObserver(this);
             }
