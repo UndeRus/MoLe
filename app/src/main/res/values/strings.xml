@@ -192,7 +192,7 @@
     <string name="template_details_amount_label">Amount</string>
     <string name="template_details_test_text_label">Test text</string>
     <string name="template_details_account_name_label">Account name</string>
-    <string name="template_details_account_row_label">Transaction account details</string>
+    <string name="template_details_account_row_label">Account details</string>
     <string name="account_name_source_label">Account name source</string>
     <string name="template_details_source_literal">literal</string>
     <string name="account_comment_source_label">Account comment source</string>
