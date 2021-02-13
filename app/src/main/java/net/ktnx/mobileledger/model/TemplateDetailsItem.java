@@ -658,7 +658,7 @@ abstract public class TemplateDetailsItem {
                                 ss.setSpan(notMatchedSpan(), 0, m.start(),
                                         Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                             if (m.end() < testText.length() - 1)
-                                ss.setSpan(notMatchedSpan(), m.end(), testText.length() - 1,
+                                ss.setSpan(notMatchedSpan(), m.end(), testText.length(),
                                         Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
                             ss.setSpan(matchedSpan(), m.start(0), m.end(0),
