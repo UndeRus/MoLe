@@ -549,8 +549,17 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 b.templateDetailsAccountAmount.setText(Data.formatNumber(amt));
             });
 
-            b.negateAmountSwitch.setOnCheckedChangeListener(
-                    (buttonView, isChecked) -> getItem().setNegateAmount(isChecked));
+            b.negateAmountSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                getItem().setNegateAmount(isChecked);
+                b.templateDetailsNegateAmountText.setText(
+                        isChecked ? R.string.template_account_change_amount_sign
+                                  : R.string.template_account_keep_amount_sign);
+            });
+            final View.OnClickListener negLabelClickListener = (view) -> {
+                b.negateAmountSwitch.toggle();
+            };
+            b.templateDetailsNegateAmountLabel.setOnClickListener(negLabelClickListener);
+            b.templateDetailsNegateAmountText.setOnClickListener(negLabelClickListener);
         }
         @Override
         void bind(TemplateDetailsItem item) {
@@ -601,6 +610,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 b.templateDetailsAccountAmountLayout.setVisibility(View.GONE);
                 b.negateAmountSwitch.setVisibility(View.VISIBLE);
                 b.negateAmountSwitch.setChecked(accRow.isNegateAmount());
+                b.templateDetailsNegateAmountText.setText(
+                        accRow.isNegateAmount() ? R.string.template_account_change_amount_sign
+                                                : R.string.template_account_keep_amount_sign);
             }
 
             b.templateAccountNameSourceLabel.setOnClickListener(

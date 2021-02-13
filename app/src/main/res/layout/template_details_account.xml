@@ -141,21 +141,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/template_account_amount_source_label"
         />
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/negate_amount_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/template_details_account_amount_source"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/template_account_amount_source_label"
-        />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/template_details_account_amount_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/text_margin"
         android:textAppearance="?attr/textAppearanceListItem"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/template_details_negate_amount_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/template_details_account_amount_source"
@@ -169,5 +161,37 @@
             android:selectAllOnFocus="true"
             />
     </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/template_details_negate_amount_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/text_margin"
+        android:text="@string/template_account_negate_amount_label"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintBottom_toTopOf="@id/template_details_negate_amount_text"
+        app:layout_constraintEnd_toStartOf="@+id/negate_amount_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_amount_layout"
+        />
+    <TextView
+        android:id="@+id/template_details_negate_amount_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/template_account_keep_amount_sign"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/template_details_negate_amount_text"
+        app:layout_constraintEnd_toStartOf="@+id/negate_amount_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/template_details_negate_amount_label"
+        />
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/negate_amount_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/template_details_negate_amount_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/template_details_negate_amount_label"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

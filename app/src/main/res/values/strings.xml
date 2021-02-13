@@ -229,4 +229,7 @@
     <string name="action_undo">Undo</string>
     <string name="pattern_match_result">Pattern match result</string>
     <string name="template_item_match_group_source">Group %1$d (%2$s)</string>
+    <string name="template_account_keep_amount_sign">Sign will not be altered</string>
+    <string name="template_account_change_amount_sign">Amount sign will be changed (plus to minus; minus to plus)</string>
+    <string name="template_account_negate_amount_label">Change amount sign</string>
 </resources>

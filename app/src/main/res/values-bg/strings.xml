@@ -219,4 +219,7 @@
     <string name="action_undo">Връщане</string>
     <string name="pattern_match_result">Резултат от прилагането на шаблона</string>
     <string name="template_item_match_group_source">Група %1$d (%2$s)</string>
+    <string name="template_account_keep_amount_sign">Без промяна на знака</string>
+    <string name="template_account_change_amount_sign">Обръщане на знака на сумата (от плюс на минус и от минус на плюс)</string>
+    <string name="template_account_negate_amount_label">Знак на сумата</string>
 </resources>
