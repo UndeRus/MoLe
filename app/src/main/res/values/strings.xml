@@ -164,8 +164,8 @@
     <string name="go_to_date_menu_title">Go to date</string>
     <string name="splash_icon_description">Main app icon</string>
     <string name="sub_accounts_expand_collapse_trigger_description">Sub-accounts expand/collapse trigger</string>
-    <string name="transaction_count_summary">%,d transactions as of %s</string>
-    <string name="account_count_summary">%,d accounts as of %s</string>
+    <string name="transaction_count_summary">%1$,d transactions as of %2$s</string>
+    <string name="account_count_summary">%1$,d accounts as of %2$s</string>
     <string name="server_version_unknown_label">Unknown</string>
     <string name="detected_server_pre_1_20_1">Before 1.20.1</string>
     <string name="detected_version_label">Detected version</string>
@@ -225,7 +225,7 @@
     <string name="implementation_pending">Not implemented yet</string>
     <string name="title_edit_template">Edit template</string>
     <string name="title_new_template">New template</string>
-    <string name="template_xxx_deleted">Template \'%s\' deleted</string>
+    <string name="template_xxx_deleted">Template \'%1$s\' deleted</string>
     <string name="action_undo">Undo</string>
     <string name="pattern_match_result">Pattern match result</string>
 </resources>

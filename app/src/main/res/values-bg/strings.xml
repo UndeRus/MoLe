@@ -154,8 +154,8 @@
     <string name="navigation_drawer_open">Отваряне на страничния панел</string>
     <string name="navigation_drawer_close">Затваряне на страничния панел</string>
     <string name="nav_header_desc">Заглавна част на страничния панел</string>
-    <string name="transaction_count_summary">%,d движения към %s</string>
-    <string name="account_count_summary">%,d сметки към %s</string>
+    <string name="transaction_count_summary">%1$,d движения към %2$s</string>
+    <string name="account_count_summary">%1$,d сметки към %2$s</string>
     <string name="server_version_unknown_label">Неизвестна</string>
     <string name="detected_server_pre_1_20_1">Преди 1.20.1</string>
     <string name="detected_version_label">Открита версия</string>
@@ -215,7 +215,7 @@
     <string name="template_details_source_literal">ръчно въвеждане</string>
     <string name="account_comment_source_label">Източник на бележка към сметката</string>
     <string name="account_amount_source_label">Източник на името на сметката</string>
-    <string name="template_xxx_deleted">Макетът „%s“ е изтрит</string>
+    <string name="template_xxx_deleted">Макетът „%1$s“ е изтрит</string>
     <string name="action_undo">Връщане</string>
     <string name="pattern_match_result">Резултат от прилагането на шаблона</string>
 </resources>
