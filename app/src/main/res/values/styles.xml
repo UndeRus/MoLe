@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -30,8 +30,8 @@
         <item name="textInputStyle">
             @style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense
         </item>
-        <item name="colorError">#FFE1E2</item>
-        <item name="colorOnError">#CD1609</item>
+        <item name="colorError">#CD1609</item>
+        <item name="colorOnError">#FFE1E2</item>
         <item name="colorPrimary">#935ff2</item>
         <item name="colorPrimaryTransparent">#00935ff2</item>
         <item name="colorSecondary">#6920ed</item>
