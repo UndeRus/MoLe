@@ -496,7 +496,8 @@ public class ProfileDetailFragment extends Fragment {
 
         if (model.getUseAuthentication()) {
             String urlText = model.getUrl();
-            if (urlText.startsWith("http") && !urlText.startsWith("https"))
+            if (urlText.startsWith("http://") ||
+                urlText.length() >= 8 && !urlText.startsWith("https://"))
                 showWarning = true;
         }
 
