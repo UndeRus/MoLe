@@ -1,0 +1,79 @@
+<!--
+  ~ Copyright © 2021 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108"
+    >
+    <group
+        android:scaleX="0.73"
+        android:scaleY="0.73"
+        android:translateX="14.58"
+        android:translateY="14.58"
+        >
+        <path
+            android:pathData="m42.06,32.596c-1.331,1.331 -1.33,3.49 0.002,4.82 1.331,1.33 3.488,1.329 4.818,-0.002 3.962,-3.962 10.28,-3.962 14.242,0 1.33,1.331 3.487,1.332 4.818,0.002 1.332,-1.33 1.333,-3.488 0.002,-4.82 -7.523,-6.703 -17.464,-6.433 -23.881,0z"
+            android:strokeLineJoin="round"
+            android:strokeWidth="7.1924"
+            android:fillColor="#ffffff"
+            android:strokeColor="#00000000"
+            android:fillType="nonZero"
+            android:strokeLineCap="round"/>
+        <path
+            android:pathData="m32.531,23.62c-1.33,1.33 -1.33,3.487 0,4.818 1.33,1.33 3.487,1.33 4.818,0 9.225,-9.227 24.078,-9.227 33.304,0 1.33,1.33 3.487,1.33 4.818,0 1.33,-1.33 1.33,-3.487 0,-4.818 -12.952,-12.351 -31.975,-11.302 -42.939,0z"
+            android:strokeLineJoin="round"
+            android:strokeWidth="7.1924"
+            android:fillColor="#ffffff"
+            android:strokeColor="#00000000"
+            android:fillType="nonZero"
+            android:strokeLineCap="round"/>
+        <path
+            android:pathData="m17.52,41.916c-3.229,0.666 -3.355,3.178 -3.355,3.827L14.165,89.41c0,2.088 1.746,3.837 3.835,3.837 13.048,-2.199 19.956,-2.121 36,0.007C68.79,91.212 79.587,90.998 90,93.247c2.089,0 3.835,-1.749 3.835,-3.837L93.835,45.743c0,-2.094 -1.814,-3.538 -3.636,-3.827 -9.491,-1.502 -13.338,-2.216 -27.678,-0.945 0.484,1.475 0.72,2.785 0.442,4.184 10.721,-1.146 19.131,-0.668 26.469,0.915l-0.045,42.916C77.902,86.92 70.894,86.96 56.213,88.799L56.213,52.774c-1.422,0.348 -3.104,0.332 -4.426,0L51.787,88.799C40.094,86.929 28.873,86.93 18.591,88.987L18.591,46.07c11.035,-1.397 15.892,-2.046 26.444,-0.915 -0.18,-1.441 0.022,-2.978 0.451,-4.184 -9.086,-1.124 -17.014,-0.646 -27.966,0.945z"
+            android:strokeLineJoin="round"
+            android:strokeWidth="4.42609"
+            android:fillColor="#ffffff"
+            android:strokeColor="#00000000"
+            android:fillType="nonZero"
+            android:strokeLineCap="round"/>
+        <path
+            android:pathData="M32.773,55.429L32.773,65.965L22.238,65.965v5.137h10.534v10.534h5.137L37.91,71.102L48.446,71.102L48.446,65.965L37.91,65.965L37.91,55.429Z"
+            android:strokeLineJoin="miter"
+            android:strokeWidth="5.42196"
+            android:fillColor="#ffffff"
+            android:strokeColor="#00000000"
+            android:fillType="evenOdd"
+            android:strokeLineCap="butt"/>
+        <path
+            android:pathData="M59.352,65.965L59.352,71.102L85.559,71.102v-5.137z"
+            android:strokeLineJoin="miter"
+            android:strokeWidth="5.42196"
+            android:fillColor="#ffffff"
+            android:strokeColor="#00000000"
+            android:fillType="evenOdd"
+            android:strokeLineCap="butt"/>
+        <path
+            android:pathData="m54,40.578c1.764,0 3.407,1.645 3.407,3.407 0,1.762 -1.643,3.403 -3.407,3.403 -1.764,0 -3.407,-1.641 -3.407,-3.403 0,-1.762 1.643,-3.407 3.407,-3.407z"
+            android:strokeLineJoin="round"
+            android:strokeWidth="11.5078"
+            android:fillColor="#ffffff"
+            android:strokeColor="#00000000"
+            android:fillType="nonZero"
+            android:strokeLineCap="round"/>
+    </group>
+</vector>
