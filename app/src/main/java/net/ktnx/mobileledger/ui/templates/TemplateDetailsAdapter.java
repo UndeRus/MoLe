@@ -602,6 +602,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 b.templateDetailsAccountAmount.setText((amt == null) ? null : String.format(
                         Data.locale.getValue(), "%,4.2f", (accRow.getAmount())));
                 b.negateAmountSwitch.setVisibility(View.GONE);
+                b.templateDetailsNegateAmountLabel.setVisibility(View.GONE);
+                b.templateDetailsNegateAmountText.setVisibility(View.GONE);
             }
             else {
                 b.templateDetailsAccountAmountSource.setText(
@@ -613,6 +615,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 b.templateDetailsNegateAmountText.setText(
                         accRow.isNegateAmount() ? R.string.template_account_change_amount_sign
                                                 : R.string.template_account_keep_amount_sign);
+                b.templateDetailsNegateAmountLabel.setVisibility(View.VISIBLE);
+                b.templateDetailsNegateAmountText.setVisibility(View.VISIBLE);
             }
 
             b.templateAccountNameSourceLabel.setOnClickListener(
