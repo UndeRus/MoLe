@@ -19,15 +19,16 @@ package net.ktnx.mobileledger.dao;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.room.ColumnInfo;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.RoomWarnings;
 import androidx.room.Update;
 
 import net.ktnx.mobileledger.db.Account;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -53,39 +54,50 @@ public abstract class AccountDAO extends BaseDAO<Account> {
 //    @Query("SELECT * FROM patterns")
 //    List<PatternWithAccounts> getPatternsWithAccounts();
 
-    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+    static public List<String> unbox(List<AccountNameContainer> list) {
+        ArrayList<String> result = new ArrayList<>(list.size());
+        for (AccountNameContainer item : list) {
+            result.add(item.name);
+        }
+
+        return result;
+    }
+    @Query("SELECT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END AS ordering " + "FROM accounts " +
            "WHERE profile=:profileUUID AND name_upper LIKE '%%'||:term||'%%' " +
            "ORDER BY ordering, name_upper, rowid ")
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    public abstract LiveData<List<Account>> lookupInProfileByName(@NonNull String profileUUID,
-                                                                  @NonNull String term);
+    public abstract LiveData<List<AccountNameContainer>> lookupInProfileByName(
+            @NonNull String profileUUID, @NonNull String term);
 
-    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+    @Query("SELECT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END AS ordering " + "FROM accounts " +
            "WHERE profile=:profileUUID AND name_upper LIKE '%%'||:term||'%%' " +
            "ORDER BY ordering, name_upper, rowid ")
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    public abstract List<Account> lookupInProfileByNameSync(@NonNull String profileUUID,
-                                                            @NonNull String term);
+    public abstract List<AccountNameContainer> lookupInProfileByNameSync(
+            @NonNull String profileUUID, @NonNull String term);
 
-    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+    @Query("SELECT DISTINCT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END AS ordering " + "FROM accounts " +
            "WHERE name_upper LIKE '%%'||:term||'%%' " + "ORDER BY ordering, name_upper, rowid ")
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    public abstract LiveData<List<Account>> lookupByName(@NonNull String term);
+    public abstract LiveData<List<AccountNameContainer>> lookupByName(@NonNull String term);
 
-    @Query("SELECT *, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+    @Query("SELECT DISTINCT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END AS ordering " + "FROM accounts " +
            "WHERE name_upper LIKE '%%'||:term||'%%' " + "ORDER BY ordering, name_upper, rowid ")
-    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
-    public abstract List<Account> lookupByNameSync(@NonNull String term);
+    public abstract List<AccountNameContainer> lookupByNameSync(@NonNull String term);
+
+    static public class AccountNameContainer {
+        @ColumnInfo
+        public String name;
+        @ColumnInfo
+        public int ordering;
+    }
 }

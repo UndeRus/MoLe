@@ -28,7 +28,7 @@ import net.ktnx.mobileledger.dao.AccountDAO;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccountAutocompleteAdapter extends ArrayAdapter<Account> {
+public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
     private final AccountFilter filter = new AccountFilter();
     private final AccountDAO dao = DB.get()
                                      .getAccountDAO();
@@ -66,10 +66,10 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<Account> {
                 return results;
             }
 
-            final List<Account> matches =
+            final List<String> matches = AccountDAO.unbox(
                     (profileUUID == null) ? dao.lookupByNameSync(String.valueOf(constraint))
                                           : dao.lookupInProfileByNameSync(profileUUID,
-                                                  String.valueOf(constraint));
+                                                  String.valueOf(constraint)));
             results.values = matches;
             results.count = matches.size();
 
@@ -84,7 +84,7 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<Account> {
             else {
                 setNotifyOnChange(false);
                 clear();
-                addAll((List<Account>) results.values);
+                addAll((List<String>) results.values);
                 notifyDataSetChanged();
             }
         }
