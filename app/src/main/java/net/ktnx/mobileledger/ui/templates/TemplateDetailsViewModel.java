@@ -163,6 +163,7 @@ public class TemplateDetailsViewModel extends ViewModel {
 
             TemplateAccountDAO taDAO = DB.get()
                                          .getTemplateAccountDAO();
+            taDAO.prepareForSave(mPatternId);
             for (int i = 1; i < list.size(); i++) {
                 final TemplateDetailsItem.AccountRow accRowItem = list.get(i)
                                                                       .asAccountRowItem();
@@ -181,6 +182,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                         dbAccount.getId(), dbAccount.getAccountName(),
                         dbAccount.getAccountComment(), dbAccount.getNegateAmount(), accRowItem));
             }
+            taDAO.finishSave(mPatternId);
         });
     }
 }
