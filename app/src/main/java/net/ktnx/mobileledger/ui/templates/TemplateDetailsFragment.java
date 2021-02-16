@@ -117,7 +117,7 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
         }
 
 
-        TemplateDetailsAdapter adapter = new TemplateDetailsAdapter();
+        TemplateDetailsAdapter adapter = new TemplateDetailsAdapter(mViewModel);
         b.patternDetailsRecyclerView.setAdapter(adapter);
         mViewModel.getItems(mPatternId)
                   .observe(getViewLifecycleOwner(), adapter::setItems);

@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.templates;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -28,6 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
@@ -54,8 +56,11 @@ import java.util.regex.Pattern;
 class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter.ViewHolder> {
     private static final String D_TEMPLATE_UI = "template-ui";
     private final AsyncListDiffer<TemplateDetailsItem> differ;
-    public TemplateDetailsAdapter() {
+    private final TemplateDetailsViewModel mModel;
+    private final ItemTouchHelper itemTouchHelper;
+    public TemplateDetailsAdapter(TemplateDetailsViewModel model) {
         super();
+        mModel = model;
         setHasStableIds(true);
         differ = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<TemplateDetailsItem>() {
             @Override
@@ -90,6 +95,97 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 }
             }
         });
+        itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            @Override
+            public float getMoveThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 0.1f;
+            }
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return false;
+            }
+            @Override
+            public RecyclerView.ViewHolder chooseDropTarget(
+                    @NonNull RecyclerView.ViewHolder selected,
+                    @NonNull List<RecyclerView.ViewHolder> dropTargets, int curX, int curY) {
+                RecyclerView.ViewHolder best = null;
+                int bestDistance = 0;
+                for (RecyclerView.ViewHolder v : dropTargets) {
+                    if (v == selected)
+                        continue;
+
+                    final int viewTop = v.itemView.getTop();
+                    int distance = Math.abs(viewTop - curY);
+                    if (best == null) {
+                        best = v;
+                        bestDistance = distance;
+                    }
+                    else {
+                        if (distance < bestDistance) {
+                            bestDistance = distance;
+                            best = v;
+                        }
+                    }
+                }
+
+                Logger.debug("dnd", "Best target is " + best);
+                return best;
+            }
+            @Override
+            public boolean canDropOver(@NonNull RecyclerView recyclerView,
+                                       @NonNull RecyclerView.ViewHolder current,
+                                       @NonNull RecyclerView.ViewHolder target) {
+                final int adapterPosition = target.getAdapterPosition();
+
+                // first item is immovable
+                if (adapterPosition == 0)
+                    return false;
+
+                return super.canDropOver(recyclerView, current, target);
+            }
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView,
+                                        @NonNull RecyclerView.ViewHolder viewHolder) {
+                int flags = 0;
+                // the top item (transaction params) is always there
+                final int adapterPosition = viewHolder.getAdapterPosition();
+                if (adapterPosition > 0)
+                    flags |= makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                            ItemTouchHelper.UP | ItemTouchHelper.DOWN) |
+                             makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,
+                                     ItemTouchHelper.START | ItemTouchHelper.END);
+
+                return flags;
+            }
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+
+                final int fromPosition = viewHolder.getAdapterPosition();
+                final int toPosition = target.getAdapterPosition();
+                mModel.moveItem(fromPosition, toPosition);
+
+                return true;
+            }
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int pos = viewHolder.getAdapterPosition();
+                mModel.removeItem(pos);
+            }
+        });
+    }
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+
+        itemTouchHelper.attachToRecyclerView(null);
     }
     @Override
     public long getItemId(int position) {
@@ -560,6 +656,12 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             };
             b.templateDetailsNegateAmountLabel.setOnClickListener(negLabelClickListener);
             b.templateDetailsNegateAmountText.setOnClickListener(negLabelClickListener);
+            b.patternAccountLabel.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    itemTouchHelper.startDrag(this);
+                }
+                return false;
+            });
         }
         @Override
         void bind(TemplateDetailsItem item) {

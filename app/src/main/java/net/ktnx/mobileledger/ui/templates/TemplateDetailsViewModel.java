@@ -184,4 +184,16 @@ public class TemplateDetailsViewModel extends ViewModel {
             taDAO.finishSave(mPatternId);
         });
     }
+    public void moveItem(int sourcePos, int targetPos) {
+        ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
+        TemplateDetailsItem item = newList.remove(sourcePos);
+        newList.add(targetPos, item);
+        items.setValue(newList);
+    }
+    public void removeItem(int position) {
+        ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
+        newList.remove(position);
+        checkItemConsistency(newList);
+        items.setValue(newList);
+    }
 }
