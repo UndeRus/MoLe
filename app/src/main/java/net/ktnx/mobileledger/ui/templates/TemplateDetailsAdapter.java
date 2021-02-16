@@ -651,9 +651,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         isChecked ? R.string.template_account_change_amount_sign
                                   : R.string.template_account_keep_amount_sign);
             });
-            final View.OnClickListener negLabelClickListener = (view) -> {
-                b.negateAmountSwitch.toggle();
-            };
+            final View.OnClickListener negLabelClickListener =
+                    (view) -> b.negateAmountSwitch.toggle();
             b.templateDetailsNegateAmountLabel.setOnClickListener(negLabelClickListener);
             b.templateDetailsNegateAmountText.setOnClickListener(negLabelClickListener);
             b.patternAccountLabel.setOnTouchListener((v, event) -> {
