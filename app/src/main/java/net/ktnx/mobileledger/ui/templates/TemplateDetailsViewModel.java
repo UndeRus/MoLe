@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TemplateDetailsViewModel extends ViewModel {
     private final MutableLiveData<List<TemplateDetailsItem>> items =
@@ -45,6 +46,7 @@ public class TemplateDetailsViewModel extends ViewModel {
     private Long mPatternId;
     private String mDefaultPatternName;
     private boolean itemsLoaded = false;
+    private final AtomicInteger syntheticItemId = new AtomicInteger(0);
 
     public String getDefaultPatternName() {
         return mDefaultPatternName;
@@ -54,37 +56,34 @@ public class TemplateDetailsViewModel extends ViewModel {
     }
 
     public void resetItems() {
-        ArrayList<TemplateDetailsItem> newList = new ArrayList<>();
-        final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
-        header.setName(mDefaultPatternName);
-        header.setId(0);
-        newList.add(header);
-
-        while (newList.size() < 3) {
-            final TemplateDetailsItem.AccountRow aRow = TemplateDetailsItem.createAccountRow();
-            aRow.setId(newList.size() + 1);
-            newList.add(aRow);
-        }
-
-        items.setValue(newList);
+        checkItemConsistency(new ArrayList<>());
     }
-    private void checkItemConsistency() {
-        ArrayList<TemplateDetailsItem> newList = new ArrayList<>(items.getValue());
+    public void checkItemConsistency(List<TemplateDetailsItem> list) {
+        if (list == null)
+            list = new ArrayList<>(items.getValue());
+
         boolean changes = false;
-        if (newList.size() < 1) {
+        if (list.size() < 1) {
             final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
             header.setName(mDefaultPatternName);
-            newList.add(header);
+            header.setId(genItemId());
+            list.add(header);
             changes = true;
         }
 
-        while (newList.size() < 3) {
-            newList.add(TemplateDetailsItem.createAccountRow());
+        while (list.size() < 3) {
+            final TemplateDetailsItem.AccountRow accountRow =
+                    TemplateDetailsItem.createAccountRow();
+            accountRow.setId(genItemId());
+            list.add(accountRow);
             changes = true;
         }
 
         if (changes)
-            items.setValue(newList);
+            items.setValue(list);
+    }
+    public int genItemId() {
+        return syntheticItemId.decrementAndGet();
     }
     public LiveData<List<TemplateDetailsItem>> getItems(Long patternId) {
         if (itemsLoaded && Objects.equals(patternId, this.mPatternId))
@@ -170,7 +169,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 TemplateAccount dbAccount = accRowItem.toDBO(dbHeader.getId());
                 dbAccount.setTemplateId(mPatternId);
                 dbAccount.setPosition(i);
-                if (newPattern) {
+                if (dbAccount.getId() < 0) {
                     dbAccount.setId(null);
                     dbAccount.setId(taDAO.insertSync(dbAccount));
                 }
