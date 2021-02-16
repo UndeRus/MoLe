@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.ui.templates;
 
+import android.annotation.SuppressLint;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -655,6 +656,10 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     (view) -> b.negateAmountSwitch.toggle();
             b.templateDetailsNegateAmountLabel.setOnClickListener(negLabelClickListener);
             b.templateDetailsNegateAmountText.setOnClickListener(negLabelClickListener);
+            manageAccountLabelDrag();
+        }
+        @SuppressLint("ClickableViewAccessibility")
+        public void manageAccountLabelDrag() {
             b.patternAccountLabel.setOnTouchListener((v, event) -> {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     itemTouchHelper.startDrag(this);
