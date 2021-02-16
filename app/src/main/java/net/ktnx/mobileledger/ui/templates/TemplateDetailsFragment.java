@@ -49,11 +49,6 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
     private InteractionListener interactionListener;
     public TemplateDetailsFragment() {
     }
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.template_details_menu, menu);
-    }
     public static TemplateDetailsFragment newInstance(int columnCount, int patternId) {
         final TemplateDetailsFragment fragment = new TemplateDetailsFragment();
         Bundle args = new Bundle();
@@ -62,6 +57,11 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
             args.putInt(ARG_TEMPLATE_ID, patternId);
         fragment.setArguments(args);
         return fragment;
+    }
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.template_details_menu, menu);
     }
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
