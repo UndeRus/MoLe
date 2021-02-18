@@ -500,8 +500,9 @@ abstract public class TemplateDetailsItem {
                 compiledPattern = null;
 
                 testMatch = new SpannableString(testText);
-                testMatch.setSpan(notMatchedSpan(), 0, testText.length() - 1,
-                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                if (!testText.isEmpty())
+                    testMatch.setSpan(notMatchedSpan(), 0, testText.length() - 1,
+                            Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
         }
         @NonNull
