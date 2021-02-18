@@ -40,7 +40,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class MobileLedgerDatabase extends SQLiteOpenHelper {
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     public static final String DB_NAME = "MoLe.db";
-    private static final int LATEST_REVISION = 57;
+    private static final int LATEST_REVISION = 58;
     private static final String CREATE_DB_SQL = "create_db";
     private final Application mContext;
 
@@ -88,7 +88,7 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 
-            Pattern endOfStatement = Pattern.compile(";\\s*(?:--.*)$");
+            Pattern endOfStatement = Pattern.compile(";\\s*(?:--.*)?$");
 
             String line;
             String sqlStatement = null;
@@ -121,8 +121,9 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
             }
 
             if (sqlStatement != null)
-                throw new RuntimeException(
-                        String.format("Error applying %s: EOF after continuation", revFile));
+                throw new RuntimeException(String.format(
+                        "Error applying %s: EOF after continuation. Line %s, Incomplete " +
+                        "statement: %s", revFile, lineNo, sqlStatement));
 
         }
         catch (IOException e) {
