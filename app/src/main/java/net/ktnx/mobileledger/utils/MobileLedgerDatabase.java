@@ -88,11 +88,10 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
             InputStreamReader isr = new InputStreamReader(res);
             BufferedReader reader = new BufferedReader(isr);
 
-            Pattern continuation = Pattern.compile("\\\\\\s*$");
+            Pattern endOfStatement = Pattern.compile(";\\s*(?:--.*)$");
 
             String line;
             String sqlStatement = null;
-            boolean eolPending;
             int lineNo = 0;
             while ((line = reader.readLine()) != null) {
                 lineNo++;
@@ -101,19 +100,13 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
                 if (line.isEmpty())
                     continue;
 
-                Matcher m = continuation.matcher(line);
-                eolPending = false;
-                if (m.find()) {
-                    line = m.replaceFirst("");
-                    eolPending = true;
-                }
-
                 if (sqlStatement == null)
                     sqlStatement = line;
                 else
                     sqlStatement = sqlStatement.concat(line);
 
-                if (eolPending)
+                Matcher m = endOfStatement.matcher(line);
+                if (!m.find())
                     continue;
 
                 try {
