@@ -248,7 +248,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             for (int i = 1; i < items.size(); i++) {
                 final TemplateDetailsItem item = items.get(i);
                 Logger.debug("tmpl",
-                        String.format(Locale.US, "  %d: id %d, pos %d", i, item.getId(), item.getPosition()));
+                        String.format(Locale.US, "  %d: id %d, pos %d", i, item.getId(),
+                                item.getPosition()));
             }
         }
         differ.submitList(items);
