@@ -232,4 +232,7 @@
     <string name="template_account_keep_amount_sign">Sign will not be altered</string>
     <string name="template_account_change_amount_sign">Amount sign will be changed (plus to minus; minus to plus)</string>
     <string name="template_account_negate_amount_label">Change amount sign</string>
+    <string name="template_is_fallback_label">Fallback template</string>
+    <string name="template_is_fallback_yes">Template will be offered for selection only when no templates match that aren\'t marked as fallback templates</string>
+    <string name="template_is_fallback_no">Template is a primary, high priority one, not a catch-all</string>
 </resources>

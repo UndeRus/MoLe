@@ -222,4 +222,7 @@
     <string name="template_account_keep_amount_sign">Без промяна на знака</string>
     <string name="template_account_change_amount_sign">Обръщане на знака на сумата (от плюс на минус и от минус на плюс)</string>
     <string name="template_account_negate_amount_label">Знак на сумата</string>
+    <string name="template_is_fallback_label">Резервен макет</string>
+    <string name="template_is_fallback_yes">Макетът ще се предлага за избор само ако няма друг макет, който да пасва и да не е маркиран като резервен</string>
+    <string name="template_is_fallback_no">Макетът не е резервен</string>
 </resources>

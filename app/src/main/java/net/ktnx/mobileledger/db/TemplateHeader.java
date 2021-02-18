@@ -60,6 +60,8 @@ public class TemplateHeader extends TemplateBase {
     private Integer dateDay;
     @ColumnInfo(name = "date_day_match_group")
     private Integer dateDayMatchGroup;
+    @ColumnInfo(name = "is_fallback")
+    private boolean isFallback;
     public TemplateHeader(@NotNull Long id, @NonNull String name,
                           @NonNull String regularExpression) {
         this.id = id;
@@ -81,6 +83,13 @@ public class TemplateHeader extends TemplateBase {
         dateMonthMatchGroup = origin.dateMonthMatchGroup;
         dateDay = origin.dateDay;
         dateDayMatchGroup = origin.dateDayMatchGroup;
+        isFallback = origin.isFallback;
+    }
+    public boolean isFallback() {
+        return isFallback;
+    }
+    public void setFallback(boolean fallback) {
+        isFallback = fallback;
     }
     public String getTestText() {
         return testText;

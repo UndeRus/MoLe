@@ -349,8 +349,9 @@
         android:id="@+id/transaction_comment_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/text_margin"
         app:endIconMode="clear_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/template_is_fallback_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/template_transaction_comment_source"
@@ -362,5 +363,35 @@
             android:hint="@string/template_transaction_comment_hint"
             />
     </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/template_is_fallback_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/template_is_fallback_label"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintBottom_toTopOf="@+id/template_is_fallback_text"
+        app:layout_constraintEnd_toStartOf="@id/template_is_fallback_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/transaction_comment_layout"
+        />
+    <TextView
+        android:id="@+id/template_is_fallback_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/template_is_fallback_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/template_is_fallback_label"
+        />
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/template_is_fallback_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/template_is_fallback_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/template_is_fallback_label"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

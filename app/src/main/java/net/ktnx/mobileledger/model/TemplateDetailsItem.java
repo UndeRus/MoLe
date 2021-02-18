@@ -98,6 +98,8 @@ abstract public class TemplateDetailsItem {
             else
                 header.setDateYearMatchGroup(ph.getDateYearMatchGroup());
 
+            header.setFallback(ph.isFallback());
+
             return header;
         }
         else if (p instanceof TemplateAccount) {
@@ -446,6 +448,7 @@ abstract public class TemplateDetailsItem {
         private PossiblyMatchedValue<Integer> dateMonth = PossiblyMatchedValue.withLiteralInt(null);
         private PossiblyMatchedValue<Integer> dateDay = PossiblyMatchedValue.withLiteralInt(null);
         private SpannableString testMatch;
+        private boolean isFallback;
         private Header() {
             super(Type.HEADER);
         }
@@ -463,11 +466,19 @@ abstract public class TemplateDetailsItem {
             dateYear = new PossiblyMatchedValue<>(origin.dateYear);
             dateMonth = new PossiblyMatchedValue<>(origin.dateMonth);
             dateDay = new PossiblyMatchedValue<>(origin.dateDay);
+
+            isFallback = origin.isFallback;
         }
         private static StyleSpan capturedSpan() { return new StyleSpan(Typeface.BOLD); }
         private static UnderlineSpan matchedSpan() { return new UnderlineSpan(); }
         private static ForegroundColorSpan notMatchedSpan() {
             return new ForegroundColorSpan(Color.GRAY);
+        }
+        public boolean isFallback() {
+            return isFallback;
+        }
+        public void setFallback(boolean fallback) {
+            this.isFallback = fallback;
         }
         public String getName() {
             return name;
@@ -603,7 +614,7 @@ abstract public class TemplateDetailsItem {
             return Misc.equalStrings(name, o.name) && Misc.equalStrings(pattern, o.pattern) &&
                    Misc.equalStrings(testText, o.testText) &&
                    Misc.equalStrings(patternError, o.patternError) &&
-                   Objects.equals(testMatch, o.testMatch);
+                   Objects.equals(testMatch, o.testMatch) && isFallback == o.isFallback;
         }
         public String getMatchGroupText(int group) {
             if (compiledPattern != null && testText != null) {
@@ -672,6 +683,8 @@ abstract public class TemplateDetailsItem {
                 result.setDateDay(dateDay.getValue());
             else
                 result.setDateDayMatchGroup(dateDay.getMatchGroup());
+
+            result.setFallback(isFallback);
 
             return result;
         }

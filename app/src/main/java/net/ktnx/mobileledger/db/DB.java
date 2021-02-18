@@ -31,7 +31,7 @@ import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
-@Database(version = 56, entities = {TemplateHeader.class, TemplateAccount.class, Currency.class,
+@Database(version = 57, entities = {TemplateHeader.class, TemplateAccount.class, Currency.class,
                                     net.ktnx.mobileledger.db.Account.class
 })
 abstract public class DB extends RoomDatabase {

@@ -399,6 +399,19 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 }
             };
             b.transactionComment.addTextChangedListener(transactionCommentWatcher);
+
+            b.templateIsFallbackSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (updatePropagationDisabled)
+                    return;
+
+                getItem().setFallback(isChecked);
+                b.templateIsFallbackText.setText(isChecked ? R.string.template_is_fallback_yes
+                                                           : R.string.template_is_fallback_no);
+            });
+            final View.OnClickListener fallbackLabelClickListener =
+                    (view) -> b.templateIsFallbackSwitch.toggle();
+            b.templateIsFallbackLabel.setOnClickListener(fallbackLabelClickListener);
+            b.templateIsFallbackText.setOnClickListener(fallbackLabelClickListener);
         }
         @NotNull
         private TemplateDetailsItem.Header getItem() {
@@ -569,6 +582,11 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         v -> selectHeaderDetailSource(v, HeaderDetail.COMMENT));
 
                 b.templateDetailsHeadScanQrButton.setOnClickListener(this::scanTestQR);
+
+                b.templateIsFallbackSwitch.setChecked(header.isFallback());
+                b.templateIsFallbackText.setText(
+                        header.isFallback() ? R.string.template_is_fallback_yes
+                                            : R.string.template_is_fallback_no);
 
                 checkPatternError(header);
             }
