@@ -114,6 +114,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                                                         .getTemplateDAO()
                                                         .getTemplates();
         allTemplates.observe(getViewLifecycleOwner(), templateHeaders -> {
+            ArrayList<TemplateHeader> matchingFallbackTemplates = new ArrayList<>();
             ArrayList<TemplateHeader> matchingTemplates = new ArrayList<>();
 
             for (TemplateHeader ph : templateHeaders) {
@@ -129,7 +130,10 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                     Logger.debug("pattern",
                             String.format("Pattern '%s' [%s] matches '%s'", ph.getName(),
                                     patternSource, text));
-                    matchingTemplates.add(ph);
+                    if (ph.isFallback())
+                        matchingFallbackTemplates.add(ph);
+                    else
+                        matchingTemplates.add(ph);
                 }
                 catch (ParcelFormatException e) {
                     // ignored
@@ -138,6 +142,9 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                             e);
                 }
             }
+
+            if (matchingTemplates.isEmpty())
+                matchingTemplates = matchingFallbackTemplates;
 
             if (matchingTemplates.isEmpty())
                 alertNoTemplateMatch(text);
