@@ -95,7 +95,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         args.putString(TemplatesActivity.ARG_ADD_TEMPLATE, scanned);
         requireContext().startActivity(intent, args);
     }
-    private void alertNoPatternMatch(String scanned) {
+    private void alertNoTemplateMatch(String scanned) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
         builder.setCancelable(true)
                .setMessage(R.string.no_template_matches)
@@ -110,13 +110,13 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         if (Misc.emptyIsNull(text) == null)
             return;
 
-        LiveData<List<TemplateHeader>> allPatterns = DB.get()
-                                                       .getTemplateDAO()
-                                                       .getTemplates();
-        allPatterns.observe(getViewLifecycleOwner(), patternHeaders -> {
-            ArrayList<TemplateHeader> matchingPatterns = new ArrayList<>();
+        LiveData<List<TemplateHeader>> allTemplates = DB.get()
+                                                        .getTemplateDAO()
+                                                        .getTemplates();
+        allTemplates.observe(getViewLifecycleOwner(), templateHeaders -> {
+            ArrayList<TemplateHeader> matchingTemplates = new ArrayList<>();
 
-            for (TemplateHeader ph : patternHeaders) {
+            for (TemplateHeader ph : templateHeaders) {
                 String patternSource = ph.getRegularExpression();
                 if (Misc.emptyIsNull(patternSource) == null)
                     continue;
@@ -129,7 +129,7 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                     Logger.debug("pattern",
                             String.format("Pattern '%s' [%s] matches '%s'", ph.getName(),
                                     patternSource, text));
-                    matchingPatterns.add(ph);
+                    matchingTemplates.add(ph);
                 }
                 catch (ParcelFormatException e) {
                     // ignored
@@ -139,31 +139,31 @@ public class NewTransactionFragment extends QRScanCapableFragment {
                 }
             }
 
-            if (matchingPatterns.isEmpty())
-                alertNoPatternMatch(text);
-            else if (matchingPatterns.size() == 1)
-                applyPattern(matchingPatterns.get(0), text);
+            if (matchingTemplates.isEmpty())
+                alertNoTemplateMatch(text);
+            else if (matchingTemplates.size() == 1)
+                applyTemplate(matchingTemplates.get(0), text);
             else
-                choosePattern(matchingPatterns, text);
+                chooseTemplate(matchingTemplates, text);
         });
     }
-    private void choosePattern(ArrayList<TemplateHeader> matchingPatterns, String matchedText) {
-        final String patternNameColumn = "name";
+    private void chooseTemplate(ArrayList<TemplateHeader> matchingTemplates, String matchedText) {
+        final String templateNameColumn = "name";
         AbstractCursor cursor = new AbstractCursor() {
             @Override
             public int getCount() {
-                return matchingPatterns.size();
+                return matchingTemplates.size();
             }
             @Override
             public String[] getColumnNames() {
-                return new String[]{"_id", patternNameColumn};
+                return new String[]{"_id", templateNameColumn};
             }
             @Override
             public String getString(int column) {
                 if (column == 0)
                     return String.valueOf(getPosition());
-                return matchingPatterns.get(getPosition())
-                                       .getName();
+                return matchingTemplates.get(getPosition())
+                                        .getName();
             }
             @Override
             public short getShort(int column) {
@@ -201,14 +201,14 @@ public class NewTransactionFragment extends QRScanCapableFragment {
         builder.setCancelable(true)
                .setTitle(R.string.choose_template_to_apply)
                .setIcon(R.drawable.ic_baseline_auto_graph_24)
-               .setSingleChoiceItems(cursor, -1, patternNameColumn, (dialog, which) -> {
-                   applyPattern(matchingPatterns.get(which), matchedText);
+               .setSingleChoiceItems(cursor, -1, templateNameColumn, (dialog, which) -> {
+                   applyTemplate(matchingTemplates.get(which), matchedText);
                    dialog.dismiss();
                })
                .create()
                .show();
     }
-    private void applyPattern(TemplateHeader patternHeader, String text) {
+    private void applyTemplate(TemplateHeader patternHeader, String text) {
         Pattern pattern = Pattern.compile(patternHeader.getRegularExpression());
 
         Matcher m = pattern.matcher(text);
