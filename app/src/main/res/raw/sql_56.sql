@@ -20,7 +20,7 @@ BEGIN TRANSACTION;
 
 create table accounts_new(profile varchar not null, name varchar not null, \
  name_upper varchar not null, level integer not null, parent_name varchar, \
- expanded default 1, amounts_expanded boolean default 0, \
+ expanded integer default 1, amounts_expanded integer default 0, \
  generation integer default 0, primary key(profile, name));
 insert into accounts_new(profile, name, name_upper, level, parent_name, expanded, \
   amounts_expanded, generation) \
