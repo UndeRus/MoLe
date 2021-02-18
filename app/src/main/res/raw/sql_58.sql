@@ -50,6 +50,21 @@ select uuid, name, url, use_authentication, auth_user, auth_password, order_no,
  detected_version_pre_1_19, detected_version_major, detected_version_minor
 from profiles;
 
+drop table profiles;
+
+alter table profiles_new
+rename to profiles;
+
+create table options_new(profile varchar not null, name varchar not null, value varchar, primary key(profile, name));
+
+insert into options_new(profile, name, value)
+select profile, name, value from options;
+
+drop table options;
+
+alter table options_new
+rename to options;
+
 COMMIT TRANSACTION;
 
 PRAGMA foreign_keys = ON;

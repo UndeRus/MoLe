@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 58,
-    "identityHash": "ba63bc73720c33314f20ec5312984ab4",
+    "identityHash": "44f57b04fd657bffc7f36554b678696f",
     "entities": [
       {
         "tableName": "templates",
@@ -461,12 +461,45 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "options",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profile` TEXT NOT NULL, `name` TEXT NOT NULL, `value` TEXT, PRIMARY KEY(`profile`, `name`))",
+        "fields": [
+          {
+            "fieldPath": "profile",
+            "columnName": "profile",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "profile",
+            "name"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ba63bc73720c33314f20ec5312984ab4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44f57b04fd657bffc7f36554b678696f')"
     ]
   }
 }
