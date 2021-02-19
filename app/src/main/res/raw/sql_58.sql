@@ -93,6 +93,33 @@ select description, description_upper, generation from description_history;
 drop table description_history;
 alter table description_history_new rename to description_history;
 
+-- transactions
+
+create table transactions_new(
+ profile varchar not null,
+ id integer not null,
+ data_hash varchar not null,
+ year integer not null,
+ month integer not null,
+ day integer not null,
+ description varchar collate NOCASE not null,
+ comment varchar,
+ generation integer not null default 0,
+ primary key(profile,id));
+
+insert into transactions_new(profile, id, data_hash, year, month, day, description,
+ comment, generation)
+select profile, id, data_hash, year, month, day, description,
+       comment, generation
+from transactions;
+
+drop table transactions;
+alter table transactions_new rename to transactions;
+
+create unique index un_transactions_data_hash on transactions(profile,data_hash);
+create index idx_transaction_description on transactions(description);
+
+
 COMMIT TRANSACTION;
 
 PRAGMA foreign_keys = ON;
