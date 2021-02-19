@@ -65,6 +65,23 @@ drop table options;
 alter table options_new
 rename to options;
 
+create table account_values_new(
+ profile varchar not null,
+ account varchar not null,
+ currency varchar not null default '',
+ value real not null,
+ generation integer not null default 0,
+ primary key(profile, account, currency));
+
+insert into account_values_new(
+ profile, account, currency, value, generation)
+select profile, account, currency, value, generation
+from account_values;
+
+drop table account_values;
+alter table account_values_new rename to account_values;
+
+
 COMMIT TRANSACTION;
 
 PRAGMA foreign_keys = ON;

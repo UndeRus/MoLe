@@ -39,8 +39,14 @@ create table profiles(
 create table accounts(profile varchar not null, name varchar not null, name_upper varchar not null, level integer not null, parent_name varchar, expanded integer not null default 1, amounts_expanded integer not null default 0, generation integer not null default 0, primary key(profile, name));
 create table options(profile varchar not null, name varchar not null, value varchar, primary key(profile, name));
 
-create table account_values(profile varchar not null, account varchar not null, currency varchar not null default '', value decimal not null, generation integer default 0 );
-create unique index un_account_values on account_values(profile,account,currency);
+create table account_values(
+ profile varchar not null,
+ account varchar not null,
+ currency varchar not null default '',
+ value real not null,
+ generation integer not null default 0,
+ primary key(profile, account, currency));
+
 create table description_history(description varchar not null primary key, description_upper varchar, generation integer default 0);
 create unique index un_description_history on description_history(description_upper);
 create table transactions(profile varchar not null, id integer not null, data_hash varchar not null, year integer not null, month integer not null, day integer not null, description varchar not null, comment varchar, generation integer default 0);

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 58,
-    "identityHash": "44f57b04fd657bffc7f36554b678696f",
+    "identityHash": "ce42602c9c1d3edae4cb67fa54bc6f76",
     "entities": [
       {
         "tableName": "templates",
@@ -494,12 +494,60 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "account_values",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profile` TEXT NOT NULL, `account` TEXT NOT NULL, `currency` TEXT NOT NULL DEFAULT '', `value` REAL NOT NULL, `generation` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`profile`, `account`, `currency`))",
+        "fields": [
+          {
+            "fieldPath": "profile",
+            "columnName": "profile",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currency",
+            "columnName": "currency",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generation",
+            "columnName": "generation",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "profile",
+            "account",
+            "currency"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44f57b04fd657bffc7f36554b678696f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ce42602c9c1d3edae4cb67fa54bc6f76')"
     ]
   }
 }
