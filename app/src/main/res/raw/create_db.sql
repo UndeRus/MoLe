@@ -66,8 +66,21 @@ create table transactions(
 create unique index un_transactions_data_hash on transactions(profile,data_hash);
 create index idx_transaction_description on transactions(description);
 
-create table transaction_accounts(profile varchar not null, transaction_id integer not null, order_no integer not null, account_name varchar not null, currency varchar not null default '', amount decimal not null, comment varchar, generation integer default 0, constraint fk_transaction_accounts_acc foreign key(profile,account_name) references accounts(profile,name), constraint fk_transaction_accounts_trn foreign key(profile, transaction_id) references transactions(profile,id));
-create unique index un_transaction_accounts_order on transaction_accounts(profile, transaction_id, order_no);
+create table transaction_accounts(
+ profile varchar not null,
+ transaction_id integer not null,
+ order_no integer not null,
+ account_name varchar not null,
+ currency varchar not null default '',
+ amount real not null,
+ comment varchar,
+ generation integer not null default 0,
+ primary key(profile, transaction_id, order_no),
+ foreign key (profile,account_name) references accounts(profile,name)
+  on delete cascade on update restrict,
+ foreign key(profile, transaction_id) references transactions(profile,id)
+  on delete cascade on update restrict);
+
 create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap integer not null);
 
 CREATE TABLE templates (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT NOT NULL, regular_expression TEXT NOT NULL, test_text TEXT, transaction_description TEXT, transaction_description_match_group INTEGER, transaction_comment TEXT, transaction_comment_match_group INTEGER, date_year INTEGER, date_year_match_group INTEGER, date_month INTEGER, date_month_match_group INTEGER, date_day INTEGER, date_day_match_group INTEGER, is_fallback INTEGER NOT NULL DEFAULT 0);

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 58,
-    "identityHash": "00d9b541473347c65a90e47ce9072436",
+    "identityHash": "249d4507f837a17defe32f1bc9dc2de6",
     "entities": [
       {
         "tableName": "templates",
@@ -662,12 +662,105 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "transaction_accounts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profile` TEXT NOT NULL, `transaction_id` INTEGER NOT NULL, `order_no` INTEGER NOT NULL, `account_name` TEXT NOT NULL, `currency` TEXT NOT NULL DEFAULT '', `amount` REAL NOT NULL, `comment` TEXT, `generation` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`profile`, `transaction_id`, `order_no`), FOREIGN KEY(`profile`, `transaction_id`) REFERENCES `transactions`(`profile`, `id`) ON UPDATE RESTRICT ON DELETE CASCADE , FOREIGN KEY(`profile`, `account_name`) REFERENCES `accounts`(`profile`, `name`) ON UPDATE RESTRICT ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "profile",
+            "columnName": "profile",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transactionId",
+            "columnName": "transaction_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "orderNo",
+            "columnName": "order_no",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "accountName",
+            "columnName": "account_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currency",
+            "columnName": "currency",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "amount",
+            "columnName": "amount",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "comment",
+            "columnName": "comment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "generation",
+            "columnName": "generation",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "profile",
+            "transaction_id",
+            "order_no"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "transactions",
+            "onDelete": "CASCADE",
+            "onUpdate": "RESTRICT",
+            "columns": [
+              "profile",
+              "transaction_id"
+            ],
+            "referencedColumns": [
+              "profile",
+              "id"
+            ]
+          },
+          {
+            "table": "accounts",
+            "onDelete": "CASCADE",
+            "onUpdate": "RESTRICT",
+            "columns": [
+              "profile",
+              "account_name"
+            ],
+            "referencedColumns": [
+              "profile",
+              "name"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '00d9b541473347c65a90e47ce9072436')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '249d4507f837a17defe32f1bc9dc2de6')"
     ]
   }
 }

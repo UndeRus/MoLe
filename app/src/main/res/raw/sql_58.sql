@@ -119,6 +119,31 @@ alter table transactions_new rename to transactions;
 create unique index un_transactions_data_hash on transactions(profile,data_hash);
 create index idx_transaction_description on transactions(description);
 
+-- transaction_accounts
+
+create table transaction_accounts_new(
+ profile varchar not null,
+ transaction_id integer not null,
+ order_no integer not null,
+ account_name varchar not null,
+ currency varchar not null default '',
+ amount real not null,
+ comment varchar,
+ generation integer not null default 0,
+ primary key(profile, transaction_id, order_no),
+ foreign key (profile,account_name) references accounts(profile,name)
+  on delete cascade on update restrict,
+ foreign key(profile, transaction_id) references transactions(profile,id)
+  on delete cascade on update restrict);
+
+insert into transaction_accounts_new(profile, transaction_id, order_no, account_name,
+ currency, amount, comment, generation)
+select profile, transaction_id, order_no, account_name,
+       currency, amount, comment, generation
+from transaction_accounts;
+
+drop table transaction_accounts;
+alter table transaction_accounts_new rename to transaction_accounts;
 
 COMMIT TRANSACTION;
 

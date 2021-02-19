@@ -34,7 +34,7 @@ import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 @Database(version = 58,
           entities = {TemplateHeader.class, TemplateAccount.class, Currency.class, Account.class,
                       Profile.class, Option.class, AccountValue.class, DescriptionHistory.class,
-                      Transaction.class
+                      Transaction.class, TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
     private static DB instance;
