@@ -26,6 +26,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.lifecycle.MutableLiveData;
 
 import net.ktnx.mobileledger.BuildConfig;
+import net.ktnx.mobileledger.db.DB;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,7 +44,14 @@ public class MobileLedgerDatabase extends SQLiteOpenHelper {
     private static final int LATEST_REVISION = 58;
     private static final String CREATE_DB_SQL = "create_db";
     private final Application mContext;
-
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        // force a check by Room to ensure everything is OK
+        // TODO: remove when all DB structure manipulation is via Room
+        DB.get()
+          .compileStatement("SELECT COUNT(*) FROM profiles");
+    }
     public MobileLedgerDatabase(Application context) {
         super(context, DB_NAME, null, LATEST_REVISION);
         debug("db", "creating helper instance");
