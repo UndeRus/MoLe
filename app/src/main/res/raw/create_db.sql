@@ -47,8 +47,11 @@ create table account_values(
  generation integer not null default 0,
  primary key(profile, account, currency));
 
-create table description_history(description varchar not null primary key, description_upper varchar, generation integer default 0);
-create unique index un_description_history on description_history(description_upper);
+create table description_history(description varchar collate NOCASE not null,
+ description_upper varchar not null,
+ generation integer not null default 0,
+ primary key(description));
+
 create table transactions(profile varchar not null, id integer not null, data_hash varchar not null, year integer not null, month integer not null, day integer not null, description varchar not null, comment varchar, generation integer default 0);
 create unique index un_transactions_id on transactions(profile,id);
 create unique index un_transactions_data_hash on transactions(profile,data_hash);

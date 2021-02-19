@@ -81,6 +81,17 @@ from account_values;
 drop table account_values;
 alter table account_values_new rename to account_values;
 
+create table description_history_new(
+ description varchar collate NOCASE not null primary key,
+ description_upper varchar not null,
+ generation integer not null default 0,
+ primary key(description));
+
+insert into description_history_new(description, description_upper, generation)
+select description, description_upper, generation from description_history;
+
+drop table description_history;
+alter table description_history_new rename to description_history;
 
 COMMIT TRANSACTION;
 
