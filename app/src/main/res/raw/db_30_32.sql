@@ -1,4 +1,4 @@
--- Copyright © 2019 Damyan Ivanov.
+-- Copyright © 2021 Damyan Ivanov.
 -- This file is part of MoLe.
 -- MoLe is free software: you can distribute it and/or modify it
 -- under the term of the GNU General Public License as published by
@@ -13,9 +13,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
-BEGIN TRANSACTION;
+-- migrate from revision 30 to revision 32
 
-create table profiles(uuid varchar not null primary key, name not null, url not null, use_authentication boolean not null, auth_user varchar, auth_password varchar);
-create unique index un_profile_name on profiles(name);
+-- 31
+alter table profiles add show_comments_by_default boolean default 0;
 
-COMMIT TRANSACTION;
+-- 32
+update profiles set show_comments_by_default = 1;

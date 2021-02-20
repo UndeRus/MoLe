@@ -1,4 +1,4 @@
--- Copyright © 2020 Damyan Ivanov.
+-- Copyright © 2021 Damyan Ivanov.
 -- This file is part of MoLe.
 -- MoLe is free software: you can distribute it and/or modify it
 -- under the term of the GNU General Public License as published by
@@ -12,10 +12,8 @@
 --
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
-pragma foreign_keys=off;
-BEGIN TRANSACTION;
 
-delete from transaction_accounts where not exists (select 1 from accounts a where a.profile=transaction_accounts.profile and a.name=transaction_accounts.account_name);
-delete from transaction_accounts where not exists (select 1 from transactions t where t.profile=transaction_accounts.profile and t.id=transaction_accounts.transaction_id);
+-- migrate from revision 20 to revision 22
 
-COMMIT TRANSACTION;
+alter table accounts add amounts_expanded boolean default 0;
+alter table profiles add preferred_accounts_filter varchar;

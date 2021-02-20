@@ -13,9 +13,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
-BEGIN TRANSACTION;
+-- migrate from revision 22 to revision 30
 
-create index if not exists fk_pattern_accounts_pattern on pattern_accounts(pattern_id);
-create index if not exists fk_pattern_accounts_currency on pattern_accounts(currency);
+-- 23, 24, 27, 28
+alter table profiles
+add future_dates integer,
+add api_version integer,
+add show_commodity_by_default boolean default 0,
+add default_commodity varchar;
 
-COMMIT TRANSACTION;
+-- 25
+create table currencies(id integer not null primary key, name varchar not null, position varchar not null, has_gap boolean not null);
+
+-- 26
+alter table transaction_accounts add comment varchar;
+
+-- 29
+create index idx_transaction_description on transactions(description);
+
+-- 30
+delete from options
+where profile <> '-'
+  and not exists (select 1 from profiles p where p.uuid=options.profile);

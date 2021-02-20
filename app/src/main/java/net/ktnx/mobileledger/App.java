@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailModel;
 import net.ktnx.mobileledger.utils.Globals;
@@ -143,6 +144,10 @@ public class App extends Application {
         if (dbHelper != null)
             return;
 
+        // Let Room do any possible migrations
+        // this method may be removed when all DB access is made via Room
+        DB.get()
+          .compileStatement("select count(*) from profiles");
         dbHelper = new MobileLedgerDatabase(this);
     }
 }

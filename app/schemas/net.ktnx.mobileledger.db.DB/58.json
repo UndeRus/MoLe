@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 58,
-    "identityHash": "249d4507f837a17defe32f1bc9dc2de6",
+    "identityHash": "0f584c8b143be77895cc315ffbc41f3e",
     "entities": [
       {
         "tableName": "templates",
@@ -726,7 +726,17 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "fk_tran_acc_prof_acc",
+            "unique": false,
+            "columnNames": [
+              "profile",
+              "account_name"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `fk_tran_acc_prof_acc` ON `${TABLE_NAME}` (`profile`, `account_name`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "transactions",
@@ -760,7 +770,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '249d4507f837a17defe32f1bc9dc2de6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f584c8b143be77895cc315ffbc41f3e')"
     ]
   }
 }

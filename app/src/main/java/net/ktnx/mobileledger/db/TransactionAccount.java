@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
 @Entity(tableName = "transaction_accounts", primaryKeys = {"profile", "transaction_id", "order_no"},
         foreignKeys = {@ForeignKey(entity = Transaction.class, parentColumns = {"profile", "id"},
@@ -29,7 +30,7 @@ import androidx.room.ForeignKey;
                        @ForeignKey(entity = Account.class, parentColumns = {"profile", "name"},
                                    childColumns = {"profile", "account_name"},
                                    onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT)
-        })
+        }, indices = {@Index(name = "fk_tran_acc_prof_acc", value = {"profile", "account_name"})})
 public class TransactionAccount {
     @ColumnInfo
     @NonNull
