@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.templates;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.lifecycle.ViewModelProvider;
@@ -36,6 +37,7 @@ import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.databinding.ActivityTemplatesBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
+import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 import net.ktnx.mobileledger.utils.Logger;
 
@@ -43,10 +45,11 @@ import java.util.Objects;
 
 public class TemplatesActivity extends CrashReportingActivity
         implements TemplateListFragment.OnTemplateListFragmentInteractionListener,
-        TemplateDetailsFragment.InteractionListener {
+        TemplateDetailsFragment.InteractionListener, QR.QRScanResultReceiver, QR.QRScanTrigger {
     public static final String ARG_ADD_TEMPLATE = "add-template";
     private ActivityTemplatesBinding b;
     private NavController navController;
+    private ActivityResultLauncher<Void> qrScanLauncher;
     //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        super.onCreateOptionsMenu(menu);
@@ -86,6 +89,8 @@ public class TemplatesActivity extends CrashReportingActivity
 
         b.fabAdd.setOnClickListener(v -> onEditTemplate(null));
         b.fabSave.setOnClickListener(v -> onSaveTemplate());
+
+        qrScanLauncher = QR.registerLauncher(this, this);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -152,5 +157,17 @@ public class TemplatesActivity extends CrashReportingActivity
                         .show();
             });
         });
+    }
+    @Override
+    public void onQRScanResult(String scanned) {
+        Logger.debug("PatDet_fr", String.format("Got scanned text '%s'", scanned));
+        TemplateDetailsViewModel model = new ViewModelProvider(
+                navController.getViewModelStoreOwner(R.id.template_list_navigation)).get(
+                TemplateDetailsViewModel.class);
+        model.setTestText(scanned);
+    }
+    @Override
+    public void triggerQRScan() {
+        qrScanLauncher.launch(null);
     }
 }

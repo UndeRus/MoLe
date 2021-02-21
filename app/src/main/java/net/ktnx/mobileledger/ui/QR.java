@@ -50,4 +50,8 @@ public class QR {
     public interface QRScanResultReceiver {
         void onQRScanResult(String scanned);
     }
+
+    public interface QRScanTrigger {
+        void triggerQRScan();
+    }
 }

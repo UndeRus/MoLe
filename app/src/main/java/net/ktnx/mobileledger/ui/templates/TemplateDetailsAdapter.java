@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.templates;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.Resources;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -41,7 +42,7 @@ import net.ktnx.mobileledger.databinding.TemplateDetailsHeaderBinding;
 import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
-import net.ktnx.mobileledger.ui.QRScanCapableFragment;
+import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.TemplateDetailSourceSelectorFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -617,7 +618,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
 
         }
         private void scanTestQR(View view) {
-            QRScanCapableFragment.triggerQRScan();
+            Context ctx = view.getContext();
+            if (ctx instanceof QR.QRScanTrigger)
+                ((QR.QRScanTrigger) ctx).triggerQRScan();
         }
     }
 

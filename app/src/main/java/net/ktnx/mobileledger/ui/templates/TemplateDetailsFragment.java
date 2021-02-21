@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
@@ -36,10 +37,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsFragmentBinding;
-import net.ktnx.mobileledger.ui.QRScanCapableFragment;
 import net.ktnx.mobileledger.utils.Logger;
 
-public class TemplateDetailsFragment extends QRScanCapableFragment {
+public class TemplateDetailsFragment extends Fragment {
     static final String ARG_TEMPLATE_ID = "pattern-id";
     private static final String ARG_COLUMN_COUNT = "column-count";
     private TemplateDetailsFragmentBinding b;
@@ -123,12 +123,6 @@ public class TemplateDetailsFragment extends QRScanCapableFragment {
                   .observe(getViewLifecycleOwner(), adapter::setItems);
 
         return b.getRoot();
-    }
-    @Override
-    protected void onQrScanned(String text) {
-        Logger.debug("PatDet_fr", String.format("Got scanned text '%s'", text));
-        if (text != null)
-            mViewModel.setTestText(text);
     }
     interface InteractionListener {
         void onDeleteTemplate(@NonNull Long templateId);
