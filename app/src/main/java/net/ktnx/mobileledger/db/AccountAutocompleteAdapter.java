@@ -24,6 +24,7 @@ import android.widget.Filter;
 import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,10 +67,13 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
                 return results;
             }
 
+            Logger.debug("acc", String.format("Looking for account '%s'", constraint));
             final List<String> matches = AccountDAO.unbox(
-                    (profileUUID == null) ? dao.lookupByNameSync(String.valueOf(constraint))
+                    (profileUUID == null) ? dao.lookupByNameSync(String.valueOf(constraint)
+                                                                       .toUpperCase())
                                           : dao.lookupInProfileByNameSync(profileUUID,
-                                                  String.valueOf(constraint)));
+                                                  String.valueOf(constraint)
+                                                        .toUpperCase()));
             results.values = matches;
             results.count = matches.size();
 
