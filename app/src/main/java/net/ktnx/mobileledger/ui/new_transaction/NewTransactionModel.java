@@ -57,12 +57,13 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.MatchResult;
 
-enum ItemType {generalData, transactionRow, bottomFiller}
+enum ItemType {generalData, transactionRow}
 
 enum FocusedElement {Account, Comment, Amount, Description, TransactionComment}
 
 
 public class NewTransactionModel extends ViewModel {
+    private static final int MIN_ITEMS = 3;
     private final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> isSubmittable = new InertMutableLiveData<>(false);
     private final MutableLiveData<Boolean> showComments = new MutableLiveData<>(true);
@@ -155,7 +156,6 @@ public class NewTransactionModel extends ViewModel {
         list.add(new TransactionHead(""));
         list.add(new TransactionAccount(""));
         list.add(new TransactionAccount(""));
-        list.add(new BottomFiller());
         items.setValue(list);
     }
     boolean accountsInInitialState() {
@@ -225,7 +225,7 @@ public class NewTransactionModel extends ViewModel {
 
         newItems.add(head);
 
-        for (int i = 1; i < present.size() - 1; i++) {
+        for (int i = 1; i < present.size(); i++) {
             final TransactionAccount row = present.get(i)
                                                   .toTransactionAccount();
             if (!row.isEmpty())
@@ -259,8 +259,6 @@ public class NewTransactionModel extends ViewModel {
 
                   newItems.add(accRow);
               }
-
-              newItems.add(new BottomFiller());
 
               items.postValue(newItems);
           });
@@ -373,7 +371,7 @@ public class NewTransactionModel extends ViewModel {
         tr.setComment(head.getComment());
         LedgerTransactionAccount emptyAmountAccount = null;
         float emptyAmountAccountBalance = 0;
-        for (int i = 1; i < list.size() - 1; i++) {
+        for (int i = 1; i < list.size(); i++) {
             TransactionAccount item = list.get(i)
                                           .toTransactionAccount();
             LedgerTransactionAccount acc = new LedgerTransactionAccount(item.getAccountName()
@@ -465,8 +463,6 @@ public class NewTransactionModel extends ViewModel {
 
         noteFocusChanged(1, FocusedElement.Description);
 
-        newList.add(new BottomFiller());
-
         setItems(newList);
     }
     /**
@@ -522,7 +518,7 @@ public class NewTransactionModel extends ViewModel {
                 submittable = false;
             }
 
-            for (int i = 1; i < list.size() - 1; i++) {
+            for (int i = 1; i < list.size(); i++) {
                 TransactionAccount item = list.get(i)
                                               .toTransactionAccount();
 
@@ -589,7 +585,7 @@ public class NewTransactionModel extends ViewModel {
                 float currencyBalance = balance.get(balCurrency);
                 if (Misc.isZero(currencyBalance)) {
                     // remove hints from all amount inputs in that currency
-                    for (int i = 1; i < list.size() - 1; i++) {
+                    for (int i = 1; i < list.size(); i++) {
                         TransactionAccount acc = list.get(i)
                                                      .toTransactionAccount();
                         if (Misc.equalStrings(acc.getCurrency(), balCurrency)) {
@@ -729,7 +725,7 @@ public class NewTransactionModel extends ViewModel {
                     Logger.debug("submittable",
                             String.format("Adding new item with %s for currency %s",
                                     newAcc.getAmountHint(), balCurrency));
-                    list.add(list.size() - 1, newAcc);
+                    list.add(newAcc);
                     listChanged = true;
                 }
             }
@@ -737,7 +733,7 @@ public class NewTransactionModel extends ViewModel {
             // drop extra empty rows, not needed
             for (String currName : emptyRowsForCurrency.currencies()) {
                 List<Item> emptyItems = emptyRowsForCurrency.getList(currName);
-                while ((list.size() > 4) && (emptyItems.size() > 1)) {
+                while ((list.size() > MIN_ITEMS) && (emptyItems.size() > 1)) {
                     if (workingWithLiveList && !liveListCopied) {
                         list = copyList(list);
                         liveListCopied = true;
@@ -748,7 +744,7 @@ public class NewTransactionModel extends ViewModel {
                 }
 
                 // unused currency, remove last item (which is also an empty one)
-                if ((list.size() > 4) && (emptyItems.size() == 1)) {
+                if ((list.size() > MIN_ITEMS) && (emptyItems.size() == 1)) {
                     List<Item> currItems = itemsForCurrency.getList(currName);
 
                     if (currItems.size() == 1) {
@@ -765,12 +761,12 @@ public class NewTransactionModel extends ViewModel {
 
             // 6) at least two rows need to be present in the ledger
             //    (the list also contains header and trailer)
-            while (list.size() < 4) {
+            while (list.size() < MIN_ITEMS) {
                 if (workingWithLiveList && !liveListCopied) {
                     list = copyList(list);
                     liveListCopied = true;
                 }
-                list.add(list.size() - 1, new TransactionAccount(""));
+                list.add(new TransactionAccount(""));
                 listChanged = true;
             }
 
@@ -798,7 +794,7 @@ public class NewTransactionModel extends ViewModel {
     @SuppressLint("DefaultLocale")
     private void dumpItemList(@NotNull String msg, @NotNull List<Item> list) {
         Logger.debug("submittable", "== Dump of all items " + msg);
-        for (int i = 1; i < list.size() - 1; i++) {
+        for (int i = 1; i < list.size(); i++) {
             TransactionAccount item = list.get(i)
                                           .toTransactionAccount();
             Logger.debug("submittable", String.format("%d:%s", i, item.toString()));
@@ -859,8 +855,6 @@ public class NewTransactionModel extends ViewModel {
                 return new TransactionHead((TransactionHead) origin);
             if (origin instanceof TransactionAccount)
                 return new TransactionAccount((TransactionAccount) origin);
-            if (origin instanceof BottomFiller)
-                return new BottomFiller((BottomFiller) origin);
             throw new RuntimeException("Don't know how to handle " + origin);
         }
         public int getId() {
@@ -894,8 +888,6 @@ public class NewTransactionModel extends ViewModel {
                 return ((TransactionHead) item).equalContents((TransactionHead) this);
             if (this instanceof TransactionAccount)
                 return ((TransactionAccount) item).equalContents((TransactionAccount) this);
-            if (this instanceof BottomFiller)
-                return true;
 
             throw new RuntimeException("Don't know how to handle " + this);
         }
@@ -998,26 +990,6 @@ public class NewTransactionModel extends ViewModel {
             return Objects.equals(date, other.date) &&
                    TextUtils.equals(description, other.description) &&
                    TextUtils.equals(comment, other.comment);
-        }
-    }
-
-    public static class BottomFiller extends Item {
-        public BottomFiller(BottomFiller origin) {
-            id = origin.id;
-            // nothing to do
-        }
-        public BottomFiller() {
-            super();
-        }
-        @Override
-        public ItemType getType() {
-            return ItemType.bottomFiller;
-        }
-        @SuppressLint("DefaultLocale")
-        @NonNull
-        @Override
-        public String toString() {
-            return String.format("id:%d «bottom filler»", id);
         }
     }
 

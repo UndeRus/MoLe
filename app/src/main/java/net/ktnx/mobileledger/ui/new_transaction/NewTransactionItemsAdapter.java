@@ -52,7 +52,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                                                   @NonNull NewTransactionModel.Item newItem) {
 
 //                    Logger.debug("new-trans",
-//                            String.format("comparing contents of {%s} and {%s}", oldItem.toString(),
+//                            String.format("comparing contents of {%s} and {%s}", oldItem
+//                            .toString(),
 //                                    newItem.toString()));
                     return oldItem.equalContents(newItem);
                 }
@@ -79,10 +80,8 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                                        @NonNull RecyclerView.ViewHolder target) {
                 final int adapterPosition = target.getAdapterPosition();
 
-                // first and last items are immovable
+                // first item is immovable
                 if (adapterPosition == 0)
-                    return false;
-                if (adapterPosition == adapter.getItemCount() - 1)
                     return false;
 
                 return super.canDropOver(recyclerView, current, target);
@@ -93,7 +92,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
                 // the top (date and description) and the bottom (padding) items are always there
                 final int adapterPosition = viewHolder.getAdapterPosition();
-                if ((adapterPosition > 0) && (adapterPosition < adapter.getItemCount() - 1)) {
+                if (adapterPosition > 0) {
                     flags |= makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
                             ItemTouchHelper.UP | ItemTouchHelper.DOWN) |
                              makeFlag(ItemTouchHelper.ACTION_STATE_SWIPE,

@@ -598,12 +598,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     b.ntrPadding.setVisibility(View.GONE);
                     setEditable(true);
                 }
-                else if (item instanceof NewTransactionModel.BottomFiller) {
-                    b.ntrData.setVisibility(View.GONE);
-                    b.ntrAccount.setVisibility(View.GONE);
-                    b.ntrPadding.setVisibility(View.VISIBLE);
-                    setEditable(false);
-                }
                 else {
                     throw new RuntimeException("Don't know how to handle " + item);
                 }
