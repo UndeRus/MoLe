@@ -145,7 +145,7 @@ public class TemplatesActivity extends CrashReportingActivity
         TemplateHeaderDAO dao = DB.get()
                                   .getTemplateDAO();
 
-        dao.getTemplateWitAccountsAsync(templateId, template -> {
+        dao.getTemplateWithAccountsAsync(templateId, template -> {
             TemplateWithAccounts copy = TemplateWithAccounts.from(template);
             dao.deleteAsync(template.header, () -> {
                 navController.popBackStack(R.id.templateListFragment, false);

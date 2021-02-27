@@ -106,7 +106,7 @@ public abstract class TemplateHeaderDAO {
         }
     }
 
-    public void getTemplateWitAccountsAsync(@NonNull Long id, @NonNull
+    public void getTemplateWithAccountsAsync(@NonNull Long id, @NonNull
             AsyncResultCallback<TemplateWithAccounts> callback) {
         LiveData<TemplateWithAccounts> resultReceiver = getTemplateWithAccounts(id);
         resultReceiver.observeForever(new Observer<TemplateWithAccounts>() {

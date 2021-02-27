@@ -17,18 +17,30 @@
 
 package net.ktnx.mobileledger.ui.new_transaction;
 
+import android.annotation.SuppressLint;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
-import net.ktnx.mobileledger.model.Currency;
+import net.ktnx.mobileledger.BuildConfig;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.TemplateAccount;
+import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.InertMutableLiveData;
+import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
+import net.ktnx.mobileledger.model.MatchedTemplate;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
+import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,171 +48,301 @@ import org.jetbrains.annotations.NotNull;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.MatchResult;
+
+enum ItemType {generalData, transactionRow, bottomFiller}
+
+enum FocusedElement {Account, Comment, Amount, Description, TransactionComment}
+
 
 public class NewTransactionModel extends ViewModel {
-    final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
-    final ArrayList<Item> items = new ArrayList<>();
-    final MutableLiveData<Boolean> isSubmittable = new MutableLiveData<>(false);
-    final MutableLiveData<Boolean> showComments = new MutableLiveData<>(true);
-    private final Item header = new Item(this, "");
-    private final Item trailer = new Item(this);
-    private final MutableLiveData<Integer> focusedItem = new MutableLiveData<>(0);
-    private final MutableLiveData<Integer> accountCount = new MutableLiveData<>(0);
-    private final MutableLiveData<Boolean> simulateSave = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> showCurrency = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> isSubmittable = new InertMutableLiveData<>(false);
+    private final MutableLiveData<Boolean> showComments = new MutableLiveData<>(true);
+    private final MutableLiveData<List<Item>> items = new MutableLiveData<>();
+    private final MutableLiveData<Integer> accountCount = new InertMutableLiveData<>(0);
+    private final MutableLiveData<Boolean> simulateSave = new InertMutableLiveData<>(false);
     private final AtomicInteger busyCounter = new AtomicInteger(0);
-    private final MutableLiveData<Boolean> busyFlag = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> busyFlag = new InertMutableLiveData<>(false);
     private final Observer<MobileLedgerProfile> profileObserver = profile -> {
         showCurrency.postValue(profile.getShowCommodityByDefault());
         showComments.postValue(profile.getShowCommentsByDefault());
     };
+    private final MutableLiveData<FocusInfo> focusInfo = new MutableLiveData<>();
     private boolean observingDataProfile;
-    void observeShowComments(LifecycleOwner owner, Observer<? super Boolean> observer) {
-        showComments.observe(owner, observer);
+    public NewTransactionModel() {
+        reset();
     }
-    void observeBusyFlag(@NonNull LifecycleOwner owner, Observer<? super Boolean> observer) {
-        busyFlag.observe(owner, observer);
+    public LiveData<Boolean> getShowCurrency() {
+        return showCurrency;
+    }
+    public LiveData<List<Item>> getItems() {
+        return items;
+    }
+    private void setItems(@NonNull List<Item> newList) {
+        checkTransactionSubmittable(newList);
+        setItemsWithoutSubmittableChecks(newList);
+    }
+    private void setItemsWithoutSubmittableChecks(@NonNull List<Item> list) {
+        Logger.debug("new-trans", "model: Setting new item list");
+        items.setValue(list);
+        accountCount.setValue(list.size() - 2);
+    }
+    private List<Item> copyList() {
+        return copyList(null);
+    }
+    private List<Item> copyList(@Nullable List<Item> source) {
+        List<Item> copy = new ArrayList<>();
+        List<Item> oldList = (source == null) ? items.getValue() : source;
+
+        if (oldList != null)
+            for (Item item : oldList) {
+                copy.add(Item.from(item));
+            }
+
+        return copy;
+    }
+    private List<Item> shallowCopyListWithoutItem(int position) {
+        List<Item> copy = new ArrayList<>();
+        List<Item> oldList = items.getValue();
+
+        if (oldList != null) {
+            int i = 0;
+            for (Item item : oldList) {
+                if (i++ == position)
+                    continue;
+                copy.add(item);
+            }
+        }
+
+        return copy;
+    }
+    private List<Item> shallowCopyList() {
+        return new ArrayList<>(items.getValue());
+    }
+    LiveData<Boolean> getShowComments() {
+        return showComments;
     }
     void observeDataProfile(LifecycleOwner activity) {
         if (!observingDataProfile)
             Data.observeProfile(activity, profileObserver);
         observingDataProfile = true;
     }
-    boolean getSimulateSave() {
-        return simulateSave.getValue();
+    boolean getSimulateSaveFlag() {
+        Boolean value = simulateSave.getValue();
+        if (value == null)
+            return false;
+        return value;
     }
-    public void setSimulateSave(boolean simulateSave) {
-        this.simulateSave.setValue(simulateSave);
+    LiveData<Boolean> getSimulateSave() {
+        return simulateSave;
     }
     void toggleSimulateSave() {
-        simulateSave.setValue(!simulateSave.getValue());
-    }
-    void observeSimulateSave(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                             @NonNull androidx.lifecycle.Observer<? super Boolean> observer) {
-        this.simulateSave.observe(owner, observer);
-    }
-    int getAccountCount() {
-        return items.size();
-    }
-    public SimpleDate getDate() {
-        return header.date.getValue();
-    }
-    public void setDate(SimpleDate date) {
-        header.date.setValue(date);
-    }
-    public String getDescription() {
-        return header.description.getValue();
-    }
-    public String getComment() {
-        return header.comment.getValue();
+        simulateSave.setValue(!getSimulateSaveFlag());
     }
     LiveData<Boolean> isSubmittable() {
         return this.isSubmittable;
     }
     void reset() {
-        header.date.setValue(null);
-        header.description.setValue(null);
-        header.comment.setValue(null);
-        items.clear();
-        items.add(new Item(this, new LedgerTransactionAccount("")));
-        items.add(new Item(this, new LedgerTransactionAccount("")));
-        focusedItem.setValue(0);
-    }
-    void observeFocusedItem(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                            @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
-        this.focusedItem.observe(owner, observer);
-    }
-    void stopObservingFocusedItem(@NonNull androidx.lifecycle.Observer<? super Integer> observer) {
-        this.focusedItem.removeObserver(observer);
-    }
-    void observeAccountCount(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                             @NonNull androidx.lifecycle.Observer<? super Integer> observer) {
-        this.accountCount.observe(owner, observer);
-    }
-    void stopObservingAccountCount(@NonNull androidx.lifecycle.Observer<? super Integer> observer) {
-        this.accountCount.removeObserver(observer);
-    }
-    int getFocusedItem() { return focusedItem.getValue(); }
-    void setFocusedItem(int position) {
-        focusedItem.setValue(position);
-    }
-    int addAccount(LedgerTransactionAccount acc) {
-        items.add(new Item(this, acc));
-        accountCount.setValue(getAccountCount());
-        return items.size();
+        List<Item> list = new ArrayList<>();
+        list.add(new TransactionHead(""));
+        list.add(new TransactionAccount(""));
+        list.add(new TransactionAccount(""));
+        list.add(new BottomFiller());
+        items.setValue(list);
     }
     boolean accountsInInitialState() {
-        for (Item item : items) {
-            LedgerTransactionAccount acc = item.getAccount();
-            if (acc.isAmountSet())
-                return false;
-            if (!acc.getAccountName()
-                    .trim()
-                    .isEmpty())
+        final List<Item> list = items.getValue();
+
+        if (list == null)
+            return true;
+
+        for (Item item : list) {
+            if (!(item instanceof TransactionAccount))
+                continue;
+
+            TransactionAccount accRow = (TransactionAccount) item;
+            if (!accRow.isEmpty())
                 return false;
         }
 
         return true;
     }
-    LedgerTransactionAccount getAccount(int index) {
-        return items.get(index)
-                    .getAccount();
-    }
-    Item getItem(int index) {
-        if (index == 0) {
-            return header;
+    void applyTemplate(MatchedTemplate matchedTemplate, String text) {
+        SimpleDate transactionDate = null;
+        final MatchResult matchResult = matchedTemplate.matchResult;
+        final TemplateHeader templateHead = matchedTemplate.templateHead;
+        {
+            int day = extractIntFromMatches(matchResult, templateHead.getDateDayMatchGroup(),
+                    templateHead.getDateDay());
+            int month = extractIntFromMatches(matchResult, templateHead.getDateMonthMatchGroup(),
+                    templateHead.getDateMonth());
+            int year = extractIntFromMatches(matchResult, templateHead.getDateYearMatchGroup(),
+                    templateHead.getDateYear());
+
+            if (year > 0 || month > 0 || day > 0) {
+                SimpleDate today = SimpleDate.today();
+                if (year <= 0)
+                    year = today.year;
+                if (month <= 0)
+                    month = today.month;
+                if (day <= 0)
+                    day = today.day;
+
+                transactionDate = new SimpleDate(year, month, day);
+
+                Logger.debug("pattern", "setting transaction date to " + transactionDate);
+            }
         }
 
-        if (index <= items.size())
-            return items.get(index - 1);
+        List<Item> present = copyList();
 
-        return trailer;
-    }
-    void removeRow(Item item, NewTransactionItemsAdapter adapter) {
-        int pos = items.indexOf(item);
-        items.remove(pos);
-        if (adapter != null) {
-            adapter.notifyItemRemoved(pos + 1);
-            sendCountNotifications();
+        TransactionHead head = new TransactionHead(present.get(0)
+                                                          .toTransactionHead());
+        if (transactionDate != null)
+            head.setDate(transactionDate);
+
+        final String transactionDescription = extractStringFromMatches(matchResult,
+                templateHead.getTransactionDescriptionMatchGroup(),
+                templateHead.getTransactionDescription());
+        if (Misc.emptyIsNull(transactionDescription) != null)
+            head.setDescription(transactionDescription);
+
+        final String transactionComment = extractStringFromMatches(matchResult,
+                templateHead.getTransactionCommentMatchGroup(),
+                templateHead.getTransactionComment());
+        if (Misc.emptyIsNull(transactionComment) != null)
+            head.setComment(transactionComment);
+
+        List<Item> newItems = new ArrayList<>();
+
+        newItems.add(head);
+
+        for (int i = 1; i < present.size() - 1; i++) {
+            final TransactionAccount row = present.get(i)
+                                                  .toTransactionAccount();
+            if (!row.isEmpty())
+                newItems.add(new TransactionAccount(row));
         }
+
+        DB.get()
+          .getTemplateDAO()
+          .getTemplateWithAccountsAsync(templateHead.getId(), entry -> {
+              int rowIndex = 0;
+              final boolean accountsInInitialState = accountsInInitialState();
+              for (TemplateAccount acc : entry.accounts) {
+                  rowIndex++;
+
+                  String accountName =
+                          extractStringFromMatches(matchResult, acc.getAccountNameMatchGroup(),
+                                  acc.getAccountName());
+                  String accountComment =
+                          extractStringFromMatches(matchResult, acc.getAccountCommentMatchGroup(),
+                                  acc.getAccountComment());
+                  Float amount = extractFloatFromMatches(matchResult, acc.getAmountMatchGroup(),
+                          acc.getAmount());
+                  if (amount != null && acc.getNegateAmount() != null && acc.getNegateAmount())
+                      amount = -amount;
+
+                  // TODO currency
+                  TransactionAccount accRow = new TransactionAccount(accountName);
+                  accRow.setComment(accountComment);
+                  if (amount != null)
+                      accRow.setAmount(amount);
+
+                  newItems.add(accRow);
+              }
+
+              newItems.add(new BottomFiller());
+
+              items.postValue(newItems);
+          });
+    }
+    private int extractIntFromMatches(MatchResult m, Integer group, Integer literal) {
+        if (literal != null)
+            return literal;
+
+        if (group != null) {
+            int grp = group;
+            if (grp > 0 & grp <= m.groupCount())
+                try {
+                    return Integer.parseInt(m.group(grp));
+                }
+                catch (NumberFormatException e) {
+                    Logger.debug("new-trans", "Error extracting matched number", e);
+                }
+        }
+
+        return 0;
+    }
+    private String extractStringFromMatches(MatchResult m, Integer group, String literal) {
+        if (literal != null)
+            return literal;
+
+        if (group != null) {
+            int grp = group;
+            if (grp > 0 & grp <= m.groupCount())
+                return m.group(grp);
+        }
+
+        return null;
+    }
+    private Float extractFloatFromMatches(MatchResult m, Integer group, Float literal) {
+        if (literal != null)
+            return literal;
+
+        if (group != null) {
+            int grp = group;
+            if (grp > 0 & grp <= m.groupCount())
+                try {
+                    return Float.valueOf(m.group(grp));
+                }
+                catch (NumberFormatException e) {
+                    Logger.debug("new-trans", "Error extracting matched number", e);
+                }
+        }
+
+        return null;
     }
     void removeItem(int pos) {
-        items.remove(pos);
-        accountCount.setValue(getAccountCount());
-    }
-    void sendCountNotifications() {
-        accountCount.setValue(getAccountCount());
-    }
-    public void sendFocusedNotification() {
-        focusedItem.setValue(focusedItem.getValue());
-    }
-    void updateFocusedItem(int position) {
-        focusedItem.setValue(position);
+        List<Item> newList = shallowCopyListWithoutItem(pos);
+        setItems(newList);
     }
     void noteFocusChanged(int position, FocusedElement element) {
-        getItem(position).setFocusedElement(element);
+        FocusInfo present = focusInfo.getValue();
+        if (present == null || present.position != position || present.element != element)
+            focusInfo.setValue(new FocusInfo(position, element));
     }
-    void swapItems(int one, int two) {
-        Collections.swap(items, one - 1, two - 1);
+    public LiveData<FocusInfo> getFocusInfo() {
+        return focusInfo;
     }
-    void moveItemLast(int index) {
+    void moveItem(int fromIndex, int toIndex) {
+        List<Item> newList = shallowCopyList();
+        Item item = newList.remove(fromIndex);
+        newList.add(toIndex, item);
+        items.setValue(newList); // same count, same submittable state
+    }
+    void moveItemLast(List<Item> list, int index) {
         /*   0
              1   <-- index
              2
              3   <-- desired position
+                 (no bottom filler)
          */
-        int itemCount = items.size();
+        int itemCount = list.size();
 
-        if (index < itemCount - 1) {
-            Item acc = items.remove(index);
-            items.add(itemCount - 1, acc);
-        }
+        if (index < itemCount - 1)
+            list.add(list.remove(index));
     }
     void toggleCurrencyVisible() {
-        showCurrency.setValue(!showCurrency.getValue());
+        showCurrency.setValue(!Objects.requireNonNull(showCurrency.getValue()));
     }
     void stopObservingBusyFlag(Observer<Boolean> observer) {
         busyFlag.removeObserver(observer);
@@ -215,178 +357,580 @@ public class NewTransactionModel extends ViewModel {
         if (newValue == 0)
             busyFlag.postValue(false);
     }
-    public boolean getBusyFlag() {
-        return busyFlag.getValue();
+    public LiveData<Boolean> getBusyFlag() {
+        return busyFlag;
     }
     public void toggleShowComments() {
-        showComments.setValue(!showComments.getValue());
+        showComments.setValue(!Objects.requireNonNull(showComments.getValue()));
     }
-    enum ItemType {generalData, transactionRow, bottomFiller}
+    public LedgerTransaction constructLedgerTransaction() {
+        List<Item> list = Objects.requireNonNull(items.getValue());
+        TransactionHead head = list.get(0)
+                                   .toTransactionHead();
+        SimpleDate date = head.getDate();
+        LedgerTransaction tr = head.asLedgerTransaction();
 
-    enum FocusedElement {Account, Comment, Amount, Description, TransactionComment}
+        tr.setComment(head.getComment());
+        LedgerTransactionAccount emptyAmountAccount = null;
+        float emptyAmountAccountBalance = 0;
+        for (int i = 1; i < list.size() - 1; i++) {
+            TransactionAccount item = list.get(i)
+                                          .toTransactionAccount();
+            LedgerTransactionAccount acc = new LedgerTransactionAccount(item.getAccountName()
+                                                                            .trim(),
+                    item.getCurrency());
+            if (acc.getAccountName()
+                   .isEmpty())
+                continue;
 
+            acc.setComment(item.getComment());
 
-    //==========================================================================================
-
-
-    static class Item {
-        private final ItemType type;
-        private final MutableLiveData<SimpleDate> date = new MutableLiveData<>();
-        private final MutableLiveData<String> description = new MutableLiveData<>();
-        private final MutableLiveData<String> amountHint = new MutableLiveData<>(null);
-        private final NewTransactionModel model;
-        private final MutableLiveData<Boolean> editable = new MutableLiveData<>(true);
-        private final MutableLiveData<String> comment = new MutableLiveData<>(null);
-        private final MutableLiveData<Currency> currency = new MutableLiveData<>(null);
-        private final MutableLiveData<Boolean> amountValid = new MutableLiveData<>(true);
-        private LedgerTransactionAccount account;
-        private FocusedElement focusedElement = FocusedElement.Account;
-        private boolean amountHintIsSet = false;
-        Item(NewTransactionModel model) {
-            this.model = model;
-            type = ItemType.bottomFiller;
-            editable.setValue(false);
-        }
-        Item(NewTransactionModel model, String description) {
-            this.model = model;
-            this.type = ItemType.generalData;
-            this.description.setValue(description);
-            this.editable.setValue(true);
-        }
-        Item(NewTransactionModel model, LedgerTransactionAccount account) {
-            this.model = model;
-            this.type = ItemType.transactionRow;
-            this.account = account;
-            String currName = account.getCurrency();
-            Currency curr = null;
-            if ((currName != null) && !currName.isEmpty())
-                curr = Currency.loadByName(currName);
-            this.currency.setValue(curr);
-            this.editable.setValue(true);
-        }
-        FocusedElement getFocusedElement() {
-            return focusedElement;
-        }
-        void setFocusedElement(FocusedElement focusedElement) {
-            this.focusedElement = focusedElement;
-        }
-        public NewTransactionModel getModel() {
-            return model;
-        }
-        void setEditable(boolean editable) {
-            ensureTypeIsGeneralDataOrTransactionRow();
-            this.editable.setValue(editable);
-        }
-        private void ensureTypeIsGeneralDataOrTransactionRow() {
-            if ((type != ItemType.generalData) && (type != ItemType.transactionRow)) {
-                throw new RuntimeException(
-                        String.format("Actual type (%s) differs from wanted (%s or %s)", type,
-                                ItemType.generalData, ItemType.transactionRow));
-            }
-        }
-        String getAmountHint() {
-            ensureType(ItemType.transactionRow);
-            return amountHint.getValue();
-        }
-        void setAmountHint(String amountHint) {
-            ensureType(ItemType.transactionRow);
-
-            // avoid unnecessary triggers
-            if (amountHint == null) {
-                if (this.amountHint.getValue() == null)
-                    return;
-                amountHintIsSet = false;
+            if (item.isAmountSet()) {
+                acc.setAmount(item.getAmount());
+                emptyAmountAccountBalance += item.getAmount();
             }
             else {
-                if (amountHint.equals(this.amountHint.getValue()))
-                    return;
-                amountHintIsSet = true;
+                emptyAmountAccount = acc;
             }
 
-            this.amountHint.setValue(amountHint);
+            tr.addAccount(acc);
         }
-        void observeAmountHint(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                               @NonNull androidx.lifecycle.Observer<? super String> observer) {
-            this.amountHint.observe(owner, observer);
+
+        if (emptyAmountAccount != null)
+            emptyAmountAccount.setAmount(-emptyAmountAccountBalance);
+
+        return tr;
+    }
+    void loadTransactionIntoModel(String profileUUID, int transactionId) {
+        List<Item> newList = new ArrayList<>();
+        LedgerTransaction tr;
+        MobileLedgerProfile profile = Data.getProfile(profileUUID);
+        if (profile == null)
+            throw new RuntimeException(String.format(
+                    "Unable to find profile %s, which is supposed to contain transaction %d",
+                    profileUUID, transactionId));
+
+        tr = profile.loadTransaction(transactionId);
+        TransactionHead head = new TransactionHead(tr.getDescription());
+        head.setComment(tr.getComment());
+
+        newList.add(head);
+
+        List<LedgerTransactionAccount> accounts = tr.getAccounts();
+
+        TransactionAccount firstNegative = null;
+        TransactionAccount firstPositive = null;
+        int singleNegativeIndex = -1;
+        int singlePositiveIndex = -1;
+        int negativeCount = 0;
+        for (int i = 0; i < accounts.size(); i++) {
+            LedgerTransactionAccount acc = accounts.get(i);
+            TransactionAccount item =
+                    new TransactionAccount(acc.getAccountName(), acc.getCurrency());
+            newList.add(item);
+
+            item.setAccountName(acc.getAccountName());
+            item.setComment(acc.getComment());
+            if (acc.isAmountSet()) {
+                item.setAmount(acc.getAmount());
+                if (acc.getAmount() < 0) {
+                    if (firstNegative == null) {
+                        firstNegative = item;
+                        singleNegativeIndex = i + 1;
+                    }
+                    else
+                        singleNegativeIndex = -1;
+                }
+                else {
+                    if (firstPositive == null) {
+                        firstPositive = item;
+                        singlePositiveIndex = i + 1;
+                    }
+                    else
+                        singlePositiveIndex = -1;
+                }
+            }
+            else
+                item.resetAmount();
         }
-        void stopObservingAmountHint(
-                @NonNull androidx.lifecycle.Observer<? super String> observer) {
-            this.amountHint.removeObserver(observer);
+
+        if (singleNegativeIndex != -1) {
+            firstNegative.resetAmount();
+            moveItemLast(newList, singleNegativeIndex);
         }
-        ItemType getType() {
-            return type;
+        else if (singlePositiveIndex != -1) {
+            firstPositive.resetAmount();
+            moveItemLast(newList, singlePositiveIndex);
         }
-        void ensureType(ItemType wantedType) {
-            if (type != wantedType) {
-                throw new RuntimeException(
-                        String.format("Actual type (%s) differs from wanted (%s)", type,
-                                wantedType));
+
+        noteFocusChanged(1, FocusedElement.Description);
+
+        newList.add(new BottomFiller());
+
+        setItems(newList);
+    }
+    /**
+     * A transaction is submittable if:
+     * 0) has description
+     * 1) has at least two account names
+     * 2) each row with amount has account name
+     * 3) for each commodity:
+     * 3a) amounts must balance to 0, or
+     * 3b) there must be exactly one empty amount (with account)
+     * 4) empty accounts with empty amounts are ignored
+     * Side effects:
+     * 5) a row with an empty account name or empty amount is guaranteed to exist for each
+     * commodity
+     * 6) at least two rows need to be present in the ledger
+     *
+     * @param list - the item list to check. Can be the displayed list or a list that will be
+     *             displayed soon
+     */
+    @SuppressLint("DefaultLocale")
+    void checkTransactionSubmittable(@Nullable List<Item> list) {
+        boolean workingWithLiveList = false;
+        boolean liveListCopied = false;
+        if (list == null) {
+            list = Objects.requireNonNull(items.getValue());
+            workingWithLiveList = true;
+        }
+
+        if (BuildConfig.DEBUG)
+            dumpItemList("Before submittable checks", list);
+
+        int accounts = 0;
+        final BalanceForCurrency balance = new BalanceForCurrency();
+        final String descriptionText = list.get(0)
+                                           .toTransactionHead()
+                                           .getDescription();
+        boolean submittable = true;
+        boolean listChanged = false;
+        final ItemsForCurrency itemsForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithEmptyAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAccountAndEmptyAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithEmptyAccountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAmountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency itemsWithAccountForCurrency = new ItemsForCurrency();
+        final ItemsForCurrency emptyRowsForCurrency = new ItemsForCurrency();
+        final List<Item> emptyRows = new ArrayList<>();
+
+        try {
+            if ((descriptionText == null) || descriptionText.trim()
+                                                            .isEmpty())
+            {
+                Logger.debug("submittable", "Transaction not submittable: missing description");
+                submittable = false;
+            }
+
+            for (int i = 1; i < list.size() - 1; i++) {
+                TransactionAccount item = list.get(i)
+                                              .toTransactionAccount();
+
+                String accName = item.getAccountName()
+                                     .trim();
+                String currName = item.getCurrency();
+
+                itemsForCurrency.add(currName, item);
+
+                if (accName.isEmpty()) {
+                    itemsWithEmptyAccountForCurrency.add(currName, item);
+
+                    if (item.isAmountSet()) {
+                        // 2) each amount has account name
+                        Logger.debug("submittable", String.format(
+                                "Transaction not submittable: row %d has no account name, but" +
+                                " has" + " amount %1.2f", i + 1, item.getAmount()));
+                        submittable = false;
+                    }
+                    else {
+                        emptyRowsForCurrency.add(currName, item);
+                    }
+                }
+                else {
+                    accounts++;
+                    itemsWithAccountForCurrency.add(currName, item);
+                }
+
+                if (!item.isAmountValid()) {
+                    Logger.debug("submittable",
+                            String.format("Not submittable: row %d has an invalid amount", i + 1));
+                    submittable = false;
+                }
+                else if (item.isAmountSet()) {
+                    itemsWithAmountForCurrency.add(currName, item);
+                    balance.add(currName, item.getAmount());
+                }
+                else {
+                    itemsWithEmptyAmountForCurrency.add(currName, item);
+
+                    if (!accName.isEmpty())
+                        itemsWithAccountAndEmptyAmountForCurrency.add(currName, item);
+                }
+            }
+
+            // 1) has at least two account names
+            if (accounts < 2) {
+                if (accounts == 0)
+                    Logger.debug("submittable", "Transaction not submittable: no account names");
+                else if (accounts == 1)
+                    Logger.debug("submittable",
+                            "Transaction not submittable: only one account name");
+                else
+                    Logger.debug("submittable",
+                            String.format("Transaction not submittable: only %d account names",
+                                    accounts));
+                submittable = false;
+            }
+
+            // 3) for each commodity:
+            // 3a) amount must balance to 0, or
+            // 3b) there must be exactly one empty amount (with account)
+            for (String balCurrency : itemsForCurrency.currencies()) {
+                float currencyBalance = balance.get(balCurrency);
+                if (Misc.isZero(currencyBalance)) {
+                    // remove hints from all amount inputs in that currency
+                    for (int i = 1; i < list.size() - 1; i++) {
+                        TransactionAccount acc = list.get(i)
+                                                     .toTransactionAccount();
+                        if (Misc.equalStrings(acc.getCurrency(), balCurrency)) {
+                            if (BuildConfig.DEBUG)
+                                Logger.debug("submittable",
+                                        String.format("Resetting hint of '%s' [%s]",
+                                                Misc.nullIsEmpty(acc.getAccountName()),
+                                                balCurrency));
+                            if (acc.amountHintIsSet && !TextUtils.isEmpty(acc.getAmountHint())) {
+                                if (workingWithLiveList && !liveListCopied) {
+                                    list = copyList(list);
+                                    liveListCopied = true;
+                                }
+                                final TransactionAccount newAcc = new TransactionAccount(acc);
+                                newAcc.setAmountHint(null);
+                                if (!liveListCopied) {
+                                    list = copyList(list);
+                                    liveListCopied = true;
+                                }
+                                list.set(i, newAcc);
+                                listChanged = true;
+                            }
+                        }
+                    }
+                }
+                else {
+                    List<Item> tmpList =
+                            itemsWithAccountAndEmptyAmountForCurrency.getList(balCurrency);
+                    int balanceReceiversCount = tmpList.size();
+                    if (balanceReceiversCount != 1) {
+                        if (BuildConfig.DEBUG) {
+                            if (balanceReceiversCount == 0)
+                                Logger.debug("submittable", String.format(
+                                        "Transaction not submittable [%s]: non-zero balance " +
+                                        "with no empty amounts with accounts", balCurrency));
+                            else
+                                Logger.debug("submittable", String.format(
+                                        "Transaction not submittable [%s]: non-zero balance " +
+                                        "with multiple empty amounts with accounts", balCurrency));
+                        }
+                        submittable = false;
+                    }
+
+                    List<Item> emptyAmountList =
+                            itemsWithEmptyAmountForCurrency.getList(balCurrency);
+
+                    // suggest off-balance amount to a row and remove hints on other rows
+                    Item receiver = null;
+                    if (!tmpList.isEmpty())
+                        receiver = tmpList.get(0);
+                    else if (!emptyAmountList.isEmpty())
+                        receiver = emptyAmountList.get(0);
+
+                    for (int i = 0; i < list.size(); i++) {
+                        Item item = list.get(i);
+                        if (!(item instanceof TransactionAccount))
+                            continue;
+
+                        TransactionAccount acc = item.toTransactionAccount();
+                        if (!Misc.equalStrings(acc.getCurrency(), balCurrency))
+                            continue;
+
+                        if (item == receiver) {
+                            final String hint = String.format("%1.2f", -currencyBalance);
+                            if (!acc.isAmountHintSet() ||
+                                !TextUtils.equals(acc.getAmountHint(), hint))
+                            {
+                                Logger.debug("submittable",
+                                        String.format("Setting amount hint of {%s} to %s [%s]",
+                                                acc.toString(), hint, balCurrency));
+                                if (workingWithLiveList & !liveListCopied) {
+                                    list = copyList(list);
+                                    liveListCopied = true;
+                                }
+                                final TransactionAccount newAcc = new TransactionAccount(acc);
+                                newAcc.setAmountHint(hint);
+                                list.set(i, newAcc);
+                                listChanged = true;
+                            }
+                        }
+                        else {
+                            if (BuildConfig.DEBUG)
+                                Logger.debug("submittable",
+                                        String.format("Resetting hint of '%s' [%s]",
+                                                Misc.nullIsEmpty(acc.getAccountName()),
+                                                balCurrency));
+                            if (acc.amountHintIsSet && !TextUtils.isEmpty(acc.getAmountHint())) {
+                                if (workingWithLiveList && !liveListCopied) {
+                                    list = copyList(list);
+                                    liveListCopied = true;
+                                }
+                                final TransactionAccount newAcc = new TransactionAccount(acc);
+                                newAcc.setAmountHint(null);
+                                list.set(i, newAcc);
+                                listChanged = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 5) a row with an empty account name or empty amount is guaranteed to exist for
+            // each commodity
+            for (String balCurrency : balance.currencies()) {
+                int currEmptyRows = itemsWithEmptyAccountForCurrency.size(balCurrency);
+                int currRows = itemsForCurrency.size(balCurrency);
+                int currAccounts = itemsWithAccountForCurrency.size(balCurrency);
+                int currAmounts = itemsWithAmountForCurrency.size(balCurrency);
+                if ((currEmptyRows == 0) &&
+                    ((currRows == currAccounts) || (currRows == currAmounts)))
+                {
+                    // perhaps there already is an unused empty row for another currency that
+                    // is not used?
+//                        boolean foundIt = false;
+//                        for (Item item : emptyRows) {
+//                            Currency itemCurrency = item.getCurrency();
+//                            String itemCurrencyName =
+//                                    (itemCurrency == null) ? "" : itemCurrency.getName();
+//                            if (Misc.isZero(balance.get(itemCurrencyName))) {
+//                                item.setCurrency(Currency.loadByName(balCurrency));
+//                                item.setAmountHint(
+//                                        String.format("%1.2f", -balance.get(balCurrency)));
+//                                foundIt = true;
+//                                break;
+//                            }
+//                        }
+//
+//                        if (!foundIt)
+                    if (workingWithLiveList && !liveListCopied) {
+                        list = copyList(list);
+                        liveListCopied = true;
+                    }
+                    final TransactionAccount newAcc = new TransactionAccount("", balCurrency);
+                    final float bal = balance.get(balCurrency);
+                    if (!Misc.isZero(bal) && currAmounts == currRows)
+                        newAcc.setAmountHint(String.format("%4.2f", -bal));
+                    Logger.debug("submittable",
+                            String.format("Adding new item with %s for currency %s",
+                                    newAcc.getAmountHint(), balCurrency));
+                    list.add(list.size() - 1, newAcc);
+                    listChanged = true;
+                }
+            }
+
+            // drop extra empty rows, not needed
+            for (String currName : emptyRowsForCurrency.currencies()) {
+                List<Item> emptyItems = emptyRowsForCurrency.getList(currName);
+                while ((list.size() > 4) && (emptyItems.size() > 1)) {
+                    if (workingWithLiveList && !liveListCopied) {
+                        list = copyList(list);
+                        liveListCopied = true;
+                    }
+                    Item item = emptyItems.remove(1);
+                    list.remove(item);
+                    listChanged = true;
+                }
+
+                // unused currency, remove last item (which is also an empty one)
+                if ((list.size() > 4) && (emptyItems.size() == 1)) {
+                    List<Item> currItems = itemsForCurrency.getList(currName);
+
+                    if (currItems.size() == 1) {
+                        if (workingWithLiveList && !liveListCopied) {
+                            list = copyList(list);
+                            liveListCopied = true;
+                        }
+                        Item item = emptyItems.get(0);
+                        list.remove(item);
+                        listChanged = true;
+                    }
+                }
+            }
+
+            // 6) at least two rows need to be present in the ledger
+            //    (the list also contains header and trailer)
+            while (list.size() < 4) {
+                if (workingWithLiveList && !liveListCopied) {
+                    list = copyList(list);
+                    liveListCopied = true;
+                }
+                list.add(list.size() - 1, new TransactionAccount(""));
+                listChanged = true;
+            }
+
+
+            Logger.debug("submittable", submittable ? "YES" : "NO");
+            isSubmittable.setValue(submittable);
+
+            if (BuildConfig.DEBUG)
+                dumpItemList("After submittable checks", list);
+        }
+        catch (NumberFormatException e) {
+            Logger.debug("submittable", "NO (because of NumberFormatException)");
+            isSubmittable.setValue(false);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            Logger.debug("submittable", "NO (because of an Exception)");
+            isSubmittable.setValue(false);
+        }
+
+        if (listChanged && workingWithLiveList) {
+            setItemsWithoutSubmittableChecks(list);
+        }
+    }
+    @SuppressLint("DefaultLocale")
+    private void dumpItemList(@NotNull String msg, @NotNull List<Item> list) {
+        Logger.debug("submittable", "== Dump of all items " + msg);
+        for (int i = 1; i < list.size() - 1; i++) {
+            TransactionAccount item = list.get(i)
+                                          .toTransactionAccount();
+            Logger.debug("submittable", String.format("%d:%s", i, item.toString()));
+        }
+    }
+    public void setItemCurrency(int position, String newCurrency) {
+        TransactionAccount item = Objects.requireNonNull(items.getValue())
+                                         .get(position)
+                                         .toTransactionAccount();
+        final String oldCurrency = item.getCurrency();
+
+        if (Misc.equalStrings(oldCurrency, newCurrency))
+            return;
+
+        List<Item> newList = copyList();
+        newList.get(position)
+               .toTransactionAccount()
+               .setCurrency(newCurrency);
+
+        setItems(newList);
+    }
+    public LiveData<Integer> getAccountCount() {
+        return accountCount;
+    }
+    public boolean accountListIsEmpty() {
+        List<Item> items = Objects.requireNonNull(this.items.getValue());
+
+        for (Item item : items) {
+            if (!(item instanceof TransactionAccount))
+                continue;
+
+            if (!((TransactionAccount) item).isEmpty())
+                return false;
+        }
+
+        return true;
+    }
+
+    public static class FocusInfo {
+        int position;
+        FocusedElement element;
+        public FocusInfo(int position, FocusedElement element) {
+            this.position = position;
+            this.element = element;
+        }
+    }
+
+    static abstract class Item {
+        private static int idDispenser = 0;
+        protected int id;
+        private Item() {
+            synchronized (Item.class) {
+                id = ++idDispenser;
             }
         }
+        public static Item from(Item origin) {
+            if (origin instanceof TransactionHead)
+                return new TransactionHead((TransactionHead) origin);
+            if (origin instanceof TransactionAccount)
+                return new TransactionAccount((TransactionAccount) origin);
+            if (origin instanceof BottomFiller)
+                return new BottomFiller((BottomFiller) origin);
+            throw new RuntimeException("Don't know how to handle " + origin);
+        }
+        public int getId() {
+            return id;
+        }
+        public abstract ItemType getType();
+        public TransactionHead toTransactionHead() {
+            if (this instanceof TransactionHead)
+                return (TransactionHead) this;
+
+            throw new IllegalStateException("Wrong item type " + this);
+        }
+        public TransactionAccount toTransactionAccount() {
+            if (this instanceof TransactionAccount)
+                return (TransactionAccount) this;
+
+            throw new IllegalStateException("Wrong item type " + this);
+        }
+        public boolean equalContents(@Nullable Object item) {
+            if (item == null)
+                return false;
+
+            if (!getClass().equals(item.getClass()))
+                return false;
+
+            // shortcut - comparing same instance
+            if (item == this)
+                return true;
+
+            if (this instanceof TransactionHead)
+                return ((TransactionHead) item).equalContents((TransactionHead) this);
+            if (this instanceof TransactionAccount)
+                return ((TransactionAccount) item).equalContents((TransactionAccount) this);
+            if (this instanceof BottomFiller)
+                return true;
+
+            throw new RuntimeException("Don't know how to handle " + this);
+        }
+    }
+
+
+//==========================================================================================
+
+    public static class TransactionHead extends Item {
+        private SimpleDate date;
+        private String description;
+        private String comment;
+        TransactionHead(String description) {
+            super();
+            this.description = description;
+        }
+        public TransactionHead(TransactionHead origin) {
+            id = origin.id;
+            date = origin.date;
+            description = origin.description;
+            comment = origin.comment;
+        }
         public SimpleDate getDate() {
-            ensureType(ItemType.generalData);
-            return date.getValue();
+            return date;
         }
         public void setDate(SimpleDate date) {
-            ensureType(ItemType.generalData);
-            this.date.setValue(date);
+            this.date = date;
         }
         public void setDate(String text) throws ParseException {
-            if ((text == null) || text.trim()
-                                      .isEmpty())
-            {
-                setDate((SimpleDate) null);
+            if (Misc.emptyIsNull(text) == null) {
+                date = null;
                 return;
             }
 
-            SimpleDate date = Globals.parseLedgerDate(text);
-            this.setDate(date);
-        }
-        void observeDate(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                         @NonNull androidx.lifecycle.Observer<? super SimpleDate> observer) {
-            this.date.observe(owner, observer);
-        }
-        void stopObservingDate(@NonNull androidx.lifecycle.Observer<? super SimpleDate> observer) {
-            this.date.removeObserver(observer);
-        }
-        public String getDescription() {
-            ensureType(ItemType.generalData);
-            return description.getValue();
-        }
-        public void setDescription(String description) {
-            ensureType(ItemType.generalData);
-            this.description.setValue(description);
-        }
-        void observeDescription(@NonNull @NotNull androidx.lifecycle.LifecycleOwner owner,
-                                @NonNull androidx.lifecycle.Observer<? super String> observer) {
-            this.description.observe(owner, observer);
-        }
-        void stopObservingDescription(
-                @NonNull androidx.lifecycle.Observer<? super String> observer) {
-            this.description.removeObserver(observer);
-        }
-        public String getTransactionComment() {
-            ensureType(ItemType.generalData);
-            return comment.getValue();
-        }
-        public void setTransactionComment(String transactionComment) {
-            ensureType(ItemType.generalData);
-            this.comment.setValue(transactionComment);
-        }
-        void observeTransactionComment(@NonNull @NotNull LifecycleOwner owner,
-                                       @NonNull Observer<? super String> observer) {
-            ensureType(ItemType.generalData);
-            this.comment.observe(owner, observer);
-        }
-        void stopObservingTransactionComment(@NonNull Observer<? super String> observer) {
-            this.comment.removeObserver(observer);
-        }
-        public LedgerTransactionAccount getAccount() {
-            ensureType(ItemType.transactionRow);
-            return account;
-        }
-        public void setAccountName(String name) {
-            account.setAccountName(name);
+            date = Globals.parseLedgerDate(text);
         }
         /**
          * getFormattedDate()
@@ -396,75 +940,271 @@ public class NewTransactionModel extends ViewModel {
         String getFormattedDate() {
             if (date == null)
                 return null;
-            SimpleDate d = date.getValue();
-            if (d == null)
-                return null;
 
             Calendar today = GregorianCalendar.getInstance();
 
-            if (today.get(Calendar.YEAR) != d.year) {
-                return String.format(Locale.US, "%d/%02d/%02d", d.year, d.month, d.day);
+            if (today.get(Calendar.YEAR) != date.year) {
+                return String.format(Locale.US, "%d/%02d/%02d", date.year, date.month, date.day);
             }
 
-            if (today.get(Calendar.MONTH) != d.month - 1) {
-                return String.format(Locale.US, "%d/%02d", d.month, d.day);
+            if (today.get(Calendar.MONTH) + 1 != date.month) {
+                return String.format(Locale.US, "%d/%02d", date.month, date.day);
             }
 
-            return String.valueOf(d.day);
+            return String.valueOf(date.day);
         }
-        void observeEditableFlag(NewTransactionActivity activity, Observer<Boolean> observer) {
-            editable.observe(activity, observer);
+        @NonNull
+        @Override
+        public String toString() {
+            @SuppressLint("DefaultLocale") StringBuilder b = new StringBuilder(
+                    String.format("id:%d/%s", id, Integer.toHexString(hashCode())));
+
+            if (TextUtils.isEmpty(description))
+                b.append(" «no description»");
+            else
+                b.append(String.format(" descr'%s'", description));
+
+            if (date != null)
+                b.append(String.format("@%s", date.toString()));
+
+            if (!TextUtils.isEmpty(comment))
+                b.append(String.format(" /%s/", comment));
+
+            return b.toString();
         }
-        void stopObservingEditableFlag(Observer<Boolean> observer) {
-            editable.removeObserver(observer);
+        public String getDescription() {
+            return description;
         }
-        void observeComment(NewTransactionActivity activity, Observer<String> observer) {
-            comment.observe(activity, observer);
+        public void setDescription(String description) {
+            this.description = description;
         }
-        void stopObservingComment(Observer<String> observer) {
-            comment.removeObserver(observer);
+        public String getComment() {
+            return comment;
         }
         public void setComment(String comment) {
-            getAccount().setComment(comment);
-            this.comment.postValue(comment);
+            this.comment = comment;
         }
-        public Currency getCurrency() {
-            return this.currency.getValue();
+        @Override
+        public ItemType getType() {
+            return ItemType.generalData;
         }
-        public void setCurrency(Currency currency) {
-            Currency present = this.currency.getValue();
-            if ((currency == null) && (present != null) ||
-                (currency != null) && !currency.equals(present))
-            {
-                getAccount().setCurrency((currency != null && !currency.getName()
-                                                                       .isEmpty())
-                                         ? currency.getName() : null);
-                this.currency.setValue(currency);
-            }
+        public LedgerTransaction asLedgerTransaction() {
+            return new LedgerTransaction(null, date, description, Data.getProfile());
         }
-        void observeCurrency(NewTransactionActivity activity, Observer<Currency> observer) {
-            currency.observe(activity, observer);
+        public boolean equalContents(TransactionHead other) {
+            if (other == null)
+                return false;
+
+            return Objects.equals(date, other.date) &&
+                   TextUtils.equals(description, other.description) &&
+                   TextUtils.equals(comment, other.comment);
         }
-        void stopObservingCurrency(Observer<Currency> observer) {
-            currency.removeObserver(observer);
+    }
+
+    public static class BottomFiller extends Item {
+        public BottomFiller(BottomFiller origin) {
+            id = origin.id;
+            // nothing to do
         }
-        boolean isBottomFiller() {
-            return this.type == ItemType.bottomFiller;
+        public BottomFiller() {
+            super();
         }
-        boolean isAmountHintSet() {
+        @Override
+        public ItemType getType() {
+            return ItemType.bottomFiller;
+        }
+        @SuppressLint("DefaultLocale")
+        @NonNull
+        @Override
+        public String toString() {
+            return String.format("id:%d «bottom filler»", id);
+        }
+    }
+
+    public static class TransactionAccount extends Item {
+        private String accountName;
+        private String amountHint;
+        private String comment;
+        private String currency;
+        private float amount;
+        private boolean amountSet;
+        private boolean amountValid = true;
+        private FocusedElement focusedElement = FocusedElement.Account;
+        private boolean amountHintIsSet = false;
+        public TransactionAccount(TransactionAccount origin) {
+            id = origin.id;
+            accountName = origin.accountName;
+            amount = origin.amount;
+            amountSet = origin.amountSet;
+            amountHint = origin.amountHint;
+            amountHintIsSet = origin.amountHintIsSet;
+            comment = origin.comment;
+            currency = origin.currency;
+            amountValid = origin.amountValid;
+            focusedElement = origin.focusedElement;
+        }
+        public TransactionAccount(LedgerTransactionAccount account) {
+            super();
+            currency = account.getCurrency();
+            amount = account.getAmount();
+        }
+        public TransactionAccount(String accountName) {
+            super();
+            this.accountName = accountName;
+        }
+        public TransactionAccount(String accountName, String currency) {
+            super();
+            this.accountName = accountName;
+            this.currency = currency;
+        }
+        public boolean isAmountSet() {
+            return amountSet;
+        }
+        public String getAccountName() {
+            return accountName;
+        }
+        public void setAccountName(String accountName) {
+            this.accountName = accountName;
+        }
+        public float getAmount() {
+            if (!amountSet)
+                throw new IllegalStateException("Amount is not set");
+            return amount;
+        }
+        public void setAmount(float amount) {
+            this.amount = amount;
+            amountSet = true;
+        }
+        public void resetAmount() {
+            amountSet = false;
+        }
+        @Override
+        public ItemType getType() {
+            return ItemType.transactionRow;
+        }
+        public String getAmountHint() {
+            return amountHint;
+        }
+        public void setAmountHint(String amountHint) {
+            this.amountHint = amountHint;
+            amountHintIsSet = !TextUtils.isEmpty(amountHint);
+        }
+        public String getComment() {
+            return comment;
+        }
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+        public String getCurrency() {
+            return currency;
+        }
+        public void setCurrency(String currency) {
+            this.currency = currency;
+        }
+        public boolean isAmountValid() {
+            return amountValid;
+        }
+        public void setAmountValid(boolean amountValid) {
+            this.amountValid = amountValid;
+        }
+        public FocusedElement getFocusedElement() {
+            return focusedElement;
+        }
+        public void setFocusedElement(FocusedElement focusedElement) {
+            this.focusedElement = focusedElement;
+        }
+        public boolean isAmountHintSet() {
             return amountHintIsSet;
         }
-        void validateAmount() {
-            amountValid.setValue(true);
+        public void setAmountHintIsSet(boolean amountHintIsSet) {
+            this.amountHintIsSet = amountHintIsSet;
         }
-        void invalidateAmount() {
-            amountValid.setValue(false);
+        public boolean isEmpty() {
+            return !amountSet && Misc.emptyIsNull(accountName) == null &&
+                   Misc.emptyIsNull(comment) == null;
         }
-        void observeAmountValidity(NewTransactionActivity activity, Observer<Boolean> observer) {
-            amountValid.observe(activity, observer);
+        @SuppressLint("DefaultLocale")
+        @Override
+        public String toString() {
+            StringBuilder b = new StringBuilder();
+            b.append(String.format("id:%d/%s", id, Integer.toHexString(hashCode())));
+            if (!TextUtils.isEmpty(accountName))
+                b.append(String.format(" acc'%s'", accountName));
+
+            if (amountSet)
+                b.append(String.format(" %4.2f", amount));
+            else if (amountHintIsSet)
+                b.append(String.format(" (%s)", amountHint));
+
+            if (!TextUtils.isEmpty(currency))
+                b.append(" ")
+                 .append(currency);
+
+            if (!TextUtils.isEmpty(comment))
+                b.append(String.format(" /%s/", comment));
+
+            return b.toString();
         }
-        void stopObservingAmountValidity(Observer<Boolean> observer) {
-            amountValid.removeObserver(observer);
+        public boolean equalContents(TransactionAccount other) {
+            if (other == null)
+                return false;
+
+            boolean equal = TextUtils.equals(accountName, other.accountName) &&
+                            TextUtils.equals(comment, other.comment) &&
+                            (amountSet ? other.amountSet && amount == other.amount
+                                       : !other.amountSet) &&
+                            (amountHintIsSet ? other.amountHintIsSet &&
+                                               TextUtils.equals(amountHint, other.amountHint)
+                                             : !other.amountHintIsSet) &&
+                            TextUtils.equals(currency, other.currency);
+            Logger.debug("new-trans",
+                    String.format("Comparing {%s} and {%s}: %s", this.toString(), other.toString(),
+                            equal));
+            return equal;
+        }
+    }
+
+    private static class BalanceForCurrency {
+        private final HashMap<String, Float> hashMap = new HashMap<>();
+        float get(String currencyName) {
+            Float f = hashMap.get(currencyName);
+            if (f == null) {
+                f = 0f;
+                hashMap.put(currencyName, f);
+            }
+            return f;
+        }
+        void add(String currencyName, float amount) {
+            hashMap.put(currencyName, get(currencyName) + amount);
+        }
+        Set<String> currencies() {
+            return hashMap.keySet();
+        }
+        boolean containsCurrency(String currencyName) {
+            return hashMap.containsKey(currencyName);
+        }
+    }
+
+    private static class ItemsForCurrency {
+        private final HashMap<String, List<Item>> hashMap = new HashMap<>();
+        @NonNull
+        List<NewTransactionModel.Item> getList(@Nullable String currencyName) {
+            List<NewTransactionModel.Item> list = hashMap.get(currencyName);
+            if (list == null) {
+                list = new ArrayList<>();
+                hashMap.put(currencyName, list);
+            }
+            return list;
+        }
+        void add(@Nullable String currencyName, @NonNull NewTransactionModel.Item item) {
+            getList(currencyName).add(item);
+        }
+        int size(@Nullable String currencyName) {
+            return this.getList(currencyName)
+                       .size();
+        }
+        Set<String> currencies() {
+            return hashMap.keySet();
         }
     }
 }

@@ -24,6 +24,7 @@ import android.widget.Filter;
 import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.ArrayList;
@@ -36,6 +37,10 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
     private String profileUUID;
     public AccountAutocompleteAdapter(Context context) {
         super(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
+    }
+    public AccountAutocompleteAdapter(Context context, @NonNull MobileLedgerProfile profile) {
+        this(context);
+        profileUUID = profile.getUuid();
     }
     public void setProfileUUID(String profileUUID) {
         this.profileUUID = profileUUID;
