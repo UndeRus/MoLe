@@ -26,6 +26,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -563,7 +564,17 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 if (item instanceof NewTransactionModel.TransactionHead) {
                     NewTransactionModel.TransactionHead head = item.toTransactionHead();
                     b.newTransactionDate.setText(head.getFormattedDate());
-                    b.newTransactionDescription.setText(head.getDescription());
+
+                    // avoid triggering completion pop-up
+                    SimpleCursorAdapter a =
+                            (SimpleCursorAdapter) b.newTransactionDescription.getAdapter();
+                    try {
+                        b.newTransactionDescription.setAdapter(null);
+                        b.newTransactionDescription.setText(head.getDescription());
+                    }
+                    finally {
+                        b.newTransactionDescription.setAdapter(a);
+                    }
 
                     b.transactionComment.setText(head.getComment());
                     //styleComment(b.transactionComment, head.getComment());
@@ -576,7 +587,16 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 else if (item instanceof NewTransactionModel.TransactionAccount) {
                     NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
-                    b.accountRowAccName.setText(acc.getAccountName());
+                    // avoid triggering completion pop-up
+                    AccountAutocompleteAdapter a =
+                            (AccountAutocompleteAdapter) b.accountRowAccName.getAdapter();
+                    try {
+                        b.accountRowAccName.setAdapter(null);
+                        b.accountRowAccName.setText(acc.getAccountName());
+                    }
+                    finally {
+                        b.accountRowAccName.setAdapter(a);
+                    }
 
                     final String amountHint = acc.getAmountHint();
                     if (amountHint == null) {

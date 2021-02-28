@@ -451,6 +451,8 @@ public class NewTransactionModel extends ViewModel {
             else
                 item.resetAmount();
         }
+        if (BuildConfig.DEBUG)
+            dumpItemList("Loaded previous transaction", newList);
 
         if (singleNegativeIndex != -1) {
             firstNegative.resetAmount();
