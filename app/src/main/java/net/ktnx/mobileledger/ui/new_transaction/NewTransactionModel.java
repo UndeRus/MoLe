@@ -68,7 +68,6 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<Boolean> isSubmittable = new InertMutableLiveData<>(false);
     private final MutableLiveData<Boolean> showComments = new MutableLiveData<>(true);
     private final MutableLiveData<List<Item>> items = new MutableLiveData<>();
-    private final MutableLiveData<Integer> accountCount = new InertMutableLiveData<>(0);
     private final MutableLiveData<Boolean> simulateSave = new InertMutableLiveData<>(false);
     private final AtomicInteger busyCounter = new AtomicInteger(0);
     private final MutableLiveData<Boolean> busyFlag = new InertMutableLiveData<>(false);
@@ -93,8 +92,25 @@ public class NewTransactionModel extends ViewModel {
     }
     private void setItemsWithoutSubmittableChecks(@NonNull List<Item> list) {
         Logger.debug("new-trans", "model: Setting new item list");
+        final int cnt = list.size();
+        for (int i = 1; i < cnt - 1; i++) {
+            final TransactionAccount item = list.get(i)
+                                                .toTransactionAccount();
+            if (item.isLast) {
+                TransactionAccount replacement = new TransactionAccount(item);
+                replacement.isLast = false;
+                list.set(i, replacement);
+            }
+        }
+        final TransactionAccount last = list.get(cnt - 1)
+                                            .toTransactionAccount();
+        if (!last.isLast) {
+            TransactionAccount replacement = new TransactionAccount(last);
+            replacement.isLast = true;
+            list.set(cnt - 1, replacement);
+        }
+
         items.setValue(list);
-        accountCount.setValue(list.size() - 2);
     }
     private List<Item> copyList() {
         return copyList(null);
@@ -156,7 +172,7 @@ public class NewTransactionModel extends ViewModel {
         list.add(new TransactionHead(""));
         list.add(new TransactionAccount(""));
         list.add(new TransactionAccount(""));
-        items.setValue(list);
+        setItemsWithoutSubmittableChecks(list);
     }
     boolean accountsInInitialState() {
         final List<Item> list = items.getValue();
@@ -832,9 +848,6 @@ public class NewTransactionModel extends ViewModel {
 
         setItems(newList);
     }
-    public LiveData<Integer> getAccountCount() {
-        return accountCount;
-    }
     public boolean accountListIsEmpty() {
         List<Item> items = Objects.requireNonNull(this.items.getValue());
 
@@ -1019,6 +1032,7 @@ public class NewTransactionModel extends ViewModel {
         private boolean amountValid = true;
         private FocusedElement focusedElement = FocusedElement.Account;
         private boolean amountHintIsSet = false;
+        private boolean isLast = false;
         public TransactionAccount(TransactionAccount origin) {
             id = origin.id;
             accountName = origin.accountName;
@@ -1030,6 +1044,7 @@ public class NewTransactionModel extends ViewModel {
             currency = origin.currency;
             amountValid = origin.amountValid;
             focusedElement = origin.focusedElement;
+            isLast = origin.isLast;
         }
         public TransactionAccount(LedgerTransactionAccount account) {
             super();
@@ -1044,6 +1059,9 @@ public class NewTransactionModel extends ViewModel {
             super();
             this.accountName = accountName;
             this.currency = currency;
+        }
+        public boolean isLast() {
+            return isLast;
         }
         public boolean isAmountSet() {
             return amountSet;
@@ -1144,7 +1162,7 @@ public class NewTransactionModel extends ViewModel {
                             (amountHintIsSet ? other.amountHintIsSet &&
                                                TextUtils.equals(amountHint, other.amountHint)
                                              : !other.amountHintIsSet) &&
-                            TextUtils.equals(currency, other.currency);
+                            TextUtils.equals(currency, other.currency) && isLast == other.isLast;
             Logger.debug("new-trans",
                     String.format("Comparing {%s} and {%s}: %s", this.toString(), other.toString(),
                             equal));

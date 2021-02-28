@@ -264,16 +264,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                              ignoreFocusChanges = false;
                          }
                      });
-        adapter.model.getAccountCount()
-                     .observe(activity, count -> {
-                         final int adapterPosition = getAdapterPosition();
-                         final int layoutPosition = getLayoutPosition();
-
-                         if (adapterPosition == count)
-                             b.accountRowAccAmounts.setImeOptions(EditorInfo.IME_ACTION_DONE);
-                         else
-                             b.accountRowAccAmounts.setImeOptions(EditorInfo.IME_ACTION_NEXT);
-                     });
 
         Data.currencyGap.observe(activity,
                 hasGap -> updateCurrencyPositionAndPadding(Data.currencySymbolPosition.getValue(),
@@ -606,6 +596,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         b.accountRowAccAmounts.setHint(amountHint);
                     }
 
+                    b.accountRowAccAmounts.setImeOptions(
+                            acc.isLast() ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_NEXT);
+
                     setCurrencyString(acc.getCurrency());
                     b.accountRowAccAmounts.setText(
                             acc.isAmountSet() ? String.format("%4.2f", acc.getAmount()) : null);
@@ -616,6 +609,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     b.ntrData.setVisibility(View.GONE);
                     b.ntrAccount.setVisibility(View.VISIBLE);
                     b.ntrPadding.setVisibility(View.GONE);
+
                     setEditable(true);
                 }
                 else {
