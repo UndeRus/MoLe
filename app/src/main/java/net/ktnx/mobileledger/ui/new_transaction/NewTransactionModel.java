@@ -463,9 +463,9 @@ public class NewTransactionModel extends ViewModel {
             moveItemLast(newList, singlePositiveIndex);
         }
 
-        noteFocusChanged(1, FocusedElement.Description);
-
         setItems(newList);
+
+        noteFocusChanged(1, FocusedElement.Amount);
     }
     /**
      * A transaction is submittable if:
