@@ -738,8 +738,9 @@ public class NewTransactionModel extends ViewModel {
                         list = copyList(list);
                         liveListCopied = true;
                     }
-                    Item item = emptyItems.remove(1);
-                    list.remove(item);
+                    // the list is a copy, so the empty item is no longer present
+                    Item itemToRemove = emptyItems.remove(1);
+                    removeItemById(list, itemToRemove.id);
                     listChanged = true;
                 }
 
@@ -752,8 +753,8 @@ public class NewTransactionModel extends ViewModel {
                             list = copyList(list);
                             liveListCopied = true;
                         }
-                        Item item = emptyItems.get(0);
-                        list.remove(item);
+                        // the list is a copy, so the empty item is no longer present
+                        removeItemById(list, emptyItems.get(0).id);
                         listChanged = true;
                     }
                 }
@@ -789,6 +790,19 @@ public class NewTransactionModel extends ViewModel {
 
         if (listChanged && workingWithLiveList) {
             setItemsWithoutSubmittableChecks(list);
+        }
+    }
+    private void removeItemById(@NotNull List<Item> list, int id) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            list.removeIf(item -> item.id == id);
+        }
+        else {
+            for (Item item : list) {
+                if (item.id == id) {
+                    list.remove(item);
+                    break;
+                }
+            }
         }
     }
     @SuppressLint("DefaultLocale")
