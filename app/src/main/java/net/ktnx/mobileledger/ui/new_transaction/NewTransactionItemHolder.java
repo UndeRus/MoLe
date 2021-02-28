@@ -209,7 +209,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                          }
                          ignoreFocusChanges = true;
                          try {
-                             if (((focusInfo == null) ||
+                             if (((focusInfo == null) || (focusInfo.element == null) ||
                                   focusInfo.position != getAdapterPosition()) ||
                                  itemView.hasFocus())
                                  return;
