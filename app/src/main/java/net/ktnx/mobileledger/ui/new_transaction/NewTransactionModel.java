@@ -612,7 +612,11 @@ public class NewTransactionModel extends ViewModel {
                                         String.format("Resetting hint of '%s' [%s]",
                                                 Misc.nullIsEmpty(acc.getAccountName()),
                                                 balCurrency));
-                            if (acc.amountHintIsSet && !TextUtils.isEmpty(acc.getAmountHint())) {
+                            // skip if the amount is set, in which case the hint is not
+                            // important/visible
+                            if (!acc.isAmountSet() && acc.amountHintIsSet &&
+                                !TextUtils.isEmpty(acc.getAmountHint()))
+                            {
                                 if (workingWithLiveList && !liveListCopied) {
                                     list = copyList(list);
                                     liveListCopied = true;
@@ -1155,14 +1159,17 @@ public class NewTransactionModel extends ViewModel {
             if (other == null)
                 return false;
 
-            boolean equal = TextUtils.equals(accountName, other.accountName) &&
-                            TextUtils.equals(comment, other.comment) &&
-                            (amountSet ? other.amountSet && amount == other.amount
-                                       : !other.amountSet) &&
-                            (amountHintIsSet ? other.amountHintIsSet &&
-                                               TextUtils.equals(amountHint, other.amountHint)
-                                             : !other.amountHintIsSet) &&
-                            TextUtils.equals(currency, other.currency) && isLast == other.isLast;
+            boolean equal = TextUtils.equals(accountName, other.accountName);
+            equal = equal && TextUtils.equals(comment, other.comment) &&
+                    (amountSet ? other.amountSet && amount == other.amount : !other.amountSet);
+
+            // compare amount hint only if there is no amount
+            if (!amountSet)
+                equal = equal && (amountHintIsSet ? other.amountHintIsSet &&
+                                                    TextUtils.equals(amountHint, other.amountHint)
+                                                  : !other.amountHintIsSet);
+            equal = equal && TextUtils.equals(currency, other.currency) && isLast == other.isLast;
+
             Logger.debug("new-trans",
                     String.format("Comparing {%s} and {%s}: %s", this.toString(), other.toString(),
                             equal));
