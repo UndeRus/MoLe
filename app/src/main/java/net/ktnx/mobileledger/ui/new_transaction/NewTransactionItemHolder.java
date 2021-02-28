@@ -56,7 +56,7 @@ import java.util.Objects;
 
 class NewTransactionItemHolder extends RecyclerView.ViewHolder
         implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
-    private final String decimalDot;
+    private final String decimalDot = ".";
     private final MobileLedgerProfile mProfile;
     private final NewTransactionRowBinding b;
     private final NewTransactionItemsAdapter mAdapter;
@@ -90,7 +90,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         mProfile = Data.getProfile();
 
-        View.OnFocusChangeListener focusMonitor = (v, hasFocus) -> {
+        @SuppressLint("DefaultLocale") View.OnFocusChangeListener focusMonitor = (v, hasFocus) -> {
             final int id = v.getId();
             if (hasFocus) {
                 boolean wasSyncing = syncingData;
@@ -117,6 +117,19 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 }
                 finally {
                     syncingData = wasSyncing;
+                }
+            }
+            else {  // lost focus
+                if (id == R.id.account_row_acc_amounts) {
+                    try {
+                        String input = String.valueOf(b.accountRowAccAmounts.getText());
+                        input = input.replace(decimalSeparator, decimalDot);
+                        b.accountRowAccAmounts.setText(
+                                String.format("%4.2f", Float.parseFloat(input)));
+                    }
+                    catch (NumberFormatException ex) {
+                        // ignored
+                    }
                 }
             }
 
@@ -146,8 +159,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         Data.locale.observe(activity, locale -> decimalSeparator = String.valueOf(
                 DecimalFormatSymbols.getInstance(locale)
                                     .getMonetaryDecimalSeparator()));
-
-        decimalDot = ".";
 
         final TextWatcher tw = new TextWatcher() {
             @Override
