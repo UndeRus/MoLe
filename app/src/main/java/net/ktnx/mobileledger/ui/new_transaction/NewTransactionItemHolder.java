@@ -215,67 +215,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         commentFocusChanged(b.comment, false);
 
         adapter.model.getFocusInfo()
-                     .observe(activity, focusInfo -> {
-                         if (ignoreFocusChanges) {
-                             Logger.debug("new-trans", "Ignoring focus change");
-                             return;
-                         }
-                         ignoreFocusChanges = true;
-                         try {
-                             if (((focusInfo == null) || (focusInfo.element == null) ||
-                                  focusInfo.position != getAdapterPosition()) ||
-                                 itemView.hasFocus())
-                                 return;
-
-                             NewTransactionModel.Item item = getItem();
-                             if (item instanceof NewTransactionModel.TransactionHead) {
-                                 NewTransactionModel.TransactionHead head =
-                                         item.toTransactionHead();
-                                 // bad idea - double pop-up, and not really necessary.
-                                 // the user can tap the input to get the calendar
-                                 //if (!tvDate.hasFocus()) tvDate.requestFocus();
-                                 switch (focusInfo.element) {
-                                     case TransactionComment:
-                                         b.transactionComment.setVisibility(View.VISIBLE);
-                                         b.transactionComment.requestFocus();
-                                         break;
-                                     case Description:
-                                         boolean focused =
-                                                 b.newTransactionDescription.requestFocus();
-//                            tvDescription.dismissDropDown();
-                                         if (focused)
-                                             Misc.showSoftKeyboard(
-                                                     (NewTransactionActivity) b.getRoot()
-                                                                               .getContext());
-                                         break;
-                                 }
-                             }
-                             else if (item instanceof NewTransactionModel.TransactionAccount) {
-                                 NewTransactionModel.TransactionAccount acc =
-                                         item.toTransactionAccount();
-                                 switch (focusInfo.element) {
-                                     case Amount:
-                                         b.accountRowAccAmounts.requestFocus();
-                                         break;
-                                     case Comment:
-                                         b.comment.setVisibility(View.VISIBLE);
-                                         b.comment.requestFocus();
-                                         break;
-                                     case Account:
-                                         boolean focused = b.accountRowAccName.requestFocus();
-//                                         b.accountRowAccName.dismissDropDown();
-                                         if (focused)
-                                             Misc.showSoftKeyboard(
-                                                     (NewTransactionActivity) b.getRoot()
-                                                                               .getContext());
-                                         break;
-                                 }
-                             }
-                         }
-                         finally {
-                             ignoreFocusChanges = false;
-                         }
-                     });
+                     .observe(activity, this::applyFocus);
 
         Data.currencyGap.observe(activity,
                 hasGap -> updateCurrencyPositionAndPadding(Data.currencySymbolPosition.getValue(),
@@ -330,6 +270,61 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                          b.transactionCommentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
                      });
+    }
+    private void applyFocus(NewTransactionModel.FocusInfo focusInfo) {
+        if (ignoreFocusChanges) {
+            Logger.debug("new-trans", "Ignoring focus change");
+            return;
+        }
+        ignoreFocusChanges = true;
+        try {
+            if (((focusInfo == null) || (focusInfo.element == null) ||
+                 focusInfo.position != getAdapterPosition()))
+                return;
+
+            NewTransactionModel.Item item = getItem();
+            if (item instanceof NewTransactionModel.TransactionHead) {
+                NewTransactionModel.TransactionHead head = item.toTransactionHead();
+                // bad idea - double pop-up, and not really necessary.
+                // the user can tap the input to get the calendar
+                //if (!tvDate.hasFocus()) tvDate.requestFocus();
+                switch (focusInfo.element) {
+                    case TransactionComment:
+                        b.transactionComment.setVisibility(View.VISIBLE);
+                        b.transactionComment.requestFocus();
+                        break;
+                    case Description:
+                        boolean focused = b.newTransactionDescription.requestFocus();
+//                            tvDescription.dismissDropDown();
+                        if (focused)
+                            Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
+                                                                            .getContext());
+                        break;
+                }
+            }
+            else if (item instanceof NewTransactionModel.TransactionAccount) {
+                NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
+                switch (focusInfo.element) {
+                    case Amount:
+                        b.accountRowAccAmounts.requestFocus();
+                        break;
+                    case Comment:
+                        b.comment.setVisibility(View.VISIBLE);
+                        b.comment.requestFocus();
+                        break;
+                    case Account:
+                        boolean focused = b.accountRowAccName.requestFocus();
+//                                         b.accountRowAccName.dismissDropDown();
+                        if (focused)
+                            Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
+                                                                            .getContext());
+                        break;
+                }
+            }
+        }
+        finally {
+            ignoreFocusChanges = false;
+        }
     }
     public void checkAmountValid(String s) {
         boolean valid = true;
@@ -653,6 +648,9 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 else {
                     throw new RuntimeException("Don't know how to handle " + item);
                 }
+
+                applyFocus(mAdapter.model.getFocusInfo()
+                                         .getValue());
             }
             finally {
                 syncingData = false;
