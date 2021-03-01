@@ -492,8 +492,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 head.setDate(String.valueOf(b.newTransactionDate.getText()));
 
                 // transaction description is required
-                if (!significantChange && TextUtils.isEmpty(head.getDescription()) !=
-                                          TextUtils.isEmpty(b.newTransactionDescription.getText()))
+                if (TextUtils.isEmpty(head.getDescription()) !=
+                    TextUtils.isEmpty(b.newTransactionDescription.getText()))
                     significantChange = true;
 
                 head.setDescription(String.valueOf(b.newTransactionDescription.getText()));
@@ -503,8 +503,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
                 // having account name is important
-                if (!significantChange && TextUtils.isEmpty(acc.getAccountName()) !=
-                                          TextUtils.isEmpty(b.accountRowAccName.getText()))
+                if (TextUtils.isEmpty(acc.getAccountName()) !=
+                    TextUtils.isEmpty(b.accountRowAccName.getText()))
                     significantChange = true;
 
                 acc.setAccountName(String.valueOf(b.accountRowAccName.getText()));
