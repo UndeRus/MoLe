@@ -1035,7 +1035,7 @@ public class NewTransactionModel extends ViewModel {
         private boolean amountSet;
         private boolean amountValid = true;
         private FocusedElement focusedElement = FocusedElement.Account;
-        private boolean amountHintIsSet = false;
+        private boolean amountHintIsSet = true;
         private boolean isLast = false;
         public TransactionAccount(TransactionAccount origin) {
             id = origin.id;
