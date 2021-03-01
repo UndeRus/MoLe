@@ -176,10 +176,11 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     return;
 
                 Logger.debug("textWatcher", "calling syncData()");
-                syncData();
-                Logger.debug("textWatcher",
-                        "syncData() returned, checking if transaction is submittable");
-                adapter.model.checkTransactionSubmittable(null);
+                if (syncData()) {
+                    Logger.debug("textWatcher",
+                            "syncData() returned, checking if transaction is submittable");
+                    adapter.model.checkTransactionSubmittable(null);
+                }
                 Logger.debug("textWatcher", "done");
             }
         };
@@ -487,16 +488,30 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
         syncingData = true;
 
+        boolean significantChange = false;
+
         try {
             if (item instanceof NewTransactionModel.TransactionHead) {
                 NewTransactionModel.TransactionHead head = item.toTransactionHead();
 
                 head.setDate(String.valueOf(b.newTransactionDate.getText()));
+
+                // transaction description is required
+                if (!significantChange && TextUtils.isEmpty(head.getDescription()) !=
+                                          TextUtils.isEmpty(b.newTransactionDescription.getText()))
+                    significantChange = true;
+
                 head.setDescription(String.valueOf(b.newTransactionDescription.getText()));
                 head.setComment(String.valueOf(b.transactionComment.getText()));
             }
             else if (item instanceof NewTransactionModel.TransactionAccount) {
                 NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
+
+                // having account name is important
+                if (!significantChange && TextUtils.isEmpty(acc.getAccountName()) !=
+                                          TextUtils.isEmpty(b.accountRowAccName.getText()))
+                    significantChange = true;
+
                 acc.setAccountName(String.valueOf(b.accountRowAccName.getText()));
 
                 acc.setComment(String.valueOf(b.comment.getText()));
@@ -505,36 +520,48 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 amount = amount.trim();
 
                 if (amount.isEmpty()) {
+                    if (acc.isAmountSet())
+                        significantChange = true;
                     acc.resetAmount();
                     acc.setAmountValid(true);
                 }
                 else {
                     try {
                         amount = amount.replace(decimalSeparator, decimalDot);
-                        acc.setAmount(Float.parseFloat(amount));
+                        final float parsedAmount = Float.parseFloat(amount);
+                        if (!acc.isAmountSet() || !Misc.equalFloats(parsedAmount, acc.getAmount()))
+                            significantChange = true;
+                        acc.setAmount(parsedAmount);
                         acc.setAmountValid(true);
                     }
                     catch (NumberFormatException e) {
                         Logger.debug("new-trans", String.format(
                                 "assuming amount is not set due to number format exception. " +
                                 "input was '%s'", amount));
+                        if (acc.isAmountValid())
+                            significantChange = true;
                         acc.setAmountValid(false);
                     }
                     final String curr = String.valueOf(b.currency.getText());
+                    final String currValue;
                     if (curr.equals(b.currency.getContext()
                                               .getResources()
                                               .getString(R.string.currency_symbol)) ||
                         curr.isEmpty())
-                        acc.setCurrency(null);
+                        currValue = null;
                     else
-                        acc.setCurrency(curr);
+                        currValue = curr;
+
+                    if (!significantChange && !TextUtils.equals(acc.getCurrency(), currValue))
+                        significantChange = true;
+                    acc.setCurrency(currValue);
                 }
             }
             else {
                 throw new RuntimeException("Should not happen");
             }
 
-            return true;
+            return significantChange;
         }
         catch (ParseException e) {
             throw new RuntimeException("Should not happen", e);

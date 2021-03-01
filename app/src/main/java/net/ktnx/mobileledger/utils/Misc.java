@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -32,6 +32,7 @@ public class Misc {
     public static boolean isZero(float f) {
         return (f < 0.005) && (f > -0.005);
     }
+    public static boolean equalFloats(float a, float b) { return isZero(a - b); }
     public static void showSoftKeyboard(Activity activity) {
         // make the keyboard appear
         Configuration cf = activity.getResources()
@@ -85,15 +86,19 @@ public class Misc {
     }
     @Contract(value = "null, null -> true; null, !null -> false; !null, null -> false", pure = true)
     public static boolean equalIntegers(Integer a, Integer b) {
-        if ( a == null && b == null) return true;
-        if (a == null || b == null) return false;
+        if (a == null && b == null)
+            return true;
+        if (a == null || b == null)
+            return false;
 
         return a.equals(b);
     }
     @Contract(value = "null, null -> true; null, !null -> false; !null, null -> false", pure = true)
     public static boolean equalLongs(Long a, Long b) {
-        if ( a == null && b == null) return true;
-        if (a == null || b == null) return false;
+        if (a == null && b == null)
+            return true;
+        if (a == null || b == null)
+            return false;
 
         return a.equals(b);
     }
