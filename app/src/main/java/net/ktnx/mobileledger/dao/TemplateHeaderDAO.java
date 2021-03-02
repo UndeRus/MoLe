@@ -66,7 +66,7 @@ public abstract class TemplateHeaderDAO {
         });
     }
 
-    @Query("SELECT * FROM templates ORDER BY UPPER(name)")
+    @Query("SELECT * FROM templates ORDER BY is_fallback, UPPER(name)")
     public abstract LiveData<List<TemplateHeader>> getTemplates();
 
     @Query("SELECT * FROM templates WHERE id = :id")
