@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.navigation.NavController;
@@ -37,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsFragmentBinding;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.utils.Logger;
 
 public class TemplateDetailsFragment extends Fragment {
@@ -121,6 +123,10 @@ public class TemplateDetailsFragment extends Fragment {
         b.patternDetailsRecyclerView.setAdapter(adapter);
         mViewModel.getItems(mPatternId)
                   .observe(getViewLifecycleOwner(), adapter::setItems);
+
+        FragmentActivity activity = requireActivity();
+        if (activity instanceof FabManager.FabHandler)
+            FabManager.handle((FabManager.FabHandler) activity, b.patternDetailsRecyclerView);
 
         return b.getRoot();
     }

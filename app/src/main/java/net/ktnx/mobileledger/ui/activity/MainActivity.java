@@ -17,9 +17,7 @@
 
 package net.ktnx.mobileledger.ui.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.TimeInterpolator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.ShortcutInfo;
@@ -32,7 +30,6 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
@@ -56,6 +53,7 @@ import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.databinding.ActivityMainBinding;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.new_transaction.NewTransactionActivity;
@@ -78,7 +76,7 @@ import java.util.Objects;
  * TODO: reports
  *  */
 
-public class MainActivity extends ProfileThemedActivity {
+public class MainActivity extends ProfileThemedActivity implements FabManager.FabHandler {
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
@@ -95,8 +93,7 @@ public class MainActivity extends ProfileThemedActivity {
     private MainModel mainModel;
     private ActivityMainBinding b;
     private int fabVerticalOffset;
-    private ViewPropertyAnimator fabSlideAnimator;
-    private boolean wantedFabState = FAB_SHOWN;
+    private FabManager fabManager;
     @Override
     protected void onStart() {
         super.onStart();
@@ -256,6 +253,8 @@ public class MainActivity extends ProfileThemedActivity {
             mProfileListAdapter.notifyDataSetChanged();
         });
 
+        fabManager = new FabManager(b.btnAddTransaction);
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
 
         llm.setOrientation(RecyclerView.VERTICAL);
@@ -271,7 +270,7 @@ public class MainActivity extends ProfileThemedActivity {
                 @Override
                 public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
                     if (slideOffset > 0.2)
-                        fabHide();
+                        fabManager.hideFab();
                 }
                 @Override
                 public void onDrawerClosed(View drawerView) {
@@ -286,7 +285,7 @@ public class MainActivity extends ProfileThemedActivity {
                     super.onDrawerOpened(drawerView);
                     mProfileListAdapter.setAnimationsEnabled(true);
                     Data.drawerOpen.setValue(true);
-                    fabHide();
+                    fabManager.hideFab();
                 }
             };
             b.drawerLayout.addDrawerListener(drawerListener);
@@ -639,60 +638,21 @@ public class MainActivity extends ProfileThemedActivity {
         }
     }
     public void fabShouldShow() {
-        if (fabVerticalOffset <= 0) {
-            int top = b.btnAddTransaction.getTop();
-            int parentHeight = b.mainAppLayout.getHeight();
-            fabVerticalOffset = parentHeight - top;
-        }
-        if ((profile != null) && profile.isPostingPermitted() && !b.drawerLayout.isOpen()) {
-            fabShow();
-        }
-        else
-            fabHide();
+        if ((profile != null) && profile.isPostingPermitted() && !b.drawerLayout.isOpen())
+            fabManager.showFab();
     }
-    private void fabShow() {
-        if (wantedFabState == FAB_SHOWN)
-            return;
-
-//        b.btnAddTransaction.show();
-        if (this.fabSlideAnimator != null) {
-            this.fabSlideAnimator.cancel();
-            b.btnAddTransaction.clearAnimation();
-        }
-
-        wantedFabState = FAB_SHOWN;
-        slideFabTo(b.btnAddTransaction, 0, 200L,
-                com.google.android.material.animation.AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR);
+    @Override
+    public Context getContext() {
+        return this;
     }
-    public void fabHide() {
-        if (wantedFabState == FAB_HIDDEN)
-            return;
-
-        if (fabVerticalOffset <= 0)
-            return;
-
-//        b.btnAddTransaction.hide();
-        if (this.fabSlideAnimator != null) {
-            this.fabSlideAnimator.cancel();
-            b.btnAddTransaction.clearAnimation();
-        }
-
-        wantedFabState = FAB_HIDDEN;
-        slideFabTo(b.btnAddTransaction, fabVerticalOffset, 150L,
-                com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR);
+    @Override
+    public void showManagedFab() {
+        fabShouldShow();
     }
-    private void slideFabTo(View view, int target, long duration, TimeInterpolator interpolator) {
-        fabSlideAnimator = view.animate()
-                               .translationY((float) target)
-                               .setInterpolator(interpolator)
-                               .setDuration(duration)
-                               .setListener(new AnimatorListenerAdapter() {
-                                   public void onAnimationEnd(Animator animation) {
-                                       fabSlideAnimator = null;
-                                   }
-                               });
+    @Override
+    public void hideManagedFab() {
+        fabManager.hideFab();
     }
-
     public static class SectionsPagerAdapter extends FragmentStateAdapter {
 
         public SectionsPagerAdapter(@NonNull FragmentActivity fragmentActivity) {

@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.AccountListItem;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
@@ -89,7 +90,8 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         mainActivity.fabShouldShow();
 
-        manageFabOnScroll();
+        if (mainActivity instanceof FabManager.FabHandler)
+            FabManager.handle((FabManager.FabHandler) mainActivity, root);
 
         refreshLayout = view.findViewById(R.id.account_swipe_refresh_layout);
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);

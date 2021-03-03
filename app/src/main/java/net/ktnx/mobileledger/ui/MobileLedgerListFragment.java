@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.view.MotionEvent;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,7 +25,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;
 import net.ktnx.mobileledger.utils.Colors;
-import net.ktnx.mobileledger.utils.DimensionUtils;
 
 public class MobileLedgerListFragment extends Fragment {
     public SwipeRefreshLayout refreshLayout;
@@ -46,45 +43,5 @@ public class MobileLedgerListFragment extends Fragment {
         if (refreshLayout == null)
             return;
         refreshLayout.setRefreshing(isRunning);
-    }
-    protected void manageFabOnScroll() {
-        final MainActivity mainActivity = getMainActivity();
-        int triggerPixels = DimensionUtils.dp2px(mainActivity, 10f);
-        root.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            private float upAnchor = -1;
-            private float lastY;
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-                switch (e.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        lastY = upAnchor = e.getAxisValue(MotionEvent.AXIS_Y);
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        final float currentY = e.getAxisValue(MotionEvent.AXIS_Y);
-                        if (currentY > lastY) {
-                            // swipe down
-                            upAnchor = lastY;
-
-                            mainActivity.fabShouldShow();
-                        }
-                        else {
-                            // swipe up
-                            if (currentY < upAnchor - triggerPixels)
-                                mainActivity.fabHide();
-                        }
-
-                        lastY = currentY;
-
-                        break;
-                }
-                return false;
-            }
-            @Override
-            public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-            }
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-            }
-        });
     }
 }

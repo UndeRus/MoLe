@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -36,6 +37,7 @@ import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.databinding.FragmentTemplateListBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -92,6 +94,11 @@ public class TemplateListFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(RecyclerView.VERTICAL);
         b.templateList.setLayoutManager(llm);
+
+        FragmentActivity activity = requireActivity();
+        if (activity instanceof FabManager.FabHandler)
+            FabManager.handle((FabManager.FabHandler) activity, b.templateList);
+
         return b.getRoot();
     }
     @Override

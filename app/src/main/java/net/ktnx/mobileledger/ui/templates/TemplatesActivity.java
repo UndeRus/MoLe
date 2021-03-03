@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.ui.templates;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -37,6 +38,7 @@ import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.databinding.ActivityTemplatesBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 import net.ktnx.mobileledger.utils.Logger;
@@ -45,11 +47,13 @@ import java.util.Objects;
 
 public class TemplatesActivity extends CrashReportingActivity
         implements TemplateListFragment.OnTemplateListFragmentInteractionListener,
-        TemplateDetailsFragment.InteractionListener, QR.QRScanResultReceiver, QR.QRScanTrigger {
+        TemplateDetailsFragment.InteractionListener, QR.QRScanResultReceiver, QR.QRScanTrigger,
+        FabManager.FabHandler {
     public static final String ARG_ADD_TEMPLATE = "add-template";
     private ActivityTemplatesBinding b;
     private NavController navController;
     private ActivityResultLauncher<Void> qrScanLauncher;
+    private FabManager fabManager;
     //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        super.onCreateOptionsMenu(menu);
@@ -75,22 +79,27 @@ public class TemplatesActivity extends CrashReportingActivity
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.templateListFragment) {
-                b.fabAdd.show();
-                b.fabSave.hide();
                 b.toolbarLayout.setTitle(getString(R.string.title_activity_templates));
+                b.fab.setImageResource(R.drawable.ic_add_white_24dp);
             }
-            if (destination.getId() == R.id.templateDetailsFragment) {
-                b.fabAdd.hide();
-                b.fabSave.show();
+            else {
+                b.fab.setImageResource(R.drawable.ic_save_white_24dp);
             }
         });
 
         b.toolbarLayout.setTitle(getString(R.string.title_activity_templates));
 
-        b.fabAdd.setOnClickListener(v -> onEditTemplate(null));
-        b.fabSave.setOnClickListener(v -> onSaveTemplate());
+        b.fab.setOnClickListener(v -> {
+            if (navController.getCurrentDestination()
+                             .getId() == R.id.templateListFragment)
+                onEditTemplate(null);
+            else
+                onSaveTemplate();
+        });
 
         qrScanLauncher = QR.registerLauncher(this, this);
+
+        fabManager = new FabManager(b.fab);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -169,5 +178,17 @@ public class TemplatesActivity extends CrashReportingActivity
     @Override
     public void triggerQRScan() {
         qrScanLauncher.launch(null);
+    }
+    @Override
+    public Context getContext() {
+        return this;
+    }
+    @Override
+    public void showManagedFab() {
+        fabManager.showFab();
+    }
+    @Override
+    public void hideManagedFab() {
+        fabManager.hideFab();
     }
 }

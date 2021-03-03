@@ -40,6 +40,7 @@ import net.ktnx.mobileledger.async.TransactionDateFinder;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
@@ -111,7 +112,8 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         mainActivity.fabShouldShow();
 
-        manageFabOnScroll();
+        if (mainActivity instanceof FabManager.FabHandler)
+            FabManager.handle((FabManager.FabHandler) mainActivity, root);
 
         LinearLayoutManager llm = new LinearLayoutManager(mainActivity);
 
