@@ -23,8 +23,7 @@ import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewParent;
+import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
 
 import androidx.annotation.NonNull;
@@ -141,16 +140,20 @@ public class FabManager {
     private void calcVerticalFabOffset() {
         if (fabVerticalOffset > 0)
             return;// already calculated
-        int top = fab.getTop();
-        ViewParent parent = fab.getParent();
-        while (parent != null && !(parent instanceof View))
-            parent = parent.getParent();
+        fab.measure(0, 0);
 
-        if (parent != null) {
-            View parentView = (View) parent;
-            int parentHeight = parentView.getHeight();
-            fabVerticalOffset = parentHeight - top;
-        }
+        int height = fab.getMeasuredHeight();
+
+        int bottomMargin;
+
+        ViewGroup.LayoutParams layoutParams = fab.getLayoutParams();
+        if (layoutParams instanceof ViewGroup.MarginLayoutParams)
+            bottomMargin = ((ViewGroup.MarginLayoutParams) layoutParams).bottomMargin;
+        else
+            throw new RuntimeException("Unsupported layout params " + layoutParams.getClass()
+                                                                                  .getCanonicalName());
+
+        fabVerticalOffset = height + bottomMargin;
     }
     public interface FabHandler {
         Context getContext();
