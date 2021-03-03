@@ -175,6 +175,7 @@ public class NewTransactionModel extends ViewModel {
         list.add(new TransactionHead(""));
         list.add(new TransactionAccount(""));
         list.add(new TransactionAccount(""));
+        noteFocusChanged(0, FocusedElement.Description);
         setItemsWithoutSubmittableChecks(list);
     }
     boolean accountsInInitialState() {
