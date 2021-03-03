@@ -604,7 +604,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     b.ntrData.setVisibility(View.VISIBLE);
                     b.ntrAccount.setVisibility(View.GONE);
-                    b.ntrPadding.setVisibility(View.GONE);
                     setEditable(true);
                 }
                 else if (item instanceof NewTransactionModel.TransactionAccount) {
@@ -641,7 +640,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     b.ntrData.setVisibility(View.GONE);
                     b.ntrAccount.setVisibility(View.VISIBLE);
-                    b.ntrPadding.setVisibility(View.GONE);
 
                     setEditable(true);
                 }

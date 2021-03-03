@@ -229,13 +229,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/ntr_padding"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:minHeight="80dp"
-        >
-
-    </FrameLayout>
-
 </LinearLayout>
