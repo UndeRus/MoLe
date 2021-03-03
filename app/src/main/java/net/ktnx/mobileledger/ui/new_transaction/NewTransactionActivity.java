@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.ui.new_transaction;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.AbstractCursor;
 import android.database.Cursor;
@@ -50,6 +51,7 @@ import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.MatchedTemplate;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.activity.ProfileThemedActivity;
 import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
@@ -67,11 +69,13 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class NewTransactionActivity extends ProfileThemedActivity
         implements TaskCallback, NewTransactionFragment.OnNewTransactionFragmentInteractionListener,
-        QR.QRScanTrigger, QR.QRScanResultReceiver, DescriptionSelectedCallback {
+        QR.QRScanTrigger, QR.QRScanResultReceiver, DescriptionSelectedCallback,
+        FabManager.FabHandler {
     private NavController navController;
     private NewTransactionModel model;
     private ActivityResultLauncher<Void> qrScanLauncher;
     private ActivityNewTransactionBinding b;
+    private FabManager fabManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,20 +97,20 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
         qrScanLauncher = QR.registerLauncher(this, this);
 
+        fabManager = new FabManager(b.fabAdd);
+
         model.isSubmittable()
              .observe(this, isSubmittable -> {
                  if (isSubmittable) {
-                     b.fabAdd.show();
+                     fabManager.showFab();
                  }
                  else {
-                     b.fabAdd.hide();
+                     fabManager.hideFab();
                  }
              });
 //        viewModel.checkTransactionSubmittable(listAdapter);
 
         b.fabAdd.setOnClickListener(v -> onFabPressed());
-
-
     }
     @Override
     protected void initProfile() {
@@ -418,5 +422,19 @@ public class NewTransactionActivity extends ProfileThemedActivity
         LedgerTransaction tr = model.constructLedgerTransaction();
 
         onTransactionSave(tr);
+    }
+    @Override
+    public Context getContext() {
+        return this;
+    }
+    @Override
+    public void showManagedFab() {
+        if (Objects.requireNonNull(model.isSubmittable()
+                                        .getValue()))
+            fabManager.showFab();
+    }
+    @Override
+    public void hideManagedFab() {
+        fabManager.hideFab();
     }
 }

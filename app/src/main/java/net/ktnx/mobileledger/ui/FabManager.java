@@ -75,7 +75,8 @@ public class FabManager {
                             break;
 
                         final float absoluteY = e.getRawY();
-//                        Logger.debug("touch", String.format(Locale.US, "Move to %4.2f", absoluteY));
+//                        Logger.debug("touch", String.format(Locale.US, "Move to %4.2f",
+//                        absoluteY));
 
                         if (absoluteY > absoluteAnchor + triggerAbsolutePixels) {
                             // swipe down

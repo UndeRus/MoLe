@@ -45,6 +45,7 @@ import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.utils.Logger;
 
@@ -213,6 +214,9 @@ public class NewTransactionFragment extends Fragment {
                      else
                          p.setVisibility(View.INVISIBLE);
                  });
+
+        if (activity instanceof FabManager.FabHandler)
+            FabManager.handle((FabManager.FabHandler) activity, list);
     }
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
