@@ -1159,6 +1159,9 @@ public class NewTransactionModel extends ViewModel {
             if (!TextUtils.isEmpty(comment))
                 b.append(String.format(" /%s/", comment));
 
+            if (isLast)
+                b.append(" last");
+
             return b.toString();
         }
         public boolean equalContents(TransactionAccount other) {
