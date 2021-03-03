@@ -146,7 +146,7 @@ public class FabManager {
         while (parent != null && !(parent instanceof View))
             parent = parent.getParent();
 
-        if (parent instanceof View) {
+        if (parent != null) {
             View parentView = (View) parent;
             int parentHeight = parentView.getHeight();
             fabVerticalOffset = parentHeight - top;
