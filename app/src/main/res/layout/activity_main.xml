@@ -138,13 +138,15 @@
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/toolbar_height"
+                    android:layout_height="wrap_content"
                     android:background="?colorPrimary"
                     android:theme="@style/AppTheme.AppBarOverlay"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:popupTheme="@style/AppTheme.PopupOverlay"
+                    app:subtitleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"
+                    app:titleTextAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
                     />
 
 
