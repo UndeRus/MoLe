@@ -22,6 +22,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
@@ -37,6 +38,7 @@ import net.ktnx.mobileledger.utils.Logger;
 public class FabManager {
     private static final boolean FAB_SHOWN = true;
     private static final boolean FAB_HIDDEN = false;
+    private static final int AUTO_SHOW_DELAY_MILLS = 4000;
     private final FloatingActionButton fab;
     private boolean wantedFabState = FAB_SHOWN;
     private ViewPropertyAnimator fabSlideAnimator;
@@ -44,58 +46,8 @@ public class FabManager {
     public FabManager(FloatingActionButton fab) {
         this.fab = fab;
     }
-    @SuppressLint("ClickableViewAccessibility")
-    public static void handle(FabHandler activity, RecyclerView recyclerView) {
-        final float triggerAbsolutePixels = DimensionUtils.dp2px(activity.getContext(), 20f);
-        final float triggerRelativePixels = triggerAbsolutePixels / 4f;
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                Logger.debug("touch", "Scrolled " + dy);
-                if (dy <= 0)
-                    activity.showManagedFab();
-                else
-                    activity.hideManagedFab();
-
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
-        recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
-            private float absoluteAnchor = -1;
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-                switch (e.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        absoluteAnchor = e.getRawY();
-//                        Logger.debug("touch",
-//                                String.format(Locale.US, "Touch down at %4.2f", absoluteAnchor));
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        if (absoluteAnchor < 0)
-                            break;
-
-                        final float absoluteY = e.getRawY();
-//                        Logger.debug("touch", String.format(Locale.US, "Move to %4.2f",
-//                        absoluteY));
-
-                        if (absoluteY > absoluteAnchor + triggerAbsolutePixels) {
-                            // swipe down
-//                            Logger.debug("touch", "SHOW");
-                            activity.showManagedFab();
-                            absoluteAnchor = absoluteY;
-                        }
-                        else if (absoluteY < absoluteAnchor - triggerAbsolutePixels) {
-                            // swipe up
-//                            Logger.debug("touch", "HIDE");
-                            activity.hideManagedFab();
-                            absoluteAnchor = absoluteY;
-                        }
-
-                        break;
-                }
-                return false;
-            }
-        });
+    public static void handle(FabHandler fabHandler, RecyclerView recyclerView) {
+        new ScrollFabHandler(fabHandler, recyclerView);
     }
     private void slideFabTo(int target, long duration, TimeInterpolator interpolator) {
         fabSlideAnimator = fab.animate()
@@ -162,5 +114,81 @@ public class FabManager {
         void showManagedFab();
 
         void hideManagedFab();
+    }
+
+    public static class ScrollFabHandler {
+        final private FabHandler fabHandler;
+        private int generation = 0;
+        @SuppressLint("ClickableViewAccessibility")
+        ScrollFabHandler(FabHandler fabHandler, RecyclerView recyclerView) {
+            this.fabHandler = fabHandler;
+            final float triggerAbsolutePixels = DimensionUtils.dp2px(fabHandler.getContext(), 20f);
+            final float triggerRelativePixels = triggerAbsolutePixels / 4f;
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    Logger.debug("touch", "Scrolled " + dy);
+                    if (dy <= 0) {
+                        showFab();
+                    }
+                    else
+                        hideFab();
+
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+            });
+            recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
+                private float absoluteAnchor = -1;
+                @Override
+                public boolean onInterceptTouchEvent(@NonNull RecyclerView rv,
+                                                     @NonNull MotionEvent e) {
+                    switch (e.getActionMasked()) {
+                        case MotionEvent.ACTION_DOWN:
+                            absoluteAnchor = e.getRawY();
+//                        Logger.debug("touch",
+//                                String.format(Locale.US, "Touch down at %4.2f", absoluteAnchor));
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            if (absoluteAnchor < 0)
+                                break;
+
+                            final float absoluteY = e.getRawY();
+//                        Logger.debug("touch", String.format(Locale.US, "Move to %4.2f",
+//                        absoluteY));
+
+                            if (absoluteY > absoluteAnchor + triggerAbsolutePixels) {
+                                // swipe down
+//                            Logger.debug("touch", "SHOW");
+                                showFab();
+                                absoluteAnchor = absoluteY;
+                            }
+                            else if (absoluteY < absoluteAnchor - triggerAbsolutePixels) {
+                                // swipe up
+//                            Logger.debug("touch", "HIDE");
+                                hideFab();
+                                absoluteAnchor = absoluteY;
+                            }
+
+                            break;
+                    }
+                    return false;
+                }
+            });
+        }
+        private void hideFab() {
+            generation++;
+            int thisGeneration = generation;
+            fabHandler.hideManagedFab();
+            new Handler().postDelayed(() -> {
+                if (generation != thisGeneration)
+                    return;
+
+                showFab();
+            }, AUTO_SHOW_DELAY_MILLS);
+        }
+        private void showFab() {
+            generation++;
+            fabHandler.showManagedFab();
+        }
     }
 }
