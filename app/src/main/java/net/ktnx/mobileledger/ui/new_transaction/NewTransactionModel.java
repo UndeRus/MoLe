@@ -170,6 +170,7 @@ public class NewTransactionModel extends ViewModel {
         return this.isSubmittable;
     }
     void reset() {
+        Logger.debug("new-trans", "Resetting model");
         List<Item> list = new ArrayList<>();
         list.add(new TransactionHead(""));
         list.add(new TransactionAccount(""));
@@ -1039,6 +1040,7 @@ public class NewTransactionModel extends ViewModel {
         private FocusedElement focusedElement = FocusedElement.Account;
         private boolean amountHintIsSet = true;
         private boolean isLast = false;
+        private int accountNameCursorPosition;
         public TransactionAccount(TransactionAccount origin) {
             id = origin.id;
             accountName = origin.accountName;
@@ -1051,6 +1053,7 @@ public class NewTransactionModel extends ViewModel {
             amountValid = origin.amountValid;
             focusedElement = origin.focusedElement;
             isLast = origin.isLast;
+            accountNameCursorPosition = origin.accountNameCursorPosition;
         }
         public TransactionAccount(LedgerTransactionAccount account) {
             super();
@@ -1176,6 +1179,12 @@ public class NewTransactionModel extends ViewModel {
                     String.format("Comparing {%s} and {%s}: %s", this.toString(), other.toString(),
                             equal));
             return equal;
+        }
+        public int getAccountNameCursorPosition() {
+            return accountNameCursorPosition;
+        }
+        public void setAccountNameCursorPosition(int position) {
+            this.accountNameCursorPosition = position;
         }
     }
 

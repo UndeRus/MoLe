@@ -132,11 +132,16 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                 NewTransactionRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent,
                         false);
 
-        return new NewTransactionItemHolder(b, this);
+        final NewTransactionItemHolder newHolder = new NewTransactionItemHolder(b, this);
+        Logger.debug("new-trans",
+                "Creating new ViewHolder " + Integer.toHexString(newHolder.hashCode()));
+        return newHolder;
     }
     @Override
     public void onBindViewHolder(@NonNull NewTransactionItemHolder holder, int position) {
-        Logger.debug("bind", String.format(Locale.US, "Binding item at position %d", position));
+        Logger.debug("bind",
+                String.format(Locale.US, "Binding item at position %d, holder %s", position,
+                        Integer.toHexString(holder.hashCode())));
         NewTransactionModel.Item item = Objects.requireNonNull(differ.getCurrentList()
                                                                      .get(position));
         holder.bind(item);

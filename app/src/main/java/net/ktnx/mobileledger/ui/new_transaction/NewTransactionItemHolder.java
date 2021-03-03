@@ -503,11 +503,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
                 // having account name is important
+                final Editable incomingAccountName = b.accountRowAccName.getText();
                 if (TextUtils.isEmpty(acc.getAccountName()) !=
-                    TextUtils.isEmpty(b.accountRowAccName.getText()))
+                    TextUtils.isEmpty(incomingAccountName))
                     significantChange = true;
 
-                acc.setAccountName(String.valueOf(b.accountRowAccName.getText()));
+                acc.setAccountName(String.valueOf(incomingAccountName));
+                final int accNameSelEnd = b.accountRowAccName.getSelectionEnd();
+                final int accNameSelStart = b.accountRowAccName.getSelectionStart();
+                acc.setAccountNameCursorPosition(accNameSelEnd);
 
                 acc.setComment(String.valueOf(b.comment.getText()));
 
@@ -609,15 +613,26 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                 else if (item instanceof NewTransactionModel.TransactionAccount) {
                     NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
-                    // avoid triggering completion pop-up
-                    AccountAutocompleteAdapter a =
-                            (AccountAutocompleteAdapter) b.accountRowAccName.getAdapter();
-                    try {
-                        b.accountRowAccName.setAdapter(null);
-                        b.accountRowAccName.setText(acc.getAccountName());
-                    }
-                    finally {
-                        b.accountRowAccName.setAdapter(a);
+                    final String incomingAccountName = acc.getAccountName();
+                    final String presentAccountName = String.valueOf(b.accountRowAccName.getText());
+                    if (!TextUtils.equals(incomingAccountName, presentAccountName)) {
+                        Logger.debug("bind",
+                                String.format("Setting account name from '%s' to '%s' (| @ %d)",
+                                        presentAccountName, incomingAccountName,
+                                        acc.getAccountNameCursorPosition()));
+                        // avoid triggering completion pop-up
+                        AccountAutocompleteAdapter a =
+                                (AccountAutocompleteAdapter) b.accountRowAccName.getAdapter();
+                        try {
+                            b.accountRowAccName.setAdapter(null);
+                            b.accountRowAccName.setText(incomingAccountName);
+                            if (b.accountRowAccName.hasFocus())
+                                b.accountRowAccName.setSelection(
+                                        acc.getAccountNameCursorPosition());
+                        }
+                        finally {
+                            b.accountRowAccName.setAdapter(a);
+                        }
                     }
 
                     final String amountHint = acc.getAmountHint();
