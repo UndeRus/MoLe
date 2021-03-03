@@ -79,7 +79,7 @@ public class TemplatesActivity extends CrashReportingActivity
 
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.templateListFragment) {
-                b.toolbarLayout.setTitle(getString(R.string.title_activity_templates));
+                b.toolbar.setTitle(getString(R.string.title_activity_templates));
                 b.fab.setImageResource(R.drawable.ic_add_white_24dp);
             }
             else {
@@ -87,7 +87,7 @@ public class TemplatesActivity extends CrashReportingActivity
             }
         });
 
-        b.toolbarLayout.setTitle(getString(R.string.title_activity_templates));
+        b.toolbar.setTitle(getString(R.string.title_activity_templates));
 
         b.fab.setOnClickListener(v -> {
             if (navController.getCurrentDestination()
@@ -125,14 +125,14 @@ public class TemplatesActivity extends CrashReportingActivity
     public void onEditTemplate(Long id) {
         if (id == null) {
             navController.navigate(R.id.action_templateListFragment_to_templateDetailsFragment);
-            b.toolbarLayout.setTitle(getString(R.string.title_new_template));
+            b.toolbar.setTitle(getString(R.string.title_new_template));
         }
         else {
             Bundle bundle = new Bundle();
             bundle.putLong(TemplateDetailsFragment.ARG_TEMPLATE_ID, id);
             navController.navigate(R.id.action_templateListFragment_to_templateDetailsFragment,
                     bundle);
-            b.toolbarLayout.setTitle(getString(R.string.title_edit_template));
+            b.toolbar.setTitle(getString(R.string.title_edit_template));
         }
     }
     @Override
