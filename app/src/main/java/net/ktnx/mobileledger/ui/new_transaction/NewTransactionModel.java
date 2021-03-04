@@ -1049,7 +1049,7 @@ public class NewTransactionModel extends ViewModel {
         private boolean amountSet;
         private boolean amountValid = true;
         private FocusedElement focusedElement = FocusedElement.Account;
-        private boolean amountHintIsSet = true;
+        private boolean amountHintIsSet = false;
         private boolean isLast = false;
         private int accountNameCursorPosition;
         public TransactionAccount(TransactionAccount origin) {
