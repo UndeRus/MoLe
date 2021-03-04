@@ -230,12 +230,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                          if (showCurrency) {
                              b.currency.setVisibility(View.VISIBLE);
                              b.currencyButton.setVisibility(View.VISIBLE);
-                             b.currency.setText(mProfile.getDefaultCommodity());
+                             setCurrencyString(mProfile.getDefaultCommodity());
                          }
                          else {
                              b.currency.setVisibility(View.GONE);
                              b.currencyButton.setVisibility(View.GONE);
-                             b.currency.setText(null);
+                             setCurrencyString(null);
                          }
                      });
 
@@ -436,7 +436,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
     private void setCurrencyString(String currency) {
         @ColorInt int textColor = b.dummyText.getTextColors()
                                              .getDefaultColor();
-        if ((currency == null) || currency.isEmpty()) {
+        if (TextUtils.isEmpty(currency)) {
             b.currency.setText(R.string.currency_symbol);
             int alpha = (textColor >> 24) & 0xff;
             alpha = alpha * 3 / 4;

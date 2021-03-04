@@ -361,7 +361,20 @@ public class NewTransactionModel extends ViewModel {
             list.add(list.remove(index));
     }
     void toggleCurrencyVisible() {
-        showCurrency.setValue(!Objects.requireNonNull(showCurrency.getValue()));
+        final boolean newValue = !Objects.requireNonNull(showCurrency.getValue());
+
+        // remove currency from all items, or reset currency to the default
+        // no need to clone the list, because the removal of the currency won't lead to
+        // visual changes -- the currency fields will be hidden or reset to default anyway
+        // still, there may be changes in the submittable state
+        final List<Item> list = Objects.requireNonNull(this.items.getValue());
+        for (int i = 1; i < list.size(); i++) {
+            ((TransactionAccount) list.get(i)).setCurrency(newValue ? Data.getProfile()
+                                                                          .getDefaultCommodity()
+                                                                    : null);
+        }
+        checkTransactionSubmittable(null);
+        showCurrency.setValue(newValue);
     }
     void stopObservingBusyFlag(Observer<Boolean> observer) {
         busyFlag.removeObserver(observer);
