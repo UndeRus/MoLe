@@ -159,9 +159,10 @@ public class NewTransactionFragment extends Fragment {
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     final Resources resources = context.getResources();
                     final StringBuilder message = new StringBuilder();
-                    message.append(resources.getString(R.string.err_json_send_error_head));
-                    message.append("\n\n");
-                    message.append(error);
+                    message.append(resources.getString(R.string.err_json_send_error_head))
+                           .append("\n\n")
+                           .append(error)
+                           .append("\n\n");
                     if (mProfile.getApiVersion()
                                 .equals(API.auto))
                         message.append(
