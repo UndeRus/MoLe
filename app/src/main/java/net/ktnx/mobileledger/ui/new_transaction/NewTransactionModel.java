@@ -93,7 +93,6 @@ public class NewTransactionModel extends ViewModel {
         setItemsWithoutSubmittableChecks(newList);
     }
     private void setItemsWithoutSubmittableChecks(@NonNull List<Item> list) {
-        Logger.debug("new-trans", "model: Setting new item list");
         final int cnt = list.size();
         for (int i = 1; i < cnt - 1; i++) {
             final TransactionAccount item = list.get(i)
@@ -112,6 +111,8 @@ public class NewTransactionModel extends ViewModel {
             list.set(cnt - 1, replacement);
         }
 
+        if (BuildConfig.DEBUG)
+            dumpItemList("Before setValue()", list);
         items.setValue(list);
     }
     private List<Item> copyList() {
@@ -627,8 +628,8 @@ public class NewTransactionModel extends ViewModel {
                         if (Misc.equalStrings(acc.getCurrency(), balCurrency)) {
                             if (BuildConfig.DEBUG)
                                 Logger.debug("submittable",
-                                        String.format("Resetting hint of '%s' [%s]",
-                                                Misc.nullIsEmpty(acc.getAccountName()),
+                                        String.format(Locale.US, "Resetting hint of %d:'%s' [%s]",
+                                                i, Misc.nullIsEmpty(acc.getAccountName()),
                                                 balCurrency));
                             // skip if the amount is set, in which case the hint is not
                             // important/visible
@@ -806,7 +807,6 @@ public class NewTransactionModel extends ViewModel {
                 list.add(new TransactionAccount(""));
                 listChanged = true;
             }
-
 
             Logger.debug("submittable", submittable ? "YES" : "NO");
             isSubmittable.setValue(submittable);
