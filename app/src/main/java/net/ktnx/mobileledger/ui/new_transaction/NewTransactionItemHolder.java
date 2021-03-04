@@ -626,9 +626,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         try {
                             b.accountRowAccName.setAdapter(null);
                             b.accountRowAccName.setText(incomingAccountName);
-                            if (b.accountRowAccName.hasFocus())
-                                b.accountRowAccName.setSelection(
-                                        acc.getAccountNameCursorPosition());
+                            b.accountRowAccName.setSelection(acc.getAccountNameCursorPosition());
                         }
                         finally {
                             b.accountRowAccName.setAdapter(a);
