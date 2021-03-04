@@ -641,10 +641,6 @@ public class NewTransactionModel extends ViewModel {
                                 }
                                 final TransactionAccount newAcc = new TransactionAccount(acc);
                                 newAcc.setAmountHint(null);
-                                if (!liveListCopied) {
-                                    list = copyList(list);
-                                    liveListCopied = true;
-                                }
                                 list.set(i, newAcc);
                                 listChanged = true;
                             }
