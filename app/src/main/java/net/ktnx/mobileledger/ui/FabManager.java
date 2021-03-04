@@ -61,8 +61,10 @@ public class FabManager {
                               });
     }
     public void showFab() {
-        if (wantedFabState == FAB_SHOWN)
+        if (wantedFabState == FAB_SHOWN) {
+            Logger.debug("fab", "Ignoring request to show already visible FAB");
             return;
+        }
 
 //        b.btnAddTransaction.show();
         if (this.fabSlideAnimator != null) {
@@ -70,13 +72,16 @@ public class FabManager {
             fab.clearAnimation();
         }
 
+        Logger.debug("fab", "Showing FAB");
         wantedFabState = FAB_SHOWN;
         slideFabTo(0, 200L,
                 com.google.android.material.animation.AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR);
     }
     public void hideFab() {
-        if (wantedFabState == FAB_HIDDEN)
+        if (wantedFabState == FAB_HIDDEN) {
+            Logger.debug("fab", "Ignoring request to hide FAB -- already hidden");
             return;
+        }
 
         calcVerticalFabOffset();
 
@@ -86,6 +91,7 @@ public class FabManager {
             fab.clearAnimation();
         }
 
+        Logger.debug("fab", "Hiding FAB");
         wantedFabState = FAB_HIDDEN;
         slideFabTo(fabVerticalOffset, 150L,
                 com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR);
