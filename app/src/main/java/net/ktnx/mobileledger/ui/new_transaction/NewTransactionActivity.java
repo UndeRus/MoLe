@@ -416,7 +416,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         });
     }
     private void onFabPressed() {
-        b.fabAdd.hide();
+        fabManager.hideFab();
         Misc.hideSoftKeyboard(this);
 
         LedgerTransaction tr = model.constructLedgerTransaction();
