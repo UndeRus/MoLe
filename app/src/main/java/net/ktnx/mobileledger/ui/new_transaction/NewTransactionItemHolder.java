@@ -480,6 +480,12 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             return false;
         }
 
+        if (getAdapterPosition() < 0) {
+            // probably the row was swiped out
+            Logger.debug("new-trans", "Ignoring request to suncData(): adapter position negative");
+            return false;
+        }
+
         NewTransactionModel.Item item = getItem();
 
         syncingData = true;
