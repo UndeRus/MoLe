@@ -207,8 +207,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         b.currencyButton.setOnClickListener(v -> {
             CurrencySelectorFragment cpf = new CurrencySelectorFragment();
             cpf.showPositionAndPadding();
-            cpf.setOnCurrencySelectedListener(
-                    c -> adapter.setItemCurrency(getAdapterPosition(), c.getName()));
+            cpf.setOnCurrencySelectedListener(c -> adapter.setItemCurrency(getAdapterPosition(),
+                    (c == null) ? null : c.getName()));
             cpf.show(activity.getSupportFragmentManager(), "currency-selector");
         });
 
