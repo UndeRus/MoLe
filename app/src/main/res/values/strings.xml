@@ -236,4 +236,5 @@
     <string name="template_is_fallback_yes">Template will be offered for selection only when no templates match that aren\'t marked as fallback templates</string>
     <string name="template_is_fallback_no">Template is a primary, high priority one, not a catch-all</string>
     <string name="fallback_templates_divider">Fallback templates</string>
+    <string name="template_list_help_title">Templates</string>
 </resources>

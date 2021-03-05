@@ -17,9 +17,14 @@
 
 package net.ktnx.mobileledger.ui.templates;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -33,6 +38,7 @@ import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.databinding.FragmentTemplateListBinding;
 import net.ktnx.mobileledger.db.DB;
@@ -52,7 +58,6 @@ import java.util.List;
 public class TemplateListFragment extends Fragment {
     private FragmentTemplateListBinding b;
     private OnTemplateListFragmentInteractionListener mListener;
-
     public TemplateListFragment() {
         // Required empty public constructor
     }
@@ -70,8 +75,29 @@ public class TemplateListFragment extends Fragment {
         return fragment;
     }
     @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.template_list_menu, menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.menu_item_template_list_help) {
+            AlertDialog.Builder adb = new AlertDialog.Builder(requireContext());
+            adb.setTitle(R.string.template_list_help_title);
+            adb.setMessage(TextUtils.join("\n\n", requireContext().getResources()
+                                                                  .getStringArray(
+                                                                          R.array.template_list_help_text)));
+            adb.setPositiveButton(R.string.close_button, (dialog, buttonId) -> dialog.dismiss());
+            adb.create()
+               .show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 //        if (getArguments() != null) {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);

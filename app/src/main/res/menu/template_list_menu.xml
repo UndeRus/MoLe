@@ -22,6 +22,7 @@
     <item
         android:icon="@drawable/ic_baseline_help_24_white"
         android:title="@string/help_menu_item_title"
+        android:id="@+id/menu_item_template_list_help"
         app:showAsAction="ifRoom"
         />
 </menu>

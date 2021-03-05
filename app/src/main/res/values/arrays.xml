@@ -26,4 +26,10 @@
         <item>Duplicate</item>
         <item>Delete</item>
     </string-array>
+    <string-array name="template_list_help_text">
+        <item>Templates are like pre-filled transactions. Some of the transaction parameters are defined by the template, and others can be deduced from external source.</item>
+        <item>For example, when adding a new transaction, you could scan the QR code of a receipt and get the transaction description filled from the template, and date and amounts filled from the data in the QR code.</item>
+        <item>Templates describe which transaction parameters are fixed and which come from the external source.</item>
+        <item>Currently, scanning QR codes is the only available source. Support for pasting from the clipboard and reading/intercepting text messages (SMS) is planned for the future.</item>
+    </string-array>
 </resources>
