@@ -17,10 +17,8 @@
 
 package net.ktnx.mobileledger.ui.templates;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +42,7 @@ import net.ktnx.mobileledger.databinding.FragmentTemplateListBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.ui.FabManager;
+import net.ktnx.mobileledger.ui.HelpDialog;
 import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -82,14 +81,8 @@ public class TemplateListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_item_template_list_help) {
-            AlertDialog.Builder adb = new AlertDialog.Builder(requireContext());
-            adb.setTitle(R.string.template_list_help_title);
-            adb.setMessage(TextUtils.join("\n\n", requireContext().getResources()
-                                                                  .getStringArray(
-                                                                          R.array.template_list_help_text)));
-            adb.setPositiveButton(R.string.close_button, (dialog, buttonId) -> dialog.dismiss());
-            adb.create()
-               .show();
+            HelpDialog.show(requireContext(), R.string.template_list_help_title,
+                    R.array.template_list_help_text);
             return true;
         }
         return super.onOptionsItemSelected(item);
