@@ -32,4 +32,8 @@
         <item>Templates describe which transaction parameters are fixed and which come from the external source.</item>
         <item>Currently, scanning QR codes is the only available source. Support for pasting from the clipboard and reading/intercepting text messages (SMS) is planned for the future.</item>
     </string-array>
+    <string-array name="template_params_help">
+        <item>The pattern is a Regular expression ([Wikipedia↗](https://en.wikipedia.org/wiki/Regular_expression#Syntax)). It must match the input from the external source, or the template won\'t be considered when looking for templates corresponding to the input from the external source.</item>
+        <item>Capture groups may be used for filling some transaction parameters.</item>
+    </string-array>
 </resources>

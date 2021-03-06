@@ -237,4 +237,6 @@
     <string name="template_is_fallback_no">Template is a primary, high priority one, not a catch-all</string>
     <string name="fallback_templates_divider">Fallback templates</string>
     <string name="template_list_help_title">Templates</string>
+    <string name="template_details_template_params_label">Template parameters</string>
+    <string name="template_details_template_params_help_description">Show help on template parameters</string>
 </resources>
