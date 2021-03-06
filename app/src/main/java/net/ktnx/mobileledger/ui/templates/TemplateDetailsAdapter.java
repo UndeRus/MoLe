@@ -42,6 +42,7 @@ import net.ktnx.mobileledger.databinding.TemplateDetailsHeaderBinding;
 import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
+import net.ktnx.mobileledger.ui.HelpDialog;
 import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.TemplateDetailSourceSelectorFragment;
 import net.ktnx.mobileledger.utils.Logger;
@@ -414,6 +415,10 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     (view) -> b.templateIsFallbackSwitch.toggle();
             b.templateIsFallbackLabel.setOnClickListener(fallbackLabelClickListener);
             b.templateIsFallbackText.setOnClickListener(fallbackLabelClickListener);
+            b.templateDetailsTemplateParamsHelpButton.setOnClickListener(v -> HelpDialog.show(
+                    b.getRoot()
+                     .getContext(), R.string.template_details_template_params_label,
+                    R.array.template_params_help));
         }
         @NotNull
         private TemplateDetailsItem.Header getItem() {
