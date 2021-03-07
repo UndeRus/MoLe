@@ -125,8 +125,16 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                         String input = String.valueOf(b.accountRowAccAmounts.getText());
                         input = input.replace(decimalSeparator, decimalDot);
                         final String newText = String.format("%4.2f", Float.parseFloat(input));
-                        if (!newText.equals(input))
-                            b.accountRowAccAmounts.setText(newText);
+                        if (!newText.equals(input)) {
+                            boolean wasSyncingData = syncingData;
+                            syncingData = true;
+                            try {
+                                b.accountRowAccAmounts.setText(newText);
+                            }
+                            finally {
+                                syncingData = wasSyncingData;
+                            }
+                        }
                     }
                     catch (NumberFormatException ex) {
                         // ignored
