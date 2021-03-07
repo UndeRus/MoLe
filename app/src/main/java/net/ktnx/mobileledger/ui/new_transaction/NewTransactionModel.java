@@ -534,7 +534,8 @@ public class NewTransactionModel extends ViewModel {
         }
 
         if (BuildConfig.DEBUG)
-            dumpItemList("Before submittable checks", list);
+            dumpItemList(String.format("Before submittable checks (%s)",
+                    workingWithLiveList ? "LIVE LIST" : "custom list"), list);
 
         int accounts = 0;
         final BalanceForCurrency balance = new BalanceForCurrency();
@@ -972,7 +973,7 @@ public class NewTransactionModel extends ViewModel {
             if (TextUtils.isEmpty(description))
                 b.append(" «no description»");
             else
-                b.append(String.format(" descr'%s'", description));
+                b.append(String.format(" '%s'", description));
 
             if (date != null)
                 b.append(String.format("@%s", date.toString()));
