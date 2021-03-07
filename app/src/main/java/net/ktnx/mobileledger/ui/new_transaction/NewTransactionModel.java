@@ -688,7 +688,7 @@ public class NewTransactionModel extends ViewModel {
                         if (item == receiver) {
                             final String hint = String.format("%1.2f", -currencyBalance);
                             if (!acc.isAmountHintSet() ||
-                                !TextUtils.equals(acc.getAmountHint(), hint))
+                                !Misc.equalStrings(acc.getAmountHint(), hint))
                             {
                                 Logger.debug("submittable",
                                         String.format("Setting amount hint of {%s} to %s [%s]",
@@ -1007,8 +1007,8 @@ public class NewTransactionModel extends ViewModel {
                 return false;
 
             return Objects.equals(date, other.date) &&
-                   TextUtils.equals(description, other.description) &&
-                   TextUtils.equals(comment, other.comment);
+                   Misc.equalStrings(description, other.description) &&
+                   Misc.equalStrings(comment, other.comment);
         }
     }
 
@@ -1150,16 +1150,16 @@ public class NewTransactionModel extends ViewModel {
             if (other == null)
                 return false;
 
-            boolean equal = TextUtils.equals(accountName, other.accountName);
-            equal = equal && TextUtils.equals(comment, other.comment) &&
+            boolean equal = Misc.equalStrings(accountName, other.accountName);
+            equal = equal && Misc.equalStrings(comment, other.comment) &&
                     (amountSet ? other.amountSet && amount == other.amount : !other.amountSet);
 
             // compare amount hint only if there is no amount
             if (!amountSet)
                 equal = equal && (amountHintIsSet ? other.amountHintIsSet &&
-                                                    TextUtils.equals(amountHint, other.amountHint)
+                                                    Misc.equalStrings(amountHint, other.amountHint)
                                                   : !other.amountHintIsSet);
-            equal = equal && TextUtils.equals(currency, other.currency) && isLast == other.isLast;
+            equal = equal && Misc.equalStrings(currency, other.currency) && isLast == other.isLast;
 
             Logger.debug("new-trans",
                     String.format("Comparing {%s} and {%s}: %s", this.toString(), other.toString(),

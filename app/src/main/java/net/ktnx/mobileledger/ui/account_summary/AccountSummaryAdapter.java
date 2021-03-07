@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +41,7 @@ import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Locker;
+import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -71,9 +71,9 @@ public class AccountSummaryAdapter
                 if (oldType != newType)
                     return false;
 
-                return TextUtils.equals(oldItem.getAccount()
-                                               .getName(), newItem.getAccount()
-                                                                  .getName());
+                return Misc.equalStrings(oldItem.getAccount()
+                                                .getName(), newItem.getAccount()
+                                                                   .getName());
             }
             @Override
             public boolean areContentsTheSame(@NotNull AccountListItem oldItem,

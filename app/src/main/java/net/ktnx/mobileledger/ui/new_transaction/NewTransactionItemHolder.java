@@ -566,7 +566,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     else
                         currValue = curr;
 
-                    if (!significantChange && !TextUtils.equals(acc.getCurrency(), currValue))
+                    if (!significantChange && !Misc.equalStrings(acc.getCurrency(), currValue))
                         significantChange = true;
                     acc.setCurrency(currValue);
                 }
@@ -630,7 +630,7 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
 
                     final String incomingAccountName = acc.getAccountName();
                     final String presentAccountName = String.valueOf(b.accountRowAccName.getText());
-                    if (!TextUtils.equals(incomingAccountName, presentAccountName)) {
+                    if (!Misc.equalStrings(incomingAccountName, presentAccountName)) {
                         Logger.debug("bind",
                                 String.format("Setting account name from '%s' to '%s' (| @ %d)",
                                         presentAccountName, incomingAccountName,
