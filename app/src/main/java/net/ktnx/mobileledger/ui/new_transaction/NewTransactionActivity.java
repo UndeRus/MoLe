@@ -31,6 +31,7 @@ import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.core.view.MenuCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -159,15 +160,15 @@ public class NewTransactionActivity extends ProfileThemedActivity
         new AsyncCrasher().execute();
     }
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        if (!BuildConfig.DEBUG)
+            return true;
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.new_transaction, menu);
 
-        if (BuildConfig.DEBUG) {
-            menu.findItem(R.id.action_simulate_crash)
-                .setVisible(true);
-            menu.findItem(R.id.action_simulate_save)
-                .setVisible(true);
-        }
+        MenuCompat.setGroupDividerEnabled(menu, true);
 
         model.getSimulateSave()
              .observe(this, state -> {

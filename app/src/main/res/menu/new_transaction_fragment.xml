@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
@@ -19,30 +18,33 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-    <item
-        android:id="@+id/scan_qr"
-        android:icon="@drawable/ic_baseline_qr_code_scanner_24"
-        android:title="@string/scan_qr"
-        app:showAsAction="ifRoom"
-        />
-    <item
-        android:id="@+id/toggle_currency"
-        android:title="@string/show_currency_input"
-        android:checkable="true"
-        android:checked="false"
-        app:actionLayout="@layout/switch_item"
-        app:showAsAction="never"
-        />
-    <item
-        android:id="@+id/toggle_comments"
-        android:checkable="true"
-        android:title="@string/show_comments_switch"
-        app:actionLayout="@layout/switch_item"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_reset_new_transaction_activity"
-        android:icon="@drawable/ic_refresh_white_24dp"
-        android:title="@string/action_reset_new_transaction_activity_title"
-        app:showAsAction="never" />
-
+    <group android:id="@+id/new_transaction_fragment_menu_items">
+        <item
+            android:id="@+id/scan_qr"
+            android:icon="@drawable/ic_baseline_qr_code_scanner_24"
+            android:title="@string/scan_qr"
+            app:showAsAction="ifRoom"
+            />
+        <item
+            android:id="@+id/toggle_currency"
+            android:checkable="true"
+            android:checked="false"
+            android:title="@string/show_currency_input"
+            app:actionLayout="@layout/switch_item"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/toggle_comments"
+            android:checkable="true"
+            android:title="@string/show_comments_switch"
+            app:actionLayout="@layout/switch_item"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/action_reset_new_transaction_activity"
+            android:icon="@drawable/ic_refresh_white_24dp"
+            android:title="@string/action_reset_new_transaction_activity_title"
+            app:showAsAction="never"
+            />
+    </group>
 </menu>
