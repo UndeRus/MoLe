@@ -21,7 +21,6 @@
     <group android:id="@+id/new_transaction_debug_menu_items">
         <item
             android:id="@+id/action_simulate_crash"
-            android:onClick="simulateCrash"
             android:title="@string/crash_app_label"
             android:titleCondensed="@string/crash_app_condensed_label"
             app:showAsAction="never"
@@ -30,7 +29,6 @@
             android:id="@+id/action_simulate_save"
             android:checkable="true"
             android:checked="false"
-            android:onClick="toggleSimulateSave"
             android:title="@string/simulate_save_label"
             android:titleCondensed="@string/simulate_save_condensed_label"
             app:showAsAction="never"

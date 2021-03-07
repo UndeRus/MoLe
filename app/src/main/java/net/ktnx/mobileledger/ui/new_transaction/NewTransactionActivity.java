@@ -155,9 +155,10 @@ public class NewTransactionActivity extends ProfileThemedActivity
             navController.navigate(R.id.newTransactionFragment, b);
         }
     }
-    public void simulateCrash(MenuItem item) {
+    public boolean onSimulateCrashMenuItemClicked(MenuItem item) {
         debug("crash", "Will crash intentionally");
         new AsyncCrasher().execute();
+        return true;
     }
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -169,6 +170,11 @@ public class NewTransactionActivity extends ProfileThemedActivity
         getMenuInflater().inflate(R.menu.new_transaction, menu);
 
         MenuCompat.setGroupDividerEnabled(menu, true);
+
+        menu.findItem(R.id.action_simulate_save)
+            .setOnMenuItemClickListener(this::onToggleSimulateSaveMenuItemClicked);
+        menu.findItem(R.id.action_simulate_crash)
+            .setOnMenuItemClickListener(this::onSimulateCrashMenuItemClicked);
 
         model.getSimulateSave()
              .observe(this, state -> {
@@ -195,8 +201,9 @@ public class NewTransactionActivity extends ProfileThemedActivity
         else
             navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
     }
-    public void toggleSimulateSave(MenuItem item) {
+    public boolean onToggleSimulateSaveMenuItemClicked(MenuItem item) {
         model.toggleSimulateSave();
+        return true;
     }
 
     @Override
