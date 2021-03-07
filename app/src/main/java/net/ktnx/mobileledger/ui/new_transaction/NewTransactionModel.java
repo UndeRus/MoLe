@@ -348,6 +348,11 @@ public class NewTransactionModel extends ViewModel {
         List<Item> newList = shallowCopyList();
         Item item = newList.remove(fromIndex);
         newList.add(toIndex, item);
+
+        FocusInfo fi = focusInfo.getValue();
+        if (fi != null && fi.position == fromIndex)
+            noteFocusChanged(toIndex, fi.element);
+
         items.setValue(newList); // same count, same submittable state
     }
     void moveItemLast(List<Item> list, int index) {
