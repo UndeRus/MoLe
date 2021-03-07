@@ -116,11 +116,8 @@ public class NewTransactionModel extends ViewModel {
         items.setValue(list);
     }
     private List<Item> copyList() {
-        return copyList(null);
-    }
-    private List<Item> copyList(@Nullable List<Item> source) {
         List<Item> copy = new ArrayList<>();
-        List<Item> oldList = (source == null) ? items.getValue() : source;
+        List<Item> oldList = items.getValue();
 
         if (oldList != null)
             for (Item item : oldList) {
@@ -129,7 +126,7 @@ public class NewTransactionModel extends ViewModel {
 
         return copy;
     }
-    private List<Item> shallowCopyListWithoutItem(int position) {
+    private List<Item> copyListWithoutItem(int position) {
         List<Item> copy = new ArrayList<>();
         List<Item> oldList = items.getValue();
 
@@ -138,7 +135,7 @@ public class NewTransactionModel extends ViewModel {
             for (Item item : oldList) {
                 if (i++ == position)
                     continue;
-                copy.add(item);
+                copy.add(Item.from(item));
             }
         }
 
@@ -332,7 +329,11 @@ public class NewTransactionModel extends ViewModel {
         return null;
     }
     void removeItem(int pos) {
-        List<Item> newList = shallowCopyListWithoutItem(pos);
+        Logger.debug("new-trans", String.format(Locale.US, "Removing item at position %d", pos));
+        List<Item> newList = copyListWithoutItem(pos);
+        final FocusInfo fi = focusInfo.getValue();
+        if ((fi != null) && (pos < fi.position))
+            noteFocusChanged(fi.position - 1, fi.element);
         setItems(newList);
     }
     void noteFocusChanged(int position, FocusedElement element) {
@@ -522,9 +523,8 @@ public class NewTransactionModel extends ViewModel {
     @SuppressLint("DefaultLocale")
     void checkTransactionSubmittable(@Nullable List<Item> list) {
         boolean workingWithLiveList = false;
-        boolean liveListCopied = false;
         if (list == null) {
-            list = Objects.requireNonNull(items.getValue());
+            list = copyList();
             workingWithLiveList = true;
         }
 
@@ -636,13 +636,7 @@ public class NewTransactionModel extends ViewModel {
                             if (!acc.isAmountSet() && acc.amountHintIsSet &&
                                 !TextUtils.isEmpty(acc.getAmountHint()))
                             {
-                                if (workingWithLiveList && !liveListCopied) {
-                                    list = copyList(list);
-                                    liveListCopied = true;
-                                }
-                                final TransactionAccount newAcc = new TransactionAccount(acc);
-                                newAcc.setAmountHint(null);
-                                list.set(i, newAcc);
+                                acc.setAmountHint(null);
                                 listChanged = true;
                             }
                         }
@@ -693,13 +687,7 @@ public class NewTransactionModel extends ViewModel {
                                 Logger.debug("submittable",
                                         String.format("Setting amount hint of {%s} to %s [%s]",
                                                 acc.toString(), hint, balCurrency));
-                                if (workingWithLiveList & !liveListCopied) {
-                                    list = copyList(list);
-                                    liveListCopied = true;
-                                }
-                                final TransactionAccount newAcc = new TransactionAccount(acc);
-                                newAcc.setAmountHint(hint);
-                                list.set(i, newAcc);
+                                acc.setAmountHint(hint);
                                 listChanged = true;
                             }
                         }
@@ -710,13 +698,7 @@ public class NewTransactionModel extends ViewModel {
                                                 Misc.nullIsEmpty(acc.getAccountName()),
                                                 balCurrency));
                             if (acc.amountHintIsSet && !TextUtils.isEmpty(acc.getAmountHint())) {
-                                if (workingWithLiveList && !liveListCopied) {
-                                    list = copyList(list);
-                                    liveListCopied = true;
-                                }
-                                final TransactionAccount newAcc = new TransactionAccount(acc);
-                                newAcc.setAmountHint(null);
-                                list.set(i, newAcc);
+                                acc.setAmountHint(null);
                                 listChanged = true;
                             }
                         }
@@ -751,10 +733,6 @@ public class NewTransactionModel extends ViewModel {
 //                        }
 //
 //                        if (!foundIt)
-                    if (workingWithLiveList && !liveListCopied) {
-                        list = copyList(list);
-                        liveListCopied = true;
-                    }
                     final TransactionAccount newAcc = new TransactionAccount("", balCurrency);
                     final float bal = balance.get(balCurrency);
                     if (!Misc.isZero(bal) && currAmounts == currRows)
@@ -771,10 +749,6 @@ public class NewTransactionModel extends ViewModel {
             for (String currName : emptyRowsForCurrency.currencies()) {
                 List<Item> emptyItems = emptyRowsForCurrency.getList(currName);
                 while ((list.size() > MIN_ITEMS) && (emptyItems.size() > 1)) {
-                    if (workingWithLiveList && !liveListCopied) {
-                        list = copyList(list);
-                        liveListCopied = true;
-                    }
                     // the list is a copy, so the empty item is no longer present
                     Item itemToRemove = emptyItems.remove(1);
                     removeItemById(list, itemToRemove.id);
@@ -786,10 +760,6 @@ public class NewTransactionModel extends ViewModel {
                     List<Item> currItems = itemsForCurrency.getList(currName);
 
                     if (currItems.size() == 1) {
-                        if (workingWithLiveList && !liveListCopied) {
-                            list = copyList(list);
-                            liveListCopied = true;
-                        }
                         // the list is a copy, so the empty item is no longer present
                         removeItemById(list, emptyItems.get(0).id);
                         listChanged = true;
@@ -800,10 +770,6 @@ public class NewTransactionModel extends ViewModel {
             // 6) at least two rows need to be present in the ledger
             //    (the list also contains header and trailer)
             while (list.size() < MIN_ITEMS) {
-                if (workingWithLiveList && !liveListCopied) {
-                    list = copyList(list);
-                    liveListCopied = true;
-                }
                 list.add(new TransactionAccount(""));
                 listChanged = true;
             }
