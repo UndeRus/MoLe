@@ -62,7 +62,7 @@ public class Misc {
 
     }
     public static String emptyIsNull(String str) {
-        return "".equals(str) ? null : str;
+        return str != null && str.isEmpty() ? null : str;
     }
     public static String nullIsEmpty(String str) {
         return (str == null) ? "" : str;
