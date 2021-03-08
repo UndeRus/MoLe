@@ -21,21 +21,15 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-    <string name="nav_header_subtitle" translatable="false">dam+google@ktnx.net</string>
     <string name="nav_transactions_title">Transactions</string>
     <string name="nav_reports_title">Reports</string>
-    <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
-    <string name="pref_header_backend">Backend server</string>
 
     <string name="pref_title_use_http_auth">Enable HTTP authentication</string>
-    <string name="pref_description_use_http_auth_on">Use HTTP authentication (basic) when connecting to the backend</string>
-    <string name="pref_description_use_http_auth_off">Use plain HTTP without authentication when connecting to the backend</string>
 
-    <string name="pref_title_backend_url">Backend URL</string>
     <string name="pref_default_backend_url" translatable="false">https://server/loc</string>
 
     <string name="pref_title_backend_auth_user">Username</string>
@@ -43,38 +37,14 @@
     <string name="title_activity_new_transaction">New Transaction</string>
     <string name="new_transaction_account_hint">Account</string>
     <string name="new_transaction_date_hint">today</string>
-    <string name="new_transaction_amount_hint">0.00</string>
-    <string name="msg_at_least_two_accounts_are_required">At least two accounts are required</string>
-    <string name="err_bad_backend_url">Invalid backend URL</string>
-    <string name="err_net_io_error">Network I/O error</string>
-    <string name="err_http_error">HTTP error</string>
-    <string name="err_net_error">Network error</string>
-    <string name="progress_connecting">Connecting…</string>
     <string name="new_transaction_description_hint">Description</string>
     <string name="account_summary_title">Accounts</string>
-    <string name="menu_acc_summary_refresh_title">Refresh</string>
-    <string name="menu_acc_view_transactions">View transactions</string>
-    <string name="menu_hide_acc_condensed_title">Hide</string>
-    <string name="menu_acc_summary_show_only_starred_title">Show only starred</string>
-    <string name="err_bad_auth">Invalid username or password</string>
     <string name="action_reset_new_transaction_activity_title">Reset</string>
-    <string name="interface_pref_header_title">Interface</string>
-    <string name="pref_show_only_starred_off_summary">Account list contains all accounts</string>
-    <string name="pref_show_only_starred_on_summary">Only starred accounts are shown</string>
-    <string name="menu_acc_summary_hide_selected_title">Hide selected accounts</string>
-    <string name="menu_acc_summary_cancel_selection_title">Cancel selection</string>
-    <string name="menu_acc_summary_confirm_selection_title">Confirm selection</string>
-    <string name="title_activity_transaction_list">Transactions</string>
-    <string name="transactions_last_update_label">Last update:</string>
-    <string name="transaction_last_update_never">never</string>
-    <string name="err_cancelled">Operation cancelled</string>
-    <string name="title_profile_list">Profiles</string>
     <string name="title_profile_details">Profile Details</string>
     <string name="profiles">Profiles</string>
     <string name="new_profile_title" type="id">New profile</string>
     <string name="delete_profile">Delete profile</string>
     <string name="delete">Delete</string>
-    <string name="error_invalid_date">Invalid date</string>
     <string name="profile_name_label">Profile name</string>
     <string name="url_label">URL</string>
     <string name="text_welcome">Welcome</string>
@@ -100,7 +70,6 @@
     </string-array>
     <string name="posting_permitted">Posting of new transactions enabled</string>
     <string name="profile_subtitle_read_only">(Read only)</string>
-    <string name="crash_report_contents_label">Crash report contents:</string>
     <string name="crash_dialog_title">MoLe crashed</string>
     <string name="btn_send_crash_report">Send…</string>
     <string name="btn_not_now">Not now</string>
@@ -109,17 +78,13 @@
     <string name="crash_send_question">Would you like to send the crash report to the developer? This would help diagnosing and fixing the problem. The report is sent via email and you can review it before sending.</string>
     <string name="send_crash_via">Send crash report via:</string>
     <string name="btn_show_report">Show report</string>
-    <string name="color_label">Color</string>
     <string name="profile_list_rearrange_handle_label">Rearrange items handle</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Cancel</string>
     <string name="default_color_btn">Default</string>
     <string name="profile_color_label">Profile color</string>
     <string name="btn_select_label">Select</string>
     <string name="pref_preferred_autocompletion_account_filter_hint">Filter for transaction auto-completion</string>
     <string name="remove_profile_dialog_message">Permanently remove this profile?</string>
     <string name="Remove">Remove</string>
-    <string name="text_loading">Loading…</string>
     <string name="err_invalid_url">Invalid URL</string>
     <string name="btn_color_picker_button">Color picker button</string>
     <string name="insecure_scheme_with_auth">WARNING: Insecure http used with authentication</string>
@@ -168,7 +133,6 @@
     <string name="account_count_summary">%1$,d accounts as of %2$s</string>
     <string name="server_version_unknown_label">Unknown</string>
     <string name="detected_server_pre_1_20_1">Before 1.20.1</string>
-    <string name="detected_version_label">Detected version</string>
     <string name="new_transaction_fab_description">Plus icon</string>
     <string name="api_1_19_1">Version 1.19.1</string>
     <string name="profile_server_version_title">Server version</string>
@@ -180,16 +144,13 @@
     <string name="scan_qr">Scan QR code</string>
     <string name="nav_templates">Templates</string>
     <string name="title_activity_templates">Templates</string>
-    <string name="pattern_regex_hint">Pattern (regular expression)</string>
     <string name="help_menu_item_title">Help</string>
-    <string name="edit_button_description">Edit button</string>
     <string name="pattern_has_errors">Pattern has errors</string>
     <string name="account_name_is_empty">Account name missing</string>
     <string name="pattern_is_empty">Pattern missing</string>
     <string name="invalid_matching_group_number">Invalid matching group number</string>
     <string name="template_name_label">Template name</string>
     <string name="template_details_pattern_label">Pattern</string>
-    <string name="template_details_amount_label">Amount</string>
     <string name="template_details_test_text_label">Test text</string>
     <string name="template_details_account_name_label">Account name</string>
     <string name="template_details_account_row_label">Details of account #%d</string>
@@ -218,11 +179,8 @@
     <string name="template_details_date_month_source_label">month</string>
     <string name="unnamed_template">Template with no name</string>
     <string name="add_button_description">Add template</string>
-    <string name="save_button_description">Save template</string>
     <string name="no_template_matches">No template matches</string>
     <string name="choose_template_to_apply">Choose template to apply</string>
-    <string name="template_name">Template name</string>
-    <string name="implementation_pending">Not implemented yet</string>
     <string name="title_edit_template">Edit template</string>
     <string name="title_new_template">New template</string>
     <string name="template_xxx_deleted">Template \'%1$s\' deleted</string>

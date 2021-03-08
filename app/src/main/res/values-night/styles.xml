@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2020 Damyan Ivanov.
+  ~ Copyright © 2021 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -717,11 +717,6 @@
 
     <style name="account_summary_amounts">
         <item name="android:textAlignment">viewEnd</item>
-    </style>
-
-    <style name="account_summary_account_entry_table">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
     </style>
 
     <style name="transaction_list_comment">

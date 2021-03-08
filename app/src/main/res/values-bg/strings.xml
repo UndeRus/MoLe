@@ -17,12 +17,7 @@
   -->
 
 <resources>
-    <string name="title_activity_settings">Настройки</string>
-    <string name="pref_header_backend">Сървър</string>
     <string name="pref_title_use_http_auth">Удостоверяване</string>
-    <string name="pref_description_use_http_auth_on">Използване на удостоверяване при свързване със сървъра</string>
-    <string name="pref_description_use_http_auth_off">Без използване на удостоверяване при свързване със сървъра</string>
-    <string name="pref_title_backend_url">Адрес на сървъра</string>
     <string name="nav_reports_title">Справки</string>
     <string name="nav_transactions_title">Движения</string>
     <string name="action_settings">Настройки</string>
@@ -31,32 +26,11 @@
     <string name="title_activity_new_transaction">Ново движение</string>
     <string name="new_transaction_account_hint">Сметка</string>
     <string name="new_transaction_date_hint">днес</string>
-    <string name="msg_at_least_two_accounts_are_required">Задължително е използването на поне две сметки</string>
-    <string name="err_net_io_error">Мрежова грешка</string>
-    <string name="err_bad_backend_url">Неправилен адрес на сървър</string>
-    <string name="progress_connecting">Свързване…</string>
     <string name="new_transaction_description_hint">Описание</string>
     <string name="account_summary_title">Сметки</string>
-    <string name="menu_hide_acc_condensed_title">Скриване</string>
-    <string name="menu_acc_view_transactions">Преглед на движенията</string>
-    <string name="menu_acc_summary_refresh_title">Обновяване</string>
-    <string name="err_net_error">Мрежова грешка</string>
-    <string name="menu_acc_summary_show_only_starred_title">Показване само на любимите</string>
     <string name="action_reset_new_transaction_activity_title">Отначало</string>
-    <string name="interface_pref_header_title">Интерфейс</string>
-    <string name="pref_show_only_starred_off_summary">Списъкът на сметките съдържа всички сметки</string>
-    <string name="pref_show_only_starred_on_summary">Показват се само отбелязаните със звезда</string>
-    <string name="menu_acc_summary_cancel_selection_title">Отказ</string>
-    <string name="err_bad_auth">Грешно потребителско име или парола</string>
-    <string name="new_transaction_amount_hint">0,00</string>
-    <string name="transactions_last_update_label">Данни към:</string>
-    <string name="title_profile_list">Профили</string>
     <string name="profiles">Профили</string>
     <string name="title_profile_details">Данни за профила</string>
-    <string name="transaction_last_update_never">никога</string>
-    <string name="err_cancelled">Операцията е прекъсната</string>
-    <string name="title_activity_transaction_list">Движения</string>
-    <string name="err_http_error">Грешка в HTTP</string>
     <string name="new_profile_title">Нов профил</string>
     <string name="delete_profile">Изтриване на профила</string>
     <string name="delete">Изтриване</string>
@@ -74,7 +48,6 @@
         <item>Ноември</item>
         <item>Декември</item>
     </string-array>
-    <string name="error_invalid_date">Грешна дата</string>
     <string name="url_label">Адрес</string>
     <string name="profile_name_label">Име на профила</string>
     <string name="create_profile_label">Създаване на профил</string>
@@ -92,22 +65,15 @@
     <string name="btn_send_crash_report">Изпращане…</string>
     <string name="crash_app_label">Тестов срив</string>
     <string name="crash_dialog_title">MoLe се срина</string>
-    <string name="crash_report_contents_label">Съдържание на доклада:</string>
     <string name="profile_subtitle_read_only">(Само за преглед)</string>
-    <string name="menu_acc_summary_confirm_selection_title">Потвърждаване на избора</string>
-    <string name="menu_acc_summary_hide_selected_title">Скриване на маркираните сметки</string>
     <string name="btn_show_report">Показване на доклада</string>
     <string name="btn_select_label">Избор</string>
     <string name="profile_color_label">Цвят на профила</string>
     <string name="default_color_btn">По подразбиране</string>
-    <string name="btn_cancel">Отказ</string>
-    <string name="btn_ok">Добре</string>
     <string name="profile_list_rearrange_handle_label">Манипулатор за промяна на подредбата</string>
-    <string name="color_label">Цвят</string>
     <string name="pref_preferred_autocompletion_account_filter_hint">Филтър при избор на предишно движение</string>
     <string name="remove_profile_dialog_message">Потвърдете окончателното премахване на профила</string>
     <string name="Remove">Премахване</string>
-    <string name="text_loading">Зареждане…</string>
     <string name="err_invalid_url">Грешен или непълен адрес</string>
     <string name="btn_color_picker_button">Бутон за избор на цвят</string>
     <string name="insecure_scheme_with_auth">ВНИМАНИЕ: Използване на удостоверяване с несигурна схема на достъп</string>
@@ -158,7 +124,6 @@
     <string name="account_count_summary">%1$,d сметки към %2$s</string>
     <string name="server_version_unknown_label">Неизвестна</string>
     <string name="detected_server_pre_1_20_1">Преди 1.20.1</string>
-    <string name="detected_version_label">Открита версия</string>
     <string name="new_transaction_fab_description">Знак плюс</string>
     <string name="api_1_19_1">Версия 1.19.1</string>
     <string name="profile_server_version_title">Версия на сървъра</string>
@@ -170,9 +135,7 @@
     <string name="scan_qr">Сканиране на QR код</string>
     <string name="nav_templates">Макети</string>
     <string name="title_activity_templates">Макети</string>
-    <string name="pattern_regex_hint">Шаблон (regex)</string>
     <string name="help_menu_item_title">Помощ</string>
-    <string name="edit_button_description">Бутон за промяна</string>
     <string name="template_details_account_comment_label">Бележка към сметката</string>
     <string name="template_details_account_amount_label">Сума</string>
     <string name="choose_template_detail_source_label">Прихващане от шаблона</string>
@@ -194,11 +157,8 @@
     <string name="template_details_date_month_source_label">месец</string>
     <string name="unnamed_template">Макет без име</string>
     <string name="add_button_description">Добавяне на макет</string>
-    <string name="save_button_description">Запазване на макета</string>
     <string name="no_template_matches">Няма съвпадение с нито един макет</string>
     <string name="choose_template_to_apply">Избор на макет</string>
-    <string name="template_name">Име на макет</string>
-    <string name="implementation_pending">Функцията още не е готова</string>
     <string name="title_edit_template">Промяна на макет</string>
     <string name="title_new_template">Създаване на макет</string>
     <string name="pattern_has_errors">Шаблонът съдържа грешки</string>
@@ -207,7 +167,6 @@
     <string name="invalid_matching_group_number">Невалиден номер на прихващане</string>
     <string name="template_name_label">Име на макет</string>
     <string name="template_details_pattern_label">Шаблон</string>
-    <string name="template_details_amount_label">Сума</string>
     <string name="template_details_test_text_label">Примерен текст</string>
     <string name="template_details_account_name_label">Сметка</string>
     <string name="template_details_account_row_label">Данни за сметка №%d</string>
