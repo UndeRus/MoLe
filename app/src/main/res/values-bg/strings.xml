@@ -28,7 +28,7 @@
     <string name="action_settings">Настройки</string>
     <string name="pref_title_backend_auth_user">Потребител</string>
     <string name="pref_title_backend_auth_password">Парола</string>
-    <string name="title_activity_new_transaction">Нова транзакция</string>
+    <string name="title_activity_new_transaction">Ново движение</string>
     <string name="new_transaction_account_hint">Сметка</string>
     <string name="new_transaction_date_hint">днес</string>
     <string name="msg_at_least_two_accounts_are_required">Задължително е използването на поне две сметки</string>
@@ -38,7 +38,7 @@
     <string name="new_transaction_description_hint">Описание</string>
     <string name="account_summary_title">Сметки</string>
     <string name="menu_hide_acc_condensed_title">Скриване</string>
-    <string name="menu_acc_view_transactions">Преглед на транзакциите</string>
+    <string name="menu_acc_view_transactions">Преглед на движенията</string>
     <string name="menu_acc_summary_refresh_title">Обновяване</string>
     <string name="err_net_error">Мрежова грешка</string>
     <string name="menu_acc_summary_show_only_starred_title">Показване само на любимите</string>
@@ -55,7 +55,7 @@
     <string name="title_profile_details">Данни за профила</string>
     <string name="transaction_last_update_never">никога</string>
     <string name="err_cancelled">Операцията е прекъсната</string>
-    <string name="title_activity_transaction_list">Транзакции</string>
+    <string name="title_activity_transaction_list">Движения</string>
     <string name="err_http_error">Грешка в HTTP</string>
     <string name="new_profile_title">Нов профил</string>
     <string name="delete_profile">Изтриване на профила</string>
@@ -84,7 +84,7 @@
     <string name="err_profile_url_empty">Моля, въведете адрес, например https://server/location</string>
     <string name="err_profile_user_name_empty">Въвеждането на потребителско име е задължително когато се използва удостоверяване</string>
     <string name="err_profile_password_empty">Паролата е задължителна</string>
-    <string name="posting_permitted">Позволяване на добавянето на нови транзакции</string>
+    <string name="posting_permitted">Позволяване на добавянето на нови движения</string>
     <string name="send_crash_via">Изпращане на доклада чрез:</string>
     <string name="crash_send_question">Желаете ли да изпратите доклад за грешката на автора? Това ще помогне за диагностициране и отстраняване на проблема. Докладът се изпраща по email, като имате възможност за преглед преди изпращане.</string>
     <string name="crash_app_condensed_label">Срив</string>
@@ -104,7 +104,7 @@
     <string name="btn_ok">Добре</string>
     <string name="profile_list_rearrange_handle_label">Манипулатор за промяна на подредбата</string>
     <string name="color_label">Цвят</string>
-    <string name="pref_preferred_autocompletion_account_filter_hint" >Филтър при избор на предишна транзакция</string>
+    <string name="pref_preferred_autocompletion_account_filter_hint">Филтър при избор на предишно движение</string>
     <string name="remove_profile_dialog_message">Потвърдете окончателното премахване на профила</string>
     <string name="Remove">Премахване</string>
     <string name="text_loading">Зареждане…</string>
@@ -143,7 +143,7 @@
     <string name="show_currency_input">Валута</string>
     <string name="currency_input_by_default">Показване по подразбиране на полето за валута</string>
     <string name="profile_default_commodity">Валута по подразбиране</string>
-    <string name="ignoring_preferred_account">Липсват транзакции с предпочитаната сметка</string>
+    <string name="ignoring_preferred_account">Липсват движения с предпочитаната сметка</string>
     <string name="show_comments_switch">Коментари</string>
     <string name="show_comment_input_by_default">Показване по подразбиране на полетата за бележки</string>
     <string name="icon">икона</string>
