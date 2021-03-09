@@ -26,69 +26,46 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
-import net.ktnx.mobileledger.databinding.NewTransactionRowBinding;
+import net.ktnx.mobileledger.databinding.NewTransactionAccountRowBinding;
 import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
-import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.TextViewClearHelper;
 import net.ktnx.mobileledger.utils.DimensionUtils;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
-import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.util.Objects;
 
-class NewTransactionItemHolder extends RecyclerView.ViewHolder
-        implements DatePickerFragment.DatePickedListener, DescriptionSelectedCallback {
+class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
     private final String decimalDot = ".";
-    private final MobileLedgerProfile mProfile;
-    private final NewTransactionRowBinding b;
-    private final NewTransactionItemsAdapter mAdapter;
+    private final NewTransactionAccountRowBinding b;
     private boolean ignoreFocusChanges = false;
     private String decimalSeparator;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     //TODO multiple amounts with different currencies per posting?
-    NewTransactionItemHolder(@NonNull NewTransactionRowBinding b,
-                             NewTransactionItemsAdapter adapter) {
-        super(b.getRoot());
+    NewTransactionAccountRowItemHolder(@NonNull NewTransactionAccountRowBinding b,
+                                       NewTransactionItemsAdapter adapter) {
+        super(b.getRoot(), adapter);
         this.b = b;
-        this.mAdapter = adapter;
         new TextViewClearHelper().attachToTextView(b.comment);
 
-        b.newTransactionDescription.setNextFocusForwardId(View.NO_ID);
         b.accountRowAccName.setNextFocusForwardId(View.NO_ID);
         b.accountRowAccAmounts.setNextFocusForwardId(View.NO_ID); // magic!
-
-        b.newTransactionDate.setOnClickListener(v -> pickTransactionDate());
 
         b.accountCommentButton.setOnClickListener(v -> {
             b.comment.setVisibility(View.VISIBLE);
             b.comment.requestFocus();
         });
-
-        b.transactionCommentButton.setOnClickListener(v -> {
-            b.transactionComment.setVisibility(View.VISIBLE);
-            b.transactionComment.requestFocus();
-        });
-
-        mProfile = Data.getProfile();
 
         @SuppressLint("DefaultLocale") View.OnFocusChangeListener focusMonitor = (v, hasFocus) -> {
             final int id = v.getId();
@@ -106,14 +83,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     else if (id == R.id.comment) {
                         adapter.noteFocusIsOnComment(pos);
                     }
-                    else if (id == R.id.transaction_comment) {
-                        adapter.noteFocusIsOnTransactionComment(pos);
-                    }
-                    else if (id == R.id.new_transaction_description) {
-                        adapter.noteFocusIsOnDescription(pos);
-                    }
                     else
-                        throw new IllegalStateException("Where is the focus?");
+                        throw new IllegalStateException("Where is the focus? " + id);
                 }
                 finally {
                     syncingData = wasSyncing;
@@ -145,22 +116,15 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             if (id == R.id.comment) {
                 commentFocusChanged(b.comment, hasFocus);
             }
-            else if (id == R.id.transaction_comment) {
-                commentFocusChanged(b.transactionComment, hasFocus);
-            }
         };
 
-        b.newTransactionDescription.setOnFocusChangeListener(focusMonitor);
         b.accountRowAccName.setOnFocusChangeListener(focusMonitor);
         b.accountRowAccAmounts.setOnFocusChangeListener(focusMonitor);
         b.comment.setOnFocusChangeListener(focusMonitor);
-        b.transactionComment.setOnFocusChangeListener(focusMonitor);
 
         NewTransactionActivity activity = (NewTransactionActivity) b.getRoot()
                                                                     .getContext();
 
-        MLDB.hookAutocompletionAdapter(activity, b.newTransactionDescription,
-                MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, activity, mProfile);
         b.accountRowAccName.setAdapter(new AccountAutocompleteAdapter(b.getRoot()
                                                                        .getContext(), mProfile));
 
@@ -206,8 +170,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                     adapter.model.checkTransactionSubmittable(null);
             }
         };
-        b.newTransactionDescription.addTextChangedListener(tw);
-        monitorComment(b.transactionComment);
         b.accountRowAccName.addTextChangedListener(tw);
         monitorComment(b.comment);
         b.accountRowAccAmounts.addTextChangedListener(amountWatcher);
@@ -220,7 +182,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
             cpf.show(activity.getSupportFragmentManager(), "currency-selector");
         });
 
-        commentFocusChanged(b.transactionComment, false);
         commentFocusChanged(b.comment, false);
 
         adapter.model.getFocusInfo()
@@ -249,36 +210,8 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                      });
 
         adapter.model.getShowComments()
-                     .observe(activity, show -> {
-                         ConstraintLayout.LayoutParams amountLayoutParams =
-                                 (ConstraintLayout.LayoutParams) b.amountLayout.getLayoutParams();
-                         ConstraintLayout.LayoutParams accountParams =
-                                 (ConstraintLayout.LayoutParams) b.accountRowAccName.getLayoutParams();
-
-                         if (show) {
-                             accountParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
-                             accountParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID;
-
-                             amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.UNSET;
-                             amountLayoutParams.topToBottom = b.accountRowAccName.getId();
-
-                             b.commentLayout.setVisibility(View.VISIBLE);
-                         }
-                         else {
-                             accountParams.endToStart = b.amountLayout.getId();
-                             accountParams.endToEnd = ConstraintLayout.LayoutParams.UNSET;
-
-                             amountLayoutParams.topToBottom = ConstraintLayout.LayoutParams.UNSET;
-                             amountLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
-
-                             b.commentLayout.setVisibility(View.GONE);
-                         }
-
-                         b.accountRowAccName.setLayoutParams(accountParams);
-                         b.amountLayout.setLayoutParams(amountLayoutParams);
-
-                         b.transactionCommentLayout.setVisibility(show ? View.VISIBLE : View.GONE);
-                     });
+                     .observe(activity, show -> b.commentLayout.setVisibility(
+                             show ? View.VISIBLE : View.GONE));
     }
     private void applyFocus(NewTransactionModel.FocusInfo focusInfo) {
         if (ignoreFocusChanges) {
@@ -291,44 +224,22 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
                  focusInfo.position != getAdapterPosition()))
                 return;
 
-            NewTransactionModel.Item item = getItem();
-            if (item instanceof NewTransactionModel.TransactionHead) {
-                NewTransactionModel.TransactionHead head = item.toTransactionHead();
-                // bad idea - double pop-up, and not really necessary.
-                // the user can tap the input to get the calendar
-                //if (!tvDate.hasFocus()) tvDate.requestFocus();
-                switch (focusInfo.element) {
-                    case TransactionComment:
-                        b.transactionComment.setVisibility(View.VISIBLE);
-                        b.transactionComment.requestFocus();
-                        break;
-                    case Description:
-                        boolean focused = b.newTransactionDescription.requestFocus();
-//                            tvDescription.dismissDropDown();
-                        if (focused)
-                            Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
-                                                                            .getContext());
-                        break;
-                }
-            }
-            else if (item instanceof NewTransactionModel.TransactionAccount) {
-                NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
-                switch (focusInfo.element) {
-                    case Amount:
-                        b.accountRowAccAmounts.requestFocus();
-                        break;
-                    case Comment:
-                        b.comment.setVisibility(View.VISIBLE);
-                        b.comment.requestFocus();
-                        break;
-                    case Account:
-                        boolean focused = b.accountRowAccName.requestFocus();
+            NewTransactionModel.TransactionAccount acc = getItem().toTransactionAccount();
+            switch (focusInfo.element) {
+                case Amount:
+                    b.accountRowAccAmounts.requestFocus();
+                    break;
+                case Comment:
+                    b.comment.setVisibility(View.VISIBLE);
+                    b.comment.requestFocus();
+                    break;
+                case Account:
+                    boolean focused = b.accountRowAccName.requestFocus();
 //                                         b.accountRowAccName.dismissDropDown();
-                        if (focused)
-                            Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
-                                                                            .getContext());
-                        break;
-                }
+                    if (focused)
+                        Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
+                                                                        .getContext());
+                    break;
             }
         }
         finally {
@@ -460,8 +371,6 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         setCurrencyString((currency == null) ? null : currency.getName());
     }
     private void setEditable(Boolean editable) {
-        b.newTransactionDate.setEnabled(editable);
-        b.newTransactionDescription.setEnabled(editable);
         b.accountRowAccName.setEnabled(editable);
         b.accountRowAccAmounts.setEnabled(editable);
     }
@@ -501,96 +410,65 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         boolean significantChange = false;
 
         try {
-            if (item instanceof NewTransactionModel.TransactionHead) {
-                NewTransactionModel.TransactionHead head = item.toTransactionHead();
+            NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
-                head.setDate(String.valueOf(b.newTransactionDate.getText()));
+            // having account name is important
+            final Editable incomingAccountName = b.accountRowAccName.getText();
+            if (TextUtils.isEmpty(acc.getAccountName()) != TextUtils.isEmpty(incomingAccountName))
+                significantChange = true;
 
-                // transaction description is required
-                if (TextUtils.isEmpty(head.getDescription()) !=
-                    TextUtils.isEmpty(b.newTransactionDescription.getText()))
+            acc.setAccountName(String.valueOf(incomingAccountName));
+            final int accNameSelEnd = b.accountRowAccName.getSelectionEnd();
+            final int accNameSelStart = b.accountRowAccName.getSelectionStart();
+            acc.setAccountNameCursorPosition(accNameSelEnd);
+
+            acc.setComment(String.valueOf(b.comment.getText()));
+
+            String amount = String.valueOf(b.accountRowAccAmounts.getText());
+            amount = amount.trim();
+
+            if (amount.isEmpty()) {
+                if (acc.isAmountSet())
                     significantChange = true;
-
-                head.setDescription(String.valueOf(b.newTransactionDescription.getText()));
-                head.setComment(String.valueOf(b.transactionComment.getText()));
-            }
-            else if (item instanceof NewTransactionModel.TransactionAccount) {
-                NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
-
-                // having account name is important
-                final Editable incomingAccountName = b.accountRowAccName.getText();
-                if (TextUtils.isEmpty(acc.getAccountName()) !=
-                    TextUtils.isEmpty(incomingAccountName))
-                    significantChange = true;
-
-                acc.setAccountName(String.valueOf(incomingAccountName));
-                final int accNameSelEnd = b.accountRowAccName.getSelectionEnd();
-                final int accNameSelStart = b.accountRowAccName.getSelectionStart();
-                acc.setAccountNameCursorPosition(accNameSelEnd);
-
-                acc.setComment(String.valueOf(b.comment.getText()));
-
-                String amount = String.valueOf(b.accountRowAccAmounts.getText());
-                amount = amount.trim();
-
-                if (amount.isEmpty()) {
-                    if (acc.isAmountSet())
-                        significantChange = true;
-                    acc.resetAmount();
-                    acc.setAmountValid(true);
-                }
-                else {
-                    try {
-                        amount = amount.replace(decimalSeparator, decimalDot);
-                        final float parsedAmount = Float.parseFloat(amount);
-                        if (!acc.isAmountSet() || !Misc.equalFloats(parsedAmount, acc.getAmount()))
-                            significantChange = true;
-                        acc.setAmount(parsedAmount);
-                        acc.setAmountValid(true);
-                    }
-                    catch (NumberFormatException e) {
-                        Logger.debug("new-trans", String.format(
-                                "assuming amount is not set due to number format exception. " +
-                                "input was '%s'", amount));
-                        if (acc.isAmountValid())
-                            significantChange = true;
-                        acc.setAmountValid(false);
-                    }
-                    final String curr = String.valueOf(b.currency.getText());
-                    final String currValue;
-                    if (curr.equals(b.currency.getContext()
-                                              .getResources()
-                                              .getString(R.string.currency_symbol)) ||
-                        curr.isEmpty())
-                        currValue = null;
-                    else
-                        currValue = curr;
-
-                    if (!significantChange && !Misc.equalStrings(acc.getCurrency(), currValue))
-                        significantChange = true;
-                    acc.setCurrency(currValue);
-                }
+                acc.resetAmount();
+                acc.setAmountValid(true);
             }
             else {
-                throw new RuntimeException("Should not happen");
+                try {
+                    amount = amount.replace(decimalSeparator, decimalDot);
+                    final float parsedAmount = Float.parseFloat(amount);
+                    if (!acc.isAmountSet() || !Misc.equalFloats(parsedAmount, acc.getAmount()))
+                        significantChange = true;
+                    acc.setAmount(parsedAmount);
+                    acc.setAmountValid(true);
+                }
+                catch (NumberFormatException e) {
+                    Logger.debug("new-trans", String.format(
+                            "assuming amount is not set due to number format exception. " +
+                            "input was '%s'", amount));
+                    if (acc.isAmountValid())
+                        significantChange = true;
+                    acc.setAmountValid(false);
+                }
+                final String curr = String.valueOf(b.currency.getText());
+                final String currValue;
+                if (curr.equals(b.currency.getContext()
+                                          .getResources()
+                                          .getString(R.string.currency_symbol)) || curr.isEmpty())
+                    currValue = null;
+                else
+                    currValue = curr;
+
+                if (!significantChange && !Misc.equalStrings(acc.getCurrency(), currValue))
+                    significantChange = true;
+                acc.setCurrency(currValue);
             }
 
             return significantChange;
         }
-        catch (ParseException e) {
-            throw new RuntimeException("Should not happen", e);
-        }
         finally {
             syncingData = false;
         }
-    }
-    private void pickTransactionDate() {
-        DatePickerFragment picker = new DatePickerFragment();
-        picker.setFutureDates(mProfile.getFutureDates());
-        picker.setOnDatePickedListener(this);
-        picker.setCurrentDateFromText(b.newTransactionDate.getText());
-        picker.show(((NewTransactionActivity) b.getRoot()
-                                               .getContext()).getSupportFragmentManager(), null);
     }
     /**
      * bind
@@ -603,77 +481,47 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         try {
             syncingData = true;
             try {
-                if (item instanceof NewTransactionModel.TransactionHead) {
-                    NewTransactionModel.TransactionHead head = item.toTransactionHead();
-                    b.newTransactionDate.setText(head.getFormattedDate());
+                NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
+                final String incomingAccountName = acc.getAccountName();
+                final String presentAccountName = String.valueOf(b.accountRowAccName.getText());
+                if (!Misc.equalStrings(incomingAccountName, presentAccountName)) {
+                    Logger.debug("bind",
+                            String.format("Setting account name from '%s' to '%s' (| @ %d)",
+                                    presentAccountName, incomingAccountName,
+                                    acc.getAccountNameCursorPosition()));
                     // avoid triggering completion pop-up
-                    SimpleCursorAdapter a =
-                            (SimpleCursorAdapter) b.newTransactionDescription.getAdapter();
+                    AccountAutocompleteAdapter a =
+                            (AccountAutocompleteAdapter) b.accountRowAccName.getAdapter();
                     try {
-                        b.newTransactionDescription.setAdapter(null);
-                        b.newTransactionDescription.setText(head.getDescription());
+                        b.accountRowAccName.setAdapter(null);
+                        b.accountRowAccName.setText(incomingAccountName);
+                        b.accountRowAccName.setSelection(acc.getAccountNameCursorPosition());
                     }
                     finally {
-                        b.newTransactionDescription.setAdapter(a);
+                        b.accountRowAccName.setAdapter(a);
                     }
-
-                    b.transactionComment.setText(head.getComment());
-                    //styleComment(b.transactionComment, head.getComment());
-
-                    b.ntrData.setVisibility(View.VISIBLE);
-                    b.ntrAccount.setVisibility(View.GONE);
-                    setEditable(true);
                 }
-                else if (item instanceof NewTransactionModel.TransactionAccount) {
-                    NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
 
-                    final String incomingAccountName = acc.getAccountName();
-                    final String presentAccountName = String.valueOf(b.accountRowAccName.getText());
-                    if (!Misc.equalStrings(incomingAccountName, presentAccountName)) {
-                        Logger.debug("bind",
-                                String.format("Setting account name from '%s' to '%s' (| @ %d)",
-                                        presentAccountName, incomingAccountName,
-                                        acc.getAccountNameCursorPosition()));
-                        // avoid triggering completion pop-up
-                        AccountAutocompleteAdapter a =
-                                (AccountAutocompleteAdapter) b.accountRowAccName.getAdapter();
-                        try {
-                            b.accountRowAccName.setAdapter(null);
-                            b.accountRowAccName.setText(incomingAccountName);
-                            b.accountRowAccName.setSelection(acc.getAccountNameCursorPosition());
-                        }
-                        finally {
-                            b.accountRowAccName.setAdapter(a);
-                        }
-                    }
-
-                    final String amountHint = acc.getAmountHint();
-                    if (amountHint == null) {
-                        b.accountRowAccAmounts.setHint(R.string.zero_amount);
-                    }
-                    else {
-                        b.accountRowAccAmounts.setHint(amountHint);
-                    }
-
-                    b.accountRowAccAmounts.setImeOptions(
-                            acc.isLast() ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_NEXT);
-
-                    setCurrencyString(acc.getCurrency());
-                    b.accountRowAccAmounts.setText(
-                            acc.isAmountSet() ? String.format("%4.2f", acc.getAmount()) : null);
-                    displayAmountValidity(true);
-
-                    b.comment.setText(acc.getComment());
-
-                    b.ntrData.setVisibility(View.GONE);
-                    b.ntrAccount.setVisibility(View.VISIBLE);
-
-                    setEditable(true);
+                final String amountHint = acc.getAmountHint();
+                if (amountHint == null) {
+                    b.accountRowAccAmounts.setHint(R.string.zero_amount);
                 }
                 else {
-                    throw new RuntimeException("Don't know how to handle " + item);
+                    b.accountRowAccAmounts.setHint(amountHint);
                 }
+
+                b.accountRowAccAmounts.setImeOptions(
+                        acc.isLast() ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_NEXT);
+
+                setCurrencyString(acc.getCurrency());
+                b.accountRowAccAmounts.setText(
+                        acc.isAmountSet() ? String.format("%4.2f", acc.getAmount()) : null);
+                displayAmountValidity(true);
+
+                b.comment.setText(acc.getComment());
+
+                setEditable(true);
 
                 applyFocus(mAdapter.model.getFocusInfo()
                                          .getValue());
@@ -692,27 +540,5 @@ class NewTransactionItemHolder extends RecyclerView.ViewHolder
         editText.setVisibility(
                 ((focusedView != editText) && TextUtils.isEmpty(comment)) ? View.INVISIBLE
                                                                           : View.VISIBLE);
-    }
-    @Override
-    public void onDatePicked(int year, int month, int day) {
-        final NewTransactionModel.TransactionHead head = getItem().toTransactionHead();
-        head.setDate(new SimpleDate(year, month + 1, day));
-        b.newTransactionDate.setText(head.getFormattedDate());
-
-        boolean focused = b.newTransactionDescription.requestFocus();
-        if (focused)
-            Misc.showSoftKeyboard((NewTransactionActivity) b.getRoot()
-                                                            .getContext());
-
-    }
-    private NewTransactionModel.Item getItem() {
-        return Objects.requireNonNull(mAdapter.model.getItems()
-                                                    .getValue())
-                      .get(getAdapterPosition());
-    }
-    @Override
-    public void descriptionSelected(String description) {
-        b.accountRowAccName.setText(description);
-        b.accountRowAccAmounts.requestFocus(View.FOCUS_FORWARD);
     }
 }

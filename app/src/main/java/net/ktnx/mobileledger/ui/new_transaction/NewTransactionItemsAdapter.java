@@ -26,7 +26,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import net.ktnx.mobileledger.databinding.NewTransactionRowBinding;
+import net.ktnx.mobileledger.databinding.NewTransactionAccountRowBinding;
+import net.ktnx.mobileledger.databinding.NewTransactionHeaderRowBinding;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Logger;
 
@@ -34,7 +35,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItemHolder> {
+class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItemViewHolder> {
+    private static final int ITEM_VIEW_TYPE_HEADER = 1;
+    private static final int ITEM_VIEW_TYPE_ACCOUNT = 2;
     final NewTransactionModel model;
     private final ItemTouchHelper touchHelper;
     private final AsyncListDiffer<NewTransactionModel.Item> differ =
@@ -117,6 +120,20 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
         });
     }
     @Override
+    public int getItemViewType(int position) {
+        final ItemType type = differ.getCurrentList()
+                                    .get(position)
+                                    .getType();
+        switch (type) {
+            case generalData:
+                return ITEM_VIEW_TYPE_HEADER;
+            case transactionRow:
+                return ITEM_VIEW_TYPE_ACCOUNT;
+            default:
+                throw new RuntimeException("Can't handle " + type);
+        }
+    }
+    @Override
     public long getItemId(int position) {
         return differ.getCurrentList()
                      .get(position)
@@ -127,18 +144,33 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     }
     @NonNull
     @Override
-    public NewTransactionItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        NewTransactionRowBinding b =
-                NewTransactionRowBinding.inflate(LayoutInflater.from(parent.getContext()), parent,
-                        false);
-
-        final NewTransactionItemHolder newHolder = new NewTransactionItemHolder(b, this);
-        Logger.debug("new-trans",
-                "Creating new ViewHolder " + Integer.toHexString(newHolder.hashCode()));
-        return newHolder;
+    public NewTransactionItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
+                                                           int viewType) {
+        switch (viewType) {
+            case ITEM_VIEW_TYPE_HEADER:
+                NewTransactionHeaderRowBinding headerBinding =
+                        NewTransactionHeaderRowBinding.inflate(
+                                LayoutInflater.from(parent.getContext()), parent, false);
+                final NewTransactionHeaderItemHolder headerHolder =
+                        new NewTransactionHeaderItemHolder(headerBinding, this);
+                Logger.debug("new-trans", "Creating new Header ViewHolder " +
+                                          Integer.toHexString(headerHolder.hashCode()));
+                return headerHolder;
+            case ITEM_VIEW_TYPE_ACCOUNT:
+                NewTransactionAccountRowBinding accBinding =
+                        NewTransactionAccountRowBinding.inflate(
+                                LayoutInflater.from(parent.getContext()), parent, false);
+                final NewTransactionAccountRowItemHolder accHolder =
+                        new NewTransactionAccountRowItemHolder(accBinding, this);
+                Logger.debug("new-trans", "Creating new AccountRow ViewHolder " +
+                                          Integer.toHexString(accHolder.hashCode()));
+                return accHolder;
+            default:
+                throw new RuntimeException("Cant handle view type " + viewType);
+        }
     }
     @Override
-    public void onBindViewHolder(@NonNull NewTransactionItemHolder holder, int position) {
+    public void onBindViewHolder(@NonNull NewTransactionItemViewHolder holder, int position) {
         Logger.debug("bind",
                 String.format(Locale.US, "Binding item at position %d, holder %s", position,
                         Integer.toHexString(holder.hashCode())));
@@ -194,5 +226,9 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
     public void setItems(List<NewTransactionModel.Item> newList) {
         Logger.debug("new-trans", "adapter: submitting new item list");
         differ.submitList(newList);
+    }
+    public NewTransactionModel.Item getItem(int position) {
+        return differ.getCurrentList()
+                     .get(position);
     }
 }
