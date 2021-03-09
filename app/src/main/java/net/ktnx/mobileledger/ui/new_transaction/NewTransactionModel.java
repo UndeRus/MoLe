@@ -170,6 +170,7 @@ public class NewTransactionModel extends ViewModel {
     void reset() {
         Logger.debug("new-trans", "Resetting model");
         List<Item> list = new ArrayList<>();
+        Item.resetIdDispenser();
         list.add(new TransactionHead(""));
         list.add(new TransactionAccount(""));
         list.add(new TransactionAccount(""));
@@ -442,6 +443,7 @@ public class NewTransactionModel extends ViewModel {
     }
     void loadTransactionIntoModel(String profileUUID, int transactionId) {
         List<Item> newList = new ArrayList<>();
+        Item.resetIdDispenser();
         LedgerTransaction tr;
         MobileLedgerProfile profile = Data.getProfile(profileUUID);
         if (profile == null)
@@ -875,6 +877,9 @@ public class NewTransactionModel extends ViewModel {
             if (origin instanceof TransactionAccount)
                 return new TransactionAccount((TransactionAccount) origin);
             throw new RuntimeException("Don't know how to handle " + origin);
+        }
+        private static void resetIdDispenser() {
+            idDispenser = 0;
         }
         public int getId() {
             return id;
