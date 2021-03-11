@@ -92,6 +92,24 @@ public class NewTransactionModel extends ViewModel {
         checkTransactionSubmittable(newList);
         setItemsWithoutSubmittableChecks(newList);
     }
+    private void replaceItems(@NonNull List<Item> newList) {
+        renumberItems();
+
+        setItems(newList);
+    }
+    /**
+     * make old items replaceable in-place. makes the new values visually blend in
+     */
+    private void renumberItems() {
+        final List<Item> list = items.getValue();
+        if (list == null) {
+            return;
+        }
+
+        int id = 0;
+        for (Item item : list)
+            item.id = id++;
+    }
     private void setItemsWithoutSubmittableChecks(@NonNull List<Item> list) {
         final int cnt = list.size();
         for (int i = 1; i < cnt - 1; i++) {
@@ -175,6 +193,7 @@ public class NewTransactionModel extends ViewModel {
         list.add(new TransactionAccount(""));
         list.add(new TransactionAccount(""));
         noteFocusChanged(0, FocusedElement.Description);
+        renumberItems();
         isSubmittable.setValue(false);
         setItemsWithoutSubmittableChecks(list);
     }
@@ -865,7 +884,7 @@ public class NewTransactionModel extends ViewModel {
 
     static abstract class Item {
         private static int idDispenser = 0;
-        protected final int id;
+        protected int id;
         private Item() {
             if (this instanceof TransactionHead)
                 id = 0;
