@@ -865,11 +865,17 @@ public class NewTransactionModel extends ViewModel {
 
     static abstract class Item {
         private static int idDispenser = 0;
-        protected int id;
+        protected final int id;
         private Item() {
-            synchronized (Item.class) {
-                id = ++idDispenser;
-            }
+            if (this instanceof TransactionHead)
+                id = 0;
+            else
+                synchronized (Item.class) {
+                    id = ++idDispenser;
+                }
+        }
+        public Item(int id) {
+            this.id = id;
         }
         public static Item from(Item origin) {
             if (origin instanceof TransactionHead)
@@ -929,7 +935,7 @@ public class NewTransactionModel extends ViewModel {
             this.description = description;
         }
         public TransactionHead(TransactionHead origin) {
-            id = origin.id;
+            super(origin.id);
             date = origin.date;
             description = origin.description;
             comment = origin.comment;
@@ -1030,7 +1036,7 @@ public class NewTransactionModel extends ViewModel {
         private boolean isLast = false;
         private int accountNameCursorPosition;
         public TransactionAccount(TransactionAccount origin) {
-            id = origin.id;
+            super(origin.id);
             accountName = origin.accountName;
             amount = origin.amount;
             amountSet = origin.amountSet;
