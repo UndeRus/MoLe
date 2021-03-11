@@ -1,0 +1,7 @@
+
+* NEW
+    + transaction templates, applied via QR scan
+* IMPROVEMENTS
+    + bigger commodify button in new transaction screen
+    + unified floating action button behaviour
+    + start migration to a fully asynchronous database layer

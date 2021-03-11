@@ -1,4 +1,13 @@
 # Changes
+## [0.17.0] - 2020-03-11
+
+* NEW
+    + transaction templates, applied via QR scan
+* IMPROVEMENTS
+    + bigger commodify button in new transaction screen
+    + unified floating action button behaviour
+    + start migration to a fully asynchronous database layer
+
 ## [0.16.0] - 2020-12-28
 
 * NEW
