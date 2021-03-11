@@ -32,6 +32,7 @@ import net.ktnx.mobileledger.dao.AccountDAO;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
+import net.ktnx.mobileledger.dao.TransactionDAO;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -165,4 +166,6 @@ abstract public class DB extends RoomDatabase {
     public abstract CurrencyDAO getCurrencyDAO();
 
     public abstract AccountDAO getAccountDAO();
+
+    public abstract TransactionDAO getTransactionDAO();
 }

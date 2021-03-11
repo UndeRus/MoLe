@@ -17,23 +17,14 @@
 
 package net.ktnx.mobileledger.utils;
 
-import android.annotation.TargetApi;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.widget.AutoCompleteTextView;
-import android.widget.FilterQueryProvider;
-import android.widget.SimpleCursorAdapter;
 
 import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.DbOpQueue;
-import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
-import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import org.jetbrains.annotations.NonNls;
 
@@ -133,71 +124,6 @@ public final class MLDB {
     @SuppressWarnings("unused")
     static public void setLongOption(String name, long value) {
         setOption(name, String.valueOf(value));
-    }
-    @TargetApi(Build.VERSION_CODES.N)
-    public static void hookAutocompletionAdapter(final Context context,
-                                                 final AutoCompleteTextView view,
-                                                 final String table, final String field) {
-        hookAutocompletionAdapter(context, view, table, field, true, null, null);
-    }
-    @TargetApi(Build.VERSION_CODES.N)
-    public static void hookAutocompletionAdapter(final Context context,
-                                                 final AutoCompleteTextView view,
-                                                 final String table, final String field,
-                                                 final boolean profileSpecific,
-                                                 final DescriptionSelectedCallback callback,
-                                                 final MobileLedgerProfile profile) {
-        String[] from = {field};
-        int[] to = {android.R.id.text1};
-        SimpleCursorAdapter adapter =
-                new SimpleCursorAdapter(context, android.R.layout.simple_dropdown_item_1line, null,
-                        from, to, 0);
-        adapter.setStringConversionColumn(1);
-
-        FilterQueryProvider provider = constraint -> {
-            if (constraint == null)
-                return null;
-
-            String str = constraint.toString()
-                                   .toUpperCase();
-            debug("autocompletion", "Looking for " + str);
-
-            String sql;
-            String[] params;
-            if (profileSpecific) {
-                MobileLedgerProfile p = (profile == null) ? Data.getProfile() : profile;
-                sql = String.format(
-                        "SELECT rowid as _id, %s, CASE WHEN %s_upper LIKE ?||'%%' THEN 1 " +
-                        "WHEN %s_upper LIKE '%%:'||?||'%%' then 2 " +
-                        "WHEN %s_upper LIKE '%% '||?||'%%' THEN 3 " + "ELSE 9 END " + "FROM %s " +
-                        "WHERE profile=? AND %s_upper LIKE '%%'||?||'%%' " +
-                        "ORDER BY 3, %s_upper, 1;", field, field, field, field, table, field,
-                        field);
-                params = new String[]{str, str, str, p.getUuid(), str};
-            }
-            else {
-                sql = String.format(
-                        "SELECT rowid as _id, %s, CASE WHEN %s_upper LIKE ?||'%%' THEN 1 " +
-                        "WHEN %s_upper LIKE '%%:'||?||'%%' THEN 2 " +
-                        "WHEN %s_upper LIKE '%% '||?||'%%' THEN 3 " + "ELSE 9 END " + "FROM %s " +
-                        "WHERE %s_upper LIKE '%%'||?||'%%' " + "ORDER BY 3, %s_upper, 1;", field,
-                        field, field, field, table, field, field);
-                params = new String[]{str, str, str, str};
-            }
-            debug("autocompletion", sql);
-            SQLiteDatabase db = App.getDatabase();
-
-            return db.rawQuery(sql, params);
-        };
-
-        adapter.setFilterQueryProvider(provider);
-
-        view.setAdapter(adapter);
-
-        if (callback != null)
-            view.setOnItemClickListener(
-                    (parent, itemView, position, id) -> callback.descriptionSelected(
-                            String.valueOf(view.getText())));
     }
     public static void queryInBackground(@NonNull String statement, String[] params,
                                          @NonNull final CallbackHelper callbackHelper) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.TransactionDateFinder;
+import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
@@ -47,7 +47,6 @@ import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
@@ -130,12 +129,13 @@ public class TransactionListFragment extends MobileLedgerListFragment
         vAccountFilter = view.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = view.findViewById(R.id.transaction_filter_account_name);
 
-        MLDB.hookAutocompletionAdapter(mainActivity, accNameFilter, "accounts", "name");
+        MobileLedgerProfile profile = Data.getProfile();
+        accNameFilter.setAdapter(new AccountAutocompleteAdapter(mainActivity, profile));
         accNameFilter.setOnItemClickListener((parent, v, position, id) -> {
 //                debug("tmp", "direct onItemClick");
-            Cursor c = (Cursor) parent.getItemAtPosition(position);
             model.getAccountFilter()
-                 .setValue(c.getString(1));
+                 .setValue(parent.getItemAtPosition(position)
+                                 .toString());
             Globals.hideSoftKeyboard(mainActivity);
         });
 
@@ -144,18 +144,17 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         model.getUpdatingFlag()
              .observe(getViewLifecycleOwner(), (flag) -> refreshLayout.setRefreshing(flag));
-        MobileLedgerProfile profile = Data.getProfile();
         model.getDisplayedTransactions()
              .observe(getViewLifecycleOwner(), list -> modelAdapter.setTransactions(list));
 
         view.findViewById(R.id.clearAccountNameFilter)
             .setOnClickListener(v -> {
-                        model.getAccountFilter()
-                             .setValue(null);
-                        vAccountFilter.setVisibility(View.GONE);
-                        menuTransactionListFilter.setVisible(true);
-                        Globals.hideSoftKeyboard(mainActivity);
-                    });
+                model.getAccountFilter()
+                     .setValue(null);
+                vAccountFilter.setVisibility(View.GONE);
+                menuTransactionListFilter.setVisible(true);
+                Globals.hideSoftKeyboard(mainActivity);
+            });
 
         model.foundTransactionItemIndex.observe(getViewLifecycleOwner(), pos -> {
             Logger.debug("go-to-date", String.format(Locale.US, "Found pos %d", pos));

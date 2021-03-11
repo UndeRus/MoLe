@@ -24,7 +24,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -32,10 +32,10 @@ import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.NewTransactionHeaderRowBinding;
+import net.ktnx.mobileledger.db.TransactionDescriptionAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
@@ -96,8 +96,12 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
         NewTransactionActivity activity = (NewTransactionActivity) b.getRoot()
                                                                     .getContext();
 
-        MLDB.hookAutocompletionAdapter(activity, b.newTransactionDescription,
-                MLDB.DESCRIPTION_HISTORY_TABLE, "description", false, activity, mProfile);
+        b.newTransactionDescription.setAdapter(
+                new TransactionDescriptionAutocompleteAdapter(activity));
+        b.newTransactionDescription.setOnItemClickListener(
+                (parent, view, position, id) -> activity.descriptionSelected(
+                        parent.getItemAtPosition(position)
+                              .toString()));
 
         decimalSeparator = "";
         Data.locale.observe(activity, locale -> decimalSeparator = String.valueOf(
@@ -299,14 +303,14 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
                 b.newTransactionDate.setText(head.getFormattedDate());
 
                 // avoid triggering completion pop-up
-                SimpleCursorAdapter a =
-                        (SimpleCursorAdapter) b.newTransactionDescription.getAdapter();
+                ListAdapter a = b.newTransactionDescription.getAdapter();
                 try {
                     b.newTransactionDescription.setAdapter(null);
                     b.newTransactionDescription.setText(head.getDescription());
                 }
                 finally {
-                    b.newTransactionDescription.setAdapter(a);
+                    b.newTransactionDescription.setAdapter(
+                            (TransactionDescriptionAutocompleteAdapter) a);
                 }
 
                 b.transactionComment.setText(head.getComment());
