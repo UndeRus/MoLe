@@ -260,6 +260,7 @@ public class NewTransactionModel extends ViewModel {
         if (Misc.emptyIsNull(transactionComment) != null)
             head.setComment(transactionComment);
 
+        Item.resetIdDispenser();
         List<Item> newItems = new ArrayList<>();
 
         newItems.add(head);
@@ -299,7 +300,7 @@ public class NewTransactionModel extends ViewModel {
                   newItems.add(accRow);
               }
 
-              new Handler(Looper.getMainLooper()).post(() -> setItems(newItems));
+              new Handler(Looper.getMainLooper()).post(() -> replaceItems(newItems));
           });
     }
     private int extractIntFromMatches(MatchResult m, Integer group, Integer literal) {
