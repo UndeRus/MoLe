@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -100,10 +100,10 @@ public class SplashActivity extends CrashReportingActivity {
     private static class DatabaseInitTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            MobileLedgerProfile.loadAllFromDB(null);
+            MobileLedgerProfile.loadAllFromDB(0);
 
-            String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-            MobileLedgerProfile startupProfile = Data.getProfile(profileUUID);
+            long profileId = MLDB.getLongOption(MLDB.OPT_PROFILE_ID, 0);
+            MobileLedgerProfile startupProfile = Data.getProfile(profileId);
             if (startupProfile != null)
                 Data.postCurrentProfile(startupProfile);
             return null;

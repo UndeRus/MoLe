@@ -20,14 +20,25 @@ package net.ktnx.mobileledger.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
 
-@Entity(tableName = "accounts", primaryKeys = {"profile", "name"})
+@Entity(tableName = "accounts",
+        indices = {@Index(name = "un_account_name", unique = true, value = {"profile_id", "name"}),
+                   @Index(name = "fk_account_profile", value = "profile_id")
+        }, foreignKeys = {
+        @ForeignKey(entity = Profile.class, parentColumns = "id", childColumns = "profile_id",
+                    onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT)
+})
 public class Account {
     @ColumnInfo
-    int level;
+    @PrimaryKey(autoGenerate = true)
+    long id;
+    @ColumnInfo(name = "profile_id")
+    long profileId;
     @ColumnInfo
-    @NonNull
-    private String profile;
+    int level;
     @ColumnInfo
     @NonNull
     private String name;
@@ -42,12 +53,17 @@ public class Account {
     private boolean amountsExpanded = false;
     @ColumnInfo(defaultValue = "0")
     private int generation;
-    @NonNull
-    public String getProfile() {
-        return profile;
+    public long getId() {
+        return id;
     }
-    public void setProfile(@NonNull String profile) {
-        this.profile = profile;
+    public void setId(long id) {
+        this.id = id;
+    }
+    public long getProfileId() {
+        return profileId;
+    }
+    public void setProfileId(long profileId) {
+        this.profileId = profileId;
     }
     @NonNull
     public String getName() {

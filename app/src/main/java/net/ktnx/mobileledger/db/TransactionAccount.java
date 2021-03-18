@@ -22,19 +22,20 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Index;
+import androidx.room.PrimaryKey;
 
-@Entity(tableName = "transaction_accounts", primaryKeys = {"profile", "transaction_id", "order_no"},
-        foreignKeys = {@ForeignKey(entity = Transaction.class, parentColumns = {"profile", "id"},
-                                   childColumns = {"profile", "transaction_id"},
-                                   onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT),
-                       @ForeignKey(entity = Account.class, parentColumns = {"profile", "name"},
-                                   childColumns = {"profile", "account_name"},
-                                   onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT)
-        }, indices = {@Index(name = "fk_tran_acc_prof_acc", value = {"profile", "account_name"})})
+@Entity(tableName = "transaction_accounts", foreignKeys = {
+        @ForeignKey(entity = Transaction.class, parentColumns = {"id"},
+                    childColumns = {"transaction_id"}, onDelete = ForeignKey.CASCADE,
+                    onUpdate = ForeignKey.RESTRICT),
+}, indices = {@Index(name = "fk_tran_acc_trans", value = {"transaction_id"}),
+              @Index(name = "un_transaction_accounts", unique = true,
+                     value = {"transaction_id", "order_no"})
+})
 public class TransactionAccount {
     @ColumnInfo
-    @NonNull
-    private String profile;
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     @ColumnInfo(name = "transaction_id")
     private int transactionId;
     @ColumnInfo(name = "order_no")
@@ -51,13 +52,13 @@ public class TransactionAccount {
     private String comment;
     @ColumnInfo(defaultValue = "0")
     private int generation = 0;
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
     @NonNull
-    public String getProfile() {
-        return profile;
-    }
-    public void setProfile(@NonNull String profile) {
-        this.profile = profile;
-    }
     public int getTransactionId() {
         return transactionId;
     }

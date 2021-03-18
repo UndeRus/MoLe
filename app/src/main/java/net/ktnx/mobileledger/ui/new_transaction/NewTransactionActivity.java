@@ -115,10 +115,10 @@ public class NewTransactionActivity extends ProfileThemedActivity
     }
     @Override
     protected void initProfile() {
-        String profileUUID = getIntent().getStringExtra("profile_uuid");
+        long profileId = getIntent().getLongExtra("profile_id", 0);
 
-        if (profileUUID != null) {
-            mProfile = Data.getProfile(profileUUID);
+        if (profileId != 0) {
+            mProfile = Data.getProfile(profileId);
             if (mProfile == null)
                 finish();
             Data.setCurrentProfile(mProfile);
@@ -378,9 +378,9 @@ public class NewTransactionActivity extends ProfileThemedActivity
             }
             @Override
             public boolean onRow(@NonNull Cursor cursor) {
-                final String profileUUID = cursor.getString(0);
+                final long profileId = cursor.getLong(0);
                 final int transactionId = cursor.getInt(1);
-                runOnUiThread(() -> model.loadTransactionIntoModel(profileUUID, transactionId));
+                runOnUiThread(() -> model.loadTransactionIntoModel(profileId, transactionId));
                 return false; // limit 1, by the way
             }
             @Override
@@ -409,9 +409,9 @@ public class NewTransactionActivity extends ProfileThemedActivity
                             }
                             @Override
                             public boolean onRow(@NonNull Cursor cursor) {
-                                final String profileUUID = cursor.getString(0);
+                                final long profileId = cursor.getLong(0);
                                 final int transactionId = cursor.getInt(1);
-                                runOnUiThread(() -> model.loadTransactionIntoModel(profileUUID,
+                                runOnUiThread(() -> model.loadTransactionIntoModel(profileId,
                                         transactionId));
                                 return false;
                             }

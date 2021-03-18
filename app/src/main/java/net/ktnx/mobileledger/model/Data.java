@@ -94,11 +94,11 @@ public final class Data {
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void setCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
-        MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
+        MLDB.setLongOption(MLDB.OPT_PROFILE_ID, newProfile.getId());
         profile.setValue(newProfile);
     }
     public static void postCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
-        MLDB.setOption(MLDB.OPT_PROFILE_UUID, newProfile.getUuid());
+        MLDB.setLongOption(MLDB.OPT_PROFILE_ID, newProfile.getId());
         profile.postValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
@@ -116,15 +116,14 @@ public final class Data {
         }
     }
     @SuppressWarnings("WeakerAccess")
-    public static int getProfileIndex(String profileUUID) {
+    public static int getProfileIndex(long profileId) {
         try (LockHolder ignored = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
             if (prList == null)
                 throw new AssertionError();
             for (int i = 0; i < prList.size(); i++) {
                 MobileLedgerProfile p = prList.get(i);
-                if (p.getUuid()
-                     .equals(profileUUID))
+                if (p.getId() == profileId)
                     return i;
             }
 
@@ -132,13 +131,13 @@ public final class Data {
         }
     }
     public static int retrieveCurrentThemeIdFromDb() {
-        String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-        if (profileUUID == null)
+        long profileId = MLDB.getLongOption(MLDB.OPT_PROFILE_ID, 0);
+        if (profileId == 0)
             return -1;
 
         SQLiteDatabase db = App.getDatabase();
         try (Cursor c = db.rawQuery("SELECT theme from profiles where uuid=?",
-                new String[]{profileUUID}))
+                new String[]{String.valueOf(profileId)}))
         {
             if (c.moveToNext())
                 return c.getInt(0);
@@ -147,18 +146,18 @@ public final class Data {
         return -1;
     }
     @Nullable
-    public static MobileLedgerProfile getProfile(String profileUUID) {
+    public static MobileLedgerProfile getProfile(long profileId) {
         MobileLedgerProfile profile;
         try (LockHolder readLock = profilesLocker.lockForReading()) {
             List<MobileLedgerProfile> prList = profiles.getValue();
             if ((prList == null) || prList.isEmpty()) {
                 readLock.close();
                 try (LockHolder ignored = profilesLocker.lockForWriting()) {
-                    profile = MobileLedgerProfile.loadAllFromDB(profileUUID);
+                    profile = MobileLedgerProfile.loadAllFromDB(profileId);
                 }
             }
             else {
-                int i = getProfileIndex(profileUUID);
+                int i = getProfileIndex(profileId);
                 if (i == -1)
                     i = 0;
                 profile = prList.get(i);
@@ -218,8 +217,8 @@ public final class Data {
         if (currentProfile != null)
             return currentProfile;
 
-        String profileUUID = MLDB.getOption(MLDB.OPT_PROFILE_UUID, null);
-        MobileLedgerProfile startupProfile = getProfile(profileUUID);
+        long profileId = MLDB.getLongOption(MLDB.OPT_PROFILE_ID, 0);
+        MobileLedgerProfile startupProfile = getProfile(profileId);
         if (startupProfile != null)
             setCurrentProfile(startupProfile);
         Logger.debug("profile", "initProfile() returning " + startupProfile);

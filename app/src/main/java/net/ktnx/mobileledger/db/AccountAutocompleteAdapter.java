@@ -34,16 +34,16 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
     private final AccountFilter filter = new AccountFilter();
     private final AccountDAO dao = DB.get()
                                      .getAccountDAO();
-    private String profileUUID;
+    private long profileId;
     public AccountAutocompleteAdapter(Context context) {
         super(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
     }
     public AccountAutocompleteAdapter(Context context, @NonNull MobileLedgerProfile profile) {
         this(context);
-        profileUUID = profile.getUuid();
+        profileId = profile.getId();
     }
-    public void setProfileUUID(String profileUUID) {
-        this.profileUUID = profileUUID;
+    public void setProfileId(long profileId) {
+        this.profileId = profileId;
     }
     @NonNull
     @Override
@@ -73,12 +73,11 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
             }
 
             Logger.debug("acc", String.format("Looking for account '%s'", constraint));
-            final List<String> matches = AccountDAO.unbox(
-                    (profileUUID == null) ? dao.lookupByNameSync(String.valueOf(constraint)
-                                                                       .toUpperCase())
-                                          : dao.lookupInProfileByNameSync(profileUUID,
-                                                  String.valueOf(constraint)
-                                                        .toUpperCase()));
+            final List<String> matches = AccountDAO.unbox((profileId == 0) ? dao.lookupByNameSync(
+                    String.valueOf(constraint)
+                          .toUpperCase()) : dao.lookupInProfileByNameSync(profileId,
+                    String.valueOf(constraint)
+                          .toUpperCase()));
             results.values = matches;
             results.count = matches.size();
 

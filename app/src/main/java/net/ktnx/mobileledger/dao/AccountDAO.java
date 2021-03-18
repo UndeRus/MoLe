@@ -33,8 +33,16 @@ import java.util.List;
 
 @Dao
 public abstract class AccountDAO extends BaseDAO<Account> {
+    static public List<String> unbox(List<AccountNameContainer> list) {
+        ArrayList<String> result = new ArrayList<>(list.size());
+        for (AccountNameContainer item : list) {
+            result.add(item.name);
+        }
+
+        return result;
+    }
     @Insert
-    public abstract void insertSync(Account item);
+    public abstract long insertSync(Account item);
 
     @Update
     public abstract void updateSync(Account item);
@@ -45,40 +53,31 @@ public abstract class AccountDAO extends BaseDAO<Account> {
     @Query("SELECT * FROM accounts")
     public abstract LiveData<List<Account>> getAll();
 
-    @Query("SELECT * FROM accounts WHERE profile = :profileUUID AND name = :accountName")
-    public abstract LiveData<Account> getByName(@NonNull String profileUUID,
-                                                @NonNull String accountName);
-
-//    not useful for now
+    //    not useful for now
 //    @Transaction
 //    @Query("SELECT * FROM patterns")
 //    List<PatternWithAccounts> getPatternsWithAccounts();
-
-    static public List<String> unbox(List<AccountNameContainer> list) {
-        ArrayList<String> result = new ArrayList<>(list.size());
-        for (AccountNameContainer item : list) {
-            result.add(item.name);
-        }
-
-        return result;
-    }
-    @Query("SELECT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
-           "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
-           "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
-           "               ELSE 9 END AS ordering " + "FROM accounts " +
-           "WHERE profile=:profileUUID AND name_upper LIKE '%%'||:term||'%%' " +
-           "ORDER BY ordering, name_upper, rowid ")
-    public abstract LiveData<List<AccountNameContainer>> lookupInProfileByName(
-            @NonNull String profileUUID, @NonNull String term);
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND name = :accountName")
+    public abstract LiveData<Account> getByName(long profileId, @NonNull String accountName);
 
     @Query("SELECT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END AS ordering " + "FROM accounts " +
-           "WHERE profile=:profileUUID AND name_upper LIKE '%%'||:term||'%%' " +
+           "WHERE profile_id=:profileId AND name_upper LIKE '%%'||:term||'%%' " +
            "ORDER BY ordering, name_upper, rowid ")
-    public abstract List<AccountNameContainer> lookupInProfileByNameSync(
-            @NonNull String profileUUID, @NonNull String term);
+    public abstract LiveData<List<AccountNameContainer>> lookupInProfileByName(long profileId,
+                                                                               @NonNull
+                                                                                       String term);
+
+    @Query("SELECT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
+           "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
+           "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
+           "               ELSE 9 END AS ordering " + "FROM accounts " +
+           "WHERE profile_id=:profileId AND name_upper LIKE '%%'||:term||'%%' " +
+           "ORDER BY ordering, name_upper, rowid ")
+    public abstract List<AccountNameContainer> lookupInProfileByNameSync(long profileId,
+                                                                         @NonNull String term);
 
     @Query("SELECT DISTINCT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +

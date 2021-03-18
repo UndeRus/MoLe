@@ -20,7 +20,11 @@ package net.ktnx.mobileledger.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
+import org.jetbrains.annotations.NotNull;
 
 /*
 create table transactions(profile varchar not null, id integer not null, data_hash varchar not
@@ -29,16 +33,20 @@ collate NOCASE not null, comment varchar, generation integer default 0, primary 
 create unique index un_transactions_data_hash on transactions(profile,data_hash);
 create index idx_transaction_description on transactions(description);
  */
-@Entity(tableName = "transactions", primaryKeys = {"profile", "id"}, indices = {
-        @Index(name = "un_transactions_data_hash", unique = true, value = {"profile", "data_hash"}),
-        @Index(name = "idx_transaction_description", value = "description")
+@Entity(tableName = "transactions", foreignKeys = {
+        @ForeignKey(entity = Profile.class, parentColumns = "id", childColumns = "profile_id",
+                    onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT)
+}, indices = {@Index(name = "un_transactions_data_hash", unique = true,
+                     value = {"profile_id", "data_hash"}),
+              @Index(name = "idx_transaction_description", value = "description"),
+              @Index(name = "fk_transaction_profile", value = "profile_id")
 })
 public class Transaction {
     @ColumnInfo
-    @NonNull
-    private String profile;
-    @ColumnInfo
-    private int id;
+    @PrimaryKey(autoGenerate = true)
+    long id;
+    @ColumnInfo(name = "profile_id")
+    private long profileId;
     @ColumnInfo(name = "data_hash")
     @NonNull
     private String dataHash;
@@ -55,22 +63,22 @@ public class Transaction {
     private String comment;
     @ColumnInfo
     private int generation = 0;
-    public String getProfile() {
-        return profile;
+    public long getProfileId() {
+        return profileId;
     }
-    public void setProfile(String profile) {
-        this.profile = profile;
+    public void setProfileId(long profileId) {
+        this.profileId = profileId;
     }
-    public int getId() {
+    public long getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
     public String getDataHash() {
         return dataHash;
     }
-    public void setDataHash(String dataHash) {
+    public void setDataHash(@NotNull String dataHash) {
         this.dataHash = dataHash;
     }
     public int getYear() {

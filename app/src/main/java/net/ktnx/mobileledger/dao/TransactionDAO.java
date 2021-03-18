@@ -42,7 +42,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         return result;
     }
     @Insert
-    public abstract void insertSync(Transaction item);
+    public abstract long insertSync(Transaction item);
 
     @Update
     public abstract void updateSync(Transaction item);
@@ -57,8 +57,8 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
 //    @Transaction
 //    @Query("SELECT * FROM patterns")
 //    List<PatternWithAccounts> getPatternsWithAccounts();
-    @Query("SELECT * FROM transactions WHERE profile = :profileUUID AND id = :id")
-    public abstract LiveData<Transaction> getById(@NonNull String profileUUID, long id);
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    public abstract LiveData<Transaction> getById(long id);
 
     @Query("SELECT DISTINCT description, CASE WHEN description_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN description_upper LIKE '%%:'||:term||'%%' THEN 2 " +

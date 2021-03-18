@@ -461,15 +461,15 @@ public class NewTransactionModel extends ViewModel {
 
         return tr;
     }
-    void loadTransactionIntoModel(String profileUUID, int transactionId) {
+    void loadTransactionIntoModel(long profileId, int transactionId) {
         List<Item> newList = new ArrayList<>();
         Item.resetIdDispenser();
         LedgerTransaction tr;
-        MobileLedgerProfile profile = Data.getProfile(profileUUID);
+        MobileLedgerProfile profile = Data.getProfile(profileId);
         if (profile == null)
             throw new RuntimeException(String.format(
                     "Unable to find profile %s, which is supposed to contain transaction %d",
-                    profileUUID, transactionId));
+                    profileId, transactionId));
 
         tr = profile.loadTransaction(transactionId);
         TransactionHead head = new TransactionHead(tr.getDescription());

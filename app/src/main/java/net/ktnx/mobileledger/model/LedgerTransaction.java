@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -52,12 +52,12 @@ public class LedgerTransaction {
             return res;
         return Float.compare(o1.getAmount(), o2.getAmount());
     };
-    private final String profile;
+    private final long profile;
     private final Integer id;
+    private final List<LedgerTransactionAccount> accounts;
     private SimpleDate date;
     private String description;
     private String comment;
-    private final List<LedgerTransactionAccount> accounts;
     private String dataHash;
     private boolean dataLoaded;
     public LedgerTransaction(Integer id, String dateString, String description)
@@ -66,7 +66,7 @@ public class LedgerTransaction {
     }
     public LedgerTransaction(Integer id, SimpleDate date, String description,
                              MobileLedgerProfile profile) {
-        this.profile = profile.getUuid();
+        this.profile = profile.getId();
         this.id = id;
         this.date = date;
         this.description = description;
@@ -83,8 +83,8 @@ public class LedgerTransaction {
     public LedgerTransaction(int id) {
         this(id, (SimpleDate) null, null);
     }
-    public LedgerTransaction(int id, String profileUUID) {
-        this.profile = profileUUID;
+    public LedgerTransaction(int id, long profileId) {
+        this.profile = profileId;
         this.id = id;
         this.date = null;
         this.description = null;
@@ -170,7 +170,7 @@ public class LedgerTransaction {
 
         try (Cursor cTr = db.rawQuery(
                 "SELECT year, month, day, description, comment from transactions WHERE profile=? " +
-                "AND id=?", new String[]{profile, String.valueOf(id)}))
+                "AND id=?", new String[]{String.valueOf(profile), String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
                 date = new SimpleDate(cTr.getInt(0), cTr.getInt(1), cTr.getInt(2));
@@ -182,7 +182,7 @@ public class LedgerTransaction {
                 try (Cursor cAcc = db.rawQuery(
                         "SELECT account_name, amount, currency, comment FROM " +
                         "transaction_accounts WHERE profile=? AND transaction_id = ?",
-                        new String[]{profile, String.valueOf(id)}))
+                        new String[]{String.valueOf(profile), String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {
 //                        debug("transactions",

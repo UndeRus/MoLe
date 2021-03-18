@@ -35,7 +35,7 @@ public final class MLDB {
     public static final String DESCRIPTION_HISTORY_TABLE = "description_history";
     public static final String OPT_LAST_SCRAPE = "last_scrape";
     @NonNls
-    public static final String OPT_PROFILE_UUID = "profile_uuid";
+    public static final String OPT_PROFILE_ID = "profile_id";
     private static final String NO_PROFILE = "-";
     @SuppressWarnings("unused")
     static public int getIntOption(String name, int default_value) {

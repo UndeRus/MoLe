@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -34,7 +34,7 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
     protected String doInBackground(MainModel[] model) {
         final MobileLedgerProfile profile = Data.getProfile();
 
-        String profile_uuid = profile.getUuid();
+        long profile_id = profile.getId();
         Data.backgroundTaskStarted();
         try {
             String sql;
@@ -45,7 +45,7 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
             if (accFilter == null) {
                 sql = "SELECT id, year, month, day FROM transactions WHERE profile=? ORDER BY " +
                       "year desc, month desc, day desc, id desc";
-                params = new String[]{profile_uuid};
+                params = new String[]{String.valueOf(profile_id)};
 
             }
             else {
@@ -55,7 +55,7 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
                       "and ta.account_name LIKE ?||'%' AND ta" +
                       ".amount <> 0 ORDER BY tr.year desc, tr.month desc, tr.day desc, tr.id " +
                       "desc";
-                params = new String[]{profile_uuid, accFilter};
+                params = new String[]{String.valueOf(profile_id), accFilter};
             }
 
             debug("UTT", sql);

@@ -51,7 +51,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public final class MobileLedgerProfile {
     // N.B. when adding new fields, update the copy-constructor below
-    private final String uuid;
+    private final long id;
     private String name;
     private boolean permitPosting;
     private boolean showCommentsByDefault;
@@ -71,11 +71,11 @@ public final class MobileLedgerProfile {
     private HledgerVersion detectedVersion;
     // N.B. when adding new fields, update the copy-constructor below
     transient private AccountAndTransactionListSaver accountAndTransactionListSaver;
-    public MobileLedgerProfile(String uuid) {
-        this.uuid = uuid;
+    public MobileLedgerProfile(long id) {
+        this.id = id;
     }
     public MobileLedgerProfile(MobileLedgerProfile origin) {
-        uuid = origin.uuid;
+        id = origin.id;
         name = origin.name;
         permitPosting = origin.permitPosting;
         showCommentsByDefault = origin.showCommentsByDefault;
@@ -97,11 +97,11 @@ public final class MobileLedgerProfile {
     }
     // loads all profiles into Data.profiles
     // returns the profile with the given UUID
-    public static MobileLedgerProfile loadAllFromDB(@Nullable String currentProfileUUID) {
+    public static MobileLedgerProfile loadAllFromDB(long currentProfileId) {
         MobileLedgerProfile result = null;
         ArrayList<MobileLedgerProfile> list = new ArrayList<>();
         SQLiteDatabase db = App.getDatabase();
-        try (Cursor cursor = db.rawQuery("SELECT uuid, name, url, use_authentication, auth_user, " +
+        try (Cursor cursor = db.rawQuery("SELECT id, name, url, use_authentication, auth_user, " +
                                          "auth_password, permit_posting, theme, order_no, " +
                                          "preferred_accounts_filter, future_dates, api_version, " +
                                          "show_commodity_by_default, default_commodity, " +
@@ -110,7 +110,7 @@ public final class MobileLedgerProfile {
                                          "profiles order by order_no", null))
         {
             while (cursor.moveToNext()) {
-                MobileLedgerProfile item = new MobileLedgerProfile(cursor.getString(0));
+                MobileLedgerProfile item = new MobileLedgerProfile(cursor.getLong(0));
                 item.setName(cursor.getString(1));
                 item.setUrl(cursor.getString(2));
                 item.setAuthEnabled(cursor.getInt(3) == 1);
@@ -141,8 +141,7 @@ public final class MobileLedgerProfile {
                     }
                 }
                 list.add(item);
-                if (item.getUuid()
-                        .equals(currentProfileUUID))
+                if (item.getId() == currentProfileId)
                     result = item;
             }
         }
@@ -156,7 +155,7 @@ public final class MobileLedgerProfile {
             int orderNo = 0;
             for (MobileLedgerProfile p : Objects.requireNonNull(Data.profiles.getValue())) {
                 db.execSQL("update profiles set order_no=? where uuid=?",
-                        new Object[]{orderNo, p.getUuid()});
+                        new Object[]{orderNo, p.getId()});
                 p.orderNo = orderNo;
                 orderNo++;
             }
@@ -194,7 +193,7 @@ public final class MobileLedgerProfile {
             return false;
 
         MobileLedgerProfile p = (MobileLedgerProfile) obj;
-        if (!uuid.equals(p.uuid))
+        if (id != p.id)
             return false;
         if (!name.equals(p.name))
             return false;
@@ -281,8 +280,8 @@ public final class MobileLedgerProfile {
     public void setPostingPermitted(boolean permitPosting) {
         this.permitPosting = permitPosting;
     }
-    public String getUuid() {
-        return uuid;
+    public long getId() {
+        return id;
     }
     public String getName() {
         return name;
@@ -334,14 +333,14 @@ public final class MobileLedgerProfile {
 //                                            "url=%s, permit_posting=%s, authEnabled=%s, " +
 //                                            "themeHue=%d", uuid, name, url,
 //                    permitPosting ? "TRUE" : "FALSE", authEnabled ? "TRUE" : "FALSE", themeHue));
-            db.execSQL("REPLACE INTO profiles(uuid, name, permit_posting, url, " +
+            db.execSQL("REPLACE INTO profiles(id, name, permit_posting, url, " +
                        "use_authentication, auth_user, auth_password, theme, order_no, " +
                        "preferred_accounts_filter, future_dates, api_version, " +
                        "show_commodity_by_default, default_commodity, show_comments_by_default," +
                        "detected_version_pre_1_19, detected_version_major, " +
                        "detected_version_minor) " +
                        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    new Object[]{uuid, name, permitPosting, url, authEnabled,
+                    new Object[]{id, name, permitPosting, url, authEnabled,
                                  authEnabled ? authUserName : null,
                                  authEnabled ? authPassword : null, themeHue, orderNo,
                                  preferredAccountsFilter, futureDates.toInt(), apiVersion.toInt(),
@@ -368,13 +367,13 @@ public final class MobileLedgerProfile {
             params.add(acc.isExpanded() ? 1 : 0);
         }
         sql += " where profile=? and name=?";
-        params.add(uuid);
+        params.add(id);
         params.add(acc.getName());
         db.execSQL(sql, params.toArray());
 
         db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, " +
                    "expanded, generation) select ?,?,?,?,?,0,? where (select changes() = 0)",
-                new Object[]{uuid, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
+                new Object[]{id, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
                              acc.getLevel(), generation
                 });
 //        debug("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
@@ -401,7 +400,7 @@ public final class MobileLedgerProfile {
 
         db.execSQL("replace into account_values(profile, account, " +
                    "currency, value, generation) values(?, ?, ?, ?, ?);",
-                new Object[]{uuid, name, Misc.emptyIsNull(currency), amount, generation});
+                new Object[]{id, name, Misc.emptyIsNull(currency), amount, generation});
     }
     public void storeTransaction(SQLiteDatabase db, int generation, LedgerTransaction tr) {
         tr.fillDataHash();
@@ -410,12 +409,12 @@ public final class MobileLedgerProfile {
         db.execSQL("UPDATE transactions SET year=?, month=?, day=?, description=?, comment=?, " +
                    "data_hash=?, generation=? WHERE profile=? AND id=?",
                 new Object[]{d.year, d.month, d.day, tr.getDescription(), tr.getComment(),
-                             tr.getDataHash(), generation, uuid, tr.getId()
+                             tr.getDataHash(), generation, id, tr.getId()
                 });
         db.execSQL("INSERT INTO transactions(profile, id, year, month, day, description, " +
                    "comment, data_hash, generation) " +
                    "select ?,?,?,?,?,?,?,?,? WHERE (select changes() = 0)",
-                new Object[]{uuid, tr.getId(), tr.getDate().year, tr.getDate().month,
+                new Object[]{id, tr.getId(), tr.getDate().year, tr.getDate().month,
                              tr.getDate().day, tr.getDescription(), tr.getComment(),
                              tr.getDataHash(), generation
                 });
@@ -427,12 +426,12 @@ public final class MobileLedgerProfile {
                        "WHERE profile=? AND transaction_id=? AND order_no=?",
                     new Object[]{item.getAccountName(), item.getAmount(),
                                  Misc.nullIsEmpty(item.getCurrency()), item.getComment(),
-                                 generation, uuid, tr.getId(), accountOrderNo
+                                 generation, id, tr.getId(), accountOrderNo
                     });
             db.execSQL("INSERT INTO transaction_accounts(profile, transaction_id, " +
                        "order_no, account_name, amount, currency, comment, generation) " +
                        "select ?, ?, ?, ?, ?, ?, ?, ? WHERE (select changes() = 0)",
-                    new Object[]{uuid, tr.getId(), accountOrderNo, item.getAccountName(),
+                    new Object[]{id, tr.getId(), accountOrderNo, item.getAccountName(),
                                  item.getAmount(), Misc.nullIsEmpty(item.getCurrency()),
                                  item.getComment(), generation
                     });
@@ -444,7 +443,7 @@ public final class MobileLedgerProfile {
     public String getOption(String name, String default_value) {
         SQLiteDatabase db = App.getDatabase();
         try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
-                new String[]{uuid, name}))
+                new String[]{String.valueOf(id), name}))
         {
             if (cursor.moveToFirst()) {
                 String result = cursor.getString(0);
@@ -489,23 +488,23 @@ public final class MobileLedgerProfile {
     public void setOption(String name, String value) {
         debug("profile", String.format("setting option %s=%s", name, value));
         DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
-                new String[]{uuid, name, value});
+                new String[]{String.valueOf(id), name, value});
     }
     public void setLongOption(String name, long value) {
         setOption(name, String.valueOf(value));
     }
     public void removeFromDB() {
         SQLiteDatabase db = App.getDatabase();
-        debug("db", String.format("removing profile %s from DB", uuid));
+        debug("db", String.format(Locale.ROOT, "removing profile %d from DB", id));
         db.beginTransactionNonExclusive();
         try {
-            Object[] uuid_param = new Object[]{uuid};
-            db.execSQL("delete from transaction_accounts where profile=?", uuid_param);
-            db.execSQL("delete from transactions where profile=?", uuid_param);
-            db.execSQL("delete from account_values where profile=?", uuid_param);
-            db.execSQL("delete from accounts where profile=?", uuid_param);
-            db.execSQL("delete from options where profile=?", uuid_param);
-            db.execSQL("delete from profiles where uuid=?", uuid_param);
+            Object[] id_param = new Object[]{id};
+            db.execSQL("delete from transaction_accounts where profile=?", id_param);
+            db.execSQL("delete from transactions where profile=?", id_param);
+            db.execSQL("delete from account_values where profile=?", id_param);
+            db.execSQL("delete from accounts where profile=?", id_param);
+            db.execSQL("delete from options where profile=?", id_param);
+            db.execSQL("delete from profiles where uuid=?", id_param);
             db.setTransactionSuccessful();
         }
         finally {
@@ -513,7 +512,7 @@ public final class MobileLedgerProfile {
         }
     }
     public LedgerTransaction loadTransaction(int transactionId) {
-        LedgerTransaction tr = new LedgerTransaction(transactionId, this.uuid);
+        LedgerTransaction tr = new LedgerTransaction(transactionId, this.id);
         tr.loadData(App.getDatabase());
 
         return tr;
@@ -532,7 +531,7 @@ public final class MobileLedgerProfile {
     public int getNextTransactionsGeneration(SQLiteDatabase db) {
         int generation = 1;
         try (Cursor c = db.rawQuery("SELECT generation FROM transactions WHERE profile=? LIMIT 1",
-                new String[]{uuid}))
+                new String[]{String.valueOf(id)}))
         {
             if (c.moveToFirst()) {
                 generation = c.getInt(0) + 1;
@@ -543,7 +542,7 @@ public final class MobileLedgerProfile {
     private int getNextAccountsGeneration(SQLiteDatabase db) {
         int generation = 1;
         try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile=? LIMIT 1",
-                new String[]{uuid}))
+                new String[]{String.valueOf(id)}))
         {
             if (c.moveToFirst()) {
                 generation = c.getInt(0) + 1;
@@ -554,24 +553,24 @@ public final class MobileLedgerProfile {
     private void deleteNotPresentAccounts(SQLiteDatabase db, int generation) {
         Logger.debug("db/benchmark", "Deleting obsolete accounts");
         db.execSQL("DELETE FROM account_values WHERE profile=? AND generation <> ?",
-                new Object[]{uuid, generation});
+                new Object[]{id, generation});
         db.execSQL("DELETE FROM accounts WHERE profile=? AND generation <> ?",
-                new Object[]{uuid, generation});
+                new Object[]{id, generation});
         Logger.debug("db/benchmark", "Done deleting obsolete accounts");
     }
     private void deleteNotPresentTransactions(SQLiteDatabase db, int generation) {
         Logger.debug("db/benchmark", "Deleting obsolete transactions");
         db.execSQL("DELETE FROM transaction_accounts WHERE profile=? AND generation <> ?",
-                new Object[]{uuid, generation});
+                new Object[]{id, generation});
         db.execSQL("DELETE FROM transactions WHERE profile=? AND generation <> ?",
-                new Object[]{uuid, generation});
+                new Object[]{id, generation});
         Logger.debug("db/benchmark", "Done deleting obsolete transactions");
     }
     public void wipeAllData() {
         SQLiteDatabase db = App.getDatabase();
         db.beginTransaction();
         try {
-            String[] pUuid = new String[]{uuid};
+            String[] pUuid = new String[]{String.valueOf(id)};
             db.execSQL("delete from options where profile=?", pUuid);
             db.execSQL("delete from accounts where profile=?", pUuid);
             db.execSQL("delete from account_values where profile=?", pUuid);

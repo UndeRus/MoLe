@@ -20,21 +20,13 @@ package net.ktnx.mobileledger.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-/*
- create table profiles(uuid varchar not null primary key, name not null, url not null,
- use_authentication boolean not null, auth_user varchar, auth_password varchar, order_no
- integer, permit_posting boolean default 0, theme integer default -1, preferred_accounts_filter
- varchar, future_dates integer, api_version integer, show_commodity_by_default boolean default
- 0, default_commodity varchar, show_comments_by_default boolean default 1,
- detected_version_pre_1_19 boolean, detected_version_major integer, detected_version_minor
- integer);
-*/
-@Entity(tableName = "profiles", primaryKeys = {"uuid"})
+@Entity(tableName = "profiles")
 public class Profile {
-    @NonNull
     @ColumnInfo
-    private String uuid = "invalid";
+    @PrimaryKey(autoGenerate = true)
+    private long id;
     @NonNull
     @ColumnInfo
     private String name = "";
@@ -71,12 +63,11 @@ public class Profile {
     private int detectedVersionMajor;
     @ColumnInfo(name = "detected_version_minor")
     private int detectedVersionMinor;
-    @NonNull
-    public String getUuid() {
-        return uuid;
+    public long getId() {
+        return id;
     }
-    public void setUuid(@NonNull String uuid) {
-        this.uuid = uuid;
+    public void setId(long id) {
+        this.id = id;
     }
     @NonNull
     public String getName() {

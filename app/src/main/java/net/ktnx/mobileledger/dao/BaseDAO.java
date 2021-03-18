@@ -24,12 +24,12 @@ import android.os.Looper;
 import androidx.annotation.Nullable;
 
 abstract class BaseDAO<T> {
-    abstract void insertSync(T item);
-    public void insert(T item, @Nullable Runnable onDone) {
+    abstract long insertSync(T item);
+    public void insert(T item, @Nullable OnInsertedReceiver receiver) {
         AsyncTask.execute(() -> {
-            insertSync(item);
-            if (onDone != null)
-                new Handler(Looper.getMainLooper()).post(onDone);
+            long id = insertSync(item);
+            if (receiver != null)
+                new Handler(Looper.getMainLooper()).post(() -> receiver.onInsert(id));
         });
     }
 
@@ -49,6 +49,7 @@ abstract class BaseDAO<T> {
                 new Handler(Looper.getMainLooper()).post(onDone);
         });
     }
-
-
+    interface OnInsertedReceiver {
+        void onInsert(long id);
+    }
 }

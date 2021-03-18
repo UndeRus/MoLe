@@ -347,13 +347,13 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                 continue;
 
             final ShortcutInfo.Builder builder =
-                    new ShortcutInfo.Builder(this, "new_transaction_" + p.getUuid());
+                    new ShortcutInfo.Builder(this, "new_transaction_" + p.getId());
             ShortcutInfo si = builder.setShortLabel(p.getName())
                                      .setIcon(Icon.createWithResource(this,
                                              R.drawable.thick_plus_icon))
                                      .setIntent(new Intent(Intent.ACTION_VIEW, null, this,
-                                             NewTransactionActivity.class).putExtra("profile_uuid",
-                                             p.getUuid()))
+                                             NewTransactionActivity.class).putExtra("profile_id",
+                                             p.getId()))
                                      .setRank(i)
                                      .build();
             shortcuts.add(si);

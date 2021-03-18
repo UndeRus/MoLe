@@ -169,7 +169,7 @@ public class AccountSummaryAdapter
             model.updateDisplayedAccounts();
 
             DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
-                    new Object[]{mAccount.isExpanded(), mAccount.getName(), profile.getUuid()
+                    new Object[]{mAccount.isExpanded(), mAccount.getName(), profile.getId()
                     });
 
         }
@@ -192,7 +192,7 @@ public class AccountSummaryAdapter
                 return;
 
             DbOpQueue.add("update accounts set amounts_expanded=? where name=? and profile=?",
-                    new Object[]{mAccount.amountsExpanded(), mAccount.getName(), profile.getUuid()
+                    new Object[]{mAccount.amountsExpanded(), mAccount.getName(), profile.getId()
                     });
 
         }

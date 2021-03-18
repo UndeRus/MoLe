@@ -62,7 +62,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.UUID;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -111,7 +110,7 @@ public class ProfileDetailFragment extends Fragment {
         builder.setTitle(mProfile.getName());
         builder.setMessage(R.string.remove_profile_dialog_message);
         builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
-            debug("profiles", String.format("[fragment] removing profile %s", mProfile.getUuid()));
+            debug("profiles", String.format("[fragment] removing profile %s", mProfile.getId()));
             mProfile.removeFromDB();
             ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
             if (oldList == null)
@@ -431,9 +430,7 @@ public class ProfileDetailFragment extends Fragment {
 //                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
 
             final MobileLedgerProfile currentProfile = Data.getProfile();
-            if (mProfile.getUuid()
-                        .equals(currentProfile.getUuid()))
-            {
+            if (mProfile.getId() == currentProfile.getId()) {
                 Data.setCurrentProfile(mProfile);
             }
 
@@ -442,7 +439,7 @@ public class ProfileDetailFragment extends Fragment {
                 viewAdapter.notifyItemChanged(pos);
         }
         else {
-            mProfile = new MobileLedgerProfile(String.valueOf(UUID.randomUUID()));
+            mProfile = new MobileLedgerProfile(0);
             model.updateProfile(mProfile);
             mProfile.storeInDB();
             final ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);

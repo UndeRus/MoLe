@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -286,7 +286,7 @@ public class MainModel extends ViewModel {
         @Override
         public void run() {
             Logger.debug("async-acc", "AccountListLoader::run() entered");
-            String profileUUID = profile.getUuid();
+            long profileId = profile.getId();
             ArrayList<LedgerAccount> list = new ArrayList<>();
             HashMap<String, LedgerAccount> map = new HashMap<>();
 
@@ -296,7 +296,7 @@ public class MainModel extends ViewModel {
 
             SQLiteDatabase db = App.getDatabase();
             Logger.debug("async-acc", "AccountListLoader::run() connected to DB");
-            try (Cursor cursor = db.rawQuery(sql, new String[]{profileUUID})) {
+            try (Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(profileId)})) {
                 Logger.debug("async-acc", "AccountListLoader::run() executed query");
                 while (cursor.moveToNext()) {
                     if (isInterrupted())
@@ -305,7 +305,7 @@ public class MainModel extends ViewModel {
                     final String accName = cursor.getString(0);
 //                    debug("accounts",
 //                            String.format("Read account '%s' from DB [%s]", accName,
-//                            profileUUID));
+//                            profileId));
                     String parentName = LedgerAccount.extractParentName(accName);
                     LedgerAccount parent;
                     if (parentName != null) {
@@ -326,7 +326,7 @@ public class MainModel extends ViewModel {
 
                     try (Cursor c2 = db.rawQuery(
                             "SELECT value, currency FROM account_values WHERE profile = ?" + " " +
-                            "AND account = ?", new String[]{profileUUID, accName}))
+                            "AND account = ?", new String[]{String.valueOf(profileId), accName}))
                     {
                         while (c2.moveToNext()) {
                             acc.addAmount(c2.getFloat(0), c2.getString(1));

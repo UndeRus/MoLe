@@ -21,22 +21,20 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 
-@Entity(tableName = "options", primaryKeys = {"profile", "name"})
+@Entity(tableName = "options", primaryKeys = {"profile_id", "name"})
 public class Option {
-    @NonNull
-    @ColumnInfo
-    private String profile = "invalid";
+    @ColumnInfo(name = "profile_id")
+    private long profileId;
     @NonNull
     @ColumnInfo
     private String name = "";
     @ColumnInfo
     private String value;
-    @NonNull
-    public String getProfile() {
-        return profile;
+    public long getProfileId() {
+        return profileId;
     }
-    public void setProfile(@NonNull String profile) {
-        this.profile = profile;
+    public void setProfile(long profileId) {
+        this.profileId = profileId;
     }
     @NonNull
     public String getName() {

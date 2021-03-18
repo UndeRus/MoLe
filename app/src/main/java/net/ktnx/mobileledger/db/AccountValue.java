@@ -20,20 +20,24 @@ package net.ktnx.mobileledger.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
 
-/*
-create table account_values(profile varchar not null, account varchar not null, currency varchar
-not null default '', value decimal not null, generation integer default 0 );
-create unique index un_account_values on account_values(profile,account,currency);
- */
-@Entity(tableName = "account_values", primaryKeys = {"profile", "account", "currency"})
+
+@Entity(tableName = "account_values", indices = {
+        @Index(name = "un_account_values", unique = true, value = {"account_id", "currency"}),
+        @Index(name = "fk_account_value_acc", value = "account_id")
+}, foreignKeys = {
+        @ForeignKey(entity = Account.class, parentColumns = "id", childColumns = "account_id",
+                    onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT)
+})
 public class AccountValue {
     @ColumnInfo
-    @NonNull
-    private String profile;
+    @PrimaryKey(autoGenerate = true)
+    long id;
     @ColumnInfo
-    @NonNull
-    private String account;
+    private long account_id;
     @NonNull
     @ColumnInfo(defaultValue = "")
     private String currency = "";
@@ -41,19 +45,17 @@ public class AccountValue {
     private float value;
     @ColumnInfo(defaultValue = "0")
     private int generation = 0;
-    @NonNull
-    public String getProfile() {
-        return profile;
+    public long getId() {
+        return id;
     }
-    public void setProfile(@NonNull String profile) {
-        this.profile = profile;
+    public void setId(long id) {
+        this.id = id;
     }
-    @NonNull
-    public String getAccount() {
-        return account;
+    public long getAccount_id() {
+        return account_id;
     }
-    public void setAccount(@NonNull String account) {
-        this.account = account;
+    public void setAccount_id(long account_id) {
+        this.account_id = account_id;
     }
     @NonNull
     public String getCurrency() {

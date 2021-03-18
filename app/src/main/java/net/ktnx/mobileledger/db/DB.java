@@ -50,7 +50,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
                       Transaction.class, TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
-    public static final int REVISION = 58;
+    public static final int REVISION = 59;
     public static final String DB_NAME = "MoLe.db";
     private static DB instance;
     public static DB get() {
