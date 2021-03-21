@@ -136,7 +136,7 @@ public final class Data {
             return -1;
 
         SQLiteDatabase db = App.getDatabase();
-        try (Cursor c = db.rawQuery("SELECT theme from profiles where uuid=?",
+        try (Cursor c = db.rawQuery("SELECT theme from profiles where id=?",
                 new String[]{String.valueOf(profileId)}))
         {
             if (c.moveToNext())

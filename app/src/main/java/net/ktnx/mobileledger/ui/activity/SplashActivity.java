@@ -54,6 +54,7 @@ public class SplashActivity extends CrashReportingActivity {
         startupTime = System.currentTimeMillis();
 
         AsyncTask<Void, Void, Void> dbInitTask = new DatabaseInitTask();
+        Logger.debug("splash", "starting dbInit task");
         dbInitTask.execute();
     }
     @Override

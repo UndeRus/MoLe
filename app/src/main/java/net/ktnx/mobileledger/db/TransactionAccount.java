@@ -27,8 +27,8 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "transaction_accounts", foreignKeys = {
         @ForeignKey(entity = Transaction.class, parentColumns = {"id"},
                     childColumns = {"transaction_id"}, onDelete = ForeignKey.CASCADE,
-                    onUpdate = ForeignKey.RESTRICT),
-}, indices = {@Index(name = "fk_tran_acc_trans", value = {"transaction_id"}),
+                    onUpdate = ForeignKey.RESTRICT)
+}, indices = {@Index(name = "fk_trans_acc_trans", value = {"transaction_id"}),
               @Index(name = "un_transaction_accounts", unique = true,
                      value = {"transaction_id", "order_no"})
 })

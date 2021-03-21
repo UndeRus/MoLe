@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -70,7 +70,7 @@ public class Colors {
     int secondary;
     @ColorInt
     public static int tableRowDarkBG;
-    public static int profileThemeId = -1;
+    public static int profileThemeId = DEFAULT_HUE_DEG;
     public static void refreshColors(Resources.Theme theme) {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);

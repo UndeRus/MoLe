@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.Logger;
 
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
@@ -36,8 +37,11 @@ public class ProfileThemedActivity extends CrashReportingActivity {
 
         Colors.setupTheme(this, themeHue);
 
-        if (themeSetUp)
+        if (themeSetUp) {
+            Logger.debug("prf-thm-act",
+                    "setupProfileColors(): theme already set up, recreating activity");
             this.recreate();
+        }
         themeSetUp = true;
 
         Colors.profileThemeId = Data.retrieveCurrentThemeIdFromDb();

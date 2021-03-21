@@ -36,8 +36,8 @@ create index idx_transaction_description on transactions(description);
 @Entity(tableName = "transactions", foreignKeys = {
         @ForeignKey(entity = Profile.class, parentColumns = "id", childColumns = "profile_id",
                     onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.RESTRICT)
-}, indices = {@Index(name = "un_transactions_data_hash", unique = true,
-                     value = {"profile_id", "data_hash"}),
+}, indices = {@Index(name = "un_transactions_ledger_id", unique = true,
+                     value = {"profile_id", "ledger_id"}),
               @Index(name = "idx_transaction_description", value = "description"),
               @Index(name = "fk_transaction_profile", value = "profile_id")
 })
@@ -45,6 +45,8 @@ public class Transaction {
     @ColumnInfo
     @PrimaryKey(autoGenerate = true)
     long id;
+    @ColumnInfo(name = "ledger_id")
+    long ledgerId;
     @ColumnInfo(name = "profile_id")
     private long profileId;
     @ColumnInfo(name = "data_hash")
@@ -63,6 +65,12 @@ public class Transaction {
     private String comment;
     @ColumnInfo
     private int generation = 0;
+    public long getLedgerId() {
+        return ledgerId;
+    }
+    public void setLedgerId(long ledgerId) {
+        this.ledgerId = ledgerId;
+    }
     public long getProfileId() {
         return profileId;
     }

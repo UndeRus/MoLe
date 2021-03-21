@@ -452,6 +452,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         Data.lastUpdateAccountCount.removeObservers(this);
         Data.lastUpdateDate.removeObservers(this);
 
+        Logger.debug("MainActivity", "profileThemeChanged(): recreating activity");
         recreate();
     }
     public void fabNewTransactionClicked(View view) {

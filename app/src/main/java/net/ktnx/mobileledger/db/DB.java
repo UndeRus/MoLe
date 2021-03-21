@@ -30,6 +30,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.dao.AccountDAO;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
+import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
@@ -72,6 +73,7 @@ abstract public class DB extends RoomDatabase {
                                                                  multiVersionMigration(34, 40),
                                                                  singleVersionMigration(41),
                                                                  multiVersionMigration(41, 58),
+                                                                 singleVersionMigration(59)
                                                                  })
                                   .addCallback(new Callback() {
                                       @Override
@@ -168,4 +170,6 @@ abstract public class DB extends RoomDatabase {
     public abstract AccountDAO getAccountDAO();
 
     public abstract TransactionDAO getTransactionDAO();
+
+    public abstract OptionDAO getOptionDAO();
 }

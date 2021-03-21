@@ -19,7 +19,6 @@ package net.ktnx.mobileledger.utils;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 
@@ -36,18 +35,7 @@ public final class MLDB {
     public static final String OPT_LAST_SCRAPE = "last_scrape";
     @NonNls
     public static final String OPT_PROFILE_ID = "profile_id";
-    private static final String NO_PROFILE = "-";
-    @SuppressWarnings("unused")
-    static public int getIntOption(String name, int default_value) {
-        String s = getOption(name, String.valueOf(default_value));
-        try {
-            return Integer.parseInt(s);
-        }
-        catch (Exception e) {
-            debug("db", "returning default int value of " + name, e);
-            return default_value;
-        }
-    }
+    public static final long NO_PROFILE = 0;
     @SuppressWarnings("unused")
     static public long getLongOption(String name, long default_value) {
         String s = getOption(name, String.valueOf(default_value));
@@ -59,45 +47,11 @@ public final class MLDB {
             return default_value;
         }
     }
-    static public void getOption(String name, String defaultValue, GetOptCallback cb) {
-        AsyncTask<Void, Void, String> t = new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                SQLiteDatabase db = App.getDatabase();
-                try (Cursor cursor = db.rawQuery(
-                        "select value from options where profile=? and name=?",
-                        new String[]{NO_PROFILE, name}))
-                {
-                    if (cursor.moveToFirst()) {
-                        String result = cursor.getString(0);
-
-                        if (result == null)
-                            result = defaultValue;
-
-                        debug("async-db", "option " + name + "=" + result);
-                        return result;
-                    }
-                    else
-                        return defaultValue;
-                }
-                catch (Exception e) {
-                    debug("db", "returning default value for " + name, e);
-                    return defaultValue;
-                }
-            }
-            @Override
-            protected void onPostExecute(String result) {
-                cb.onResult(result);
-            }
-        };
-
-        t.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
-    }
     static public String getOption(String name, String default_value) {
         debug("db", "about to fetch option " + name);
         SQLiteDatabase db = App.getDatabase();
-        try (Cursor cursor = db.rawQuery("select value from options where profile=? and name=?",
-                new String[]{NO_PROFILE, name}))
+        try (Cursor cursor = db.rawQuery("select value from options where profile_id=? and name=?",
+                new String[]{String.valueOf(NO_PROFILE), name}))
         {
             if (cursor.moveToFirst()) {
                 String result = cursor.getString(0);
@@ -118,8 +72,8 @@ public final class MLDB {
     }
     static public void setOption(String name, String value) {
         debug("option", String.format("%s := %s", name, value));
-        DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
-                new String[]{NO_PROFILE, name, value});
+        DbOpQueue.add("insert or replace into options(profile_id, name, value) values(?, ?, ?);",
+                new String[]{String.valueOf(NO_PROFILE), name, value});
     }
     @SuppressWarnings("unused")
     static public void setLongOption(String name, long value) {

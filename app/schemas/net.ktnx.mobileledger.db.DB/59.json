@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 59,
-    "identityHash": "a56d86c03528ece865d81fd8171c819f",
+    "identityHash": "0ab4d8a73295b6337c52ea561994b1c8",
     "entities": [
       {
         "tableName": "templates",
@@ -375,7 +375,7 @@
       },
       {
         "tableName": "profiles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `use_authentication` INTEGER NOT NULL, `auth_user` TEXT, `auth_password` TEXT, `order_no` INTEGER NOT NULL, `permit_posting` INTEGER NOT NULL, `theme` INTEGER NOT NULL DEFAULT -1, `preferred_accounts_filter` TEXT, `future_dates` INTEGER NOT NULL, `api_version` INTEGER NOT NULL, `show_commodity_by_default` INTEGER NOT NULL, `default_commodity` TEXT, `show_comments_by_default` INTEGER NOT NULL DEFAULT 1, `detected_version_pre_1_19` INTEGER NOT NULL, `detected_version_major` INTEGER NOT NULL, `detected_version_minor` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `deprecated_uuid` TEXT, `url` TEXT NOT NULL, `use_authentication` INTEGER NOT NULL, `auth_user` TEXT, `auth_password` TEXT, `order_no` INTEGER NOT NULL, `permit_posting` INTEGER NOT NULL, `theme` INTEGER NOT NULL DEFAULT -1, `preferred_accounts_filter` TEXT, `future_dates` INTEGER NOT NULL, `api_version` INTEGER NOT NULL, `show_commodity_by_default` INTEGER NOT NULL, `default_commodity` TEXT, `show_comments_by_default` INTEGER NOT NULL DEFAULT 1, `detected_version_pre_1_19` INTEGER NOT NULL, `detected_version_major` INTEGER NOT NULL, `detected_version_minor` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -388,6 +388,12 @@
             "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "deprecatedUUID",
+            "columnName": "deprecated_uuid",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "url",
@@ -499,11 +505,11 @@
       },
       {
         "tableName": "options",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profile` INTEGER NOT NULL, `name` TEXT NOT NULL, `value` TEXT, PRIMARY KEY(`profile`, `name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profile_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `value` TEXT, PRIMARY KEY(`profile_id`, `name`))",
         "fields": [
           {
-            "fieldPath": "profile",
-            "columnName": "profile",
+            "fieldPath": "profileId",
+            "columnName": "profile_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -522,7 +528,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "profile",
+            "profile_id",
             "name"
           ],
           "autoGenerate": false
@@ -641,11 +647,17 @@
       },
       {
         "tableName": "transactions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profile_id` INTEGER NOT NULL, `data_hash` TEXT NOT NULL, `year` INTEGER NOT NULL, `month` INTEGER NOT NULL, `day` INTEGER NOT NULL, `description` TEXT NOT NULL COLLATE NOCASE, `comment` TEXT, `generation` INTEGER NOT NULL, FOREIGN KEY(`profile_id`) REFERENCES `profiles`(`id`) ON UPDATE RESTRICT ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ledger_id` INTEGER NOT NULL, `profile_id` INTEGER NOT NULL, `data_hash` TEXT NOT NULL, `year` INTEGER NOT NULL, `month` INTEGER NOT NULL, `day` INTEGER NOT NULL, `description` TEXT NOT NULL COLLATE NOCASE, `comment` TEXT, `generation` INTEGER NOT NULL, FOREIGN KEY(`profile_id`) REFERENCES `profiles`(`id`) ON UPDATE RESTRICT ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ledgerId",
+            "columnName": "ledger_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -706,13 +718,13 @@
         },
         "indices": [
           {
-            "name": "un_transactions_data_hash",
+            "name": "un_transactions_ledger_id",
             "unique": true,
             "columnNames": [
               "profile_id",
-              "data_hash"
+              "ledger_id"
             ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `un_transactions_data_hash` ON `${TABLE_NAME}` (`profile_id`, `data_hash`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `un_transactions_ledger_id` ON `${TABLE_NAME}` (`profile_id`, `ledger_id`)"
           },
           {
             "name": "idx_transaction_description",
@@ -808,12 +820,12 @@
         },
         "indices": [
           {
-            "name": "fk_tran_acc_trans",
+            "name": "fk_trans_acc_trans",
             "unique": false,
             "columnNames": [
               "transaction_id"
             ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `fk_tran_acc_trans` ON `${TABLE_NAME}` (`transaction_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `fk_trans_acc_trans` ON `${TABLE_NAME}` (`transaction_id`)"
           },
           {
             "name": "un_transaction_accounts",
@@ -843,7 +855,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a56d86c03528ece865d81fd8171c819f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0ab4d8a73295b6337c52ea561994b1c8')"
     ]
   }
 }

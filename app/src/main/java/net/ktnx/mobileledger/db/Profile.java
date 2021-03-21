@@ -30,6 +30,8 @@ public class Profile {
     @NonNull
     @ColumnInfo
     private String name = "";
+    @ColumnInfo(name = "deprecated_uuid")
+    private String deprecatedUUID;
     @NonNull
     @ColumnInfo
     private String url = "";
@@ -63,6 +65,12 @@ public class Profile {
     private int detectedVersionMajor;
     @ColumnInfo(name = "detected_version_minor")
     private int detectedVersionMinor;
+    public String getDeprecatedUUID() {
+        return deprecatedUUID;
+    }
+    public void setDeprecatedUUID(String deprecatedUUID) {
+        this.deprecatedUUID = deprecatedUUID;
+    }
     public long getId() {
         return id;
     }
