@@ -290,8 +290,8 @@ public class MainModel extends ViewModel {
             ArrayList<LedgerAccount> list = new ArrayList<>();
             HashMap<String, LedgerAccount> map = new HashMap<>();
 
-            String sql = "SELECT a.name, a.expanded, a.amounts_expanded";
-            sql += " from accounts a WHERE a.profile = ?";
+            String sql = "SELECT a.name, a.expanded, a.amounts_expanded, a.id";
+            sql += " from accounts a WHERE a.profile_id = ?";
             sql += " ORDER BY a.name";
 
             SQLiteDatabase db = App.getDatabase();
@@ -302,6 +302,7 @@ public class MainModel extends ViewModel {
                     if (isInterrupted())
                         return;
 
+                    final long accId = cursor.getLong(3);
                     final String accName = cursor.getString(0);
 //                    debug("accounts",
 //                            String.format("Read account '%s' from DB [%s]", accName,
@@ -325,8 +326,8 @@ public class MainModel extends ViewModel {
                     acc.setHasSubAccounts(false);
 
                     try (Cursor c2 = db.rawQuery(
-                            "SELECT value, currency FROM account_values WHERE profile = ?" + " " +
-                            "AND account = ?", new String[]{String.valueOf(profileId), accName}))
+                            "SELECT value, currency FROM account_values WHERE account_id = ?",
+                            new String[]{String.valueOf(accId)}))
                     {
                         while (c2.moveToNext()) {
                             acc.addAmount(c2.getFloat(0), c2.getString(1));

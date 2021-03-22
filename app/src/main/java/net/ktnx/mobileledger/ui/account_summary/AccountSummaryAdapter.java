@@ -168,7 +168,7 @@ public class AccountSummaryAdapter
                              .rotation(mAccount.isExpanded() ? 0 : 180);
             model.updateDisplayedAccounts();
 
-            DbOpQueue.add("update accounts set expanded=? where name=? and profile=?",
+            DbOpQueue.add("update accounts set expanded=? where name=? and profile_id=?",
                     new Object[]{mAccount.isExpanded(), mAccount.getName(), profile.getId()
                     });
 

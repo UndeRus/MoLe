@@ -43,7 +43,7 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
             final String accFilter = model[0].getAccountFilter()
                                              .getValue();
             if (accFilter == null) {
-                sql = "SELECT id, year, month, day FROM transactions WHERE profile=? ORDER BY " +
+                sql = "SELECT id, year, month, day FROM transactions WHERE profile_id=? ORDER BY " +
                       "year desc, month desc, day desc, id desc";
                 params = new String[]{String.valueOf(profile_id)};
 
@@ -51,7 +51,8 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
             else {
                 sql = "SELECT distinct tr.id, tr.year, tr.month, tr.day from transactions tr " +
                       "JOIN " + "transaction_accounts ta " +
-                      "ON ta.transaction_id=tr.id AND ta.profile=tr.profile WHERE tr.profile=? " +
+                      "ON ta.transaction_id=tr.id AND ta.profile=tr.profile WHERE tr.profile_id=?" +
+                      " " +
                       "and ta.account_name LIKE ?||'%' AND ta" +
                       ".amount <> 0 ORDER BY tr.year desc, tr.month desc, tr.day desc, tr.id " +
                       "desc";

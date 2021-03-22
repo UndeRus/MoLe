@@ -169,8 +169,8 @@ public class LedgerTransaction {
             return;
 
         try (Cursor cTr = db.rawQuery(
-                "SELECT year, month, day, description, comment from transactions WHERE profile=? " +
-                "AND id=?", new String[]{String.valueOf(profile), String.valueOf(id)}))
+                "SELECT year, month, day, description, comment from transactions WHERE id=?",
+                new String[]{String.valueOf(id)}))
         {
             if (cTr.moveToFirst()) {
                 date = new SimpleDate(cTr.getInt(0), cTr.getInt(1), cTr.getInt(2));
@@ -181,8 +181,8 @@ public class LedgerTransaction {
 
                 try (Cursor cAcc = db.rawQuery(
                         "SELECT account_name, amount, currency, comment FROM " +
-                        "transaction_accounts WHERE profile=? AND transaction_id = ?",
-                        new String[]{String.valueOf(profile), String.valueOf(id)}))
+                        "transaction_accounts WHERE transaction_id = ?",
+                        new String[]{String.valueOf(id)}))
                 {
                     while (cAcc.moveToNext()) {
 //                        debug("transactions",

@@ -442,7 +442,8 @@ public final class MobileLedgerProfile {
     }
     public String getOption(String name, String default_value) {
         SQLiteDatabase db = App.getDatabase();
-        try (Cursor cursor = db.rawQuery("select value from options where profile = ? and name=?",
+        try (Cursor cursor = db.rawQuery(
+                "select value from options where profile_id = ? and name=?",
                 new String[]{String.valueOf(id), name}))
         {
             if (cursor.moveToFirst()) {
