@@ -155,8 +155,8 @@ insert into transaction_accounts_new(transaction_id, order_no, account_name,
     currency, amount, comment, generation)
 select t.id, ta.order_no, ta.account_name, ta.currency, ta.amount, ta.comment, ta.generation
 from transaction_accounts ta
-join profiles p in ta.profile=p.deprecated_uuid
-join transactions t on ta.transaction_id = t.ledger_id and t.profile_id=p.id;
+join profiles p on ta.profile=p.deprecated_uuid
+join transactions_new t on ta.transaction_id = t.ledger_id and t.profile_id=p.id;
 
 drop table transaction_accounts;
 alter table transaction_accounts_new rename to transaction_accounts;
