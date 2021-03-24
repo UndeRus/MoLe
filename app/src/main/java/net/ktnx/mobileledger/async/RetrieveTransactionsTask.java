@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -555,7 +555,7 @@ public class RetrieveTransactionsTask extends
                         .compareTo(o1.getDate());
             if (res != 0)
                 return res;
-            return Integer.compare(o2.getId(), o1.getId());
+            return Long.compare(o2.getId(), o1.getId());
         });
         return trList;
     }

@@ -366,12 +366,12 @@ public final class MobileLedgerProfile {
             sql += ", expanded=?";
             params.add(acc.isExpanded() ? 1 : 0);
         }
-        sql += " where profile=? and name=?";
+        sql += " where profile_id=? and name=?";
         params.add(id);
         params.add(acc.getName());
         db.execSQL(sql, params.toArray());
 
-        db.execSQL("insert into accounts(profile, name, name_upper, parent_name, level, " +
+        db.execSQL("insert into accounts(profile_id, name, name_upper, parent_name, level, " +
                    "expanded, generation) select ?,?,?,?,?,0,? where (select changes() = 0)",
                 new Object[]{id, acc.getName(), acc.getName().toUpperCase(), acc.getParentName(),
                              acc.getLevel(), generation
@@ -398,22 +398,42 @@ public final class MobileLedgerProfile {
             }
         }
 
-        db.execSQL("replace into account_values(profile, account, " +
-                   "currency, value, generation) values(?, ?, ?, ?, ?);",
-                new Object[]{id, name, Misc.emptyIsNull(currency), amount, generation});
+        long accId = findAddAccount(db, name);
+
+        db.execSQL("replace into account_values(account_id, " +
+                   "currency, value, generation) values(?, ?, ?, ?);",
+                new Object[]{accId, Misc.emptyIsNull(currency), amount, generation});
+    }
+    private long findAddAccount(SQLiteDatabase db, String accountName) {
+        try (Cursor c = db.rawQuery("select id from accounts where profile_id=? and name=?",
+                new String[]{String.valueOf(id), accountName}))
+        {
+            if (c.moveToFirst())
+                return c.getLong(0);
+
+        }
+
+        try (Cursor c = db.rawQuery(
+                "insert into accounts(profile_id, name, name_upper) values(?, ?, ?) returning id",
+                new String[]{String.valueOf(id), accountName, accountName.toUpperCase()}))
+        {
+            c.moveToFirst();
+            return c.getInt(0);
+        }
     }
     public void storeTransaction(SQLiteDatabase db, int generation, LedgerTransaction tr) {
         tr.fillDataHash();
 //        Logger.debug("storeTransaction", String.format(Locale.US, "ID %d", tr.getId()));
         SimpleDate d = tr.getDate();
         db.execSQL("UPDATE transactions SET year=?, month=?, day=?, description=?, comment=?, " +
-                   "data_hash=?, generation=? WHERE profile=? AND id=?",
+                   "data_hash=?, generation=? WHERE profile_id=? AND ledger_id=?",
                 new Object[]{d.year, d.month, d.day, tr.getDescription(), tr.getComment(),
                              tr.getDataHash(), generation, id, tr.getId()
                 });
-        db.execSQL("INSERT INTO transactions(profile, id, year, month, day, description, " +
-                   "comment, data_hash, generation) " +
-                   "select ?,?,?,?,?,?,?,?,? WHERE (select changes() = 0)",
+        db.execSQL(
+                "INSERT INTO transactions(profile_id, ledger_id, year, month, day, description, " +
+                "comment, data_hash, generation) " +
+                "select ?,?,?,?,?,?,?,?,? WHERE (select changes() = 0)",
                 new Object[]{id, tr.getId(), tr.getDate().year, tr.getDate().month,
                              tr.getDate().day, tr.getDescription(), tr.getComment(),
                              tr.getDataHash(), generation
@@ -422,16 +442,15 @@ public final class MobileLedgerProfile {
         int accountOrderNo = 1;
         for (LedgerTransactionAccount item : tr.getAccounts()) {
             db.execSQL("UPDATE transaction_accounts SET account_name=?, amount=?, currency=?, " +
-                       "comment=?, generation=? " +
-                       "WHERE profile=? AND transaction_id=? AND order_no=?",
+                       "comment=?, generation=? " + "WHERE transaction_id=? AND order_no=?",
                     new Object[]{item.getAccountName(), item.getAmount(),
                                  Misc.nullIsEmpty(item.getCurrency()), item.getComment(),
-                                 generation, id, tr.getId(), accountOrderNo
+                                 generation, tr.getId(), accountOrderNo
                     });
-            db.execSQL("INSERT INTO transaction_accounts(profile, transaction_id, " +
+            db.execSQL("INSERT INTO transaction_accounts(transaction_id, " +
                        "order_no, account_name, amount, currency, comment, generation) " +
                        "select ?, ?, ?, ?, ?, ?, ?, ? WHERE (select changes() = 0)",
-                    new Object[]{id, tr.getId(), accountOrderNo, item.getAccountName(),
+                    new Object[]{tr.getId(), accountOrderNo, item.getAccountName(),
                                  item.getAmount(), Misc.nullIsEmpty(item.getCurrency()),
                                  item.getComment(), generation
                     });
@@ -488,7 +507,7 @@ public final class MobileLedgerProfile {
     }
     public void setOption(String name, String value) {
         debug("profile", String.format("setting option %s=%s", name, value));
-        DbOpQueue.add("insert or replace into options(profile, name, value) values(?, ?, ?);",
+        DbOpQueue.add("insert or replace into options(profile_id, name, value) values(?, ?, ?);",
                 new String[]{String.valueOf(id), name, value});
     }
     public void setLongOption(String name, long value) {
@@ -500,12 +519,10 @@ public final class MobileLedgerProfile {
         db.beginTransactionNonExclusive();
         try {
             Object[] id_param = new Object[]{id};
-            db.execSQL("delete from transaction_accounts where profile=?", id_param);
-            db.execSQL("delete from transactions where profile=?", id_param);
-            db.execSQL("delete from account_values where profile=?", id_param);
+            db.execSQL("delete from transactions where profile_id=?", id_param);
             db.execSQL("delete from accounts where profile=?", id_param);
             db.execSQL("delete from options where profile=?", id_param);
-            db.execSQL("delete from profiles where uuid=?", id_param);
+            db.execSQL("delete from profiles where id=?", id_param);
             db.setTransactionSuccessful();
         }
         finally {
@@ -531,7 +548,8 @@ public final class MobileLedgerProfile {
     }
     public int getNextTransactionsGeneration(SQLiteDatabase db) {
         int generation = 1;
-        try (Cursor c = db.rawQuery("SELECT generation FROM transactions WHERE profile=? LIMIT 1",
+        try (Cursor c = db.rawQuery(
+                "SELECT generation FROM transactions WHERE profile_id=? LIMIT 1",
                 new String[]{String.valueOf(id)}))
         {
             if (c.moveToFirst()) {
@@ -542,7 +560,7 @@ public final class MobileLedgerProfile {
     }
     private int getNextAccountsGeneration(SQLiteDatabase db) {
         int generation = 1;
-        try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile=? LIMIT 1",
+        try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile_id=? LIMIT 1",
                 new String[]{String.valueOf(id)}))
         {
             if (c.moveToFirst()) {

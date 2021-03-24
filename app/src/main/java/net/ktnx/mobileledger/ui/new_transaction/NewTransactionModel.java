@@ -1031,7 +1031,7 @@ public class NewTransactionModel extends ViewModel {
             return ItemType.generalData;
         }
         public LedgerTransaction asLedgerTransaction() {
-            return new LedgerTransaction(null, date, description, Data.getProfile());
+            return new LedgerTransaction(0, date, description, Data.getProfile());
         }
         public boolean equalContents(TransactionHead other) {
             if (other == null)

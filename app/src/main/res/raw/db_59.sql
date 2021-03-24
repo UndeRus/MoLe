@@ -94,6 +94,16 @@ select o.name, p.id, o.value
 from options o
 join profiles p on p.deprecated_uuid = o.profile;
 
+insert into options_new(name, profile_id, value)
+select o.name, 0, o.value
+from options o
+where o.profile='-';
+
+update options_new
+set name='profile_id'
+  , value=(select p.id from profiles p where p.deprecated_uuid=value)
+where name='profile_uuid';
+
 drop table options;
 alter table options_new rename to options;
 

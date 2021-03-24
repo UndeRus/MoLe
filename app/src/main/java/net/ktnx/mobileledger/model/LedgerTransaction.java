@@ -53,18 +53,17 @@ public class LedgerTransaction {
         return Float.compare(o1.getAmount(), o2.getAmount());
     };
     private final long profile;
-    private final Integer id;
+    private final long id;
     private final List<LedgerTransactionAccount> accounts;
     private SimpleDate date;
     private String description;
     private String comment;
     private String dataHash;
     private boolean dataLoaded;
-    public LedgerTransaction(Integer id, String dateString, String description)
-            throws ParseException {
+    public LedgerTransaction(long id, String dateString, String description) throws ParseException {
         this(id, Globals.parseLedgerDate(dateString), description);
     }
-    public LedgerTransaction(Integer id, SimpleDate date, String description,
+    public LedgerTransaction(long id, SimpleDate date, String description,
                              MobileLedgerProfile profile) {
         this.profile = profile.getId();
         this.id = id;
@@ -74,11 +73,11 @@ public class LedgerTransaction {
         this.dataHash = null;
         dataLoaded = false;
     }
-    public LedgerTransaction(Integer id, SimpleDate date, String description) {
+    public LedgerTransaction(long id, SimpleDate date, String description) {
         this(id, date, description, Data.getProfile());
     }
     public LedgerTransaction(SimpleDate date, String description) {
-        this(null, date, description);
+        this(0, date, description);
     }
     public LedgerTransaction(int id) {
         this(id, (SimpleDate) null, null);
@@ -126,7 +125,7 @@ public class LedgerTransaction {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public int getId() {
+    public long getId() {
         return id;
     }
     protected void fillDataHash() {
