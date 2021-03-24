@@ -1,0 +1,3 @@
+
+* FIXES
+    + fix a bug in db migration for profiles without detected version

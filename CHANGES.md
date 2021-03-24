@@ -1,4 +1,9 @@
 # Changes
+## [0.17.1] - 2020-03-24
+
+* FIXES
+    + fix a bug in db migration for profiles without detected version
+
 ## [0.17.0] - 2020-03-11
 
 * NEW
