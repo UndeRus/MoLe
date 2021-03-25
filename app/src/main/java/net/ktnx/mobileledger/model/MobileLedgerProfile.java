@@ -449,7 +449,7 @@ public final class MobileLedgerProfile {
                     });
             db.execSQL("INSERT INTO transaction_accounts(transaction_id, " +
                        "order_no, account_name, amount, currency, comment, generation) " +
-                       "select ?, ?, ?, ?, ?, ?, ?, ? WHERE (select changes() = 0)",
+                       "select ?, ?, ?, ?, ?, ?, ? WHERE (select changes() = 0)",
                     new Object[]{tr.getId(), accountOrderNo, item.getAccountName(),
                                  item.getAmount(), Misc.nullIsEmpty(item.getCurrency()),
                                  item.getComment(), generation
