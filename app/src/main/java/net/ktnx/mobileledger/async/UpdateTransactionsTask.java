@@ -50,12 +50,9 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
             }
             else {
                 sql = "SELECT distinct tr.id, tr.year, tr.month, tr.day from transactions tr " +
-                      "JOIN " + "transaction_accounts ta " +
-                      "ON ta.transaction_id=tr.id AND ta.profile=tr.profile WHERE tr.profile_id=?" +
-                      " " +
-                      "and ta.account_name LIKE ?||'%' AND ta" +
-                      ".amount <> 0 ORDER BY tr.year desc, tr.month desc, tr.day desc, tr.id " +
-                      "desc";
+                      "JOIN transaction_accounts ta ON ta.transaction_id=tr.id WHERE tr" +
+                      ".profile_id=? and ta.account_name LIKE ?||'%' AND ta.amount <> 0 ORDER " +
+                      "BY tr.year desc, tr.month desc, tr.day desc, tr.id " + "desc";
                 params = new String[]{String.valueOf(profile_id), accFilter};
             }
 
