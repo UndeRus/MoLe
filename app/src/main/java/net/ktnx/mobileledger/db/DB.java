@@ -74,7 +74,7 @@ abstract public class DB extends RoomDatabase {
                                                                  singleVersionMigration(41),
                                                                  multiVersionMigration(41, 58),
                                                                  singleVersionMigration(59)
-                                                                 })
+                                  })
                                   .addCallback(new Callback() {
                                       @Override
                                       public void onOpen(@NonNull SupportSQLiteDatabase db) {
