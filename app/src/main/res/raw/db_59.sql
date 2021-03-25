@@ -73,15 +73,6 @@ select p.id, a.level, a.name, a.name_upper, a.parent_name, a.expanded, a.amounts
 from profiles_new p
 join accounts a on a.profile=p.deprecated_uuid;
 
-drop table accounts;
-alter table accounts_new rename to accounts;
-
-drop table profiles;
-alter table profiles_new rename to profiles;
-
-create index fk_account_profile on accounts(profile_id);
-create unique index un_account_name on accounts(profile_id, name);
-
 -- options
 create table options_new(
 name text not null,
@@ -92,7 +83,7 @@ primary key(profile_id,name));
 insert into options_new(name, profile_id, value)
 select o.name, p.id, o.value
 from options o
-join profiles p on p.deprecated_uuid = o.profile;
+join profiles_new p on p.deprecated_uuid = o.profile;
 
 insert into options_new(name, profile_id, value)
 select o.name, 0, o.value
@@ -101,21 +92,18 @@ where o.profile='-';
 
 update options_new
 set name='profile_id'
-  , value=(select p.id from profiles p where p.deprecated_uuid=value)
+  , value=(select p.id from profiles_new p where p.deprecated_uuid=value)
 where name='profile_uuid';
 
-drop table options;
-alter table options_new rename to options;
-
-update options
+update options_new
 set name='profile_id'
-  , value=(select p.id from profiles p where p.deprecated_uuid=options.value)
+  , value=(select p.id from profiles_new p where p.deprecated_uuid=options_new.value)
 where name='profile_uuid';
 
 -- account_values
 create table account_values_new(
 id integer not null primary key,
-account_id integer not null references accounts(id) on delete cascade on update restrict,
+account_id integer not null references accounts_new(id) on delete cascade on update restrict,
 currency text not null default '',
 value real not null,
 generation integer not null default 0);
@@ -123,19 +111,13 @@ generation integer not null default 0);
 insert into account_values_new(account_id, currency, value, generation)
 select a.id, av.currency, av.value, av.generation
 from account_values av
-join profiles p on p.deprecated_uuid=av.profile
-join accounts a on a.profile_id = p.id and a.name = av.account;
-
-drop table account_values;
-alter table account_values_new rename to account_values;
-
-create index fk_account_value_acc on account_values(account_id);
-create unique index un_account_values on account_values(account_id, currency);
+join profiles_new p on p.deprecated_uuid=av.profile
+join accounts_new a on a.profile_id = p.id and a.name = av.account;
 
 -- transactions
 create table transactions_new(
 id integer not null primary key,
-profile_id integer not null references profiles(id) on delete cascade on update restrict,
+profile_id integer not null references profiles_new(id) on delete cascade on update restrict,
 ledger_id integer not null,
 description text not null,
 year integer not null,
@@ -148,7 +130,7 @@ generation integer not null);
 insert into transactions_new(profile_id, ledger_id, description, year, month, day, comment, data_hash, generation)
 select p.id, t.id, t.description, t.year, t.month, t.day, t.comment, t.data_hash, t.generation
 from transactions t
-join profiles p on p.deprecated_uuid = t.profile;
+join profiles_new p on p.deprecated_uuid = t.profile;
 
 -- transaction_accounts
 create table transaction_accounts_new(
@@ -165,14 +147,34 @@ insert into transaction_accounts_new(transaction_id, order_no, account_name,
     currency, amount, comment, generation)
 select t.id, ta.order_no, ta.account_name, ta.currency, ta.amount, ta.comment, ta.generation
 from transaction_accounts ta
-join profiles p on ta.profile=p.deprecated_uuid
+join profiles_new p on ta.profile=p.deprecated_uuid
 join transactions_new t on ta.transaction_id = t.ledger_id and t.profile_id=p.id;
+
+-- table drop/rename
+drop table options;
+alter table options_new rename to options;
+
+drop table account_values;
+alter table account_values_new rename to account_values;
 
 drop table transaction_accounts;
 alter table transaction_accounts_new rename to transaction_accounts;
 
 drop table transactions;
 alter table transactions_new rename to transactions;
+
+drop table accounts;
+alter table accounts_new rename to accounts;
+
+drop table profiles;
+alter table profiles_new rename to profiles;
+
+-- indices
+create index fk_account_profile on accounts(profile_id);
+create unique index un_account_name on accounts(profile_id, name);
+
+create index fk_account_value_acc on account_values(account_id);
+create unique index un_account_values on account_values(account_id, currency);
 
 create index idx_transaction_description on transactions(description);
 create unique index un_transactions_ledger_id on transactions(profile_id, ledger_id);
