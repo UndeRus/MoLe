@@ -566,17 +566,20 @@ public final class MobileLedgerProfile {
     }
     private void deleteNotPresentAccounts(SQLiteDatabase db, int generation) {
         Logger.debug("db/benchmark", "Deleting obsolete accounts");
-        db.execSQL("DELETE FROM account_values WHERE profile=? AND generation <> ?",
+        db.execSQL("DELETE FROM account_values WHERE (select a.profile_id from accounts a where a" +
+                   ".id=account_values.account_id)=? AND generation <> ?",
                 new Object[]{id, generation});
-        db.execSQL("DELETE FROM accounts WHERE profile=? AND generation <> ?",
+        db.execSQL("DELETE FROM accounts WHERE profile_id=? AND generation <> ?",
                 new Object[]{id, generation});
         Logger.debug("db/benchmark", "Done deleting obsolete accounts");
     }
     private void deleteNotPresentTransactions(SQLiteDatabase db, int generation) {
         Logger.debug("db/benchmark", "Deleting obsolete transactions");
-        db.execSQL("DELETE FROM transaction_accounts WHERE profile=? AND generation <> ?",
+        db.execSQL(
+                "DELETE FROM transaction_accounts WHERE (select t.profile_id from transactions t " +
+                "where t.id=transaction_accounts.transaction_id)=? AND generation" + " <> ?",
                 new Object[]{id, generation});
-        db.execSQL("DELETE FROM transactions WHERE profile=? AND generation <> ?",
+        db.execSQL("DELETE FROM transactions WHERE profile_id=? AND generation <> ?",
                 new Object[]{id, generation});
         Logger.debug("db/benchmark", "Done deleting obsolete transactions");
     }
