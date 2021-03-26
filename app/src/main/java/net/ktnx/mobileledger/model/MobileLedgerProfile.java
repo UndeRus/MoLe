@@ -547,27 +547,22 @@ public final class MobileLedgerProfile {
         this.themeHue = themeHue;
     }
     public int getNextTransactionsGeneration(SQLiteDatabase db) {
-        int generation = 1;
         try (Cursor c = db.rawQuery(
                 "SELECT generation FROM transactions WHERE profile_id=? LIMIT 1",
                 new String[]{String.valueOf(id)}))
         {
-            if (c.moveToFirst()) {
-                generation = c.getInt(0) + 1;
-            }
+            if (c.moveToFirst())
+                return c.getInt(0) + 1;
         }
-        return generation;
+        return 1;
     }
     private int getNextAccountsGeneration(SQLiteDatabase db) {
-        int generation = 1;
         try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile_id=? LIMIT 1",
-                new String[]{String.valueOf(id)}))
-        {
-            if (c.moveToFirst()) {
-                generation = c.getInt(0) + 1;
-            }
+                new String[]{String.valueOf(id)})) {
+            if (c.moveToFirst())
+                return c.getInt(0) + 1;
         }
-        return generation;
+        return 1;
     }
     private void deleteNotPresentAccounts(SQLiteDatabase db, int generation) {
         Logger.debug("db/benchmark", "Deleting obsolete accounts");
