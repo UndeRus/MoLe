@@ -62,7 +62,7 @@ public class FabManager {
     }
     public void showFab() {
         if (wantedFabState == FAB_SHOWN) {
-            Logger.debug("fab", "Ignoring request to show already visible FAB");
+//            Logger.debug("fab", "Ignoring request to show already visible FAB");
             return;
         }
 
@@ -79,7 +79,7 @@ public class FabManager {
     }
     public void hideFab() {
         if (wantedFabState == FAB_HIDDEN) {
-            Logger.debug("fab", "Ignoring request to hide FAB -- already hidden");
+//            Logger.debug("fab", "Ignoring request to hide FAB -- already hidden");
             return;
         }
 
@@ -133,7 +133,7 @@ public class FabManager {
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                    Logger.debug("touch", "Scrolled " + dy);
+//                    Logger.debug("touch", "Scrolled " + dy);
                     if (dy <= 0) {
                         showFab();
                     }
