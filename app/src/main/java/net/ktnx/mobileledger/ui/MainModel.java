@@ -363,7 +363,7 @@ public class MainModel extends ViewModel {
             Logger.debug("dFilter", "waiting for synchronized block");
             Logger.debug("dFilter", String.format(Locale.US,
                     "entered synchronized block (about to examine %d accounts)", list.size()));
-            newDisplayed.add(new AccountListItem());    // header
+            newDisplayed.add(new AccountListItem.Header());    // header
 
             int count = 0;
             for (LedgerAccount a : list) {
@@ -371,7 +371,7 @@ public class MainModel extends ViewModel {
                     return;
 
                 if (a.isVisible()) {
-                    newDisplayed.add(new AccountListItem(a));
+                    newDisplayed.add(new AccountListItem.Account(a));
                     count++;
                 }
             }

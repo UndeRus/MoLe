@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -22,25 +22,34 @@ import androidx.annotation.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class AccountListItem {
-    private final Type type;
-    private LedgerAccount account;
-    public AccountListItem(@NotNull LedgerAccount account) {
-        this.type = Type.ACCOUNT;
-        this.account = account;
-    }
-    public AccountListItem() {
-        this.type = Type.HEADER;
-    }
+    private AccountListItem() {}
     @NonNull
     public Type getType() {
-        return type;
+        if (this instanceof Account)
+            return Type.ACCOUNT;
+        else if (this instanceof Header)
+            return Type.HEADER;
+        else
+            throw new RuntimeException("Unsupported sub-class " + this);
     }
     @NotNull
     public LedgerAccount getAccount() {
-        if (type != Type.ACCOUNT)
-            throw new IllegalStateException(
-                    String.format("Item type is not %s, but %s", Type.ACCOUNT, type));
-        return account;
+        if (this instanceof Account)
+            return ((Account) this).account;
+
+        throw new IllegalStateException(String.format("Item type is not Account, but %s", this));
     }
     public enum Type {ACCOUNT, HEADER}
+
+    public static class Account extends AccountListItem {
+        private final LedgerAccount account;
+        public Account(@NotNull LedgerAccount account) {
+            this.account = account;
+        }
+    }
+
+    public static class Header extends AccountListItem {
+        public Header() {
+        }
+    }
 }
