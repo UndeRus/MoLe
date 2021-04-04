@@ -15,30 +15,16 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+package net.ktnx.mobileledger.db;
 
-buildscript {
-    
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.3'
-        
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
+import java.util.List;
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+public class AccountWithAmounts {
+    @Embedded
+    public Account account;
+    @Relation(parentColumn = "id", entityColumn = "account_id")
+    public List<AccountValue> amounts;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -20,25 +20,28 @@ package net.ktnx.mobileledger.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.lang.ref.WeakReference;
+import net.ktnx.mobileledger.db.Account;
+import net.ktnx.mobileledger.db.AccountValue;
+import net.ktnx.mobileledger.db.AccountWithAmounts;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class LedgerAccount {
     static Pattern reHigherAccount = Pattern.compile("^[^:]+:");
+    private final LedgerAccount parent;
+    private long dbId;
+    private long profileId;
     private String name;
     private String shortName;
     private int level;
-    private final LedgerAccount parent;
     private boolean expanded;
     private List<LedgerAmount> amounts;
     private boolean hasSubAccounts;
     private boolean amountsExpanded;
-    private final WeakReference<MobileLedgerProfile> profileWeakReference;
 
-    public LedgerAccount(MobileLedgerProfile profile, String name, @Nullable LedgerAccount parent) {
-        this.profileWeakReference = new WeakReference<>(profile);
+    public LedgerAccount(String name, @Nullable LedgerAccount parent) {
         this.parent = parent;
         if (parent != null && !name.startsWith(parent.getName() + ":"))
             throw new IllegalStateException(
@@ -54,9 +57,21 @@ public class LedgerAccount {
         else
             return accName.substring(0, colonPos);
     }
-    public @Nullable
-    MobileLedgerProfile getProfile() {
-        return profileWeakReference.get();
+    @NonNull
+    static public LedgerAccount fromDBO(AccountWithAmounts in, LedgerAccount parent) {
+        LedgerAccount res = new LedgerAccount(in.account.getName(), parent);
+        res.dbId = in.account.getId();
+        res.profileId = in.account.getProfileId();
+        res.setName(in.account.getName());
+        res.setExpanded(in.account.isExpanded());
+        res.setAmountsExpanded(in.account.isAmountsExpanded());
+
+        res.amounts = new ArrayList<>();
+        for (AccountValue val : in.amounts) {
+            res.amounts.add(new LedgerAmount(val.getValue(), val.getCurrency()));
+        }
+
+        return res;
     }
     @Override
     public int hashCode() {
@@ -92,15 +107,9 @@ public class LedgerAccount {
                              .startsWith(name + ":");
     }
     private void stripName() {
-        if (parent == null) {
-            level = 0;
-            shortName = name;
-        }
-        else {
-            level = parent.level + 1;
-            shortName = name.substring(parent.getName()
-                                             .length() + 1);
-        }
+        String[] split = name.split(":");
+        shortName = split[split.length - 1];
+        level = split.length - 1;
     }
     public String getName() {
         return name;
@@ -153,12 +162,10 @@ public class LedgerAccount {
     public int getLevel() {
         return level;
     }
-
     @NonNull
     public String getShortName() {
         return shortName;
     }
-
     public String getParentName() {
         return (parent == null) ? null : parent.getName();
     }
@@ -184,12 +191,28 @@ public class LedgerAccount {
     public boolean amountsExpanded() { return amountsExpanded; }
     public void setAmountsExpanded(boolean flag) { amountsExpanded = flag; }
     public void toggleAmountsExpanded() { amountsExpanded = !amountsExpanded; }
-
     public void propagateAmountsTo(LedgerAccount acc) {
         for (LedgerAmount a : amounts)
             a.propagateToAccount(acc);
     }
     public List<LedgerAmount> getAmounts() {
         return amounts;
+    }
+    @NonNull
+    public Account toDBO() {
+        Account dbo = new Account();
+        dbo.setName(name);
+        dbo.setNameUpper(name.toUpperCase());
+        dbo.setParentName(extractParentName(name));
+        dbo.setLevel(level);
+        dbo.setId(dbId);
+        dbo.setProfileId(profileId);
+        dbo.setExpanded(expanded);
+        dbo.setAmountsExpanded(amountsExpanded);
+
+        return dbo;
+    }
+    public long getId() {
+        return dbId;
     }
 }

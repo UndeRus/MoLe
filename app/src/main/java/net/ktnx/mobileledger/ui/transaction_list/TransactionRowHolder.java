@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TransactionListItem;
 
 import java.util.Observer;
@@ -59,23 +58,8 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
         this.vHeader = itemView.findViewById(R.id.last_update_container);
         this.tvLastUpdate = itemView.findViewById(R.id.last_update_text);
     }
-    private void initLastUpdateObserver() {
-        if (lastUpdateObserver != null)
-            return;
-
-        lastUpdateObserver = (o, arg) -> setLastUpdateText(Data.lastTransactionsUpdateText.get());
-
-        Data.lastTransactionsUpdateText.addObserver(lastUpdateObserver);
-    }
     void setLastUpdateText(String text) {
         tvLastUpdate.setText(text);
-    }
-    private void dropLastUpdateObserver() {
-        if (lastUpdateObserver == null)
-            return;
-
-        Data.lastTransactionsUpdateText.deleteObserver(lastUpdateObserver);
-        lastUpdateObserver = null;
     }
     void setType(TransactionListItem.Type newType) {
         if (newType == lastType)
@@ -86,19 +70,16 @@ class TransactionRowHolder extends RecyclerView.ViewHolder {
                 vHeader.setVisibility(View.GONE);
                 vTransaction.setVisibility(View.VISIBLE);
                 vDelimiter.setVisibility(View.GONE);
-                dropLastUpdateObserver();
                 break;
             case DELIMITER:
                 vHeader.setVisibility(View.GONE);
                 vTransaction.setVisibility(View.GONE);
                 vDelimiter.setVisibility(View.VISIBLE);
-                dropLastUpdateObserver();
                 break;
             case HEADER:
                 vHeader.setVisibility(View.VISIBLE);
                 vTransaction.setVisibility(View.GONE);
                 vDelimiter.setVisibility(View.GONE);
-                initLastUpdateObserver();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + newType);

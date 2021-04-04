@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!--
+  ~ Copyright © 2021 Damyan Ivanov.
+  ~ This file is part of MoLe.
+  ~ MoLe is free software: you can distribute it and/or modify it
+  ~ under the term of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your opinion), any later version.
+  ~
+  ~ MoLe is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License terms for details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/account_summary_row"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:longClickable="true"
+    android:paddingTop="4dp"
+    >
+
+    <TextView
+        android:id="@+id/last_update_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/activity_horizontal_margin"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="1 123 transactions as of 29.02.2020 13:37"
+        android:textAppearance="@android:style/TextAppearance.Material.Small"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

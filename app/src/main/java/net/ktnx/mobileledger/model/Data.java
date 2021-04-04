@@ -32,7 +32,6 @@ import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MLDB;
-import net.ktnx.mobileledger.utils.ObservableValue;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -62,9 +61,9 @@ public final class Data {
     public static final MutableLiveData<Integer> lastUpdateTransactionCount =
             new MutableLiveData<>(0);
     public static final MutableLiveData<Integer> lastUpdateAccountCount = new MutableLiveData<>(0);
-    public static final ObservableValue<String> lastTransactionsUpdateText =
-            new ObservableValue<>();
-    public static final ObservableValue<String> lastAccountsUpdateText = new ObservableValue<>();
+    public static final MutableLiveData<String> lastTransactionsUpdateText =
+            new MutableLiveData<>();
+    public static final MutableLiveData<String> lastAccountsUpdateText = new MutableLiveData<>();
     private static final MutableLiveData<MobileLedgerProfile> profile =
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);

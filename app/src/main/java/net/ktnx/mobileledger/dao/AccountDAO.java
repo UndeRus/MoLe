@@ -24,9 +24,11 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import net.ktnx.mobileledger.db.Account;
+import net.ktnx.mobileledger.db.AccountWithAmounts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,8 +52,18 @@ public abstract class AccountDAO extends BaseDAO<Account> {
     @Delete
     public abstract void deleteSync(Account item);
 
-    @Query("SELECT * FROM accounts")
-    public abstract LiveData<List<Account>> getAll();
+    @Delete
+    public abstract void deleteSync(List<Account> items);
+
+    @Query("SELECT * FROM accounts WHERE profile_id=:profileId")
+    public abstract LiveData<List<Account>> getAll(long profileId);
+
+    @Transaction
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId")
+    public abstract LiveData<List<AccountWithAmounts>> getAllWithAmounts(long profileId);
+
+    @Query("SELECT * FROM accounts WHERE id=:id")
+    public abstract Account getByIdSync(long id);
 
     //    not useful for now
 //    @Transaction
@@ -59,6 +71,11 @@ public abstract class AccountDAO extends BaseDAO<Account> {
 //    List<PatternWithAccounts> getPatternsWithAccounts();
     @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND name = :accountName")
     public abstract LiveData<Account> getByName(long profileId, @NonNull String accountName);
+
+    @Transaction
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND name = :accountName")
+    public abstract LiveData<AccountWithAmounts> getByNameWithAmounts(long profileId,
+                                                                      @NonNull String accountName);
 
     @Query("SELECT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
@@ -92,6 +109,9 @@ public abstract class AccountDAO extends BaseDAO<Account> {
            "               ELSE 9 END AS ordering " + "FROM accounts " +
            "WHERE name_upper LIKE '%%'||:term||'%%' " + "ORDER BY ordering, name_upper, rowid ")
     public abstract List<AccountNameContainer> lookupByNameSync(@NonNull String term);
+
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId")
+    public abstract List<Account> allForProfileSync(long profileId);
 
     static public class AccountNameContainer {
         @ColumnInfo

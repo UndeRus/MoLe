@@ -29,6 +29,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.dao.AccountValueDAO;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
 import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
@@ -168,6 +169,8 @@ abstract public class DB extends RoomDatabase {
     public abstract CurrencyDAO getCurrencyDAO();
 
     public abstract AccountDAO getAccountDAO();
+
+    public abstract AccountValueDAO getAccountValueDAO();
 
     public abstract TransactionDAO getTransactionDAO();
 

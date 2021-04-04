@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,19 +32,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.db.AccountWithAmounts;
+import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.model.AccountListItem;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.MobileLedgerListFragment;
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
-import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -76,7 +80,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.backgroundTasksRunning.observe(this.getViewLifecycleOwner(),
                 this::onBackgroundTaskRunningChanged);
 
-        modelAdapter = new AccountSummaryAdapter(model);
+        modelAdapter = new AccountSummaryAdapter();
         MainActivity mainActivity = getMainActivity();
 
         root = view.findViewById(R.id.account_root);
@@ -91,7 +95,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         mainActivity.fabShouldShow();
 
         if (mainActivity instanceof FabManager.FabHandler)
-            FabManager.handle((FabManager.FabHandler) mainActivity, root);
+            FabManager.handle(mainActivity, root);
 
         refreshLayout = view.findViewById(R.id.account_swipe_refresh_layout);
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
@@ -100,13 +104,28 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             model.scheduleTransactionListRetrieval();
         });
 
-        model.getDisplayedAccounts()
-             .observe(getViewLifecycleOwner(), this::onAccountsChanged);
-    }
-    private void onAccountsChanged(List<AccountListItem> accounts) {
-        Logger.debug("async-acc",
-                String.format(Locale.US, "fragment: got new account list (%d items)",
-                        accounts.size()));
-        modelAdapter.setAccounts(accounts);
+        DB.get()
+          .getAccountDAO()
+          .getAllWithAmounts(Data.getProfile()
+                                 .getId())
+          .observe(getViewLifecycleOwner(), list -> AsyncTask.execute(() -> {
+              List<AccountListItem> adapterList = new ArrayList<>();
+              adapterList.add(new AccountListItem.Header(Data.lastAccountsUpdateText));
+              HashMap<String, LedgerAccount> accMap = new HashMap<>();
+              for (AccountWithAmounts dbAcc : list) {
+                  LedgerAccount parent = null;
+                  String parentName = dbAcc.account.getParentName();
+                  if (parentName != null)
+                      parent = accMap.get(parentName);
+                  if (parent != null)
+                      parent.setHasSubAccounts(true);
+                  final LedgerAccount account = LedgerAccount.fromDBO(dbAcc, parent);
+                  if (account.isVisible())
+                      adapterList.add(new AccountListItem.Account(account));
+                  accMap.put(dbAcc.account.getName(), account);
+              }
+              modelAdapter.setAccounts(adapterList);
+              Data.lastUpdateAccountCount.postValue(adapterList.size() - 1);
+          }));
     }
 }

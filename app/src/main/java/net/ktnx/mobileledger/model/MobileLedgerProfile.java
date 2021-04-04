@@ -22,15 +22,21 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
 import androidx.annotation.Nullable;
+import androidx.room.Transaction;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
+import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.dao.OptionDAO;
+import net.ktnx.mobileledger.dao.TransactionDAO;
+import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
@@ -558,7 +564,8 @@ public final class MobileLedgerProfile {
     }
     private int getNextAccountsGeneration(SQLiteDatabase db) {
         try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile_id=? LIMIT 1",
-                new String[]{String.valueOf(id)})) {
+                new String[]{String.valueOf(id)}))
+        {
             if (c.moveToFirst())
                 return c.getInt(0) + 1;
         }
@@ -583,22 +590,22 @@ public final class MobileLedgerProfile {
                 new Object[]{id, generation});
         Logger.debug("db/benchmark", "Done deleting obsolete transactions");
     }
+    @Transaction
+    public void wipeAllDataSync() {
+        OptionDAO optDao = DB.get()
+                             .getOptionDAO();
+        optDao.deleteSync(optDao.allForProfileSync(id));
+
+        AccountDAO accDao = DB.get()
+                              .getAccountDAO();
+        accDao.deleteSync(accDao.allForProfileSync(id));
+
+        TransactionDAO trnDao = DB.get()
+                                  .getTransactionDAO();
+        trnDao.deleteSync(trnDao.allForProfileSync(id));
+    }
     public void wipeAllData() {
-        SQLiteDatabase db = App.getDatabase();
-        db.beginTransaction();
-        try {
-            String[] pUuid = new String[]{String.valueOf(id)};
-            db.execSQL("delete from options where profile=?", pUuid);
-            db.execSQL("delete from accounts where profile=?", pUuid);
-            db.execSQL("delete from account_values where profile=?", pUuid);
-            db.execSQL("delete from transactions where profile=?", pUuid);
-            db.execSQL("delete from transaction_accounts where profile=?", pUuid);
-            db.setTransactionSuccessful();
-            debug("wipe", String.format(Locale.ENGLISH, "Profile %s wiped out", pUuid[0]));
-        }
-        finally {
-            db.endTransaction();
-        }
+        AsyncTask.execute(this::wipeAllDataSync);
     }
     public List<Currency> getCurrencies() {
         SQLiteDatabase db = App.getDatabase();

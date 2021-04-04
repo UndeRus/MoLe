@@ -121,9 +121,6 @@ public class RetrieveTransactionsTask extends
             return null;
         }
     }
-    public MobileLedgerProfile getProfile() {
-        return profile;
-    }
     @Override
     protected void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
@@ -214,7 +211,7 @@ public class RetrieveTransactionsTask extends
                             else {
                                 parentAccount = null;
                             }
-                            lastAccount = new LedgerAccount(profile, accName, parentAccount);
+                            lastAccount = new LedgerAccount(accName, parentAccount);
 
                             accounts.add(lastAccount);
                             map.put(accName, lastAccount);
@@ -378,7 +375,7 @@ public class RetrieveTransactionsTask extends
             parentAccount = null;
         }
 
-        acc = new LedgerAccount(profile, accountName, parentAccount);
+        acc = new LedgerAccount(accountName, parentAccount);
         createdAccounts.add(acc);
         return acc;
     }

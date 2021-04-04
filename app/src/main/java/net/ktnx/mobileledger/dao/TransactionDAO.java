@@ -50,6 +50,9 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     @Delete
     public abstract void deleteSync(Transaction item);
 
+    @Delete
+    public abstract void deleteSync(List<Transaction> items);
+
     @Query("SELECT * FROM transactions")
     public abstract LiveData<List<Transaction>> getAll();
 
@@ -67,6 +70,9 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            "WHERE description_upper LIKE '%%'||:term||'%%' " +
            "ORDER BY ordering, description_upper, rowid ")
     public abstract List<DescriptionContainer> lookupDescriptionSync(@NonNull String term);
+
+    @Query("SELECT * from transactions WHERE profile_id = :profileId")
+    public abstract List<Transaction> allForProfileSync(long profileId);
 
     static public class DescriptionContainer {
         @ColumnInfo

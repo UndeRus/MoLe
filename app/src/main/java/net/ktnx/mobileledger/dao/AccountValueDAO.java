@@ -17,38 +17,32 @@
 
 package net.ktnx.mobileledger.dao;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import net.ktnx.mobileledger.db.Option;
+import net.ktnx.mobileledger.db.AccountValue;
 
 import java.util.List;
 
 @Dao
-public abstract class OptionDAO extends BaseDAO<Option> {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public abstract long insertSync(Option item);
+public abstract class AccountValueDAO extends BaseDAO<AccountValue> {
+    @Insert
+    public abstract long insertSync(AccountValue item);
 
     @Update
-    public abstract void updateSync(Option item);
+    public abstract void updateSync(AccountValue item);
 
     @Delete
-    public abstract void deleteSync(Option item);
+    public abstract void deleteSync(AccountValue item);
 
-    @Delete
-    public abstract void deleteSync(List<Option> items);
+    @Query("SELECT * FROM account_values WHERE account_id=:accountId")
+    public abstract LiveData<List<AccountValue>> getAll(long accountId);
 
-    @Query("SELECT * FROM options WHERE profile_id = :profileId AND name = :name")
-    public abstract LiveData<Option> load(long profileId, String name);
-
-    @Query("SELECT * FROM options WHERE profile_id = :profileId AND name = :name")
-    public abstract Option loadSync(long profileId, String name);
-
-    @Query("SELECT * FROM options WHERE profile_id = :profileId")
-    public abstract List<Option> allForProfileSync(long profileId);
+    @Query("SELECT * FROM account_values WHERE account_id = :accountId AND currency = :currency")
+    public abstract AccountValue getByCurrencySync(long accountId, @NonNull String currency);
 }

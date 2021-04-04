@@ -18,11 +18,13 @@
 package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 
 import org.jetbrains.annotations.NotNull;
 
-public class AccountListItem {
+public abstract class AccountListItem {
     private AccountListItem() {}
+    public abstract boolean sameContent(AccountListItem other);
     @NonNull
     public Type getType() {
         if (this instanceof Account)
@@ -46,10 +48,30 @@ public class AccountListItem {
         public Account(@NotNull LedgerAccount account) {
             this.account = account;
         }
+        @Override
+        public boolean sameContent(AccountListItem other) {
+            if (!(other instanceof Account))
+                return false;
+            return ((Account) other).account.hasSubAccounts() == account.hasSubAccounts() &&
+                   ((Account) other).account.amountsExpanded() == account.amountsExpanded() &&
+                   ((Account) other).account.isExpanded() == account.isExpanded() &&
+                   ((Account) other).account.getLevel() == account.getLevel() &&
+                   ((Account) other).account.getAmountsString()
+                                            .equals(account.getAmountsString());
+        }
     }
 
     public static class Header extends AccountListItem {
-        public Header() {
+        private final LiveData<String> text;
+        public Header(@NonNull LiveData<String> text) {
+            this.text = text;
+        }
+        public LiveData<String> getText() {
+            return text;
+        }
+        @Override
+        public boolean sameContent(AccountListItem other) {
+            return true;
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -21,20 +21,41 @@ import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
 
+import net.ktnx.mobileledger.dao.AccountValueDAO;
+import net.ktnx.mobileledger.db.Account;
+import net.ktnx.mobileledger.db.AccountValue;
+import net.ktnx.mobileledger.db.DB;
+
 public class LedgerAmount {
     private final String currency;
     private final float amount;
+    private long dbId;
 
     public LedgerAmount(float amount, @NonNull String currency) {
         this.currency = currency;
         this.amount = amount;
     }
-
     public LedgerAmount(float amount) {
         this.amount = amount;
         this.currency = null;
     }
+    static public LedgerAmount fromDBO(AccountValue dbo) {
+        final LedgerAmount ledgerAmount = new LedgerAmount(dbo.getValue(), dbo.getCurrency());
+        ledgerAmount.dbId = dbo.getId();
+        return ledgerAmount;
+    }
+    public AccountValue toDBO(Account account) {
+        final AccountValueDAO dao = DB.get()
+                                      .getAccountValueDAO();
+        AccountValue obj = new AccountValue();
+        obj.setId(dbId);
+        obj.setAccountId(account.getId());
 
+        obj.setCurrency(currency);
+        obj.setValue(amount);
+
+        return obj;
+    }
     @SuppressLint("DefaultLocale")
     @NonNull
     public String toString() {

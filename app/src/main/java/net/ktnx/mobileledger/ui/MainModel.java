@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
@@ -28,7 +26,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.async.TransactionAccumulator;
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
@@ -71,7 +68,6 @@ public class MainModel extends ViewModel {
     private SimpleDate lastTransactionDate;
     transient private RetrieveTransactionsTask retrieveTransactionsTask;
     transient private Thread displayedAccountsUpdater;
-    transient private AccountListLoader loader = null;
     private TransactionsDisplayedFilter displayedTransactionsUpdater;
     public static ArrayList<LedgerAccount> mergeAccountListsFromWeb(List<LedgerAccount> oldList,
                                                                     List<LedgerAccount> newList) {
@@ -214,16 +210,6 @@ public class MainModel extends ViewModel {
     public LiveData<List<AccountListItem>> getDisplayedAccounts() {
         return displayedAccounts;
     }
-    synchronized public void scheduleAccountListReload() {
-        Logger.debug("async-acc", "scheduleAccountListReload() enter");
-        if ((loader != null) && loader.isAlive()) {
-            Logger.debug("async-acc", "returning early - loader already active");
-            return;
-        }
-
-        loader = new AccountListLoader(profile, this);
-        loader.start();
-    }
     public synchronized void setAndStoreAccountAndTransactionListFromWeb(
             List<LedgerAccount> accounts, List<LedgerTransaction> transactions) {
         profile.storeAccountAndTransactionListAsync(accounts, transactions);
@@ -234,12 +220,6 @@ public class MainModel extends ViewModel {
         updateDisplayedAccounts();
 
         updateDisplayedTransactionsFromWeb(transactions);
-    }
-    synchronized public void abortAccountListReload() {
-        if (loader == null)
-            return;
-        loader.interrupt();
-        loader = null;
     }
     synchronized public void updateDisplayedAccounts() {
         if (displayedAccountsUpdater != null) {
@@ -275,81 +255,6 @@ public class MainModel extends ViewModel {
     public void clearTransactions() {
         displayedTransactions.setValue(new ArrayList<>());
     }
-
-    static class AccountListLoader extends Thread {
-        private final MobileLedgerProfile profile;
-        private final MainModel model;
-        AccountListLoader(MobileLedgerProfile profile, MainModel model) {
-            this.profile = profile;
-            this.model = model;
-        }
-        @Override
-        public void run() {
-            Logger.debug("async-acc", "AccountListLoader::run() entered");
-            long profileId = profile.getId();
-            ArrayList<LedgerAccount> list = new ArrayList<>();
-            HashMap<String, LedgerAccount> map = new HashMap<>();
-
-            String sql = "SELECT a.name, a.expanded, a.amounts_expanded, a.id";
-            sql += " from accounts a WHERE a.profile_id = ?";
-            sql += " ORDER BY a.name";
-
-            SQLiteDatabase db = App.getDatabase();
-            Logger.debug("async-acc", "AccountListLoader::run() connected to DB");
-            try (Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(profileId)})) {
-                Logger.debug("async-acc", "AccountListLoader::run() executed query");
-                while (cursor.moveToNext()) {
-                    if (isInterrupted())
-                        return;
-
-                    final long accId = cursor.getLong(3);
-                    final String accName = cursor.getString(0);
-//                    debug("accounts",
-//                            String.format("Read account '%s' from DB [%s]", accName,
-//                            profileId));
-                    String parentName = LedgerAccount.extractParentName(accName);
-                    LedgerAccount parent;
-                    if (parentName != null) {
-                        parent = map.get(parentName);
-                        if (parent == null)
-                            throw new IllegalStateException(
-                                    String.format("Can't load account '%s': parent '%s' not loaded",
-                                            accName, parentName));
-                        parent.setHasSubAccounts(true);
-                    }
-                    else
-                        parent = null;
-
-                    LedgerAccount acc = new LedgerAccount(profile, accName, parent);
-                    acc.setExpanded(cursor.getInt(1) == 1);
-                    acc.setAmountsExpanded(cursor.getInt(2) == 1);
-                    acc.setHasSubAccounts(false);
-
-                    try (Cursor c2 = db.rawQuery(
-                            "SELECT value, currency FROM account_values WHERE account_id = ?",
-                            new String[]{String.valueOf(accId)}))
-                    {
-                        while (c2.moveToNext()) {
-                            acc.addAmount(c2.getFloat(0), c2.getString(1));
-                        }
-                    }
-
-                    list.add(acc);
-                    map.put(accName, acc);
-                }
-                Logger.debug("async-acc", "AccountListLoader::run() query execution done");
-            }
-
-            if (isInterrupted())
-                return;
-
-            Logger.debug("async-acc", "AccountListLoader::run() posting new list");
-            model.allAccounts = list;
-            model.updateAccountsMap(list);
-            model.updateDisplayedAccounts();
-        }
-    }
-
     static class AccountListDisplayedFilter extends Thread {
         private final MainModel model;
         private final List<LedgerAccount> list;
@@ -363,7 +268,7 @@ public class MainModel extends ViewModel {
             Logger.debug("dFilter", "waiting for synchronized block");
             Logger.debug("dFilter", String.format(Locale.US,
                     "entered synchronized block (about to examine %d accounts)", list.size()));
-            newDisplayed.add(new AccountListItem.Header());    // header
+            newDisplayed.add(new AccountListItem.Header(Data.lastAccountsUpdateText));    // header
 
             int count = 0;
             for (LedgerAccount a : list) {

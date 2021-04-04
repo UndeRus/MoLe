@@ -424,7 +424,6 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         mainModel.clearTransactions();
 
         if (haveProfile) {
-            mainModel.scheduleAccountListReload();
             Logger.debug("transactions", "requesting list reload");
             mainModel.scheduleTransactionListReload();
 
@@ -542,16 +541,16 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         Integer transactionCount = Data.lastUpdateTransactionCount.getValue();
         Date lastUpdate = Data.lastUpdateDate.getValue();
         if (lastUpdate == null) {
-            Data.lastTransactionsUpdateText.set("----");
-            Data.lastAccountsUpdateText.set("----");
+            Data.lastTransactionsUpdateText.setValue("----");
+            Data.lastAccountsUpdateText.setValue("----");
         }
         else {
-            Data.lastTransactionsUpdateText.set(
+            Data.lastTransactionsUpdateText.setValue(
                     String.format(Objects.requireNonNull(Data.locale.getValue()),
                             templateForTransactions,
                             transactionCount == null ? 0 : transactionCount,
                             DateUtils.formatDateTime(this, lastUpdate.getTime(), formatFlags)));
-            Data.lastAccountsUpdateText.set(
+            Data.lastAccountsUpdateText.setValue(
                     String.format(Objects.requireNonNull(Data.locale.getValue()),
                             templateForAccounts, accountCount == null ? 0 : accountCount,
                             DateUtils.formatDateTime(this, lastUpdate.getTime(), formatFlags)));
