@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LifecycleOwner;
@@ -56,10 +57,38 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
     private static final int ITEM_TYPE_HEADER = 1;
     private static final int ITEM_TYPE_ACCOUNT = 2;
     private final AsyncListDiffer<AccountListItem> listDiffer;
+
     AccountSummaryAdapter() {
         setHasStableIds(true);
-        
+
         listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<AccountListItem>() {
+            @Nullable
+            @Override
+            public Object getChangePayload(@NonNull AccountListItem oldItem,
+                                           @NonNull AccountListItem newItem) {
+                Change changes = new Change();
+
+                final LedgerAccount oldAcc = oldItem.getAccount();
+                final LedgerAccount newAcc = newItem.getAccount();
+
+                if (!Misc.equalStrings(oldAcc.getName(), newAcc.getName()))
+                    changes.add(Change.NAME);
+
+                if (oldAcc.getLevel() != newAcc.getLevel())
+                    changes.add(Change.LEVEL);
+
+                if (oldAcc.isExpanded() != newAcc.isExpanded())
+                    changes.add(Change.EXPANDED);
+
+                if (oldAcc.amountsExpanded() != newAcc.amountsExpanded())
+                    changes.add(Change.EXPANDED_AMOUNTS);
+
+                if (!oldAcc.getAmountsString()
+                           .equals(newAcc.getAmountsString()))
+                    changes.add(Change.AMOUNTS);
+
+                return changes.toPayload();
+            }
             @Override
             public boolean areItemsTheSame(@NotNull AccountListItem oldItem,
                                            @NotNull AccountListItem newItem) {
@@ -70,9 +99,9 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                 if (oldType == AccountListItem.Type.HEADER)
                     return true;
 
-                return Misc.equalStrings(oldItem.getAccount()
-                                                .getName(), newItem.getAccount()
-                                                                   .getName());
+                return oldItem.getAccount()
+                              .getId() == newItem.getAccount()
+                                                 .getId();
             }
             @Override
             public boolean areContentsTheSame(@NotNull AccountListItem oldItem,
@@ -90,11 +119,17 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                          .getAccount()
                          .getId();
     }
+    @Override
+    public void onBindViewHolder(@NonNull RowHolder holder, int position,
+                                 @NonNull List<Object> payloads) {
+        holder.bind(listDiffer.getCurrentList()
+                              .get(position), payloads);
+        super.onBindViewHolder(holder, position, payloads);
+    }
     public void onBindViewHolder(@NonNull RowHolder holder, int position) {
         holder.bind(listDiffer.getCurrentList()
-                              .get(position));
+                              .get(position), null);
     }
-
     @NonNull
     @Override
     public RowHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -117,7 +152,6 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
         Logger.debug("acc-ui", "Creating " + result);
         return result;
     }
-
     @Override
     public int getItemCount() {
         return listDiffer.getCurrentList()
@@ -130,11 +164,45 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
     public void setAccounts(List<AccountListItem> newList) {
         new Handler(Looper.getMainLooper()).post(() -> listDiffer.submitList(newList));
     }
+    static class Change {
+        static final int NAME = 1;
+        static final int EXPANDED = 1 << 1;
+        static final int LEVEL = 1 << 2;
+        static final int EXPANDED_AMOUNTS = 1 << 3;
+        static final int AMOUNTS = 1 << 4;
+        private int value = 0;
+        public Change() {
+        }
+        public Change(int initialValue) {
+            value = initialValue;
+        }
+        public void add(int bits) {
+            value = value | bits;
+        }
+        public void add(Change change) {
+            value = value | change.value;
+        }
+        public void remove(int bits) {
+            value = value & (~bits);
+        }
+        public void remove(Change change) {
+            value = value & (~change.value);
+        }
+        public Change toPayload() {
+            if (value == 0)
+                return null;
+            return this;
+        }
+        public boolean has(int bits) {
+            return value == 0 || (value & bits) == bits;
+        }
+    }
+
     static abstract class RowHolder extends RecyclerView.ViewHolder {
         public RowHolder(@NonNull View itemView) {
             super(itemView);
         }
-        public abstract void bind(AccountListItem accountListItem);
+        public abstract void bind(AccountListItem accountListItem, @Nullable List<Object> payloads);
     }
 
     static class HeaderRowHolder extends RowHolder {
@@ -144,7 +212,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
             b = binding;
         }
         @Override
-        public void bind(AccountListItem item) {
+        public void bind(AccountListItem item, @Nullable List<Object> payloads) {
             Resources r = itemView.getResources();
             Logger.debug("acc", itemView.getContext()
                                         .toString());
@@ -234,45 +302,61 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
             return true;
         }
         @Override
-        public void bind(AccountListItem item) {
+        public void bind(AccountListItem item, @Nullable List<Object> payloads) {
             LedgerAccount acc = item.getAccount();
 
+            Change changes = new Change();
+            if (payloads != null) {
+                for (Object p : payloads) {
+                    if (p instanceof Change)
+                        changes.add((Change) p);
+                }
+            }
             debug("accounts",
                     String.format(Locale.US, "Binding to '%s' to %s", acc.getName(), this));
+
             Resources rm = b.getRoot()
                             .getContext()
                             .getResources();
 
-            b.accountRowAccName.setText(acc.getShortName());
+            if (changes.has(Change.NAME))
+                b.accountRowAccName.setText(acc.getShortName());
 
-            ConstraintLayout.LayoutParams lp =
-                    (ConstraintLayout.LayoutParams) b.accountNameLayout.getLayoutParams();
-            lp.setMarginStart(
-                    acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
+            if (changes.has(Change.LEVEL)) {
+                ConstraintLayout.LayoutParams lp =
+                        (ConstraintLayout.LayoutParams) b.accountNameLayout.getLayoutParams();
+                lp.setMarginStart(
+                        acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
+            }
 
             if (acc.hasSubAccounts()) {
                 b.accountExpanderContainer.setVisibility(View.VISIBLE);
-                int wantedRotation = acc.isExpanded() ? 0 : 180;
-                if (b.accountExpanderContainer.getRotation() != wantedRotation) {
-                    Logger.debug("acc-ui",
-                            String.format(Locale.ROOT, "Rotating %s to %d", acc.getName(),
-                                    wantedRotation));
-                    b.accountExpanderContainer.animate()
-                                              .rotation(wantedRotation);
+
+                if (changes.has(Change.EXPANDED)) {
+                    int wantedRotation = acc.isExpanded() ? 0 : 180;
+                    if (b.accountExpanderContainer.getRotation() != wantedRotation) {
+                        Logger.debug("acc-ui",
+                                String.format(Locale.ROOT, "Rotating %s to %d", acc.getName(),
+                                        wantedRotation));
+                        b.accountExpanderContainer.animate()
+                                                  .rotation(wantedRotation);
+                    }
                 }
             }
             else {
                 b.accountExpanderContainer.setVisibility(View.GONE);
             }
 
-            int amounts = acc.getAmountCount();
-            if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
-                b.accountRowAccAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
-                b.accountRowAmountsExpanderContainer.setVisibility(View.VISIBLE);
-            }
-            else {
-                b.accountRowAccAmounts.setText(acc.getAmountsString());
-                b.accountRowAmountsExpanderContainer.setVisibility(View.GONE);
+            if (changes.has(Change.EXPANDED_AMOUNTS)) {
+                int amounts = acc.getAmountCount();
+                if ((amounts > AMOUNT_LIMIT) && !acc.amountsExpanded()) {
+                    b.accountRowAccAmounts.setText(acc.getAmountsString(AMOUNT_LIMIT));
+                    b.accountRowAmountsExpanderContainer.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.accountRowAccAmounts.setText(acc.getAmountsString());
+                    b.accountRowAmountsExpanderContainer.setVisibility(View.GONE);
+                }
             }
         }
     }
