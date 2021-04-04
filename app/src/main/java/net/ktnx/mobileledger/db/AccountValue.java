@@ -36,8 +36,8 @@ public class AccountValue {
     @ColumnInfo
     @PrimaryKey(autoGenerate = true)
     long id;
-    @ColumnInfo
-    private long account_id;
+    @ColumnInfo(name = "account_id")
+    private long accountId;
     @NonNull
     @ColumnInfo(defaultValue = "")
     private String currency = "";
@@ -51,11 +51,11 @@ public class AccountValue {
     public void setId(long id) {
         this.id = id;
     }
-    public long getAccount_id() {
-        return account_id;
+    public long getAccountId() {
+        return accountId;
     }
-    public void setAccount_id(long account_id) {
-        this.account_id = account_id;
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
     @NonNull
     public String getCurrency() {

@@ -547,7 +547,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "account_id",
+            "fieldPath": "accountId",
             "columnName": "account_id",
             "affinity": "INTEGER",
             "notNull": true
