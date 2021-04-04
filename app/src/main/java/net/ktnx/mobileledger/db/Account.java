@@ -52,7 +52,7 @@ public class Account {
     @ColumnInfo(name = "amounts_expanded", defaultValue = "0")
     private boolean amountsExpanded = false;
     @ColumnInfo(defaultValue = "0")
-    private int generation;
+    private long generation;
     public long getId() {
         return id;
     }
@@ -103,10 +103,10 @@ public class Account {
     public void setAmountsExpanded(boolean amountsExpanded) {
         this.amountsExpanded = amountsExpanded;
     }
-    public int getGeneration() {
+    public long getGeneration() {
         return generation;
     }
-    public void setGeneration(int generation) {
+    public void setGeneration(long generation) {
         this.generation = generation;
     }
     @NonNull
