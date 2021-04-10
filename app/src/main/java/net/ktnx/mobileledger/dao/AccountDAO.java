@@ -23,15 +23,19 @@ import androidx.room.ColumnInfo;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
 import net.ktnx.mobileledger.db.Account;
+import net.ktnx.mobileledger.db.AccountValue;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
+import net.ktnx.mobileledger.db.DB;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Dao
 public abstract class AccountDAO extends BaseDAO<Account> {
@@ -43,9 +47,34 @@ public abstract class AccountDAO extends BaseDAO<Account> {
 
         return result;
     }
-    @Insert
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract long insertSync(Account item);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void insertSync(List<Account> items);
+
+    @Transaction
+    public void insertSync(@NonNull AccountWithAmounts accountWithAmounts) {
+        final AccountValueDAO valueDAO = DB.get()
+                                           .getAccountValueDAO();
+        Account account = accountWithAmounts.account;
+        Account existingAccount = getByNameSync(account.getProfileId(), account.getName());
+        if (existingAccount != null) {
+            existingAccount.setGeneration(account.getGeneration());
+            account = existingAccount;
+            updateSync(account);
+        }
+        else {
+            long accountId = insertSync(account);
+            account.setId(accountId);
+        }
+        for (AccountValue value : accountWithAmounts.amounts) {
+            value.setAccountId(account.getId());
+            value.setGeneration(account.getGeneration());
+            value.setId(valueDAO.insertSync(value));
+        }
+    }
     @Update
     public abstract void updateSync(Account item);
 
@@ -71,6 +100,9 @@ public abstract class AccountDAO extends BaseDAO<Account> {
 //    List<PatternWithAccounts> getPatternsWithAccounts();
     @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND name = :accountName")
     public abstract LiveData<Account> getByName(long profileId, @NonNull String accountName);
+
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND name = :accountName")
+    public abstract Account getByNameSync(long profileId, @NonNull String accountName);
 
     @Transaction
     @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND name = :accountName")
@@ -113,10 +145,48 @@ public abstract class AccountDAO extends BaseDAO<Account> {
     @Query("SELECT * FROM accounts WHERE profile_id = :profileId")
     public abstract List<Account> allForProfileSync(long profileId);
 
+    @Query("SELECT generation FROM accounts WHERE profile_id = :profileId LIMIT 1")
+    protected abstract AccountGenerationContainer getGenerationPOJOSync(long profileId);
+    public long getGenerationSync(long profileId) {
+        AccountGenerationContainer result = getGenerationPOJOSync(profileId);
+
+        if (result == null)
+            return 0;
+        return result.generation;
+    }
+    @Query("DELETE FROM accounts WHERE profile_id = :profileId AND generation <> " +
+           ":currentGeneration")
+    public abstract void purgeOldAccountsSync(long profileId, long currentGeneration);
+
+    @Query("DELETE FROM account_values WHERE EXISTS (SELECT 1 FROM accounts a WHERE a" +
+           ".id=account_values.account_id AND a.profile_id=:profileId) AND generation <> " +
+           ":currentGeneration")
+    public abstract void purgeOldAccountValuesSync(long profileId, long currentGeneration);
+    @Transaction
+    public void storeAccountsSync(List<AccountWithAmounts> accounts, long profileId) {
+        long generation = getGenerationSync(profileId) + 1;
+
+        for (AccountWithAmounts rec : accounts) {
+            rec.account.setGeneration(generation);
+            rec.account.setProfileId(profileId);
+            insertSync(rec);
+        }
+        purgeOldAccountsSync(profileId, generation);
+        purgeOldAccountValuesSync(profileId, generation);
+    }
+
     static public class AccountNameContainer {
         @ColumnInfo
         public String name;
         @ColumnInfo
         public int ordering;
+    }
+
+    static class AccountGenerationContainer {
+        @ColumnInfo
+        long generation;
+        public AccountGenerationContainer(long generation) {
+            this.generation = generation;
+        }
     }
 }

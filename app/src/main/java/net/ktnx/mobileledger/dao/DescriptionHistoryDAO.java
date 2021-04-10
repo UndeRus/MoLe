@@ -26,14 +26,13 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import net.ktnx.mobileledger.db.Transaction;
-import net.ktnx.mobileledger.db.TransactionWithAccounts;
+import net.ktnx.mobileledger.db.DescriptionHistory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Dao
-public abstract class TransactionDAO extends BaseDAO<Transaction> {
+public abstract class DescriptionHistoryDAO extends BaseDAO<DescriptionHistory> {
     static public List<String> unbox(List<DescriptionContainer> list) {
         ArrayList<String> result = new ArrayList<>(list.size());
         for (DescriptionContainer item : list) {
@@ -43,30 +42,23 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         return result;
     }
     @Insert
-    public abstract long insertSync(Transaction item);
+    public abstract long insertSync(DescriptionHistory item);
 
     @Update
-    public abstract void updateSync(Transaction item);
+    public abstract void updateSync(DescriptionHistory item);
 
     @Delete
-    public abstract void deleteSync(Transaction item);
+    public abstract void deleteSync(DescriptionHistory item);
 
     @Delete
-    public abstract void deleteSync(List<Transaction> items);
+    public abstract void deleteSync(List<DescriptionHistory> items);
 
-    @Query("SELECT * FROM transactions")
-    public abstract LiveData<List<Transaction>> getAll();
+    @Query("DELETE FROM description_history where not exists (select 1 from transactions tr where" +
+           " upper(tr.description)=description_history.description_upper)")
+    public abstract void sweepSync();
 
-    //    not useful for now
-//    @Transaction
-//    @Query("SELECT * FROM patterns")
-//    List<PatternWithAccounts> getPatternsWithAccounts();
-    @Query("SELECT * FROM transactions WHERE id = :id")
-    public abstract LiveData<Transaction> getById(long id);
-
-    @androidx.room.Transaction
-    @Query("SELECT * FROM transactions WHERE id = :transactionId")
-    public abstract LiveData<TransactionWithAccounts> getByIdWithAccounts(long transactionId);
+    @Query("SELECT * FROM description_history")
+    public abstract LiveData<List<DescriptionHistory>> getAll();
 
     @Query("SELECT DISTINCT description, CASE WHEN description_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN description_upper LIKE '%%:'||:term||'%%' THEN 2 " +
@@ -74,10 +66,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            "               ELSE 9 END AS ordering " + "FROM description_history " +
            "WHERE description_upper LIKE '%%'||:term||'%%' " +
            "ORDER BY ordering, description_upper, rowid ")
-    public abstract List<DescriptionContainer> lookupDescriptionSync(@NonNull String term);
-
-    @Query("SELECT * from transactions WHERE profile_id = :profileId")
-    public abstract List<Transaction> allForProfileSync(long profileId);
+    public abstract List<DescriptionContainer> lookupSync(@NonNull String term);
 
     static public class DescriptionContainer {
         @ColumnInfo

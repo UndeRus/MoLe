@@ -15,27 +15,16 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.dao;
+package net.ktnx.mobileledger.db;
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
-import net.ktnx.mobileledger.db.Profile;
+import java.util.List;
 
-@Dao
-public abstract class ProfileDAO extends BaseDAO<Profile> {
-    @Insert
-    abstract long insertSync(Profile item);
-
-    @Update
-    abstract void updateSync(Profile item);
-
-    @Delete
-    public abstract void deleteSync(Profile item);
-
-    @Query("select * from profiles where id = :profileId")
-    public abstract Profile getByIdSync(long profileId);
+public class TransactionWithAccounts {
+    @Embedded
+    public Transaction transaction;
+    @Relation(parentColumn = "id", entityColumn = "transaction_id")
+    public List<TransactionAccount> accounts;
 }

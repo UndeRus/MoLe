@@ -24,7 +24,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.SparseArray;
 
 import androidx.annotation.Nullable;
@@ -34,8 +33,12 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DbOpQueue;
 import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.dao.DescriptionHistoryDAO;
 import net.ktnx.mobileledger.dao.OptionDAO;
+import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
+import net.ktnx.mobileledger.db.AccountValue;
+import net.ktnx.mobileledger.db.AccountWithAmounts;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
@@ -49,7 +52,6 @@ import org.jetbrains.annotations.Contract;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -160,7 +162,7 @@ public final class MobileLedgerProfile {
         try {
             int orderNo = 0;
             for (MobileLedgerProfile p : Objects.requireNonNull(Data.profiles.getValue())) {
-                db.execSQL("update profiles set order_no=? where uuid=?",
+                db.execSQL("update profiles set order_no=? where id=?",
                         new Object[]{orderNo, p.getId()});
                 p.orderNo = orderNo;
                 orderNo++;
@@ -384,49 +386,6 @@ public final class MobileLedgerProfile {
                 });
 //        debug("accounts", String.format("Stored account '%s' in DB [%s]", acc.getName(), uuid));
     }
-    public void storeAccountValue(SQLiteDatabase db, int generation, String name, String currency,
-                                  Float amount) {
-        if (!TextUtils.isEmpty(currency)) {
-            boolean exists;
-            try (Cursor c = db.rawQuery("select 1 from currencies where name=?",
-                    new String[]{currency}))
-            {
-                exists = c.moveToFirst();
-            }
-            if (!exists) {
-                db.execSQL(
-                        "insert into currencies(id, name, position, has_gap) values((select max" +
-                        "(id) from currencies)+1, ?, ?, ?)", new Object[]{currency,
-                                                                          Objects.requireNonNull(
-                                                                                  Data.currencySymbolPosition.getValue()).toString(),
-                                                                          Data.currencyGap.getValue()
-                        });
-            }
-        }
-
-        long accId = findAddAccount(db, name);
-
-        db.execSQL("replace into account_values(account_id, " +
-                   "currency, value, generation) values(?, ?, ?, ?);",
-                new Object[]{accId, Misc.emptyIsNull(currency), amount, generation});
-    }
-    private long findAddAccount(SQLiteDatabase db, String accountName) {
-        try (Cursor c = db.rawQuery("select id from accounts where profile_id=? and name=?",
-                new String[]{String.valueOf(id), accountName}))
-        {
-            if (c.moveToFirst())
-                return c.getLong(0);
-
-        }
-
-        try (Cursor c = db.rawQuery(
-                "insert into accounts(profile_id, name, name_upper) values(?, ?, ?) returning id",
-                new String[]{String.valueOf(id), accountName, accountName.toUpperCase()}))
-        {
-            c.moveToFirst();
-            return c.getInt(0);
-        }
-    }
     public void storeTransaction(SQLiteDatabase db, int generation, LedgerTransaction tr) {
         tr.fillDataHash();
 //        Logger.debug("storeTransaction", String.format(Locale.US, "ID %d", tr.getId()));
@@ -520,20 +479,9 @@ public final class MobileLedgerProfile {
         setOption(name, String.valueOf(value));
     }
     public void removeFromDB() {
-        SQLiteDatabase db = App.getDatabase();
-        debug("db", String.format(Locale.ROOT, "removing profile %d from DB", id));
-        db.beginTransactionNonExclusive();
-        try {
-            Object[] id_param = new Object[]{id};
-            db.execSQL("delete from transactions where profile_id=?", id_param);
-            db.execSQL("delete from accounts where profile=?", id_param);
-            db.execSQL("delete from options where profile=?", id_param);
-            db.execSQL("delete from profiles where id=?", id_param);
-            db.setTransactionSuccessful();
-        }
-        finally {
-            db.endTransaction();
-        }
+        ProfileDAO dao = DB.get()
+                           .getProfileDAO();
+        AsyncTask.execute(() -> dao.deleteSync(dao.getByIdSync(id)));
     }
     public LedgerTransaction loadTransaction(int transactionId) {
         LedgerTransaction tr = new LedgerTransaction(transactionId, this.id);
@@ -562,24 +510,6 @@ public final class MobileLedgerProfile {
         }
         return 1;
     }
-    private int getNextAccountsGeneration(SQLiteDatabase db) {
-        try (Cursor c = db.rawQuery("SELECT generation FROM accounts WHERE profile_id=? LIMIT 1",
-                new String[]{String.valueOf(id)}))
-        {
-            if (c.moveToFirst())
-                return c.getInt(0) + 1;
-        }
-        return 1;
-    }
-    private void deleteNotPresentAccounts(SQLiteDatabase db, int generation) {
-        Logger.debug("db/benchmark", "Deleting obsolete accounts");
-        db.execSQL("DELETE FROM account_values WHERE (select a.profile_id from accounts a where a" +
-                   ".id=account_values.account_id)=? AND generation <> ?",
-                new Object[]{id, generation});
-        db.execSQL("DELETE FROM accounts WHERE profile_id=? AND generation <> ?",
-                new Object[]{id, generation});
-        Logger.debug("db/benchmark", "Done deleting obsolete accounts");
-    }
     private void deleteNotPresentTransactions(SQLiteDatabase db, int generation) {
         Logger.debug("db/benchmark", "Deleting obsolete transactions");
         db.execSQL(
@@ -603,6 +533,10 @@ public final class MobileLedgerProfile {
         TransactionDAO trnDao = DB.get()
                                   .getTransactionDAO();
         trnDao.deleteSync(trnDao.allForProfileSync(id));
+
+        DescriptionHistoryDAO descDao = DB.get()
+                                          .getDescriptionHistoryDAO();
+        descDao.sweepSync();
     }
     public void wipeAllData() {
         AsyncTask.execute(this::wipeAllDataSync);
@@ -751,25 +685,9 @@ public final class MobileLedgerProfile {
             SQLiteDatabase db = App.getDatabase();
             db.beginTransactionNonExclusive();
             try {
-                int accountsGeneration = profile.getNextAccountsGeneration(db);
-                if (isInterrupted())
-                    return;
-
                 int transactionsGeneration = profile.getNextTransactionsGeneration(db);
                 if (isInterrupted())
                     return;
-
-                for (LedgerAccount acc : accounts) {
-                    profile.storeAccount(db, accountsGeneration, acc, false);
-                    if (isInterrupted())
-                        return;
-                    for (LedgerAmount amt : acc.getAmounts()) {
-                        profile.storeAccountValue(db, accountsGeneration, acc.getName(),
-                                amt.getCurrency(), amt.getAmount());
-                        if (isInterrupted())
-                            return;
-                    }
-                }
 
                 for (LedgerTransaction tr : transactions) {
                     profile.storeTransaction(db, transactionsGeneration, tr);
@@ -781,9 +699,6 @@ public final class MobileLedgerProfile {
                 if (isInterrupted()) {
                     return;
                 }
-                profile.deleteNotPresentAccounts(db, accountsGeneration);
-                if (isInterrupted())
-                    return;
 
                 Map<String, Boolean> unique = new HashMap<>();
 
@@ -810,6 +725,37 @@ public final class MobileLedgerProfile {
             finally {
                 db.endTransaction();
             }
+
+            AsyncTask.execute(() -> {
+                List<AccountWithAmounts> list = new ArrayList<>();
+
+                final AccountDAO dao = DB.get()
+                                         .getAccountDAO();
+
+                for (LedgerAccount acc : accounts) {
+                    AccountWithAmounts rec = new AccountWithAmounts();
+                    rec.account = acc.toDBO();
+
+                    if (isInterrupted())
+                        return;
+
+                    rec.amounts = new ArrayList<>();
+                    for (LedgerAmount amt : acc.getAmounts()) {
+                        AccountValue av = new AccountValue();
+                        av.setCurrency(amt.getCurrency());
+                        av.setValue(amt.getAmount());
+
+                        rec.amounts.add(av);
+                    }
+
+                    list.add(rec);
+                }
+
+                if (isInterrupted())
+                    return;
+
+                dao.storeAccountsSync(list, profile.getId());
+            });
         }
         private void storeDescription(SQLiteDatabase db, int generation, String description,
                                       String descriptionUpper) {
