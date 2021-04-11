@@ -25,10 +25,8 @@ import android.os.Handler;
 import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 public class SplashActivity extends CrashReportingActivity {
@@ -103,10 +101,6 @@ public class SplashActivity extends CrashReportingActivity {
         protected Void doInBackground(Void... voids) {
             MobileLedgerProfile.loadAllFromDB(0);
 
-            long profileId = MLDB.getLongOption(MLDB.OPT_PROFILE_ID, 0);
-            MobileLedgerProfile startupProfile = Data.getProfile(profileId);
-            if (startupProfile != null)
-                Data.postCurrentProfile(startupProfile);
             return null;
         }
         @Override

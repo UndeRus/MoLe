@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -38,4 +39,10 @@ public abstract class ProfileDAO extends BaseDAO<Profile> {
 
     @Query("select * from profiles where id = :profileId")
     public abstract Profile getByIdSync(long profileId);
+
+    @Query("SELECT * FROM profiles WHERE id=:profileId")
+    public abstract LiveData<Profile> getById(long profileId);
+
+    @Query("SELECT * FROM profiles LIMIT 1")
+    public abstract Profile getAnySync();
 }

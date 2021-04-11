@@ -17,21 +17,16 @@
 
 package net.ktnx.mobileledger.model;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.utils.LockHolder;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -93,11 +88,9 @@ public final class Data {
         backgroundTasksRunning.postValue(cnt > 0);
     }
     public static void setCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
-        MLDB.setLongOption(MLDB.OPT_PROFILE_ID, newProfile.getId());
         profile.setValue(newProfile);
     }
     public static void postCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
-        MLDB.setLongOption(MLDB.OPT_PROFILE_ID, newProfile.getId());
         profile.postValue(newProfile);
     }
     public static int getProfileIndex(MobileLedgerProfile profile) {
@@ -128,21 +121,6 @@ public final class Data {
 
             return -1;
         }
-    }
-    public static int retrieveCurrentThemeIdFromDb() {
-        long profileId = MLDB.getLongOption(MLDB.OPT_PROFILE_ID, 0);
-        if (profileId == 0)
-            return -1;
-
-        SQLiteDatabase db = App.getDatabase();
-        try (Cursor c = db.rawQuery("SELECT theme from profiles where id=?",
-                new String[]{String.valueOf(profileId)}))
-        {
-            if (c.moveToNext())
-                return c.getInt(0);
-        }
-
-        return -1;
     }
     @Nullable
     public static MobileLedgerProfile getProfile(long profileId) {
@@ -211,19 +189,6 @@ public final class Data {
                                       Observer<MobileLedgerProfile> observer) {
         profile.observe(lifecycleOwner, observer);
     }
-    public synchronized static MobileLedgerProfile initProfile() {
-        MobileLedgerProfile currentProfile = profile.getValue();
-        if (currentProfile != null)
-            return currentProfile;
-
-        long profileId = MLDB.getLongOption(MLDB.OPT_PROFILE_ID, 0);
-        MobileLedgerProfile startupProfile = getProfile(profileId);
-        if (startupProfile != null)
-            setCurrentProfile(startupProfile);
-        Logger.debug("profile", "initProfile() returning " + startupProfile);
-        return startupProfile;
-    }
-
     public static void removeProfileObservers(LifecycleOwner owner) {
         profile.removeObservers(owner);
     }

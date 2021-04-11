@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
 import java.lang.ref.WeakReference;
@@ -148,8 +149,10 @@ public class ProfilesRecyclerViewAdapter
         if (profile == null)
             throw new IllegalStateException("Profile row without associated profile");
         debug("profiles", "Setting profile to " + profile.getName());
-        if (Data.getProfile() != profile)
+        if (Data.getProfile() != profile) {
             Data.drawerOpen.setValue(false);
+            ((MainActivity) v.getContext()).storeProfilePref(profile);
+        }
         Data.setCurrentProfile(profile);
     }
     @NonNull

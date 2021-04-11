@@ -18,33 +18,52 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
+import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.dao.ProfileDAO;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
 
+import java.util.Locale;
+
 @SuppressLint("Registered")
 public class ProfileThemedActivity extends CrashReportingActivity {
+    public static final String TAG = "prf-thm-act";
+    protected static final String PARAM_PROFILE_ID = "profile-id";
+    protected static final String PARAM_THEME = "theme";
     protected MobileLedgerProfile mProfile;
     private boolean themeSetUp = false;
     private boolean mIgnoreProfileChange;
-    protected void setupProfileColors() {
-        final int themeHue = (mProfile == null) ? -1 : mProfile.getThemeHue();
+    private int mThemeHue;
+    protected void setupProfileColors(int newHue) {
+        if (themeSetUp && newHue == mThemeHue) {
+            Logger.debug(TAG,
+                    String.format(Locale.ROOT, "Ignore request to set theme to the same value (%d)",
+                            newHue));
+            return;
+        }
 
-        Colors.setupTheme(this, themeHue);
+        Logger.debug(TAG,
+                String.format(Locale.ROOT, "Changing theme from %d to %d", mThemeHue, newHue));
+
+        mThemeHue = newHue;
+        Colors.setupTheme(this, mThemeHue);
 
         if (themeSetUp) {
-            Logger.debug("prf-thm-act",
-                    "setupProfileColors(): theme already set up, recreating activity");
+            Logger.debug(TAG, "setupProfileColors(): theme already set up, recreating activity");
             this.recreate();
         }
         themeSetUp = true;
 
-        Colors.profileThemeId = Data.retrieveCurrentThemeIdFromDb();
+        Colors.profileThemeId = mThemeHue;
     }
     @Override
     protected void onStart() {
@@ -53,21 +72,53 @@ public class ProfileThemedActivity extends CrashReportingActivity {
     }
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         initProfile();
-        setupProfileColors();
 
-        mIgnoreProfileChange = true;
         Data.observeProfile(this, profile -> {
-            if (!mIgnoreProfileChange) {
-                mProfile = profile;
-                setupProfileColors();
+            if (profile == null) {
+                Logger.debug(TAG, "No current profile, leaving");
+                finish();
+                return;
             }
 
-            mIgnoreProfileChange = false;
+            mProfile = profile;
+            int hue = profile.getThemeHue();
+
+            if (hue != mThemeHue) {
+                storeProfilePref(profile);
+                setupProfileColors(hue);
+            }
         });
 
         super.onCreate(savedInstanceState);
     }
+    public void storeProfilePref(MobileLedgerProfile profile) {
+        App.storeStartupProfileAndTheme(profile.getId(), profile.getThemeHue());
+    }
     protected void initProfile() {
-        mProfile = Data.initProfile();
+        long profileId = App.getStartupProfile();
+        int hue = App.getStartupTheme();
+        if (profileId == -1)
+            mThemeHue = Colors.DEFAULT_HUE_DEG;
+
+        setupProfileColors(hue);
+
+        initProfile(profileId);
+    }
+    protected void initProfile(long profileId) {
+        AsyncTask.execute(() -> initProfileAsync(profileId));
+    }
+    private void initProfileAsync(long profileId) {
+        ProfileDAO dao = DB.get()
+                           .getProfileDAO();
+        Profile profile = dao.getByIdSync(profileId);
+
+        if (profile == null) {
+            Logger.debug(TAG, String.format(Locale.ROOT, "Profile %d not found. Trying any other",
+                    profileId));
+
+            profile = dao.getAnySync();
+        }
+
+        Data.postCurrentProfile(MobileLedgerProfile.fromDBO(profile));
     }
 }

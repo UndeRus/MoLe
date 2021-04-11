@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
@@ -26,6 +27,7 @@ import android.util.Log;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailModel;
+import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
@@ -39,6 +41,9 @@ import java.net.URL;
 import java.util.Locale;
 
 public class App extends Application {
+    public static final String PREF_NAME = "MoLe";
+    public static final String PREF_THEME_HUE = "theme-hue";
+    public static final String PREF_PROFILE_ID = "profile-id";
     public static App instance;
     private static ProfileDetailModel profileModel;
     private MobileLedgerDatabase dbHelper;
@@ -57,6 +62,23 @@ public class App extends Application {
     }
     public static void resetAuthenticationData() {
         profileModel = null;
+    }
+    public static void storeStartupProfileAndTheme(long currentProfileId, int currentTheme) {
+        SharedPreferences prefs =
+                instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(PREF_PROFILE_ID,
+                currentProfileId);
+        editor.putInt(PREF_THEME_HUE, currentTheme);
+        editor.apply();
+    }
+    public static long getStartupProfile() {
+        SharedPreferences prefs = instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        return prefs.getLong(PREF_PROFILE_ID, -1);
+    }
+    public static int getStartupTheme() {
+        SharedPreferences prefs = instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        return prefs.getInt(PREF_THEME_HUE, Colors.DEFAULT_HUE_DEG);
     }
     private String getAuthURL() {
         if (profileModel != null)

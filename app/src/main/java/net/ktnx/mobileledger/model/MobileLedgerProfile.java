@@ -40,6 +40,7 @@ import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.db.AccountValue;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
 import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailFragment;
@@ -183,6 +184,26 @@ public final class MobileLedgerProfile {
         }
         intent.putExtras(args);
         context.startActivity(intent, args);
+    }
+    public static MobileLedgerProfile fromDBO(Profile newProfile) {
+        MobileLedgerProfile p = new MobileLedgerProfile(newProfile.getId());
+        p.setDetectedVersion(new HledgerVersion(newProfile.getDetectedVersionMajor(),
+                newProfile.getDetectedVersionMinor()));
+        p.setApiVersion(newProfile.getApiVersion());
+        p.setAuthEnabled(newProfile.useAuthentication());
+        p.setAuthUserName(newProfile.getAuthUser());
+        p.setAuthPassword(newProfile.getAuthPassword());
+        p.setDefaultCommodity(newProfile.getDefaultCommodity());
+        p.setFutureDates(newProfile.getFutureDates());
+        p.setName(newProfile.getName());
+        p.setPostingPermitted(newProfile.permitPosting());
+        p.setPreferredAccountsFilter(newProfile.getPreferredAccountsFilter());
+        p.setShowCommentsByDefault(newProfile.getShowCommentsByDefault());
+        p.setShowCommodityByDefault(newProfile.getShowCommodityByDefault());
+        p.setUrl(newProfile.getUrl());
+        p.setThemeId(newProfile.getTheme());
+
+        return p;
     }
     public HledgerVersion getDetectedVersion() {
         return detectedVersion;

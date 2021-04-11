@@ -352,8 +352,11 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                                      .setIcon(Icon.createWithResource(this,
                                              R.drawable.thick_plus_icon))
                                      .setIntent(new Intent(Intent.ACTION_VIEW, null, this,
-                                             NewTransactionActivity.class).putExtra("profile_id",
-                                             p.getId()))
+                                             NewTransactionActivity.class).putExtra(
+                                             ProfileThemedActivity.PARAM_PROFILE_ID, p.getId())
+                                                                          .putExtra(
+                                                                                  ProfileThemedActivity.PARAM_THEME,
+                                                                                  p.getThemeHue()))
                                      .setRank(i)
                                      .build();
             shortcuts.add(si);
@@ -456,6 +459,8 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
     }
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
+        intent.putExtra(ProfileThemedActivity.PARAM_PROFILE_ID, profile.getId());
+        intent.putExtra(ProfileThemedActivity.PARAM_THEME, profile.getThemeHue());
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_up, R.anim.dummy);
     }

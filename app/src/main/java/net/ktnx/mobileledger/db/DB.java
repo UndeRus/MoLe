@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.db;
 
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.database.SQLException;
 
 import androidx.annotation.NonNull;
@@ -97,6 +98,25 @@ abstract public class DB extends RoomDatabase {
                 String fileName = String.format(Locale.US, "db_%d", toVersion);
 
                 applyRevisionFile(db, fileName);
+
+                // when migrating to version 59, migrate profile/theme options to the
+                // SharedPreferences
+                if (toVersion == 59) {
+                    try (Cursor c = db.query(
+                            "SELECT p.id, p.theme_hue FROM profiles p WHERE p.id=(SELECT o.value " +
+                            "FROM options WHERE o.profile_uid IS NULL AND o.name=?",
+                            new Object[]{"profile_id"}))
+                    {
+                        if (c.moveToFirst()) {
+                            long currentProfileId = c.getLong(0);
+                            int currentTheme = c.getInt(1);
+
+                            if (currentProfileId >= 0 && currentTheme >= 0) {
+                                App.storeStartupProfileAndTheme(currentProfileId, currentTheme);
+                            }
+                        }
+                    }
+                }
             }
         };
     }

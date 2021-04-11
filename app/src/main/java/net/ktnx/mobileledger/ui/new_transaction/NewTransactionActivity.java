@@ -72,6 +72,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         implements TaskCallback, NewTransactionFragment.OnNewTransactionFragmentInteractionListener,
         QR.QRScanTrigger, QR.QRScanResultReceiver, DescriptionSelectedCallback,
         FabManager.FabHandler {
+    final String TAG = "new-t-a";
     private NavController navController;
     private NewTransactionModel model;
     private ActivityResultLauncher<Void> qrScanLauncher;
@@ -115,16 +116,23 @@ public class NewTransactionActivity extends ProfileThemedActivity
     }
     @Override
     protected void initProfile() {
-        long profileId = getIntent().getLongExtra("profile_id", 0);
+        long profileId = getIntent().getLongExtra(PARAM_PROFILE_ID, 0);
+        int profileHue = getIntent().getIntExtra(PARAM_THEME, -1);
 
-        if (profileId != 0) {
-            mProfile = Data.getProfile(profileId);
-            if (mProfile == null)
-                finish();
-            Data.setCurrentProfile(mProfile);
+        if (profileHue < 0) {
+            Logger.debug(TAG, "Started with invalid/missing theme; quitting");
+            finish();
+            return;
         }
-        else
-            super.initProfile();
+
+        if (profileId <= 0) {
+            Logger.debug(TAG, "Started with invalid/missing profile_id; quitting");
+            finish();
+            return;
+        }
+
+        setupProfileColors(profileHue);
+        initProfile(profileId);
     }
     @Override
     public void finish() {
