@@ -30,6 +30,7 @@ import net.ktnx.mobileledger.dao.AccountDAO;
 import net.ktnx.mobileledger.dao.DescriptionHistoryDAO;
 import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
+import net.ktnx.mobileledger.utils.Misc;
 
 @Entity(tableName = "profiles")
 public class Profile {
@@ -194,6 +195,26 @@ public class Profile {
     @Override
     public String toString() {
         return getName();
+    }
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (!(o instanceof Profile))
+            return false;
+        Profile p = (Profile) o;
+        return id == p.id && Misc.equalStrings(name, p.name) &&
+               Misc.equalStrings(deprecatedUUID, p.deprecatedUUID) &&
+               Misc.equalStrings(url, p.url) && useAuthentication == p.useAuthentication &&
+               Misc.equalStrings(authUser, p.authUser) &&
+               Misc.equalStrings(authPassword, p.authPassword) && orderNo == p.orderNo &&
+               permitPosting == p.permitPosting && theme == p.theme &&
+               Misc.equalStrings(preferredAccountsFilter, p.preferredAccountsFilter) &&
+               futureDates == p.futureDates && apiVersion == p.apiVersion &&
+               showCommentsByDefault == p.showCommentsByDefault &&
+               Misc.equalStrings(defaultCommodity, p.defaultCommodity) &&
+               showCommentsByDefault == p.showCommentsByDefault &&
+               detectedVersionPre_1_19 == p.detectedVersionPre_1_19 &&
+               detectedVersionMajor == p.detectedVersionMajor &&
+               detectedVersionMinor == p.detectedVersionMinor;
     }
     @Transaction
     public void wipeAllDataSync() {
