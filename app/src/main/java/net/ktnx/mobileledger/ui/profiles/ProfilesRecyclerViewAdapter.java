@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.ui.profiles;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,38 +28,47 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
-import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.utils.Colors;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class ProfilesRecyclerViewAdapter
         extends RecyclerView.Adapter<ProfilesRecyclerViewAdapter.ProfileListViewHolder> {
-    private static WeakReference<ProfilesRecyclerViewAdapter> instanceRef;
     public final MutableLiveData<Boolean> editingProfiles = new MutableLiveData<>(false);
-    private final View.OnClickListener mOnClickListener = view -> {
-        MobileLedgerProfile profile = (MobileLedgerProfile) ((View) view.getParent()).getTag();
-        editProfile(view, profile);
-    };
     private final ItemTouchHelper rearrangeHelper;
+    private final AsyncListDiffer<Profile> listDiffer;
     private RecyclerView recyclerView;
     private boolean animationsEnabled = true;
+
     public ProfilesRecyclerViewAdapter() {
-        instanceRef = new WeakReference<>(this);
         debug("flow", "ProfilesRecyclerViewAdapter.new()");
+
+        setHasStableIds(true);
+        listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<Profile>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Profile oldItem, @NonNull Profile newItem) {
+                return oldItem.getId() == newItem.getId();
+            }
+            @Override
+            public boolean areContentsTheSame(@NonNull Profile oldItem, @NonNull Profile newItem) {
+                return oldItem.equals(newItem);
+            }
+        });
 
         ItemTouchHelper.Callback cb = new ItemTouchHelper.Callback() {
             @Override
@@ -73,13 +80,13 @@ public class ProfilesRecyclerViewAdapter
             public boolean onMove(@NonNull RecyclerView recyclerView,
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
-                final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-                if (profiles == null)
-                    throw new AssertionError();
+                final List<Profile> profiles = new ArrayList<>(listDiffer.getCurrentList());
                 Collections.swap(profiles, viewHolder.getAdapterPosition(),
                         target.getAdapterPosition());
-                MobileLedgerProfile.storeProfilesOrder();
-                notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                DB.get()
+                  .getProfileDAO()
+                  .updateOrder(profiles, null);
+//                notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
                 return true;
             }
             @Override
@@ -88,9 +95,14 @@ public class ProfilesRecyclerViewAdapter
         };
         rearrangeHelper = new ItemTouchHelper(cb);
     }
-    public static @Nullable
-    ProfilesRecyclerViewAdapter getInstance() {
-        return instanceRef.get();
+    @Override
+    public long getItemId(int position) {
+        return listDiffer.getCurrentList()
+                         .get(position)
+                         .getId();
+    }
+    public void setProfileList(List<Profile> list) {
+        listDiffer.submitList(list);
     }
     public void setAnimationsEnabled(boolean animationsEnabled) {
         this.animationsEnabled = animationsEnabled;
@@ -132,74 +144,22 @@ public class ProfilesRecyclerViewAdapter
         else
             startEditingProfiles();
     }
-    private void editProfile(View view, MobileLedgerProfile profile) {
-        int index = Data.getProfileIndex(profile);
-        Context context = view.getContext();
-        Intent intent = new Intent(context, ProfileDetailActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION);
-        if (index != -1)
-            intent.putExtra(ProfileDetailFragment.ARG_ITEM_ID, index);
-
-        context.startActivity(intent);
-    }
-    private void onProfileRowClicked(View v) {
-        if (editingProfiles())
-            return;
-        MobileLedgerProfile profile = (MobileLedgerProfile) v.getTag();
-        if (profile == null)
-            throw new IllegalStateException("Profile row without associated profile");
-        debug("profiles", "Setting profile to " + profile.getName());
-        if (Data.getProfile() != profile) {
-            Data.drawerOpen.setValue(false);
-            ((MainActivity) v.getContext()).storeProfilePref(profile);
-        }
-        Data.setCurrentProfile(profile);
-    }
     @NonNull
     @Override
     public ProfileListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                                   .inflate(R.layout.profile_list_content, parent, false);
-        ProfileListViewHolder holder = new ProfileListViewHolder(view);
-
-        holder.mRow.setOnClickListener(this::onProfileRowClicked);
-        holder.mTitle.setOnClickListener(v -> {
-            View row = (View) v.getParent();
-            onProfileRowClicked(row);
-        });
-        holder.mColorTag.setOnClickListener(v -> {
-            View row = (View) v.getParent()
-                               .getParent();
-            onProfileRowClicked(row);
-        });
-        holder.mTitle.setOnLongClickListener(v -> {
-            flipEditingProfiles();
-            return true;
-        });
-
-        View.OnTouchListener dragStarter = (v, event) -> {
-            if (rearrangeHelper != null && editingProfiles()) {
-                rearrangeHelper.startDrag(holder);
-                return true;
-            }
-            return false;
-        };
-
-        holder.tagAndHandleLayout.setOnTouchListener(dragStarter);
-        return holder;
+        return new ProfileListViewHolder(view);
     }
     @Override
     public void onBindViewHolder(@NonNull final ProfileListViewHolder holder, int position) {
-        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        if (profiles == null)
-            throw new AssertionError();
-        final MobileLedgerProfile profile = profiles.get(position);
-        final MobileLedgerProfile currentProfile = Data.getProfile();
+        final Profile profile = listDiffer.getCurrentList()
+                                          .get(position);
+        final Profile currentProfile = Data.getProfile();
 //        debug("profiles", String.format(Locale.ENGLISH, "pos %d: %s, current: %s", position,
 //                profile.getUuid(), currentProfile.getUuid()));
-        holder.itemView.setTag(profile);
 
-        int hue = profile.getThemeHue();
+        int hue = profile.getTheme();
         if (hue == -1)
             holder.mColorTag.setBackgroundColor(
                     Colors.getPrimaryColorForHue(Colors.DEFAULT_HUE_DEG));
@@ -209,9 +169,13 @@ public class ProfilesRecyclerViewAdapter
         holder.mTitle.setText(profile.getName());
 //            holder.mSubTitle.setText(profile.getUrl());
 
-        holder.mEditButton.setOnClickListener(mOnClickListener);
+        holder.mEditButton.setOnClickListener(view -> {
+            Profile p = listDiffer.getCurrentList()
+                                  .get(holder.getAdapterPosition());
+            ProfileDetailActivity.start(view.getContext(), p);
+        });
 
-        final boolean sameProfile = currentProfile.equals(profile);
+        final boolean sameProfile = currentProfile.getId() == profile.getId();
         holder.itemView.setBackground(
                 sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles()) {
@@ -239,10 +203,10 @@ public class ProfilesRecyclerViewAdapter
     }
     @Override
     public int getItemCount() {
-        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-        return profiles != null ? profiles.size() : 0;
+        return listDiffer.getCurrentList()
+                         .size();
     }
-    static class ProfileListViewHolder extends RecyclerView.ViewHolder {
+    class ProfileListViewHolder extends RecyclerView.ViewHolder {
         final TextView mEditButton;
         final TextView mTitle, mColorTag;
         final LinearLayout tagAndHandleLayout;
@@ -257,6 +221,47 @@ public class ProfilesRecyclerViewAdapter
             mRearrangeHandle = view.findViewById(R.id.profile_list_rearrange_handle);
             tagAndHandleLayout = view.findViewById(R.id.handle_and_tag);
             mRow = (ConstraintLayout) view;
+
+
+            mRow.setOnClickListener(this::onProfileRowClicked);
+            mTitle.setOnClickListener(v -> {
+                View row = (View) v.getParent();
+                onProfileRowClicked(row);
+            });
+            mColorTag.setOnClickListener(v -> {
+                View row = (View) v.getParent()
+                                   .getParent();
+                onProfileRowClicked(row);
+            });
+            mTitle.setOnLongClickListener(v -> {
+                flipEditingProfiles();
+                return true;
+            });
+
+            View.OnTouchListener dragStarter = (v, event) -> {
+                if (rearrangeHelper != null && editingProfiles()) {
+                    rearrangeHelper.startDrag(this);
+                    return true;
+                }
+                return false;
+            };
+
+            tagAndHandleLayout.setOnTouchListener(dragStarter);
         }
+        private void onProfileRowClicked(View v) {
+            if (editingProfiles())
+                return;
+            Profile profile = listDiffer.getCurrentList()
+                                        .get(getAdapterPosition());
+            if (Data.getProfile() != profile) {
+                debug("profiles", "Setting profile to " + profile.getName());
+                Data.drawerOpen.setValue(false);
+                Data.setCurrentProfile(profile);
+            }
+            else
+                debug("profiles",
+                        "Not setting profile to the current profile " + profile.getName());
+        }
+
     }
 }

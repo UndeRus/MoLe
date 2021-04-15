@@ -35,16 +35,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.dao.CurrencyDAO;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A fragment representing a list of Items.
@@ -109,11 +108,19 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         model = new ViewModelProvider(this).get(CurrencySelectorModel.class);
         if (onCurrencySelectedListener != null)
             model.setOnCurrencySelectedListener(onCurrencySelectedListener);
-        MobileLedgerProfile profile = Objects.requireNonNull(Data.getProfile());
+        Profile profile = Data.getProfile();
 
-        model.currencies.setValue(new CopyOnWriteArrayList<>(profile.getCurrencies()));
         CurrencySelectorRecyclerViewAdapter adapter = new CurrencySelectorRecyclerViewAdapter();
-        model.currencies.observe(this, adapter::submitList);
+        DB.get()
+          .getCurrencyDAO()
+          .getAll()
+          .observe(this, list -> {
+              List<String> strings = new ArrayList<>();
+              for (net.ktnx.mobileledger.db.Currency c : list) {
+                  strings.add(c.getName());
+              }
+              adapter.submitList(strings);
+          });
 
         recyclerView.setAdapter(adapter);
         adapter.setCurrencySelectedListener(this);
@@ -146,11 +153,11 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
 
             String currName = String.valueOf(tvNewCurrName.getText());
             if (!currName.isEmpty()) {
-                List<Currency> list = new ArrayList<>(model.currencies.getValue());
+                DB.get()
+                  .getCurrencyDAO()
+                  .insert(new net.ktnx.mobileledger.db.Currency(null,
+                          String.valueOf(tvNewCurrName.getText()), "after", false), null);
                 // FIXME hardcoded position and gap setting
-                list.add(new Currency(profile, String.valueOf(tvNewCurrName.getText()),
-                        Currency.Position.after, false));
-                model.currencies.setValue(list);
             }
 
             tvNewCurrName.setVisibility(View.GONE);
@@ -210,19 +217,18 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         model.resetOnCurrencySelectedListener();
     }
     @Override
-    public void onCurrencySelected(Currency item) {
+    public void onCurrencySelected(String item) {
         model.triggerOnCurrencySelectedListener(item);
 
         dismiss();
     }
 
     @Override
-    public void onCurrencyLongClick(Currency item) {
-        ArrayList<Currency> list = new ArrayList<>(model.currencies.getValue());
-        App.getDatabase()
-           .execSQL("delete from currencies where id=?", new Object[]{item.getId()});
-        list.remove(item);
-        model.currencies.setValue(list);
+    public void onCurrencyLongClick(String item) {
+        CurrencyDAO dao = DB.get()
+                            .getCurrencyDAO();
+        dao.getByName(item)
+           .observe(this, dao::deleteSync);
     }
     public void showPositionAndPadding() {
         deferredShowPositionAndPadding = true;

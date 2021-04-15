@@ -22,12 +22,12 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 
 abstract class NewTransactionItemViewHolder extends RecyclerView.ViewHolder {
     final NewTransactionItemsAdapter mAdapter;
-    final MobileLedgerProfile mProfile;
+    final Profile mProfile;
     public NewTransactionItemViewHolder(@NonNull View itemView,
                                         NewTransactionItemsAdapter adapter) {
         super(itemView);

@@ -18,20 +18,20 @@
 package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
-import net.ktnx.mobileledger.utils.LockHolder;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -45,8 +45,7 @@ public final class Data {
             new MutableLiveData<>(false);
     public static final MutableLiveData<RetrieveTransactionsTask.Progress> backgroundTaskProgress =
             new MutableLiveData<>();
-    public static final MutableLiveData<ArrayList<MobileLedgerProfile>> profiles =
-            new MutableLiveData<>(null);
+    public static final LiveData<List<Profile>> profiles = DB.get().getProfileDAO().getAllOrdered();
     public static final MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
@@ -59,7 +58,7 @@ public final class Data {
     public static final MutableLiveData<String> lastTransactionsUpdateText =
             new MutableLiveData<>();
     public static final MutableLiveData<String> lastAccountsUpdateText = new MutableLiveData<>();
-    private static final MutableLiveData<MobileLedgerProfile> profile =
+    private static final MutableLiveData<Profile> profile =
             new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
@@ -70,7 +69,7 @@ public final class Data {
     }
 
     @NonNull
-    public static MobileLedgerProfile getProfile() {
+    public static Profile getProfile() {
         return Objects.requireNonNull(profile.getValue());
     }
     public static void backgroundTaskStarted() {
@@ -87,60 +86,11 @@ public final class Data {
                         cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
-    public static void setCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
+    public static void setCurrentProfile(@NonNull Profile newProfile) {
         profile.setValue(newProfile);
     }
-    public static void postCurrentProfile(@NonNull MobileLedgerProfile newProfile) {
+    public static void postCurrentProfile(@NonNull Profile newProfile) {
         profile.postValue(newProfile);
-    }
-    public static int getProfileIndex(MobileLedgerProfile profile) {
-        try (LockHolder ignored = profilesLocker.lockForReading()) {
-            List<MobileLedgerProfile> prList = profiles.getValue();
-            if (prList == null)
-                throw new AssertionError();
-            for (int i = 0; i < prList.size(); i++) {
-                MobileLedgerProfile p = prList.get(i);
-                if (p.equals(profile))
-                    return i;
-            }
-
-            return -1;
-        }
-    }
-    @SuppressWarnings("WeakerAccess")
-    public static int getProfileIndex(long profileId) {
-        try (LockHolder ignored = profilesLocker.lockForReading()) {
-            List<MobileLedgerProfile> prList = profiles.getValue();
-            if (prList == null)
-                throw new AssertionError();
-            for (int i = 0; i < prList.size(); i++) {
-                MobileLedgerProfile p = prList.get(i);
-                if (p.getId() == profileId)
-                    return i;
-            }
-
-            return -1;
-        }
-    }
-    @Nullable
-    public static MobileLedgerProfile getProfile(long profileId) {
-        MobileLedgerProfile profile;
-        try (LockHolder readLock = profilesLocker.lockForReading()) {
-            List<MobileLedgerProfile> prList = profiles.getValue();
-            if ((prList == null) || prList.isEmpty()) {
-                readLock.close();
-                try (LockHolder ignored = profilesLocker.lockForWriting()) {
-                    profile = MobileLedgerProfile.loadAllFromDB(profileId);
-                }
-            }
-            else {
-                int i = getProfileIndex(profileId);
-                if (i == -1)
-                    i = 0;
-                profile = prList.get(i);
-            }
-        }
-        return profile;
     }
     public static void refreshCurrencyData(Locale locale) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
@@ -186,7 +136,7 @@ public final class Data {
         return numberFormatter.format(number);
     }
     public static void observeProfile(LifecycleOwner lifecycleOwner,
-                                      Observer<MobileLedgerProfile> observer) {
+                                      Observer<Profile> observer) {
         profile.observe(lifecycleOwner, observer);
     }
     public static void removeProfileObservers(LifecycleOwner owner) {

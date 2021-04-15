@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.ui;
 
-import net.ktnx.mobileledger.model.Currency;
-
 /**
  * This interface must be implemented by activities that contain this
  * fragment to allow an interaction in this fragment to be communicated
@@ -30,5 +28,5 @@ import net.ktnx.mobileledger.model.Currency;
  * >Communicating with Other Fragments</a> for more information.
  */
 public interface OnCurrencyLongClickListener {
-    void onCurrencyLongClick(Currency item);
+    void onCurrencyLongClick(String item);
 }

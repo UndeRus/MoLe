@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
 
+import net.ktnx.mobileledger.db.TransactionAccount;
 import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.Locale;
@@ -31,6 +32,7 @@ public class LedgerTransactionAccount {
     private String currency;
     private String comment;
     private boolean amountValid = true;
+    private long dbId;
     public LedgerTransactionAccount(String accountName, float amount, String currency,
                                     String comment) {
         this.setAccountName(accountName);
@@ -55,6 +57,13 @@ public class LedgerTransactionAccount {
             setAmount(origin.getAmount());
         amountValid = origin.amountValid;
         currency = origin.getCurrency();
+    }
+    public LedgerTransactionAccount(TransactionAccount dbo) {
+        this(dbo.getAccountName(), dbo.getAmount(), Misc.emptyIsNull(dbo.getCurrency()),
+                Misc.emptyIsNull(dbo.getComment()));
+        amountSet = true;
+        amountValid = true;
+        dbId = dbo.getId();
     }
     public String getComment() {
         return comment;
@@ -113,5 +122,16 @@ public class LedgerTransactionAccount {
         sb.append(String.format(Locale.US, "%,1.2f", amount));
 
         return sb.toString();
+    }
+    public TransactionAccount toDBO() {
+        TransactionAccount dbo = new TransactionAccount();
+        dbo.setAccountName(accountName);
+        if (amountSet)
+            dbo.setAmount(amount);
+        dbo.setComment(comment);
+        dbo.setCurrency(currency);
+        dbo.setId(dbId);
+
+        return dbo;
     }
 }

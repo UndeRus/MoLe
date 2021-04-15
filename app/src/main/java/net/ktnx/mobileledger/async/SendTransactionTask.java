@@ -20,12 +20,12 @@ package net.ktnx.mobileledger.async;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.json.ApiNotSupportedException;
 import net.ktnx.mobileledger.json.Gateway;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
@@ -56,20 +56,20 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
     private final TaskCallback taskCallback;
-    private final MobileLedgerProfile mProfile;
+    private final Profile mProfile;
     private final boolean simulate;
     protected String error;
     private String token;
     private String session;
     private LedgerTransaction transaction;
 
-    public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile,
+    public SendTransactionTask(TaskCallback callback, Profile profile,
                                boolean simulate) {
         taskCallback = callback;
         mProfile = profile;
         this.simulate = simulate;
     }
-    public SendTransactionTask(TaskCallback callback, MobileLedgerProfile profile) {
+    public SendTransactionTask(TaskCallback callback, Profile profile) {
         taskCallback = callback;
         mProfile = profile;
         simulate = false;
@@ -253,7 +253,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         try {
             transaction = ledgerTransactions[0];
 
-            final API profileApiVersion = mProfile.getApiVersion();
+            final API profileApiVersion = API.valueOf(mProfile.getApiVersion());
             switch (profileApiVersion) {
                 case auto:
                     boolean sendOK = false;

@@ -28,7 +28,6 @@ import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
 
@@ -39,7 +38,7 @@ public class ProfileThemedActivity extends CrashReportingActivity {
     public static final String TAG = "prf-thm-act";
     protected static final String PARAM_PROFILE_ID = "profile-id";
     protected static final String PARAM_THEME = "theme";
-    protected MobileLedgerProfile mProfile;
+    protected Profile mProfile;
     private boolean themeSetUp = false;
     private boolean mIgnoreProfileChange;
     private int mThemeHue;
@@ -81,7 +80,7 @@ public class ProfileThemedActivity extends CrashReportingActivity {
             }
 
             mProfile = profile;
-            int hue = profile.getThemeHue();
+            int hue = profile.getTheme();
 
             if (hue != mThemeHue) {
                 storeProfilePref(profile);
@@ -91,8 +90,8 @@ public class ProfileThemedActivity extends CrashReportingActivity {
 
         super.onCreate(savedInstanceState);
     }
-    public void storeProfilePref(MobileLedgerProfile profile) {
-        App.storeStartupProfileAndTheme(profile.getId(), profile.getThemeHue());
+    public void storeProfilePref(Profile profile) {
+        App.storeStartupProfileAndTheme(profile.getId(), profile.getTheme());
     }
     protected void initProfile() {
         long profileId = App.getStartupProfile();
@@ -119,6 +118,6 @@ public class ProfileThemedActivity extends CrashReportingActivity {
             profile = dao.getAnySync();
         }
 
-        Data.postCurrentProfile(MobileLedgerProfile.fromDBO(profile));
+        Data.postCurrentProfile(profile);
     }
 }

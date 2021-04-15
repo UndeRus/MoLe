@@ -119,9 +119,7 @@ abstract public class TemplateDetailsItem {
                 acc.setAccountCommentMatchGroup(pa.getAccountCommentMatchGroup());
 
             if (pa.getCurrencyMatchGroup() == null) {
-                final Integer currencyId = pa.getCurrency();
-                if (currencyId != null && currencyId > 0)
-                    acc.setCurrency(Currency.loadById(currencyId));
+                acc.setCurrency(pa.getCurrencyObject());
             }
             else
                 acc.setCurrencyMatchGroup(pa.getCurrencyMatchGroup());
@@ -300,7 +298,8 @@ abstract public class TemplateDetailsItem {
                 PossiblyMatchedValue.withLiteralString("");
         private final PossiblyMatchedValue<Float> amount =
                 PossiblyMatchedValue.withLiteralFloat(null);
-        private final PossiblyMatchedValue<Currency> currency = new PossiblyMatchedValue<>();
+        private final PossiblyMatchedValue<net.ktnx.mobileledger.db.Currency> currency =
+                new PossiblyMatchedValue<>();
         private boolean negateAmount;
         public AccountRow() {
             super(Type.ACCOUNT_ITEM);
@@ -339,10 +338,10 @@ abstract public class TemplateDetailsItem {
         public void setCurrencyMatchGroup(int group) {
             currency.setMatchGroup(group);
         }
-        public Currency getCurrency() {
+        public net.ktnx.mobileledger.db.Currency getCurrency() {
             return currency.getValue();
         }
-        public void setCurrency(Currency currency) {
+        public void setCurrency(net.ktnx.mobileledger.db.Currency currency) {
             this.currency.setValue(currency);
         }
         public int getAccountNameMatchGroup() {

@@ -17,31 +17,9 @@
 
 package net.ktnx.mobileledger.model;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.Misc;
 
 public class Currency {
-    public static final DiffUtil.ItemCallback<Currency> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<Currency>() {
-                @Override
-                public boolean areItemsTheSame(@NonNull Currency oldItem,
-                                               @NonNull Currency newItem) {
-                    return oldItem.id == newItem.id;
-                }
-                @Override
-                public boolean areContentsTheSame(@NonNull Currency oldItem,
-                                                  @NonNull Currency newItem) {
-                    return oldItem.name.equals(newItem.name) &&
-                           oldItem.position.equals(newItem.position) &&
-                           (oldItem.hasGap == newItem.hasGap);
-                }
-            };
     private final int id;
     private String name;
     private Position position;
@@ -57,28 +35,6 @@ public class Currency {
         this.name = name;
         this.position = position;
         this.hasGap = hasGap;
-    }
-    public Currency(MobileLedgerProfile profile, String name, Position position, boolean hasGap) {
-        SQLiteDatabase db = App.getDatabase();
-
-        try (Cursor c = db.rawQuery("select max(rowid) from currencies", null)) {
-            c.moveToNext();
-            this.id = c.getInt(0) + 1;
-        }
-        db.execSQL("insert into currencies(id, name, position, has_gap) values(?, ?, ?, ?)",
-                new Object[]{this.id, name, position.toString(), hasGap});
-
-        this.name = name;
-        this.position = position;
-        this.hasGap = hasGap;
-    }
-    public static Currency loadByName(String name) {
-        MobileLedgerProfile profile = Data.getProfile();
-        return profile.loadCurrencyByName(name);
-    }
-    public static Currency loadById(int id) {
-        MobileLedgerProfile profile = Data.getProfile();
-        return profile.loadCurrencyById(id);
     }
     static public boolean equal(Currency left, Currency right) {
         if (left == null) {

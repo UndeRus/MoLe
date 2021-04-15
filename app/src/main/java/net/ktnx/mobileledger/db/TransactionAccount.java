@@ -37,7 +37,7 @@ public class TransactionAccount {
     @PrimaryKey(autoGenerate = true)
     private long id;
     @ColumnInfo(name = "transaction_id")
-    private int transactionId;
+    private long transactionId;
     @ColumnInfo(name = "order_no")
     private int orderNo;
     @ColumnInfo(name = "account_name")
@@ -51,7 +51,7 @@ public class TransactionAccount {
     @ColumnInfo
     private String comment;
     @ColumnInfo(defaultValue = "0")
-    private int generation = 0;
+    private long generation = 0;
     public long getId() {
         return id;
     }
@@ -59,10 +59,10 @@ public class TransactionAccount {
         this.id = id;
     }
     @NonNull
-    public int getTransactionId() {
+    public long getTransactionId() {
         return transactionId;
     }
-    public void setTransactionId(int transactionId) {
+    public void setTransactionId(long transactionId) {
         this.transactionId = transactionId;
     }
     public int getOrderNo() {
@@ -97,10 +97,10 @@ public class TransactionAccount {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public int getGeneration() {
+    public long getGeneration() {
         return generation;
     }
-    public void setGeneration(int generation) {
+    public void setGeneration(long generation) {
         this.generation = generation;
     }
 }

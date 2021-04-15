@@ -64,11 +64,9 @@ public class App extends Application {
         profileModel = null;
     }
     public static void storeStartupProfileAndTheme(long currentProfileId, int currentTheme) {
-        SharedPreferences prefs =
-                instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(PREF_PROFILE_ID,
-                currentProfileId);
+        editor.putLong(PREF_PROFILE_ID, currentProfileId);
         editor.putInt(PREF_THEME_HUE, currentTheme);
         editor.apply();
     }
@@ -90,7 +88,7 @@ public class App extends Application {
         if (profileModel != null)
             return profileModel.getAuthUserName();
         return Data.getProfile()
-                   .getAuthUserName();
+                   .getAuthUser();
     }
     private String getAuthPassword() {
         if (profileModel != null)
@@ -102,7 +100,7 @@ public class App extends Application {
         if (profileModel != null)
             return profileModel.getUseAuthentication();
         return Data.getProfile()
-                   .isAuthEnabled();
+                   .useAuthentication();
     }
     @Override
     public void onCreate() {

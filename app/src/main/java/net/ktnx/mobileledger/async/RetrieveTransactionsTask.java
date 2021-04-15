@@ -23,10 +23,22 @@ import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 
 import androidx.annotation.NonNull;
+import androidx.room.Transaction;
 
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.dao.AccountValueDAO;
+import net.ktnx.mobileledger.dao.TransactionAccountDAO;
+import net.ktnx.mobileledger.dao.TransactionDAO;
+import net.ktnx.mobileledger.db.Account;
+import net.ktnx.mobileledger.db.AccountWithAmounts;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Option;
+import net.ktnx.mobileledger.db.Profile;
+import net.ktnx.mobileledger.db.TransactionAccount;
+import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.json.AccountListParser;
@@ -36,9 +48,9 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -52,6 +64,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -81,15 +94,11 @@ public class RetrieveTransactionsTask extends
     private final Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
     private final MainModel mainModel;
-    private final MobileLedgerProfile profile;
-    private final List<LedgerAccount> prevAccounts;
+    private final Profile profile;
     private int expectedPostingsCount = -1;
-    public RetrieveTransactionsTask(@NonNull MainModel mainModel,
-                                    @NonNull MobileLedgerProfile profile,
-                                    List<LedgerAccount> accounts) {
+    public RetrieveTransactionsTask(@NonNull MainModel mainModel, @NonNull Profile profile) {
         this.mainModel = mainModel;
         this.profile = profile;
-        this.prevAccounts = accounts;
     }
     private static void L(String msg) {
         //debug("transaction-parser", msg);
@@ -325,7 +334,7 @@ public class RetrieveTransactionsTask extends
 
                             state = ParserState.EXPECTING_TRANSACTION;
                             L(String.format("transaction %s parsed → expecting transaction",
-                                    transaction.getId()));
+                                    transaction.getLedgerId()));
 
 // sounds like a good idea, but transaction-1 may not be the first one chronologically
 // for example, when you add the initial seeding transaction after entering some others
@@ -340,8 +349,9 @@ public class RetrieveTransactionsTask extends
                             LedgerTransactionAccount lta = parseTransactionAccountLine(line);
                             if (lta != null) {
                                 transaction.addAccount(lta);
-                                L(String.format(Locale.ENGLISH, "%d: %s = %s", transaction.getId(),
-                                        lta.getAccountName(), lta.getAmount()));
+                                L(String.format(Locale.ENGLISH, "%d: %s = %s",
+                                        transaction.getLedgerId(), lta.getAccountName(),
+                                        lta.getAmount()));
                             }
                             else
                                 throw new IllegalStateException(
@@ -384,7 +394,7 @@ public class RetrieveTransactionsTask extends
     }
     private List<LedgerAccount> retrieveAccountList()
             throws IOException, HTTPException, ApiNotSupportedException {
-        final API apiVersion = profile.getApiVersion();
+        final API apiVersion = API.valueOf(profile.getApiVersion());
         if (apiVersion.equals(API.auto)) {
             return retrieveAccountListAnyVersion();
         }
@@ -430,9 +440,6 @@ public class RetrieveTransactionsTask extends
         SQLiteDatabase db = App.getDatabase();
         ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
-        HashMap<String, LedgerAccount> currentMap = new HashMap<>();
-        for (LedgerAccount acc : prevAccounts)
-            currentMap.put(acc.getName(), acc);
         throwIfCancelled();
         try (InputStream resp = http.getInputStream()) {
             throwIfCancelled();
@@ -452,20 +459,11 @@ public class RetrieveTransactionsTask extends
             throwIfCancelled();
         }
 
-        // the current account tree may have changed, update the new-to be tree to match
-        for (LedgerAccount acc : list) {
-            LedgerAccount prevData = currentMap.get(acc.getName());
-            if (prevData != null) {
-                acc.setExpanded(prevData.isExpanded());
-                acc.setAmountsExpanded(prevData.amountsExpanded());
-            }
-        }
-
         return list;
     }
     private List<LedgerTransaction> retrieveTransactionList()
             throws ParseException, HTTPException, IOException, ApiNotSupportedException {
-        final API apiVersion = profile.getApiVersion();
+        final API apiVersion = API.valueOf(profile.getApiVersion());
         if (apiVersion.equals(API.auto)) {
             return retrieveTransactionListAnyVersion();
         }
@@ -552,7 +550,7 @@ public class RetrieveTransactionsTask extends
                         .compareTo(o1.getDate());
             if (res != 0)
                 return res;
-            return Long.compare(o2.getId(), o1.getId());
+            return Long.compare(o2.getLedgerId(), o1.getLedgerId());
         });
         return trList;
     }
@@ -579,7 +577,10 @@ public class RetrieveTransactionsTask extends
                 transactions = new ArrayList<>();
                 retrieveTransactionListLegacy(accounts, transactions);
             }
-            mainModel.setAndStoreAccountAndTransactionListFromWeb(accounts, transactions);
+
+            storeAccountsAndTransactions(accounts, transactions);
+
+            mainModel.updateDisplayedTransactionsFromWeb(transactions);
 
             return new Result(accounts, transactions);
         }
@@ -615,6 +616,55 @@ public class RetrieveTransactionsTask extends
         finally {
             Data.backgroundTaskFinished();
         }
+    }
+    @Transaction
+    private void storeAccountsAndTransactions(List<LedgerAccount> accounts,
+                                              List<LedgerTransaction> transactions) {
+        AccountDAO accDao = DB.get()
+                              .getAccountDAO();
+        TransactionDAO trDao = DB.get()
+                                 .getTransactionDAO();
+        TransactionAccountDAO trAccDao = DB.get()
+                                           .getTransactionAccountDAO();
+        AccountValueDAO valDao = DB.get()
+                                   .getAccountValueDAO();
+
+        final List<AccountWithAmounts> list = new ArrayList<>();
+        for (LedgerAccount acc : accounts) {
+            final AccountWithAmounts a = acc.toDBOWithAmounts();
+            Account existing = accDao.getByNameSync(profile.getId(), acc.getName());
+            if (existing != null) {
+                a.account.setExpanded(existing.isExpanded());
+                a.account.setAmountsExpanded(existing.isAmountsExpanded());
+                a.account.setId(
+                        existing.getId()); // not strictly needed, but since we have it anyway...
+            }
+
+            list.add(a);
+        }
+        accDao.storeAccountsSync(list, profile.getId());
+
+        long trGen = trDao.getGenerationSync(profile.getId());
+        for (LedgerTransaction tr : transactions) {
+            TransactionWithAccounts tran = tr.toDBO();
+            tran.transaction.setGeneration(trGen);
+            tran.transaction.setProfileId(profile.getId());
+
+            tran.transaction.setId(trDao.insertSync(tran.transaction));
+
+            for (TransactionAccount trAcc : tran.accounts) {
+                trAcc.setGeneration(trGen);
+                trAcc.setTransactionId(tran.transaction.getId());
+                trAcc.setId(trAccDao.insertSync(trAcc));
+            }
+        }
+
+        trDao.purgeOldTransactionsSync(profile.getId(), trGen);
+
+        DB.get()
+          .getOptionDAO()
+          .insertSync(new Option(profile.getId(), MLDB.OPT_LAST_SCRAPE,
+                  String.valueOf((new Date()).getTime())));
     }
     public void throwIfCancelled() {
         if (isCancelled())

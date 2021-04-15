@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
 import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.AccountListItem;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -104,10 +105,12 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             model.scheduleTransactionListRetrieval();
         });
 
+        Data.observeProfile(this, this::onProfileChanged);
+    }
+    private void onProfileChanged(Profile profile) {
         DB.get()
           .getAccountDAO()
-          .getAllWithAmounts(Data.getProfile()
-                                 .getId())
+          .getAllWithAmounts(profile.getId())
           .observe(getViewLifecycleOwner(), list -> AsyncTask.execute(() -> {
               List<AccountListItem> adapterList = new ArrayList<>();
               adapterList.add(new AccountListItem.Header(Data.lastAccountsUpdateText));

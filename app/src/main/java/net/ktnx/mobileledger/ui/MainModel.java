@@ -27,23 +27,17 @@ import androidx.lifecycle.ViewModel;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.async.TransactionAccumulator;
 import net.ktnx.mobileledger.async.UpdateTransactionsTask;
-import net.ktnx.mobileledger.model.AccountListItem;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.model.TransactionListItem;
-import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class MainModel extends ViewModel {
     public final MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
@@ -51,23 +45,12 @@ public class MainModel extends ViewModel {
     private final MutableLiveData<String> accountFilter = new MutableLiveData<>();
     private final MutableLiveData<List<TransactionListItem>> displayedTransactions =
             new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<List<AccountListItem>> displayedAccounts =
-            new MutableLiveData<>();
-    private final Locker accountsLocker = new Locker();
     private final MutableLiveData<String> updateError = new MutableLiveData<>();
-    private MobileLedgerProfile profile;
-    private final List<LedgerAccount> allAccounts = new ArrayList<>();
     private SimpleDate firstTransactionDate;
     private SimpleDate lastTransactionDate;
     transient private RetrieveTransactionsTask retrieveTransactionsTask;
     transient private Thread displayedAccountsUpdater;
     private TransactionsDisplayedFilter displayedTransactionsUpdater;
-    private void setLastUpdateStamp(long transactionCount) {
-        debug("db", "Updating transaction value stamp");
-        Date now = new Date();
-        profile.setLongOption(MLDB.OPT_LAST_SCRAPE, now.getTime());
-        Data.lastUpdateDate.postValue(now);
-    }
     public void scheduleTransactionListReload() {
         UpdateTransactionsTask task = new UpdateTransactionsTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this);
@@ -78,16 +61,12 @@ public class MainModel extends ViewModel {
     public LiveData<String> getUpdateError() {
         return updateError;
     }
-    public void setProfile(MobileLedgerProfile profile) {
-        stopTransactionsRetrieval();
-        this.profile = profile;
-    }
     public LiveData<List<TransactionListItem>> getDisplayedTransactions() {
         return displayedTransactions;
     }
-    public void setDisplayedTransactions(List<TransactionListItem> list, int transactionCount) {
+    public void setDisplayedTransactions(List<TransactionListItem> list) {
         displayedTransactions.postValue(list);
-        Data.lastUpdateTransactionCount.postValue(transactionCount);
+        Data.lastUpdateTransactionCount.postValue(list.size());
     }
     public SimpleDate getFirstTransactionDate() {
         return firstTransactionDate;
@@ -124,9 +103,9 @@ public class MainModel extends ViewModel {
             Logger.debug("db", "Ignoring request for transaction retrieval - already active");
             return;
         }
-        MobileLedgerProfile profile = Data.getProfile();
+        Profile profile = Data.getProfile();
 
-        retrieveTransactionsTask = new RetrieveTransactionsTask(this, profile, allAccounts);
+        retrieveTransactionsTask = new RetrieveTransactionsTask(this, profile);
         Logger.debug("db", "Created a background transaction retrieval task");
 
         retrieveTransactionsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -138,21 +117,6 @@ public class MainModel extends ViewModel {
     public void transactionRetrievalDone() {
         retrieveTransactionsTask = null;
     }
-    public synchronized Locker lockAccountsForWriting() {
-        accountsLocker.lockForWriting();
-        return accountsLocker;
-    }
-    public LiveData<List<AccountListItem>> getDisplayedAccounts() {
-        return displayedAccounts;
-    }
-    public synchronized void setAndStoreAccountAndTransactionListFromWeb(
-            List<LedgerAccount> accounts, List<LedgerTransaction> transactions) {
-        profile.storeAccountAndTransactionListAsync(accounts, transactions);
-
-        setLastUpdateStamp(transactions.size());
-
-        updateDisplayedTransactionsFromWeb(transactions);
-    }
     synchronized public void updateDisplayedTransactionsFromWeb(List<LedgerTransaction> list) {
         if (displayedTransactionsUpdater != null) {
             displayedTransactionsUpdater.interrupt();
@@ -163,7 +127,6 @@ public class MainModel extends ViewModel {
     public void clearUpdateError() {
         updateError.postValue(null);
     }
-    public void clearAccounts() { displayedAccounts.postValue(new ArrayList<>()); }
     public void clearTransactions() {
         displayedTransactions.setValue(new ArrayList<>());
     }

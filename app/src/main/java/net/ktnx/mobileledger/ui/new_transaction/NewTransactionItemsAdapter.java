@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.databinding.NewTransactionAccountRowBinding;
 import net.ktnx.mobileledger.databinding.NewTransactionHeaderRowBinding;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.List;
@@ -61,9 +61,9 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                     return oldItem.equalContents(newItem);
                 }
             });
-    private MobileLedgerProfile mProfile;
+    private Profile mProfile;
     private int checkHoldCounter = 0;
-    NewTransactionItemsAdapter(NewTransactionModel viewModel, MobileLedgerProfile profile) {
+    NewTransactionItemsAdapter(NewTransactionModel viewModel, Profile profile) {
         super();
         setHasStableIds(true);
         model = viewModel;
@@ -139,7 +139,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                      .get(position)
                      .getId();
     }
-    public void setProfile(MobileLedgerProfile profile) {
+    public void setProfile(Profile profile) {
         mProfile = profile;
     }
     @NonNull

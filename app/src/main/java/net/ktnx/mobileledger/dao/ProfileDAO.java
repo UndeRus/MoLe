@@ -17,19 +17,39 @@
 
 package net.ktnx.mobileledger.dao;
 
+import android.os.AsyncTask;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import net.ktnx.mobileledger.db.Profile;
 
+import java.util.List;
+
 @Dao
 public abstract class ProfileDAO extends BaseDAO<Profile> {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract long insertSync(Profile item);
+
+    @Transaction
+    public long insertLastSync(Profile item) {
+        int count = getProfileCountSync();
+        item.setOrderNo(count + 1);
+        return insertSync(item);
+    }
+    public void insertLast(Profile item, OnInsertedReceiver onInsertedReceiver) {
+        AsyncTask.execute(() -> {
+            long id = insertLastSync(item);
+            if (onInsertedReceiver != null)
+                onInsertedReceiver.onInsert(id);
+        });
+    }
 
     @Update
     abstract void updateSync(Profile item);
@@ -43,6 +63,32 @@ public abstract class ProfileDAO extends BaseDAO<Profile> {
     @Query("SELECT * FROM profiles WHERE id=:profileId")
     public abstract LiveData<Profile> getById(long profileId);
 
+    @Query("SELECT * FROM profiles ORDER BY order_no")
+    public abstract List<Profile> getAllOrderedSync();
+
+    @Query("SELECT * FROM profiles ORDER BY order_no")
+    public abstract LiveData<List<Profile>> getAllOrdered();
+
     @Query("SELECT * FROM profiles LIMIT 1")
     public abstract Profile getAnySync();
+
+    @Query("SELECT MAX(order_no) FROM profiles")
+    public abstract int getProfileCountSync();
+    public void updateOrderSync(List<Profile> list) {
+        if (list == null)
+            list = getAllOrderedSync();
+        int order = 1;
+        for (Profile p : list) {
+            p.setOrderNo(order++);
+            updateSync(p);
+        }
+    }
+    public void updateOrder(List<Profile> list, Runnable onDone) {
+        AsyncTask.execute(() -> {
+            updateOrderSync(list);
+            if (onDone != null)
+                onDone.run();
+
+        });
+    }
 }

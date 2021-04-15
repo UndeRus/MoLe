@@ -177,8 +177,8 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
         b.currencyButton.setOnClickListener(v -> {
             CurrencySelectorFragment cpf = new CurrencySelectorFragment();
             cpf.showPositionAndPadding();
-            cpf.setOnCurrencySelectedListener(c -> adapter.setItemCurrency(getAdapterPosition(),
-                    (c == null) ? null : c.getName()));
+            cpf.setOnCurrencySelectedListener(
+                    c -> adapter.setItemCurrency(getAdapterPosition(), c));
             cpf.show(activity.getSupportFragmentManager(), "currency-selector");
         });
 

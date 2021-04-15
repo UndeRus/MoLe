@@ -30,8 +30,7 @@ import org.jetbrains.annotations.NotNull;
 @Entity(tableName = "templates")
 public class TemplateHeader extends TemplateBase {
     @PrimaryKey(autoGenerate = true)
-    @NonNull
-    private Long id;
+    private long id;
     @ColumnInfo(name = "name")
     @NonNull
     private String name;
@@ -127,11 +126,10 @@ public class TemplateHeader extends TemplateBase {
     public void setDateDay(Integer dateDay) {
         this.dateDay = dateDay;
     }
-    @NonNull
-    public Long getId() {
+    public long getId() {
         return id;
     }
-    public void setId(@NonNull Long id) {
+    public void setId(long id) {
         this.id = id;
     }
     @NonNull
@@ -203,7 +201,7 @@ public class TemplateHeader extends TemplateBase {
     }
     public TemplateHeader createDuplicate() {
         TemplateHeader dup = new TemplateHeader(this);
-        dup.id = null;
+        dup.id = 0;
 
         return dup;
     }

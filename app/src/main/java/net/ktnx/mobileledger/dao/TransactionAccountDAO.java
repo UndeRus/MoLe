@@ -25,35 +25,24 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import net.ktnx.mobileledger.db.Currency;
+import net.ktnx.mobileledger.db.TransactionAccount;
 
 import java.util.List;
 
 @Dao
-public abstract class CurrencyDAO extends BaseDAO<Currency> {
+public abstract class TransactionAccountDAO extends BaseDAO<TransactionAccount> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract long insertSync(Currency item);
+    public abstract long insertSync(TransactionAccount item);
 
     @Update
-    abstract void updateSync(Currency item);
+    public abstract void updateSync(TransactionAccount item);
 
     @Delete
-    public abstract void deleteSync(Currency item);
+    public abstract void deleteSync(TransactionAccount item);
 
-    @Query("SELECT * FROM currencies")
-    public abstract LiveData<List<Currency>> getAll();
+    @Delete
+    public abstract void deleteSync(List<TransactionAccount> items);
 
-    @Query("SELECT * FROM currencies WHERE id = :id")
-    abstract LiveData<Currency> getById(long id);
-
-    @Query("SELECT * FROM currencies WHERE id = :id")
-    public abstract Currency getByIdSync(long id);
-
-    @Query("SELECT * FROM currencies WHERE name = :name")
-    public abstract LiveData<Currency> getByName(String name);
-
-//    not useful for now
-//    @Transaction
-//    @Query("SELECT * FROM patterns")
-//    List<PatternWithAccounts> getPatternsWithAccounts();
+    @Query("SELECT * FROM transaction_accounts WHERE id = :id")
+    public abstract LiveData<TransactionAccount> getById(long id);
 }

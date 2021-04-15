@@ -64,7 +64,7 @@ public class Transaction {
     @ColumnInfo
     private String comment;
     @ColumnInfo
-    private int generation = 0;
+    private long generation = 0;
     public long getLedgerId() {
         return ledgerId;
     }
@@ -119,10 +119,10 @@ public class Transaction {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public int getGeneration() {
+    public long getGeneration() {
         return generation;
     }
-    public void setGeneration(int generation) {
+    public void setGeneration(long generation) {
         this.generation = generation;
     }
 

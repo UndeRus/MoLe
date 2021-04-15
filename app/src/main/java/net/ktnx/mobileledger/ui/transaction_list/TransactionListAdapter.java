@@ -75,8 +75,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                                        .equals(newItem.getDate()));
                     case TRANSACTION:
                         return oldItem.getTransaction()
-                                      .getId() == newItem.getTransaction()
-                                                         .getId();
+                                      .getLedgerId() == newItem.getTransaction()
+                                                               .getLedgerId();
                     case HEADER:
                         return true;    // there can be only one header
                     default:

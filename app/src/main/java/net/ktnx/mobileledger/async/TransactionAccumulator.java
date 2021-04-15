@@ -30,7 +30,6 @@ public class TransactionAccumulator {
     private SimpleDate earliestDate, latestDate;
     private SimpleDate lastDate;
     private boolean done;
-    private int transactionCount = 0;
     public TransactionAccumulator(MainModel model) {
         this.model = model;
 
@@ -55,11 +54,10 @@ public class TransactionAccumulator {
         list.add(new TransactionListItem(transaction));
 
         lastDate = date;
-        transactionCount++;
     }
     public void done() {
         done = true;
-        model.setDisplayedTransactions(list, transactionCount);
+        model.setDisplayedTransactions(list);
         model.setFirstTransactionDate(earliestDate);
         model.setLastTransactionDate(latestDate);
     }

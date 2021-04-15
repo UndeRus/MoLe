@@ -22,9 +22,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
@@ -32,7 +32,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
     protected String doInBackground(MainModel[] model) {
-        final MobileLedgerProfile profile = Data.getProfile();
+        final Profile profile = Data.getProfile();
 
         long profile_id = profile.getId();
         Data.backgroundTaskStarted();

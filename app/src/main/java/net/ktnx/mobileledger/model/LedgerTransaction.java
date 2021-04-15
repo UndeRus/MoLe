@@ -24,6 +24,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.db.Profile;
+import net.ktnx.mobileledger.db.Transaction;
+import net.ktnx.mobileledger.db.TransactionAccount;
+import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.utils.Digest;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -53,38 +57,77 @@ public class LedgerTransaction {
         return Float.compare(o1.getAmount(), o2.getAmount());
     };
     private final long profile;
-    private final long id;
+    private final long ledgerId;
     private final List<LedgerTransactionAccount> accounts;
+    private long dbId;
     private SimpleDate date;
     private String description;
     private String comment;
     private String dataHash;
     private boolean dataLoaded;
-    public LedgerTransaction(long id, String dateString, String description) throws ParseException {
-        this(id, Globals.parseLedgerDate(dateString), description);
+    public LedgerTransaction(long ledgerId, String dateString, String description)
+            throws ParseException {
+        this(ledgerId, Globals.parseLedgerDate(dateString), description);
     }
-    public LedgerTransaction(long id, SimpleDate date, String description,
-                             MobileLedgerProfile profile) {
+    public LedgerTransaction(TransactionWithAccounts dbo) {
+        this(dbo.transaction.getLedgerId(), dbo.transaction.getProfileId());
+        dbId = dbo.transaction.getId();
+        date = new SimpleDate(dbo.transaction.getYear(), dbo.transaction.getMonth(),
+                dbo.transaction.getDay());
+        description = dbo.transaction.getDescription();
+        comment = dbo.transaction.getComment();
+        dataHash = dbo.transaction.getDataHash();
+        if (dbo.accounts != null)
+            for (TransactionAccount acc : dbo.accounts) {
+                accounts.add(new LedgerTransactionAccount(acc));
+            }
+        dataLoaded = true;
+    }
+    public TransactionWithAccounts toDBO() {
+        TransactionWithAccounts o = new TransactionWithAccounts();
+        o.transaction = new Transaction();
+        o.transaction.setId(dbId);
+        o.transaction.setProfileId(profile);
+        o.transaction.setLedgerId(ledgerId);
+        o.transaction.setYear(date.year);
+        o.transaction.setMonth(date.month);
+        o.transaction.setDay(date.day);
+        o.transaction.setDescription(description);
+        o.transaction.setComment(comment);
+        fillDataHash();
+        o.transaction.setDataHash(dataHash);
+
+        o.accounts = new ArrayList<>();
+        int orderNo = 1;
+        for (LedgerTransactionAccount acc : accounts) {
+            TransactionAccount a = acc.toDBO();
+            a.setOrderNo(orderNo++);
+            a.setTransactionId(dbId);
+            o.accounts.add(a);
+        }
+        return o;
+    }
+    public LedgerTransaction(long ledgerId, SimpleDate date, String description, Profile profile) {
         this.profile = profile.getId();
-        this.id = id;
+        this.ledgerId = ledgerId;
         this.date = date;
         this.description = description;
         this.accounts = new ArrayList<>();
         this.dataHash = null;
         dataLoaded = false;
     }
-    public LedgerTransaction(long id, SimpleDate date, String description) {
-        this(id, date, description, Data.getProfile());
+    public LedgerTransaction(long ledgerId, SimpleDate date, String description) {
+        this(ledgerId, date, description, Data.getProfile());
     }
     public LedgerTransaction(SimpleDate date, String description) {
         this(0, date, description);
     }
-    public LedgerTransaction(int id) {
-        this(id, (SimpleDate) null, null);
+    public LedgerTransaction(int ledgerId) {
+        this(ledgerId, (SimpleDate) null, null);
     }
-    public LedgerTransaction(int id, long profileId) {
+    public LedgerTransaction(long ledgerId, long profileId) {
         this.profile = profileId;
-        this.id = id;
+        this.ledgerId = ledgerId;
         this.date = null;
         this.description = null;
         this.accounts = new ArrayList<>();
@@ -125,8 +168,8 @@ public class LedgerTransaction {
     public void setComment(String comment) {
         this.comment = comment;
     }
-    public long getId() {
-        return id;
+    public long getLedgerId() {
+        return ledgerId;
     }
     protected void fillDataHash() {
         loadData(App.getDatabase());
@@ -137,7 +180,7 @@ public class LedgerTransaction {
             StringBuilder data = new StringBuilder();
             data.append("ver1");
             data.append(profile);
-            data.append(getId());
+            data.append(getLedgerId());
             data.append('\0');
             data.append(getDescription());
             data.append('\0');
@@ -169,7 +212,7 @@ public class LedgerTransaction {
 
         try (Cursor cTr = db.rawQuery(
                 "SELECT year, month, day, description, comment from transactions WHERE id=?",
-                new String[]{String.valueOf(id)}))
+                new String[]{String.valueOf(ledgerId)}))
         {
             if (cTr.moveToFirst()) {
                 date = new SimpleDate(cTr.getInt(0), cTr.getInt(1), cTr.getInt(2));
@@ -181,7 +224,7 @@ public class LedgerTransaction {
                 try (Cursor cAcc = db.rawQuery(
                         "SELECT account_name, amount, currency, comment FROM " +
                         "transaction_accounts WHERE transaction_id = ?",
-                        new String[]{String.valueOf(id)}))
+                        new String[]{String.valueOf(ledgerId)}))
                 {
                     while (cAcc.moveToNext()) {
 //                        debug("transactions",

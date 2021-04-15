@@ -34,6 +34,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
@@ -51,12 +52,14 @@ import com.google.android.material.snackbar.Snackbar;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.databinding.ActivityMainBinding;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
 import net.ktnx.mobileledger.ui.new_transaction.NewTransactionActivity;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.ui.profiles.ProfilesRecyclerViewAdapter;
 import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
@@ -89,7 +92,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
     private DrawerLayout.SimpleDrawerListener drawerListener;
     private ActionBarDrawerToggle barDrawerToggle;
     private ViewPager2.OnPageChangeCallback pageChangeCallback;
-    private MobileLedgerProfile profile;
+    private Profile profile;
     private MainModel mainModel;
     private ActivityMainBinding b;
     private int fabVerticalOffset;
@@ -150,6 +153,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         Data.observeProfile(this, this::onProfileChanged);
 
         Data.profiles.observe(this, this::onProfileListChanged);
+
         Data.backgroundTaskProgress.observe(this, this::onRetrieveProgress);
         Data.backgroundTasksRunning.observe(this, this::onRetrieveRunningChanged);
 
@@ -208,13 +212,11 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                      .setValue(savedInstanceState.getString(STATE_ACC_FILTER, null));
         }
 
-        b.btnNoProfilesAdd.setOnClickListener(
-                v -> MobileLedgerProfile.startEditProfileActivity(this, null));
+        b.btnNoProfilesAdd.setOnClickListener(v -> ProfileDetailActivity.start(this, null));
 
         b.btnAddTransaction.setOnClickListener(this::fabNewTransactionClicked);
 
-        b.navNewProfileButton.setOnClickListener(
-                v -> MobileLedgerProfile.startEditProfileActivity(this, null));
+        b.navNewProfileButton.setOnClickListener(v -> ProfileDetailActivity.start(this, null));
 
         b.transactionListCancelDownload.setOnClickListener(this::onStopTransactionRefreshClick);
 
@@ -332,18 +334,18 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
             mainModel.scheduleTransactionListRetrieval();
         }
     }
-    private void createShortcuts(List<MobileLedgerProfile> list) {
+    private void createShortcuts(List<Profile> list) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1)
             return;
 
         ShortcutManager sm = getSystemService(ShortcutManager.class);
         List<ShortcutInfo> shortcuts = new ArrayList<>();
         int i = 0;
-        for (MobileLedgerProfile p : list) {
+        for (Profile p : list) {
             if (shortcuts.size() >= sm.getMaxShortcutCountPerActivity())
                 break;
 
-            if (!p.isPostingPermitted())
+            if (!p.permitPosting())
                 continue;
 
             final ShortcutInfo.Builder builder =
@@ -356,7 +358,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                                              ProfileThemedActivity.PARAM_PROFILE_ID, p.getId())
                                                                           .putExtra(
                                                                                   ProfileThemedActivity.PARAM_THEME,
-                                                                                  p.getThemeHue()))
+                                                                                  p.getTheme()))
                                      .setRank(i)
                                      .build();
             shortcuts.add(si);
@@ -364,7 +366,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
         sm.setDynamicShortcuts(shortcuts);
     }
-    private void onProfileListChanged(List<MobileLedgerProfile> newList) {
+    private void onProfileListChanged(List<Profile> newList) {
         if ((newList == null) || newList.isEmpty()) {
             b.noProfilesLayout.setVisibility(View.VISIBLE);
             b.mainAppLayout.setVisibility(View.GONE);
@@ -378,35 +380,31 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                 (int) (getResources().getDimension(R.dimen.thumb_row_height) * newList.size()));
 
         Logger.debug("profiles", "profile list changed");
-        mProfileListAdapter.notifyDataSetChanged();
+        mProfileListAdapter.setProfileList(newList);
 
         createShortcuts(newList);
     }
     /**
      * called when the current profile has changed
      */
-    private void onProfileChanged(MobileLedgerProfile profile) {
+    private void onProfileChanged(@Nullable Profile newProfile) {
         if (this.profile == null) {
-            if (profile == null)
+            if (newProfile == null)
                 return;
         }
         else {
-            if (this.profile.equals(profile))
+            if (this.profile.equals(newProfile))
                 return;
         }
 
-        boolean haveProfile = profile != null;
+        boolean haveProfile = newProfile != null;
 
         if (haveProfile)
-            setTitle(profile.getName());
+            setTitle(newProfile.getName());
         else
             setTitle(R.string.app_name);
 
-        mainModel.setProfile(profile);
-
-        this.profile = profile;
-
-        int newProfileTheme = haveProfile ? profile.getThemeHue() : -1;
+        int newProfileTheme = haveProfile ? newProfile.getTheme() : -1;
         if (newProfileTheme != Colors.profileThemeId) {
             Logger.debug("profiles",
                     String.format(Locale.ENGLISH, "profile theme %d → %d", Colors.profileThemeId,
@@ -418,19 +416,18 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
             return;
         }
 
+        final boolean sameProfileId = (newProfile != null) && (this.profile != null) &&
+                                      this.profile.getId() == newProfile.getId();
+
+        this.profile = newProfile;
+
         b.noProfilesLayout.setVisibility(haveProfile ? View.GONE : View.VISIBLE);
         b.pagerLayout.setVisibility(haveProfile ? View.VISIBLE : View.VISIBLE);
 
         mProfileListAdapter.notifyDataSetChanged();
 
-        mainModel.clearAccounts();
-        mainModel.clearTransactions();
-
         if (haveProfile) {
-            Logger.debug("transactions", "requesting list reload");
-            mainModel.scheduleTransactionListReload();
-
-            if (profile.isPostingPermitted()) {
+            if (newProfile.permitPosting()) {
                 b.toolbar.setSubtitle(null);
                 b.btnAddTransaction.show();
             }
@@ -445,6 +442,21 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
 
         updateLastUpdateTextFromDB();
+
+        if (sameProfileId) {
+            Logger.debug(TAG, String.format(Locale.ROOT, "Short-cut profile 'changed' to %d",
+                    newProfile.getId()));
+            return;
+        }
+
+        mainModel.stopTransactionsRetrieval();
+
+        mainModel.clearTransactions();
+
+        if (haveProfile) {
+            Logger.debug("transactions", "requesting list reload");
+            mainModel.scheduleTransactionListReload();
+        }
     }
     private void profileThemeChanged() {
         // un-hook all observed LiveData
@@ -460,7 +472,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
     public void fabNewTransactionClicked(View view) {
         Intent intent = new Intent(this, NewTransactionActivity.class);
         intent.putExtra(ProfileThemedActivity.PARAM_PROFILE_ID, profile.getId());
-        intent.putExtra(ProfileThemedActivity.PARAM_THEME, profile.getThemeHue());
+        intent.putExtra(ProfileThemedActivity.PARAM_THEME, profile.getTheme());
         startActivity(intent);
         overridePendingTransition(R.anim.slide_in_up, R.anim.dummy);
     }
@@ -523,18 +535,30 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         if (profile == null)
             return;
 
-        long lastUpdate = profile.getLongOption(MLDB.OPT_LAST_SCRAPE, 0L);
+        DB.get()
+          .getOptionDAO()
+          .load(profile.getId(), MLDB.OPT_LAST_SCRAPE)
+          .observe(this, opt -> {
+              long lastUpdate = 0;
+              if (opt != null) {
+                  try {
+                      lastUpdate = Long.parseLong(opt.getValue());
+                  }
+                  catch (NumberFormatException ex) {
+                      Logger.debug(TAG, String.format("Error parsing '%s' as long", opt.getValue()),
+                              ex);
+                  }
+              }
 
-        Logger.debug("transactions", String.format(Locale.ENGLISH, "Last update = %d", lastUpdate));
-        if (lastUpdate == 0) {
-            Data.lastUpdateDate.postValue(null);
-        }
-        else {
-            Data.lastUpdateDate.postValue(new Date(lastUpdate));
-        }
+              if (lastUpdate == 0) {
+                  Data.lastUpdateDate.postValue(null);
+              }
+              else {
+                  Data.lastUpdateDate.postValue(new Date(lastUpdate));
+              }
 
-        scheduleDataRetrievalIfStale(lastUpdate);
-
+              scheduleDataRetrievalIfStale(lastUpdate);
+          });
     }
     private void refreshLastUpdateInfo() {
         final int formatFlags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
@@ -601,7 +625,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                 builder.setMessage(error);
                 builder.setPositiveButton(R.string.btn_profile_options, (dialog, which) -> {
                     Logger.debug("error", "will start profile editor");
-                    MobileLedgerProfile.startEditProfileActivity(this, profile);
+                    ProfileDetailActivity.start(this, profile);
                 });
                 builder.create()
                        .show();
@@ -643,7 +667,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
     }
     public void fabShouldShow() {
-        if ((profile != null) && profile.isPostingPermitted() && !b.drawerLayout.isOpen())
+        if ((profile != null) && profile.permitPosting() && !b.drawerLayout.isOpen())
             fabManager.showFab();
     }
     @Override

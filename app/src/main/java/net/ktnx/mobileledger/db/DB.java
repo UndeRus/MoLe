@@ -37,6 +37,7 @@ import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
+import net.ktnx.mobileledger.dao.TransactionAccountDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.utils.Logger;
 
@@ -205,6 +206,8 @@ abstract public class DB extends RoomDatabase {
     public abstract AccountValueDAO getAccountValueDAO();
 
     public abstract TransactionDAO getTransactionDAO();
+
+    public abstract TransactionAccountDAO getTransactionAccountDAO();
 
     public abstract OptionDAO getOptionDAO();
 

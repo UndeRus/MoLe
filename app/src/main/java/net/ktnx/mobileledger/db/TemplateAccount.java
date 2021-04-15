@@ -38,11 +38,9 @@ import org.jetbrains.annotations.NotNull;
 })
 public class TemplateAccount extends TemplateBase {
     @PrimaryKey(autoGenerate = true)
-    @NotNull
-    private Long id;
-    @NonNull
+    private long id;
     @ColumnInfo(name = "template_id")
-    private Long templateId;
+    private long templateId;
     @ColumnInfo(name = "acc")
     private String accountName;
     @ColumnInfo(name = "position")
@@ -50,8 +48,8 @@ public class TemplateAccount extends TemplateBase {
     private Long position;
     @ColumnInfo(name = "acc_match_group")
     private Integer accountNameMatchGroup;
-    @ColumnInfo(name = "currency")
-    private Integer currency;
+    @ColumnInfo
+    private Long currency;
     @ColumnInfo(name = "currency_match_group")
     private Integer currencyMatchGroup;
     @ColumnInfo(name = "amount")
@@ -83,10 +81,10 @@ public class TemplateAccount extends TemplateBase {
         accountCommentMatchGroup = o.accountCommentMatchGroup;
         negateAmount = o.negateAmount;
     }
-    public Long getId() {
+    public long getId() {
         return id;
     }
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
     public Boolean getNegateAmount() {
@@ -124,11 +122,18 @@ public class TemplateAccount extends TemplateBase {
     public void setAccountNameMatchGroup(Integer accountNameMatchGroup) {
         this.accountNameMatchGroup = accountNameMatchGroup;
     }
-    public Integer getCurrency() {
+    public Long getCurrency() {
         return currency;
     }
-    public void setCurrency(Integer currency) {
+    public void setCurrency(Long currency) {
         this.currency = currency;
+    }
+    public Currency getCurrencyObject() {
+        if (currency == null || currency <= 0)
+            return null;
+        return DB.get()
+                 .getCurrencyDAO()
+                 .getByIdSync(currency);
     }
     public Integer getCurrencyMatchGroup() {
         return currencyMatchGroup;
@@ -160,10 +165,10 @@ public class TemplateAccount extends TemplateBase {
     public void setAccountCommentMatchGroup(Integer accountCommentMatchGroup) {
         this.accountCommentMatchGroup = accountCommentMatchGroup;
     }
-    public TemplateAccount createDuplicate() {
+    public TemplateAccount createDuplicate(TemplateHeader header) {
         TemplateAccount dup = new TemplateAccount(this);
-        dup.id = null;
-        dup.templateId = null;
+        dup.id = 0;
+        dup.templateId = header.getId();
 
         return dup;
     }

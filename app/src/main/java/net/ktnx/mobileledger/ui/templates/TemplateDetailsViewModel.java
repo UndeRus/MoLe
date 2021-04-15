@@ -218,7 +218,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                                             .getTemplateDAO();
             TemplateHeader dbHeader = modelHeader.toDBO();
             if (newPattern) {
-                dbHeader.setId(null);
+                dbHeader.setId(0L);
                 dbHeader.setId(mPatternId = headerDAO.insertSync(dbHeader));
             }
             else
@@ -239,7 +239,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 dbAccount.setTemplateId(mPatternId);
                 dbAccount.setPosition(i);
                 if (dbAccount.getId() < 0) {
-                    dbAccount.setId(null);
+                    dbAccount.setId(0);
                     dbAccount.setId(taDAO.insertSync(dbAccount));
                 }
                 else
@@ -255,6 +255,10 @@ public class TemplateDetailsViewModel extends ViewModel {
     }
     private ArrayList<TemplateDetailsItem> copyItems() {
         List<TemplateDetailsItem> oldList = items.getValue();
+
+        if (oldList == null)
+            return new ArrayList<>();
+
         ArrayList<TemplateDetailsItem> result = new ArrayList<>(oldList.size());
 
         for (TemplateDetailsItem item : oldList) {

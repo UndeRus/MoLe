@@ -19,7 +19,7 @@ package net.ktnx.mobileledger.utils;
 
 import androidx.annotation.NonNull;
 
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.db.Profile;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,9 +32,9 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public final class NetworkUtil {
     private static final int thirtySeconds = 30000;
     @NotNull
-    public static HttpURLConnection prepareConnection(@NonNull MobileLedgerProfile profile,
+    public static HttpURLConnection prepareConnection(@NonNull Profile profile,
                                                       @NonNull String path) throws IOException {
-        return prepareConnection(profile.getUrl(), path, profile.isAuthEnabled());
+        return prepareConnection(profile.getUrl(), path, profile.useAuthentication());
     }
     public static HttpURLConnection prepareConnection(@NonNull String url, @NonNull String path,
                                                       boolean authEnabled) throws IOException {

@@ -32,14 +32,15 @@ import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.InertMutableLiveData;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.MatchedTemplate;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -73,7 +74,7 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<Boolean> simulateSave = new InertMutableLiveData<>(false);
     private final AtomicInteger busyCounter = new AtomicInteger(0);
     private final MutableLiveData<Boolean> busyFlag = new InertMutableLiveData<>(false);
-    private final Observer<MobileLedgerProfile> profileObserver = profile -> {
+    private final Observer<Profile> profileObserver = profile -> {
         showCurrency.postValue(profile.getShowCommodityByDefault());
         showComments.postValue(profile.getShowCommentsByDefault());
     };
@@ -461,23 +462,19 @@ public class NewTransactionModel extends ViewModel {
 
         return tr;
     }
-    void loadTransactionIntoModel(long profileId, int transactionId) {
+    void loadTransactionIntoModel(@NonNull TransactionWithAccounts tr) {
         List<Item> newList = new ArrayList<>();
         Item.resetIdDispenser();
-        LedgerTransaction tr;
-        MobileLedgerProfile profile = Data.getProfile(profileId);
-        if (profile == null)
-            throw new RuntimeException(String.format(
-                    "Unable to find profile %s, which is supposed to contain transaction %d",
-                    profileId, transactionId));
 
-        tr = profile.loadTransaction(transactionId);
-        TransactionHead head = new TransactionHead(tr.getDescription());
-        head.setComment(tr.getComment());
+        TransactionHead head = new TransactionHead(tr.transaction.getDescription());
+        head.setComment(tr.transaction.getComment());
 
         newList.add(head);
 
-        List<LedgerTransactionAccount> accounts = tr.getAccounts();
+        List<LedgerTransactionAccount> accounts = new ArrayList<>();
+        for (net.ktnx.mobileledger.db.TransactionAccount acc : tr.accounts) {
+            accounts.add(new LedgerTransactionAccount(acc));
+        }
 
         TransactionAccount firstNegative = null;
         TransactionAccount firstPositive = null;
@@ -526,9 +523,10 @@ public class NewTransactionModel extends ViewModel {
             moveItemLast(newList, singlePositiveIndex);
         }
 
-        setItems(newList);
-
-        noteFocusChanged(1, FocusedElement.Amount);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            setItems(newList);
+            noteFocusChanged(1, FocusedElement.Amount);
+        });
     }
     /**
      * A transaction is submittable if:

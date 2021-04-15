@@ -34,6 +34,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.NewTransactionHeaderRowBinding;
 import net.ktnx.mobileledger.db.TransactionDescriptionAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.FutureDates;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -282,7 +283,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
     }
     private void pickTransactionDate() {
         DatePickerFragment picker = new DatePickerFragment();
-        picker.setFutureDates(mProfile.getFutureDates());
+        picker.setFutureDates(FutureDates.valueOf(mProfile.getFutureDates()));
         picker.setOnDatePickedListener(this);
         picker.setCurrentDateFromText(b.newTransactionDate.getText());
         picker.show(((NewTransactionActivity) b.getRoot()

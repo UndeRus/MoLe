@@ -26,7 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.model.FutureDates;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.util.Calendar;
@@ -54,8 +54,8 @@ public class DatePickerFragment extends AppCompatDialogFragment
         else
             this.maxDate = maxDate.toDate().getTime();
     }
-    public void setFutureDates(MobileLedgerProfile.FutureDates futureDates) {
-        if (futureDates == MobileLedgerProfile.FutureDates.All) {
+    public void setFutureDates(FutureDates futureDates) {
+        if (futureDates == FutureDates.All) {
             maxDate = Long.MAX_VALUE;
         }
         else {

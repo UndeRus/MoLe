@@ -25,10 +25,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.json.API;
-import net.ktnx.mobileledger.model.Currency;
+import net.ktnx.mobileledger.model.FutureDates;
 import net.ktnx.mobileledger.model.HledgerVersion;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -48,9 +48,9 @@ public class ProfileDetailModel extends ViewModel {
     private static final String HTTPS_URL_START = "https://";
     private final MutableLiveData<String> profileName = new MutableLiveData<>();
     private final MutableLiveData<Boolean> postingPermitted = new MutableLiveData<>(true);
-    private final MutableLiveData<Currency> defaultCommodity = new MutableLiveData<>(null);
-    private final MutableLiveData<MobileLedgerProfile.FutureDates> futureDates =
-            new MutableLiveData<>(MobileLedgerProfile.FutureDates.None);
+    private final MutableLiveData<String> defaultCommodity = new MutableLiveData<>(null);
+    private final MutableLiveData<FutureDates> futureDates =
+            new MutableLiveData<>(FutureDates.None);
     private final MutableLiveData<Boolean> showCommodityByDefault = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> showCommentsByDefault = new MutableLiveData<>(true);
     private final MutableLiveData<Boolean> useAuthentication = new MutableLiveData<>(false);
@@ -97,24 +97,24 @@ public class ProfileDetailModel extends ViewModel {
     void observeShowCommentsByDefault(LifecycleOwner lfo, Observer<Boolean> o) {
         showCommentsByDefault.observe(lfo, o);
     }
-    MobileLedgerProfile.FutureDates getFutureDates() {
+    FutureDates getFutureDates() {
         return futureDates.getValue();
     }
-    void setFutureDates(MobileLedgerProfile.FutureDates newValue) {
+    void setFutureDates(FutureDates newValue) {
         if (newValue != futureDates.getValue())
             futureDates.setValue(newValue);
     }
-    void observeFutureDates(LifecycleOwner lfo, Observer<MobileLedgerProfile.FutureDates> o) {
+    void observeFutureDates(LifecycleOwner lfo, Observer<FutureDates> o) {
         futureDates.observe(lfo, o);
     }
-    Currency getDefaultCommodity() {
+    String getDefaultCommodity() {
         return defaultCommodity.getValue();
     }
-    void setDefaultCommodity(Currency newValue) {
-        if (newValue != defaultCommodity.getValue())
+    void setDefaultCommodity(String newValue) {
+        if (!Misc.equalStrings(newValue, defaultCommodity.getValue()))
             defaultCommodity.setValue(newValue);
     }
-    void observeDefaultCommodity(LifecycleOwner lfo, Observer<Currency> o) {
+    void observeDefaultCommodity(LifecycleOwner lfo, Observer<String> o) {
         defaultCommodity.observe(lfo, o);
     }
     Boolean getShowCommodityByDefault() {
@@ -223,11 +223,10 @@ public class ProfileDetailModel extends ViewModel {
     void observeDetectingHledgerVersion(LifecycleOwner lfo, Observer<Boolean> o) {
         detectingHledgerVersion.observe(lfo, o);
     }
-    void setValuesFromProfile(MobileLedgerProfile mProfile, int newProfileHue) {
-        final int profileThemeId;
+    void setValuesFromProfile(Profile mProfile) {
         if (mProfile != null) {
             profileName.setValue(mProfile.getName());
-            postingPermitted.setValue(mProfile.isPostingPermitted());
+            postingPermitted.setValue(mProfile.permitPosting());
             showCommentsByDefault.setValue(mProfile.getShowCommentsByDefault());
             showCommodityByDefault.setValue(mProfile.getShowCommodityByDefault());
             {
@@ -235,17 +234,21 @@ public class ProfileDetailModel extends ViewModel {
                 if (TextUtils.isEmpty(comm))
                     setDefaultCommodity(null);
                 else
-                    setDefaultCommodity(new Currency(-1, comm));
+                    setDefaultCommodity(comm);
             }
-            futureDates.setValue(mProfile.getFutureDates());
-            apiVersion.setValue(mProfile.getApiVersion());
+            futureDates.setValue(
+                    FutureDates.valueOf(mProfile.getFutureDates()));
+            apiVersion.setValue(API.valueOf(mProfile.getApiVersion()));
             url.setValue(mProfile.getUrl());
-            useAuthentication.setValue(mProfile.isAuthEnabled());
-            authUserName.setValue(mProfile.isAuthEnabled() ? mProfile.getAuthUserName() : "");
-            authPassword.setValue(mProfile.isAuthEnabled() ? mProfile.getAuthPassword() : "");
+            useAuthentication.setValue(mProfile.useAuthentication());
+            authUserName.setValue(mProfile.useAuthentication() ? mProfile.getAuthUser() : "");
+            authPassword.setValue(mProfile.useAuthentication() ? mProfile.getAuthPassword() : "");
             preferredAccountsFilter.setValue(mProfile.getPreferredAccountsFilter());
-            themeId.setValue(mProfile.getThemeHue());
-            detectedVersion.setValue(mProfile.getDetectedVersion());
+            themeId.setValue(mProfile.getTheme());
+            detectedVersion.setValue(mProfile.detectedVersionPre_1_19() ? new HledgerVersion(true)
+                                                                        : new HledgerVersion(
+                                                                                mProfile.getDetectedVersionMajor(),
+                                                                                mProfile.getDetectedVersionMinor()));
         }
         else {
             profileName.setValue(null);
@@ -253,32 +256,35 @@ public class ProfileDetailModel extends ViewModel {
             postingPermitted.setValue(true);
             showCommentsByDefault.setValue(true);
             showCommodityByDefault.setValue(false);
-            setFutureDates(MobileLedgerProfile.FutureDates.None);
+            setFutureDates(FutureDates.None);
             setApiVersion(API.auto);
             useAuthentication.setValue(false);
             authUserName.setValue("");
             authPassword.setValue("");
             preferredAccountsFilter.setValue(null);
-            themeId.setValue(newProfileHue);
             detectedVersion.setValue(null);
         }
     }
-    void updateProfile(MobileLedgerProfile mProfile) {
+    void updateProfile(Profile mProfile) {
         mProfile.setName(profileName.getValue());
         mProfile.setUrl(url.getValue());
-        mProfile.setPostingPermitted(postingPermitted.getValue());
+        mProfile.setPermitPosting(postingPermitted.getValue());
         mProfile.setShowCommentsByDefault(showCommentsByDefault.getValue());
-        Currency c = defaultCommodity.getValue();
-        mProfile.setDefaultCommodity((c == null) ? null : c.getName());
+        mProfile.setDefaultCommodity(defaultCommodity.getValue());
         mProfile.setShowCommodityByDefault(showCommodityByDefault.getValue());
         mProfile.setPreferredAccountsFilter(preferredAccountsFilter.getValue());
-        mProfile.setAuthEnabled(useAuthentication.getValue());
-        mProfile.setAuthUserName(authUserName.getValue());
+        mProfile.setUseAuthentication(useAuthentication.getValue());
+        mProfile.setAuthUser(authUserName.getValue());
         mProfile.setAuthPassword(authPassword.getValue());
-        mProfile.setThemeHue(themeId.getValue());
-        mProfile.setFutureDates(futureDates.getValue());
-        mProfile.setApiVersion(apiVersion.getValue());
-        mProfile.setDetectedVersion(detectedVersion.getValue());
+        mProfile.setTheme(themeId.getValue());
+        mProfile.setFutureDates(futureDates.getValue()
+                                           .toInt());
+        mProfile.setApiVersion(apiVersion.getValue()
+                                         .toInt());
+        HledgerVersion version = detectedVersion.getValue();
+        mProfile.setDetectedVersionPre_1_19(version.isPre_1_20_1());
+        mProfile.setDetectedVersionMajor(version.getMajor());
+        mProfile.setDetectedVersionMinor(version.getMinor());
     }
     synchronized public void triggerVersionDetection() {
         if (versionDetectionThread != null)
@@ -297,7 +303,7 @@ public class ProfileDetailModel extends ViewModel {
         }
         private HledgerVersion detectVersion() {
             App.setAuthenticationDataFromProfileModel(model);
-            HttpURLConnection http = null;
+            HttpURLConnection http;
             try {
                 http = NetworkUtil.prepareConnection(model.getUrl(), "version",
                         model.getUseAuthentication());

@@ -22,6 +22,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,12 +37,24 @@ import org.jetbrains.annotations.NotNull;
  * specified {@link OnCurrencySelectedListener}.
  */
 public class CurrencySelectorRecyclerViewAdapter
-        extends ListAdapter<Currency, CurrencySelectorRecyclerViewAdapter.ViewHolder> {
+        extends ListAdapter<String, CurrencySelectorRecyclerViewAdapter.ViewHolder> {
+    private static final DiffUtil.ItemCallback<String> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<String>() {
+                @Override
+                public boolean areItemsTheSame(@NonNull String oldItem, @NonNull String newItem) {
+                    return oldItem.equals(newItem);
+                }
+                @Override
+                public boolean areContentsTheSame(@NonNull String oldItem,
+                                                  @NonNull String newItem) {
+                    return true;
+                }
+            };
 
     private OnCurrencySelectedListener currencySelectedListener;
     private OnCurrencyLongClickListener currencyLongClickListener;
     public CurrencySelectorRecyclerViewAdapter() {
-        super(Currency.DIFF_CALLBACK);
+        super(DIFF_CALLBACK);
     }
     @NotNull
     @Override
@@ -60,7 +74,7 @@ public class CurrencySelectorRecyclerViewAdapter
     public void resetCurrencySelectedListener() {
         currencySelectedListener = null;
     }
-    public void notifyCurrencySelected(Currency currency) {
+    public void notifyCurrencySelected(String currency) {
         if (null != currencySelectedListener)
             currencySelectedListener.onCurrencySelected(currency);
     }
@@ -68,14 +82,14 @@ public class CurrencySelectorRecyclerViewAdapter
         this.currencyLongClickListener = listener;
     }
     public void resetCurrencyLockClickListener() { currencyLongClickListener = null; }
-    private void notifyCurrencyLongClicked(Currency mItem) {
+    private void notifyCurrencyLongClicked(String mItem) {
         if (null != currencyLongClickListener)
             currencyLongClickListener.onCurrencyLongClick(mItem);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView mNameView;
-        private Currency mItem;
+        private String mItem;
 
         ViewHolder(View view) {
             super(view);
@@ -93,9 +107,9 @@ public class CurrencySelectorRecyclerViewAdapter
         public String toString() {
             return super.toString() + " '" + mNameView.getText() + "'";
         }
-        void bindTo(Currency item) {
+        void bindTo(String item) {
             mItem = item;
-            mNameView.setText(item.getName());
+            mNameView.setText(item);
         }
     }
 }

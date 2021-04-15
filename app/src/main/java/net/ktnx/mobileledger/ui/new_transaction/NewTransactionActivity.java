@@ -20,17 +20,15 @@ package net.ktnx.mobileledger.ui.new_transaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.AbstractCursor;
-import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFormatException;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
 import androidx.core.view.MenuCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -38,7 +36,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
@@ -46,9 +43,11 @@ import net.ktnx.mobileledger.async.AsyncCrasher;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
+import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.databinding.ActivityNewTransactionBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateHeader;
+import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.MatchedTemplate;
@@ -57,7 +56,6 @@ import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.activity.ProfileThemedActivity;
 import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.ArrayList;
@@ -349,86 +347,25 @@ public class NewTransactionActivity extends ProfileThemedActivity
         if (!model.accountListIsEmpty())
             return;
 
-        String accFilter = mProfile.getPreferredAccountsFilter();
+        AsyncTask.execute(() -> {
+            String accFilter = mProfile.getPreferredAccountsFilter();
 
-        ArrayList<String> params = new ArrayList<>();
-        StringBuilder sb = new StringBuilder("select t.profile, t.id from transactions t");
+            TransactionDAO trDao = DB.get()
+                                     .getTransactionDAO();
 
-        if (!TextUtils.isEmpty(accFilter)) {
-            sb.append(" JOIN transaction_accounts ta")
-              .append(" ON ta.profile = t.profile")
-              .append(" AND ta.transaction_id = t.id");
-        }
+            TransactionWithAccounts tr;
 
-        sb.append(" WHERE t.description=?");
-        params.add(description);
-
-        if (!TextUtils.isEmpty(accFilter)) {
-            sb.append(" AND ta.account_name LIKE '%'||?||'%'");
-            params.add(accFilter);
-        }
-
-        sb.append(" ORDER BY t.year desc, t.month desc, t.day desc LIMIT 1");
-
-        final String sql = sb.toString();
-        debug("description", sql);
-        debug("description", params.toString());
-
-        // FIXME: handle exceptions?
-        MLDB.queryInBackground(sql, params.toArray(new String[]{}), new MLDB.CallbackHelper() {
-            @Override
-            public void onStart() {
-                model.incrementBusyCounter();
-            }
-            @Override
-            public void onDone() {
-                model.decrementBusyCounter();
-            }
-            @Override
-            public boolean onRow(@NonNull Cursor cursor) {
-                final long profileId = cursor.getLong(0);
-                final int transactionId = cursor.getInt(1);
-                runOnUiThread(() -> model.loadTransactionIntoModel(profileId, transactionId));
-                return false; // limit 1, by the way
-            }
-            @Override
-            public void onNoRows() {
-                if (TextUtils.isEmpty(accFilter))
+            if (Misc.emptyIsNull(accFilter) != null) {
+                tr = trDao.getFirstByDescriptionHavingAccountSync(description, accFilter);
+                if (tr != null) {
+                    model.loadTransactionIntoModel(tr);
                     return;
-
-                debug("description", "Trying transaction search without preferred account filter");
-
-                final String broaderSql =
-                        "select t.profile, t.id from transactions t where t.description=?" +
-                        " ORDER BY year desc, month desc, day desc LIMIT 1";
-                params.remove(1);
-                debug("description", broaderSql);
-                debug("description", description);
-
-                runOnUiThread(() -> Snackbar.make(b.newTransactionNav,
-                        R.string.ignoring_preferred_account, Snackbar.LENGTH_INDEFINITE)
-                                            .show());
-
-                MLDB.queryInBackground(broaderSql, new String[]{description},
-                        new MLDB.CallbackHelper() {
-                            @Override
-                            public void onStart() {
-                                model.incrementBusyCounter();
-                            }
-                            @Override
-                            public boolean onRow(@NonNull Cursor cursor) {
-                                final long profileId = cursor.getLong(0);
-                                final int transactionId = cursor.getInt(1);
-                                runOnUiThread(() -> model.loadTransactionIntoModel(profileId,
-                                        transactionId));
-                                return false;
-                            }
-                            @Override
-                            public void onDone() {
-                                model.decrementBusyCounter();
-                            }
-                        });
+                }
             }
+
+            tr = trDao.getFirstByDescriptionSync(description);
+            if (tr != null)
+                model.loadTransactionIntoModel(tr);
         });
     }
     private void onFabPressed() {

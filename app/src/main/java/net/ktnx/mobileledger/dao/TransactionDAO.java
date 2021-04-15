@@ -23,6 +23,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -42,7 +43,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
 
         return result;
     }
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract long insertSync(Transaction item);
 
     @Update
@@ -68,6 +69,10 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     @Query("SELECT * FROM transactions WHERE id = :transactionId")
     public abstract LiveData<TransactionWithAccounts> getByIdWithAccounts(long transactionId);
 
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transactions WHERE id = :transactionId")
+    public abstract TransactionWithAccounts getByIdWithAccountsSync(long transactionId);
+
     @Query("SELECT DISTINCT description, CASE WHEN description_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN description_upper LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN description_upper LIKE '%% '||:term||'%%' THEN 3 " +
@@ -76,8 +81,40 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            "ORDER BY ordering, description_upper, rowid ")
     public abstract List<DescriptionContainer> lookupDescriptionSync(@NonNull String term);
 
+    @androidx.room.Transaction
+    @Query("SELECT * from transactions WHERE description = :description ORDER BY year desc, month" +
+           " desc, day desc LIMIT 1")
+    public abstract TransactionWithAccounts getFirstByDescriptionSync(@NonNull String description);
+
+    @androidx.room.Transaction
+    @Query("SELECT * from transactions tr JOIN transaction_accounts t_a ON t_a.transaction_id = " +
+           "tr.id WHERE tr.description = :description AND t_a.account_name LIKE " +
+           "'%'||:accountTerm||'%' ORDER BY year desc, month desc, day desc LIMIT 1")
+    public abstract TransactionWithAccounts getFirstByDescriptionHavingAccountSync(
+            @NonNull String description, @NonNull String accountTerm);
+
     @Query("SELECT * from transactions WHERE profile_id = :profileId")
     public abstract List<Transaction> allForProfileSync(long profileId);
+
+    @Query("SELECT generation FROM transactions WHERE profile_id = :profileId LIMIT 1")
+    protected abstract TransactionGenerationContainer getGenerationPOJOSync(long profileId);
+    public long getGenerationSync(long profileId) {
+        TransactionGenerationContainer result = getGenerationPOJOSync(profileId);
+
+        if (result == null)
+            return 0;
+        return result.generation;
+    }
+    @Query("DELETE FROM transactions WHERE profile_id = :profileId AND generation <> " +
+           ":currentGeneration")
+    public abstract void purgeOldTransactionsSync(long profileId, long currentGeneration);
+    static class TransactionGenerationContainer {
+        @ColumnInfo
+        long generation;
+        public TransactionGenerationContainer(long generation) {
+            this.generation = generation;
+        }
+    }
 
     static public class DescriptionContainer {
         @ColumnInfo

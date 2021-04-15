@@ -41,12 +41,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.QR;
+import net.ktnx.mobileledger.ui.profiles.ProfileDetailActivity;
 import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +65,7 @@ public class NewTransactionFragment extends Fragment {
     private NewTransactionItemsAdapter listAdapter;
     private NewTransactionModel viewModel;
     private OnNewTransactionFragmentInteractionListener mListener;
-    private MobileLedgerProfile mProfile;
+    private Profile mProfile;
     public NewTransactionFragment() {
         // Required empty public constructor
         setHasOptionsMenu(true);
@@ -163,15 +164,15 @@ public class NewTransactionFragment extends Fragment {
                            .append("\n\n")
                            .append(error)
                            .append("\n\n");
-                    if (mProfile.getApiVersion()
-                                .equals(API.auto))
+                    if (API.valueOf(mProfile.getApiVersion())
+                           .equals(API.auto))
                         message.append(
                                 resources.getString(R.string.err_json_send_error_unsupported));
                     else {
                         message.append(resources.getString(R.string.err_json_send_error_tail));
                         builder.setPositiveButton(R.string.btn_profile_options, (dialog, which) -> {
                             Logger.debug("error", "will start profile editor");
-                            MobileLedgerProfile.startEditProfileActivity(context, mProfile);
+                            ProfileDetailActivity.start(context, mProfile);
                         });
                     }
                     builder.setMessage(message);

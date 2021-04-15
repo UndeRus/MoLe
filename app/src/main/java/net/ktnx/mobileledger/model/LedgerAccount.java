@@ -212,6 +212,21 @@ public class LedgerAccount {
 
         return dbo;
     }
+    @NonNull
+    public AccountWithAmounts toDBOWithAmounts() {
+        AccountWithAmounts dbo = new AccountWithAmounts();
+        dbo.account = toDBO();
+
+        dbo.amounts = new ArrayList<>();
+        for (LedgerAmount amt : getAmounts()) {
+            AccountValue val = new AccountValue();
+            val.setCurrency(amt.getCurrency());
+            val.setValue(amt.getAmount());
+            dbo.amounts.add(val);
+        }
+
+        return dbo;
+    }
     public long getId() {
         return dbId;
     }

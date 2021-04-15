@@ -28,12 +28,13 @@ import androidx.lifecycle.MutableLiveData;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.ui.HueRing;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -151,7 +152,7 @@ public class Colors {
         }
         return colors;
     }
-    public static int getNewProfileThemeHue(ArrayList<MobileLedgerProfile> profiles) {
+    public static int getNewProfileThemeHue(List<Profile> profiles) {
         if ((profiles == null) || (profiles.size() == 0))
             return DEFAULT_HUE_DEG;
 
@@ -159,14 +160,14 @@ public class Colors {
 
         if (profiles.size() == 1) {
             int opposite = profiles.get(0)
-                                   .getThemeHue() + 180;
+                                   .getTheme() + 180;
             opposite %= 360;
             chosenHue = opposite;
         }
         else {
             ArrayList<Integer> hues = new ArrayList<>();
-            for (MobileLedgerProfile p : profiles) {
-                int hue = p.getThemeHue();
+            for (Profile p : profiles) {
+                int hue = p.getTheme();
                 if (hue == -1)
                     hue = DEFAULT_HUE_DEG;
                 hues.add(hue);

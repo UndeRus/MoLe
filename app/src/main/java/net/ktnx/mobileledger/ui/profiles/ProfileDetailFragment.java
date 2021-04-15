@@ -40,16 +40,18 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.databinding.ProfileDetailBinding;
+import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
+import net.ktnx.mobileledger.model.FutureDates;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.HueRingDialog;
 import net.ktnx.mobileledger.utils.Colors;
@@ -60,8 +62,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -79,7 +80,7 @@ public class ProfileDetailFragment extends Fragment {
     public static final String ARG_HUE = "hue";
     @NonNls
 
-    private MobileLedgerProfile mProfile;
+    private Profile mProfile;
     private boolean defaultCommoditySet;
     private boolean syncingModelFromUI = false;
     private ProfileDetailBinding binding;
@@ -97,7 +98,7 @@ public class ProfileDetailFragment extends Fragment {
         inflater.inflate(R.menu.profile_details, menu);
         final MenuItem menuDeleteProfile = menu.findItem(R.id.menuDelete);
         menuDeleteProfile.setOnMenuItemClickListener(item -> onDeleteProfile());
-        final ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
+        final List<Profile> profiles = Data.profiles.getValue();
 
         if (BuildConfig.DEBUG) {
             final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
@@ -111,17 +112,9 @@ public class ProfileDetailFragment extends Fragment {
         builder.setMessage(R.string.remove_profile_dialog_message);
         builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
             debug("profiles", String.format("[fragment] removing profile %s", mProfile.getId()));
-            mProfile.removeFromDB();
-            ArrayList<MobileLedgerProfile> oldList = Data.profiles.getValue();
-            if (oldList == null)
-                throw new AssertionError();
-            ArrayList<MobileLedgerProfile> newList = new ArrayList<>(oldList);
-            newList.remove(mProfile);
-            Data.profiles.setValue(newList);
-            if (mProfile.equals(Data.getProfile())) {
-                debug("profiles", "[fragment] setting current profile to 0");
-                Data.setCurrentProfile(newList.get(0));
-            }
+            ProfileDAO dao = DB.get()
+                               .getProfileDAO();
+            dao.delete(mProfile, () -> dao.updateOrderSync(dao.getAllOrderedSync()));
 
             final FragmentActivity activity = getActivity();
             if (activity != null)
@@ -133,23 +126,7 @@ public class ProfileDetailFragment extends Fragment {
     private boolean onWipeDataMenuClicked() {
         // this is a development option, so no confirmation
         mProfile.wipeAllData();
-        if (mProfile.equals(Data.getProfile()))
-            triggerProfileChange();
         return true;
-    }
-    private void triggerProfileChange() {
-        int index = Data.getProfileIndex(mProfile);
-        MobileLedgerProfile newProfile = new MobileLedgerProfile(mProfile);
-        final ArrayList<MobileLedgerProfile> profiles =
-                Objects.requireNonNull(Data.profiles.getValue());
-        profiles.set(index, newProfile);
-
-        ProfilesRecyclerViewAdapter viewAdapter = ProfilesRecyclerViewAdapter.getInstance();
-        if (viewAdapter != null)
-            viewAdapter.notifyItemChanged(index);
-
-        if (mProfile.equals(Data.getProfile()))
-            Data.setCurrentProfile(newProfile);
     }
     private void hookTextChangeSyncRoutine(TextView view, TextChangeSyncRoutine syncRoutine) {
         view.addTextChangedListener(new TextWatcher() {
@@ -176,30 +153,12 @@ public class ProfileDetailFragment extends Fragment {
         if (context == null)
             return;
 
-        if ((getArguments() != null) && getArguments().containsKey(ARG_ITEM_ID)) {
-            int index = getArguments().getInt(ARG_ITEM_ID, -1);
-            ArrayList<MobileLedgerProfile> profiles = Data.profiles.getValue();
-            if ((profiles != null) && (index != -1) && (index < profiles.size()))
-                mProfile = profiles.get(index);
-
-            Activity activity = this.getActivity();
-            if (activity == null)
-                throw new AssertionError();
-            CollapsingToolbarLayout appBarLayout = activity.findViewById(R.id.toolbar_layout);
-            if (appBarLayout != null) {
-                if (mProfile != null)
-                    appBarLayout.setTitle(mProfile.getName());
-                else
-                    appBarLayout.setTitle(getResources().getString(R.string.new_profile_title));
-            }
-        }
-
         final LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
         final ProfileDetailModel model = getModel();
 
         model.observeDefaultCommodity(viewLifecycleOwner, c -> {
             if (c != null)
-                setDefaultCommodity(c.getName());
+                setDefaultCommodity(c);
             else
                 resetDefaultCommodity();
         });
@@ -325,11 +284,6 @@ public class ProfileDetailFragment extends Fragment {
         hookClearErrorOnFocusListener(binding.authUserName, binding.authUserNameLayout);
         hookClearErrorOnFocusListener(binding.password, binding.passwordLayout);
 
-        if (savedInstanceState == null) {
-            model.setValuesFromProfile(mProfile, getArguments().getInt(ARG_HUE, -1));
-        }
-        checkInsecureSchemeWithAuth();
-
         binding.url.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -380,32 +334,32 @@ public class ProfileDetailFragment extends Fragment {
         });
         menu.show();
     }
-    private MobileLedgerProfile.FutureDates futureDatesSettingFromMenuItemId(int itemId) {
+    private FutureDates futureDatesSettingFromMenuItemId(int itemId) {
         if (itemId == R.id.menu_future_dates_7) {
-            return MobileLedgerProfile.FutureDates.OneWeek;
+            return FutureDates.OneWeek;
         }
         else if (itemId == R.id.menu_future_dates_14) {
-            return MobileLedgerProfile.FutureDates.TwoWeeks;
+            return FutureDates.TwoWeeks;
         }
         else if (itemId == R.id.menu_future_dates_30) {
-            return MobileLedgerProfile.FutureDates.OneMonth;
+            return FutureDates.OneMonth;
         }
         else if (itemId == R.id.menu_future_dates_60) {
-            return MobileLedgerProfile.FutureDates.TwoMonths;
+            return FutureDates.TwoMonths;
         }
         else if (itemId == R.id.menu_future_dates_90) {
-            return MobileLedgerProfile.FutureDates.ThreeMonths;
+            return FutureDates.ThreeMonths;
         }
         else if (itemId == R.id.menu_future_dates_180) {
-            return MobileLedgerProfile.FutureDates.SixMonths;
+            return FutureDates.SixMonths;
         }
         else if (itemId == R.id.menu_future_dates_365) {
-            return MobileLedgerProfile.FutureDates.OneYear;
+            return FutureDates.OneYear;
         }
         else if (itemId == R.id.menu_future_dates_all) {
-            return MobileLedgerProfile.FutureDates.All;
+            return FutureDates.All;
         }
-        return MobileLedgerProfile.FutureDates.None;
+        return FutureDates.None;
     }
     @NotNull
     private ProfileDetailModel getModel() {
@@ -416,40 +370,19 @@ public class ProfileDetailFragment extends Fragment {
             return;
 
         ProfileDetailModel model = getModel();
-        final ArrayList<MobileLedgerProfile> profiles =
-                Objects.requireNonNull(Data.profiles.getValue());
+        ProfileDAO dao = DB.get()
+                           .getProfileDAO();
 
         if (mProfile != null) {
-            int pos = Data.profiles.getValue()
-                                   .indexOf(mProfile);
-            mProfile = new MobileLedgerProfile(mProfile);
             model.updateProfile(mProfile);
-            mProfile.storeInDB();
+            dao.update(mProfile, null);
             debug("profiles", "profile stored in DB");
-            profiles.set(pos, mProfile);
 //                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
-
-            final MobileLedgerProfile currentProfile = Data.getProfile();
-            if (mProfile.getId() == currentProfile.getId()) {
-                Data.setCurrentProfile(mProfile);
-            }
-
-            ProfilesRecyclerViewAdapter viewAdapter = ProfilesRecyclerViewAdapter.getInstance();
-            if (viewAdapter != null)
-                viewAdapter.notifyItemChanged(pos);
         }
         else {
-            mProfile = new MobileLedgerProfile(0);
+            mProfile = new Profile();
             model.updateProfile(mProfile);
-            mProfile.storeInDB();
-            final ArrayList<MobileLedgerProfile> newList = new ArrayList<>(profiles);
-            newList.add(mProfile);
-            Data.profiles.setValue(newList);
-            MobileLedgerProfile.storeProfilesOrder();
-
-            // first profile ever?
-            if (newList.size() == 1)
-                Data.setCurrentProfile(mProfile);
+            dao.insertLast(mProfile, null);
         }
 
         Activity activity = getActivity();

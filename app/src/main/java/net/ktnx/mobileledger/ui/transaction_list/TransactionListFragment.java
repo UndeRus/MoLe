@@ -37,8 +37,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.TransactionDateFinder;
 import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.model.MobileLedgerProfile;
 import net.ktnx.mobileledger.ui.DatePickerFragment;
 import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
@@ -112,7 +112,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
         mainActivity.fabShouldShow();
 
         if (mainActivity instanceof FabManager.FabHandler)
-            FabManager.handle((FabManager.FabHandler) mainActivity, root);
+            FabManager.handle(mainActivity, root);
 
         LinearLayoutManager llm = new LinearLayoutManager(mainActivity);
 
@@ -129,7 +129,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
         vAccountFilter = view.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = view.findViewById(R.id.transaction_filter_account_name);
 
-        MobileLedgerProfile profile = Data.getProfile();
+        Profile profile = Data.getProfile();
         accNameFilter.setAdapter(new AccountAutocompleteAdapter(mainActivity, profile));
         accNameFilter.setOnItemClickListener((parent, v, position, id) -> {
 //                debug("tmp", "direct onItemClick");

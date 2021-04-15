@@ -47,7 +47,7 @@ public class TemplateWithAccounts {
         result.header = header.createDuplicate();
         result.accounts = new ArrayList<>();
         for (TemplateAccount acc : accounts) {
-            result.accounts.add(acc.createDuplicate());
+            result.accounts.add(acc.createDuplicate(result.header));
         }
 
         return result;

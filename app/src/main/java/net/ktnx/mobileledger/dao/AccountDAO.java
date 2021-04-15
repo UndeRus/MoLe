@@ -59,16 +59,7 @@ public abstract class AccountDAO extends BaseDAO<Account> {
         final AccountValueDAO valueDAO = DB.get()
                                            .getAccountValueDAO();
         Account account = accountWithAmounts.account;
-        Account existingAccount = getByNameSync(account.getProfileId(), account.getName());
-        if (existingAccount != null) {
-            existingAccount.setGeneration(account.getGeneration());
-            account = existingAccount;
-            updateSync(account);
-        }
-        else {
-            long accountId = insertSync(account);
-            account.setId(accountId);
-        }
+        account.setId(insertSync(account));
         for (AccountValue value : accountWithAmounts.amounts) {
             value.setAccountId(account.getId());
             value.setGeneration(account.getGeneration());
