@@ -17,10 +17,19 @@
 
 package net.ktnx.mobileledger.db;
 
+import android.os.AsyncTask;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.Transaction;
+
+import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.dao.DescriptionHistoryDAO;
+import net.ktnx.mobileledger.dao.OptionDAO;
+import net.ktnx.mobileledger.dao.TransactionDAO;
 
 @Entity(tableName = "profiles")
 public class Profile {
@@ -186,4 +195,26 @@ public class Profile {
     public String toString() {
         return getName();
     }
+    @Transaction
+    public void wipeAllDataSync() {
+        OptionDAO optDao = DB.get()
+                             .getOptionDAO();
+        optDao.deleteSync(optDao.allForProfileSync(id));
+
+        AccountDAO accDao = DB.get()
+                              .getAccountDAO();
+        accDao.deleteSync(accDao.allForProfileSync(id));
+
+        TransactionDAO trnDao = DB.get()
+                                  .getTransactionDAO();
+        trnDao.deleteSync(trnDao.allForProfileSync(id));
+
+        DescriptionHistoryDAO descDao = DB.get()
+                                          .getDescriptionHistoryDAO();
+        descDao.sweepSync();
+    }
+    public void wipeAllData() {
+        AsyncTask.execute(this::wipeAllDataSync);
+    }
+
 }
