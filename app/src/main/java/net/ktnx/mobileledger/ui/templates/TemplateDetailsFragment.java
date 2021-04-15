@@ -105,7 +105,7 @@ public class TemplateDetailsFragment extends Fragment {
         final ViewModelStoreOwner viewModelStoreOwner =
                 controller.getViewModelStoreOwner(R.id.template_list_navigation);
         mViewModel = new ViewModelProvider(viewModelStoreOwner).get(TemplateDetailsViewModel.class);
-        mViewModel.setDefaultPatternName(getString(R.string.unnamed_template));
+        mViewModel.setDefaultTemplateName(getString(R.string.unnamed_template));
         Logger.debug("flow", "PatternDetailsFragment.onCreateView(): model=" + mViewModel);
 
         b = TemplateDetailsFragmentBinding.inflate(inflater);

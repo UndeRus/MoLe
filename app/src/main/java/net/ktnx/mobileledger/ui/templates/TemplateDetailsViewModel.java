@@ -33,6 +33,7 @@ import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,13 +47,13 @@ public class TemplateDetailsViewModel extends ViewModel {
             new MutableLiveData<>(Collections.emptyList());
     private final AtomicInteger syntheticItemId = new AtomicInteger(0);
     private Long mPatternId;
-    private String mDefaultPatternName;
+    private String mDefaultTemplateName;
     private boolean itemsLoaded = false;
-    public String getDefaultPatternName() {
-        return mDefaultPatternName;
+    public String getDefaultTemplateName() {
+        return mDefaultTemplateName;
     }
-    public void setDefaultPatternName(String name) {
-        mDefaultPatternName = name;
+    public void setDefaultTemplateName(String name) {
+        mDefaultTemplateName = name;
     }
 
     public void resetItems() {
@@ -85,7 +86,6 @@ public class TemplateDetailsViewModel extends ViewModel {
 
         if (srcList.size() < 1) {
             final TemplateDetailsItem.Header header = TemplateDetailsItem.createHeader();
-            header.setName(mDefaultPatternName);
             header.setId(0);
             newList.add(header);
             changes = true;
@@ -211,6 +211,9 @@ public class TemplateDetailsViewModel extends ViewModel {
 
             TemplateDetailsItem.Header modelHeader = list.get(0)
                                                          .asHeaderItem();
+            modelHeader.setName(Misc.trim(modelHeader.getName()));
+            if (modelHeader.getName().isEmpty())
+                modelHeader.setName(getDefaultTemplateName());
             TemplateHeaderDAO headerDAO = DB.get()
                                             .getTemplateDAO();
             TemplateHeader dbHeader = modelHeader.toDBO();
