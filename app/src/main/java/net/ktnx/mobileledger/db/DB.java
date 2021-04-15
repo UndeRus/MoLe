@@ -38,6 +38,7 @@ import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
+import net.ktnx.mobileledger.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -117,6 +118,15 @@ abstract public class DB extends RoomDatabase {
                         }
                     }
                 }
+            }
+        };
+    }
+    private static Migration dummyVersionMigration(int toVersion) {
+        return new Migration(toVersion - 1, toVersion) {
+            @Override
+            public void migrate(@NonNull SupportSQLiteDatabase db) {
+                Logger.debug("db",
+                        String.format(Locale.ROOT, "Dummy DB migration to version %d", toVersion));
             }
         };
     }
