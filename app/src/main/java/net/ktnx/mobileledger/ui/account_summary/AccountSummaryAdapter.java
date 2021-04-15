@@ -149,7 +149,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                 throw new IllegalStateException("Unexpected value: " + viewType);
         }
 
-        Logger.debug("acc-ui", "Creating " + result);
+//        Logger.debug("acc-ui", "Creating " + result);
         return result;
     }
     @Override
@@ -214,8 +214,8 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
         @Override
         public void bind(AccountListItem item, @Nullable List<Object> payloads) {
             Resources r = itemView.getResources();
-            Logger.debug("acc", itemView.getContext()
-                                        .toString());
+//            Logger.debug("acc", itemView.getContext()
+//                                        .toString());
             ((AccountListItem.Header) item).getText()
                                            .observe((LifecycleOwner) itemView.getContext(),
                                                    b.lastUpdateText::setText);
@@ -312,8 +312,8 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                         changes.add((Change) p);
                 }
             }
-            debug("accounts",
-                    String.format(Locale.US, "Binding to '%s' to %s", acc.getName(), this));
+//            debug("accounts",
+//                    String.format(Locale.US, "Binding '%s' to %s", acc.getName(), this));
 
             Resources rm = b.getRoot()
                             .getContext()
@@ -335,9 +335,9 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                 if (changes.has(Change.EXPANDED)) {
                     int wantedRotation = acc.isExpanded() ? 0 : 180;
                     if (b.accountExpanderContainer.getRotation() != wantedRotation) {
-                        Logger.debug("acc-ui",
-                                String.format(Locale.ROOT, "Rotating %s to %d", acc.getName(),
-                                        wantedRotation));
+//                        Logger.debug("acc-ui",
+//                                String.format(Locale.ROOT, "Rotating %s to %d", acc.getName(),
+//                                        wantedRotation));
                         b.accountExpanderContainer.animate()
                                                   .rotation(wantedRotation);
                     }
