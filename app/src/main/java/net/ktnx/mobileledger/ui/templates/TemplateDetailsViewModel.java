@@ -43,6 +43,8 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TemplateDetailsViewModel extends ViewModel {
+    static final String TAG = "template-details-model";
+    static final String DB_TAG = TAG + "-db";
     private final MutableLiveData<List<TemplateDetailsItem>> items =
             new MutableLiveData<>(Collections.emptyList());
     private final AtomicInteger syntheticItemId = new AtomicInteger(0);
@@ -74,9 +76,9 @@ public class TemplateDetailsViewModel extends ViewModel {
         srcList = Collections.unmodifiableList(srcList);
 
         {
-            Logger.debug("tmpl", "Considering old list");
+            Logger.debug(TAG, "Considering old list");
             for (TemplateDetailsItem item : srcList)
-                Logger.debug("tmpl", String.format(Locale.US, " id %d pos %d", item.getId(),
+                Logger.debug(TAG, String.format(Locale.US, " id %d pos %d", item.getId(),
                         item.getPosition()));
         }
 
@@ -135,7 +137,7 @@ public class TemplateDetailsViewModel extends ViewModel {
         }
 
         if (changes) {
-            Logger.debug("tmpl", "Changes detected, applying new list");
+            Logger.debug(TAG, "Changes detected, applying new list");
 
             if (async)
                 items.postValue(newList);
@@ -143,7 +145,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 items.setValue(newList);
         }
         else
-            Logger.debug("tmpl", "No changes, ignoring new list");
+            Logger.debug(TAG, "No changes, ignoring new list");
     }
     public int genItemId() {
         return syntheticItemId.decrementAndGet();
@@ -172,7 +174,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 ArrayList<TemplateDetailsItem> l = new ArrayList<>();
 
                 TemplateDetailsItem header = TemplateDetailsItem.fromRoomObject(src.header);
-                Logger.debug("tmpl-db", "Got header template item with id of " + header.getId());
+                Logger.debug(DB_TAG, "Got header template item with id of " + header.getId());
                 l.add(header);
                 Collections.sort(src.accounts,
                         (o1, o2) -> Long.compare(o1.getPosition(), o2.getPosition()));
@@ -181,7 +183,7 @@ public class TemplateDetailsViewModel extends ViewModel {
                 }
 
                 for (TemplateDetailsItem i : l) {
-                    Logger.debug("tmpl-db", "Loaded pattern item " + i);
+                    Logger.debug(DB_TAG, "Loaded pattern item " + i);
                 }
                 applyList(l, true);
                 itemsLoaded = true;
@@ -211,9 +213,11 @@ public class TemplateDetailsViewModel extends ViewModel {
 
             TemplateDetailsItem.Header modelHeader = list.get(0)
                                                          .asHeaderItem();
+
             modelHeader.setName(Misc.trim(modelHeader.getName()));
             if (modelHeader.getName().isEmpty())
                 modelHeader.setName(getDefaultTemplateName());
+
             TemplateHeaderDAO headerDAO = DB.get()
                                             .getTemplateDAO();
             TemplateHeader dbHeader = modelHeader.toDBO();
@@ -323,7 +327,7 @@ public class TemplateDetailsViewModel extends ViewModel {
         items.setValue(newList);
     }
     public void removeItem(int position) {
-        Logger.debug("tmpl", "Removing item at position " + position);
+        Logger.debug(TAG, "Removing item at position " + position);
         ArrayList<TemplateDetailsItem> newList = copyItems();
         newList.remove(position);
         for (int i = position; i < newList.size(); i++)
