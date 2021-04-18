@@ -175,7 +175,8 @@ public class ProfilesRecyclerViewAdapter
             ProfileDetailActivity.start(view.getContext(), p);
         });
 
-        final boolean sameProfile = currentProfile.getId() == profile.getId();
+        final boolean sameProfile =
+                currentProfile != null && currentProfile.getId() == profile.getId();
         holder.itemView.setBackground(
                 sameProfile ? new ColorDrawable(Colors.tableRowDarkBG) : null);
         if (editingProfiles()) {

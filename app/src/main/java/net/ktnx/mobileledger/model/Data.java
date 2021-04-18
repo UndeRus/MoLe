@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -35,7 +36,6 @@ import java.text.ParsePosition;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
@@ -45,7 +45,9 @@ public final class Data {
             new MutableLiveData<>(false);
     public static final MutableLiveData<RetrieveTransactionsTask.Progress> backgroundTaskProgress =
             new MutableLiveData<>();
-    public static final LiveData<List<Profile>> profiles = DB.get().getProfileDAO().getAllOrdered();
+    public static final LiveData<List<Profile>> profiles = DB.get()
+                                                             .getProfileDAO()
+                                                             .getAllOrdered();
     public static final MutableLiveData<Currency.Position> currencySymbolPosition =
             new MutableLiveData<>();
     public static final MutableLiveData<Boolean> currencyGap = new MutableLiveData<>(true);
@@ -58,8 +60,7 @@ public final class Data {
     public static final MutableLiveData<String> lastTransactionsUpdateText =
             new MutableLiveData<>();
     public static final MutableLiveData<String> lastAccountsUpdateText = new MutableLiveData<>();
-    private static final MutableLiveData<Profile> profile =
-            new InertMutableLiveData<>();
+    private static final MutableLiveData<Profile> profile = new InertMutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
     private static NumberFormat numberFormatter;
@@ -68,9 +69,9 @@ public final class Data {
         locale.setValue(Locale.getDefault());
     }
 
-    @NonNull
+    @Nullable
     public static Profile getProfile() {
-        return Objects.requireNonNull(profile.getValue());
+        return profile.getValue();
     }
     public static void backgroundTaskStarted() {
         int cnt = backgroundTaskCount.incrementAndGet();
@@ -135,8 +136,7 @@ public final class Data {
     public static String formatNumber(float number) {
         return numberFormatter.format(number);
     }
-    public static void observeProfile(LifecycleOwner lifecycleOwner,
-                                      Observer<Profile> observer) {
+    public static void observeProfile(LifecycleOwner lifecycleOwner, Observer<Profile> observer) {
         profile.observe(lifecycleOwner, observer);
     }
     public static void removeProfileObservers(LifecycleOwner owner) {

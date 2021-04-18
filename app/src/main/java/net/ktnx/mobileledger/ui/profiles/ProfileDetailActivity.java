@@ -65,9 +65,6 @@ public class ProfileDetailActivity extends CrashReportingActivity {
     protected void onCreate(Bundle savedInstanceState) {
         final long id = getIntent().getLongExtra(ProfileDetailFragment.ARG_ITEM_ID, -1);
 
-        if (id == -1)
-            throw new RuntimeException("Invalid or missing profile ID");
-
         DB.get()
           .getProfileDAO()
           .getById(id)
