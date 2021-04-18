@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.profiles;
 import android.text.TextUtils;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
@@ -44,6 +45,8 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static net.ktnx.mobileledger.db.Profile.NO_PROFILE_ID;
+
 public class ProfileDetailModel extends ViewModel {
     private static final String HTTPS_URL_START = "https://";
     private final MutableLiveData<String> profileName = new MutableLiveData<>();
@@ -62,6 +65,7 @@ public class ProfileDetailModel extends ViewModel {
     private final MutableLiveData<Integer> themeId = new MutableLiveData<>(-1);
     private final MutableLiveData<HledgerVersion> detectedVersion = new MutableLiveData<>(null);
     private final MutableLiveData<Boolean> detectingHledgerVersion = new MutableLiveData<>(false);
+    private final MutableLiveData<Long> profileId = new MutableLiveData<>(NO_PROFILE_ID);
     public int initialThemeHue = Colors.DEFAULT_HUE_DEG;
     private VersionDetectionThread versionDetectionThread;
     public ProfileDetailModel() {
@@ -225,6 +229,7 @@ public class ProfileDetailModel extends ViewModel {
     }
     void setValuesFromProfile(Profile mProfile) {
         if (mProfile != null) {
+            profileId.setValue(mProfile.getId());
             profileName.setValue(mProfile.getName());
             postingPermitted.setValue(mProfile.permitPosting());
             showCommentsByDefault.setValue(mProfile.getShowCommentsByDefault());
@@ -236,8 +241,7 @@ public class ProfileDetailModel extends ViewModel {
                 else
                     setDefaultCommodity(comm);
             }
-            futureDates.setValue(
-                    FutureDates.valueOf(mProfile.getFutureDates()));
+            futureDates.setValue(FutureDates.valueOf(mProfile.getFutureDates()));
             apiVersion.setValue(API.valueOf(mProfile.getApiVersion()));
             url.setValue(mProfile.getUrl());
             useAuthentication.setValue(mProfile.useAuthentication());
@@ -251,6 +255,7 @@ public class ProfileDetailModel extends ViewModel {
                                                                                 mProfile.getDetectedVersionMinor()));
         }
         else {
+            profileId.setValue(NO_PROFILE_ID);
             profileName.setValue(null);
             url.setValue(HTTPS_URL_START);
             postingPermitted.setValue(true);
@@ -266,6 +271,7 @@ public class ProfileDetailModel extends ViewModel {
         }
     }
     void updateProfile(Profile mProfile) {
+        mProfile.setId(profileId.getValue());
         mProfile.setName(profileName.getValue());
         mProfile.setUrl(url.getValue());
         mProfile.setPermitPosting(postingPermitted.getValue());
@@ -282,9 +288,9 @@ public class ProfileDetailModel extends ViewModel {
         mProfile.setApiVersion(apiVersion.getValue()
                                          .toInt());
         HledgerVersion version = detectedVersion.getValue();
-        mProfile.setDetectedVersionPre_1_19(version.isPre_1_20_1());
-        mProfile.setDetectedVersionMajor(version.getMajor());
-        mProfile.setDetectedVersionMinor(version.getMinor());
+        mProfile.setDetectedVersionPre_1_19(version != null && version.isPre_1_20_1());
+        mProfile.setDetectedVersionMajor(version != null ? version.getMajor() : -1);
+        mProfile.setDetectedVersionMinor(version != null ? version.getMinor() : -1);
     }
     synchronized public void triggerVersionDetection() {
         if (versionDetectionThread != null)
@@ -292,6 +298,9 @@ public class ProfileDetailModel extends ViewModel {
 
         versionDetectionThread = new VersionDetectionThread(this);
         versionDetectionThread.start();
+    }
+    public LiveData<Long> getProfileId() {
+        return profileId;
     }
     static class VersionDetectionThread extends Thread {
         static final int TARGET_PROCESS_DURATION = 1000;

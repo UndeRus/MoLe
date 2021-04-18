@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.profiles;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -63,6 +64,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -80,7 +82,6 @@ public class ProfileDetailFragment extends Fragment {
     public static final String ARG_HUE = "hue";
     @NonNls
 
-    private Profile mProfile;
     private boolean defaultCommoditySet;
     private boolean syncingModelFromUI = false;
     private ProfileDetailBinding binding;
@@ -100,21 +101,36 @@ public class ProfileDetailFragment extends Fragment {
         menuDeleteProfile.setOnMenuItemClickListener(item -> onDeleteProfile());
         final List<Profile> profiles = Data.profiles.getValue();
 
-        if (BuildConfig.DEBUG) {
-            final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
+        final MenuItem menuWipeProfileData = menu.findItem(R.id.menuWipeData);
+        if (BuildConfig.DEBUG)
             menuWipeProfileData.setOnMenuItemClickListener(ignored -> onWipeDataMenuClicked());
-            menuWipeProfileData.setVisible(mProfile != null);
-        }
+
+        getModel().getProfileId()
+                  .observe(getViewLifecycleOwner(), id -> {
+                      menuDeleteProfile.setVisible(id > 0);
+                      if (BuildConfig.DEBUG)
+                          menuWipeProfileData.setVisible(id > 0);
+                  });
     }
     private boolean onDeleteProfile() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(mProfile.getName());
+        @NotNull ProfileDetailModel model = getModel();
+        builder.setTitle(model.getProfileName());
         builder.setMessage(R.string.remove_profile_dialog_message);
         builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
-            debug("profiles", String.format("[fragment] removing profile %s", mProfile.getId()));
+            final long profileId = Objects.requireNonNull(model.getProfileId()
+                                                               .getValue());
+            debug("profiles", String.format("[fragment] removing profile %s", profileId));
             ProfileDAO dao = DB.get()
                                .getProfileDAO();
-            dao.delete(mProfile, () -> dao.updateOrderSync(dao.getAllOrderedSync()));
+            dao.getById(profileId)
+               .observe(getViewLifecycleOwner(), profile -> {
+                   if (profile != null)
+                       AsyncTask.execute(() -> {
+                           dao.deleteSync(profile);
+                           dao.updateOrderSync(dao.getAllOrderedSync());
+                       });
+               });
 
             final FragmentActivity activity = getActivity();
             if (activity != null)
@@ -125,7 +141,14 @@ public class ProfileDetailFragment extends Fragment {
     }
     private boolean onWipeDataMenuClicked() {
         // this is a development option, so no confirmation
-        mProfile.wipeAllData();
+        DB.get()
+          .getProfileDAO()
+          .getById(Objects.requireNonNull(getModel().getProfileId()
+                                                    .getValue()))
+          .observe(getViewLifecycleOwner(), profile -> {
+              if (profile != null)
+                  profile.wipeAllData();
+          });
         return true;
     }
     private void hookTextChangeSyncRoutine(TextView view, TextChangeSyncRoutine syncRoutine) {
@@ -373,16 +396,15 @@ public class ProfileDetailFragment extends Fragment {
         ProfileDAO dao = DB.get()
                            .getProfileDAO();
 
-        if (mProfile != null) {
-            model.updateProfile(mProfile);
-            dao.update(mProfile, null);
+        Profile profile = new Profile();
+        model.updateProfile(profile);
+        if (profile.getId() > 0) {
+            dao.update(profile, null);
             debug("profiles", "profile stored in DB");
 //                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
         }
         else {
-            mProfile = new Profile();
-            model.updateProfile(mProfile);
-            dao.insertLast(mProfile, null);
+            dao.insertLast(profile, null);
         }
 
         Activity activity = getActivity();

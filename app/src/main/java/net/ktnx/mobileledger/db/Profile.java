@@ -34,6 +34,7 @@ import net.ktnx.mobileledger.utils.Misc;
 
 @Entity(tableName = "profiles")
 public class Profile {
+    public static final long NO_PROFILE_ID = 0;
     @ColumnInfo
     @PrimaryKey(autoGenerate = true)
     private long id;
