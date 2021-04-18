@@ -176,7 +176,7 @@
     <string name="date_day_hint">date</string>
     <string name="template_details_date_year_source_label">year</string>
     <string name="template_details_date_day_source_label">date</string>
-    <string name="template_details_date_month_source_label">month</string>
+    <string name="month_source_label">month</string>
     <string name="unnamed_template">Template with no name</string>
     <string name="add_button_description">Add template</string>
     <string name="no_template_matches">No template matches</string>
@@ -196,5 +196,5 @@
     <string name="fallback_templates_divider">Fallback templates</string>
     <string name="template_list_help_title">Templates</string>
     <string name="template_details_template_params_label">Template parameters</string>
-    <string name="template_details_template_params_help_description">Show help on template parameters</string>
+    <string name="template_params_help_description">Show help on template parameters</string>
 </resources>

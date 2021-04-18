@@ -415,10 +415,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     (view) -> b.templateIsFallbackSwitch.toggle();
             b.templateIsFallbackLabel.setOnClickListener(fallbackLabelClickListener);
             b.templateIsFallbackText.setOnClickListener(fallbackLabelClickListener);
-            b.templateDetailsTemplateParamsHelpButton.setOnClickListener(v -> HelpDialog.show(
-                    b.getRoot()
-                     .getContext(), R.string.template_details_template_params_label,
-                    R.array.template_params_help));
+            b.templateParamsHelpButton.setOnClickListener(v -> HelpDialog.show(b.getRoot()
+                                                                                .getContext(),
+                    R.string.template_details_template_params_label, R.array.template_params_help));
         }
         @NotNull
         private TemplateDetailsItem.Header getItem() {
@@ -498,57 +497,57 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 b.testText.setText(header.getTestText());
 
                 if (header.hasLiteralDateYear()) {
-                    b.templateDetailsYearSource.setText(R.string.template_details_source_literal);
+                    b.yearSource.setText(R.string.template_details_source_literal);
                     final Integer dateYear = header.getDateYear();
                     b.templateDetailsDateYear.setText(
                             (dateYear == null) ? null : String.valueOf(dateYear));
-                    b.templateDetailsDateYearLayout.setVisibility(View.VISIBLE);
+                    b.yearLayout.setVisibility(View.VISIBLE);
                 }
                 else {
-                    b.templateDetailsDateYearLayout.setVisibility(View.GONE);
-                    b.templateDetailsYearSource.setText(
+                    b.yearLayout.setVisibility(View.GONE);
+                    b.yearSource.setText(
                             String.format(Locale.US, groupNoText, header.getDateYearMatchGroup(),
                                     getMatchGroupText(header.getDateYearMatchGroup())));
                 }
-                b.templateDetailsYearSourceLabel.setOnClickListener(
+                b.yearSourceLabel.setOnClickListener(
                         v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
-                b.templateDetailsYearSource.setOnClickListener(
+                b.yearSource.setOnClickListener(
                         v -> selectHeaderDetailSource(v, HeaderDetail.DATE_YEAR));
 
                 if (header.hasLiteralDateMonth()) {
-                    b.templateDetailsMonthSource.setText(R.string.template_details_source_literal);
+                    b.monthSource.setText(R.string.template_details_source_literal);
                     final Integer dateMonth = header.getDateMonth();
                     b.templateDetailsDateMonth.setText(
                             (dateMonth == null) ? null : String.valueOf(dateMonth));
-                    b.templateDetailsDateMonthLayout.setVisibility(View.VISIBLE);
+                    b.monthLayout.setVisibility(View.VISIBLE);
                 }
                 else {
-                    b.templateDetailsDateMonthLayout.setVisibility(View.GONE);
-                    b.templateDetailsMonthSource.setText(
+                    b.monthLayout.setVisibility(View.GONE);
+                    b.monthSource.setText(
                             String.format(Locale.US, groupNoText, header.getDateMonthMatchGroup(),
                                     getMatchGroupText(header.getDateMonthMatchGroup())));
                 }
-                b.templateDetailsMonthSourceLabel.setOnClickListener(
+                b.monthSourceLabel.setOnClickListener(
                         v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
-                b.templateDetailsMonthSource.setOnClickListener(
+                b.monthSource.setOnClickListener(
                         v -> selectHeaderDetailSource(v, HeaderDetail.DATE_MONTH));
 
                 if (header.hasLiteralDateDay()) {
-                    b.templateDetailsDaySource.setText(R.string.template_details_source_literal);
+                    b.daySource.setText(R.string.template_details_source_literal);
                     final Integer dateDay = header.getDateDay();
                     b.templateDetailsDateDay.setText(
                             (dateDay == null) ? null : String.valueOf(dateDay));
-                    b.templateDetailsDateDayLayout.setVisibility(View.VISIBLE);
+                    b.dayLayout.setVisibility(View.VISIBLE);
                 }
                 else {
-                    b.templateDetailsDateDayLayout.setVisibility(View.GONE);
-                    b.templateDetailsDaySource.setText(
+                    b.dayLayout.setVisibility(View.GONE);
+                    b.daySource.setText(
                             String.format(Locale.US, groupNoText, header.getDateDayMatchGroup(),
                                     getMatchGroupText(header.getDateDayMatchGroup())));
                 }
-                b.templateDetailsDaySourceLabel.setOnClickListener(
+                b.daySourceLabel.setOnClickListener(
                         v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
-                b.templateDetailsDaySource.setOnClickListener(
+                b.daySource.setOnClickListener(
                         v -> selectHeaderDetailSource(v, HeaderDetail.DATE_DAY));
 
                 if (header.hasLiteralTransactionDescription()) {
