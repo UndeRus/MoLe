@@ -36,8 +36,11 @@ import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.activity.CrashReportingActivity;
 import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.Logger;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
@@ -48,13 +51,19 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
  * in a ProfileListActivity (not really).
  */
 public class ProfileDetailActivity extends CrashReportingActivity {
+    private static final String TAG = "profile-det-act";
     private ProfileDetailFragment mFragment;
     public static void start(Context context, @Nullable Profile profile) {
         Intent starter = new Intent(context, ProfileDetailActivity.class);
         if (profile != null) {
             starter.putExtra(ProfileDetailFragment.ARG_ITEM_ID, profile.getId());
-            starter.putExtra(ProfileDetailFragment.ARG_ITEM_ID, profile.getTheme());
+            starter.putExtra(ProfileDetailFragment.ARG_HUE, profile.getTheme());
+            Logger.debug(TAG,
+                    String.format(Locale.ROOT, "Starting profile editor for profile %d, theme %d",
+                            profile.getId(), profile.getTheme()));
         }
+        else
+            Logger.debug(TAG, "Starting empty profile editor");
         context.startActivity(starter);
     }
     @NotNull
