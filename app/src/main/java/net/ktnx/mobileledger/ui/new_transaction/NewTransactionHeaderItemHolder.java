@@ -54,7 +54,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
     //TODO multiple amounts with different currencies per posting?
     NewTransactionHeaderItemHolder(@NonNull NewTransactionHeaderRowBinding b,
                                    NewTransactionItemsAdapter adapter) {
-        super(b.getRoot(), adapter);
+        super(b.getRoot());
         this.b = b;
 
         b.newTransactionDescription.setNextFocusForwardId(View.NO_ID);
@@ -157,7 +157,11 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
                  focusInfo.position != getBindingAdapterPosition()))
                 return;
 
-            NewTransactionModel.Item head = getItem().toTransactionHead();
+            final NewTransactionModel.Item item = getItem();
+            if (item == null)
+                return;
+
+            NewTransactionModel.Item head = item.toTransactionHead();
             // bad idea - double pop-up, and not really necessary.
             // the user can tap the input to get the calendar
             //if (!tvDate.hasFocus()) tvDate.requestFocus();
@@ -261,7 +265,11 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
 
         syncingData = true;
         try {
-            NewTransactionModel.TransactionHead head = getItem().toTransactionHead();
+            final NewTransactionModel.Item item = getItem();
+            if (item == null)
+                return false;
+
+            NewTransactionModel.TransactionHead head = item.toTransactionHead();
 
             head.setDate(String.valueOf(b.newTransactionDate.getText()));
 
@@ -320,8 +328,11 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
 
                 setEditable(true);
 
-                applyFocus(mAdapter.model.getFocusInfo()
-                                         .getValue());
+                NewTransactionItemsAdapter adapter =
+                        (NewTransactionItemsAdapter) getBindingAdapter();
+                if (adapter != null)
+                    applyFocus(adapter.model.getFocusInfo()
+                                            .getValue());
             }
             finally {
                 syncingData = false;
@@ -340,7 +351,11 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
     }
     @Override
     public void onDatePicked(int year, int month, int day) {
-        final NewTransactionModel.TransactionHead head = getItem().toTransactionHead();
+        final NewTransactionModel.Item item = getItem();
+        if (item == null)
+            return;
+
+        final NewTransactionModel.TransactionHead head = item.toTransactionHead();
         head.setDate(new SimpleDate(year, month + 1, day));
         b.newTransactionDate.setText(head.getFormattedDate());
 

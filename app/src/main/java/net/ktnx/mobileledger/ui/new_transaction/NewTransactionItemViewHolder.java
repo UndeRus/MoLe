@@ -20,25 +20,24 @@ package net.ktnx.mobileledger.ui.new_transaction;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 
 abstract class NewTransactionItemViewHolder extends RecyclerView.ViewHolder {
-    final NewTransactionItemsAdapter mAdapter;
     final Profile mProfile;
-    public NewTransactionItemViewHolder(@NonNull View itemView,
-                                        NewTransactionItemsAdapter adapter) {
+    public NewTransactionItemViewHolder(@NonNull View itemView) {
         super(itemView);
-        mAdapter = adapter;
         mProfile = Data.getProfile();
     }
+    @Nullable
     NewTransactionModel.Item getItem() {
-        return mAdapter.getItem(getBindingAdapterPosition());
-//        return Objects.requireNonNull(mAdapter.model.getItems()
-//                                                    .getValue())
-//                      .get(getBindingAdapterPosition());
+        NewTransactionItemsAdapter adapter = (NewTransactionItemsAdapter) getBindingAdapter();
+        if (adapter == null)
+            return null;
+        return adapter.getItem(getBindingAdapterPosition());
     }
     abstract public void bind(NewTransactionModel.Item item);
 }

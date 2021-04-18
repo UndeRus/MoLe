@@ -56,7 +56,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
     //TODO multiple amounts with different currencies per posting?
     NewTransactionAccountRowItemHolder(@NonNull NewTransactionAccountRowBinding b,
                                        NewTransactionItemsAdapter adapter) {
-        super(b.getRoot(), adapter);
+        super(b.getRoot());
         this.b = b;
         new TextViewClearHelper().attachToTextView(b.comment);
 
@@ -225,7 +225,11 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                  focusInfo.position != getBindingAdapterPosition()))
                 return;
 
-            NewTransactionModel.TransactionAccount acc = getItem().toTransactionAccount();
+            final NewTransactionModel.Item item = getItem();
+            if (item == null)
+                return;
+
+            NewTransactionModel.TransactionAccount acc = item.toTransactionAccount();
             switch (focusInfo.element) {
                 case Amount:
                     b.accountRowAccAmounts.requestFocus();
@@ -404,7 +408,9 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
             return false;
         }
 
-        NewTransactionModel.Item item = getItem();
+        final NewTransactionModel.Item item = getItem();
+        if (item == null)
+            return false;
 
         syncingData = true;
 
@@ -524,8 +530,11 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
 
                 setEditable(true);
 
-                applyFocus(mAdapter.model.getFocusInfo()
-                                         .getValue());
+                NewTransactionItemsAdapter adapter =
+                        (NewTransactionItemsAdapter) getBindingAdapter();
+                if (adapter != null)
+                    applyFocus(adapter.model.getFocusInfo()
+                                            .getValue());
             }
             finally {
                 syncingData = false;
