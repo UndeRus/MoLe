@@ -407,8 +407,7 @@ public class RetrieveTransactionsTask extends
             return retrieveAccountListForVersion(apiVersion);
         }
     }
-    private List<LedgerAccount> retrieveAccountListAnyVersion()
-            throws HTTPException, ApiNotSupportedException {
+    private List<LedgerAccount> retrieveAccountListAnyVersion() throws ApiNotSupportedException {
         for (API ver : API.allVersions) {
             try {
                 return retrieveAccountListForVersion(ver);
@@ -419,10 +418,9 @@ public class RetrieveTransactionsTask extends
                                 ver.getDescription()));
             }
 
-            throw new ApiNotSupportedException();
         }
 
-        throw new RuntimeException("This should never be reached");
+        throw new ApiNotSupportedException();
     }
     private List<LedgerAccount> retrieveAccountListForVersion(API version)
             throws IOException, HTTPException {
@@ -483,16 +481,15 @@ public class RetrieveTransactionsTask extends
             try {
                 return retrieveTransactionListForVersion(ver);
             }
-            catch (Exception | HTTPException e) {
+            catch (Exception e) {
                 Logger.debug("json",
                         String.format(Locale.US, "Error during account list retrieval using API %s",
                                 ver.getDescription()));
             }
 
-            throw new ApiNotSupportedException();
         }
 
-        throw new RuntimeException("This should never be reached");
+        throw new ApiNotSupportedException();
     }
     private List<LedgerTransaction> retrieveTransactionListForVersion(API apiVersion)
             throws IOException, ParseException, HTTPException {
@@ -590,8 +587,8 @@ public class RetrieveTransactionsTask extends
         }
         catch (HTTPException e) {
             e.printStackTrace();
-            return new Result(String.format("HTTP error %d: %s", e.getResponseCode(),
-                    e.getResponseMessage()));
+            return new Result(
+                    String.format("HTTP error %d: %s", e.getResponseCode(), e.getMessage()));
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,17 +17,13 @@
 
 package net.ktnx.mobileledger.err;
 
-public class HTTPException extends Throwable {
+public class HTTPException extends Exception {
     private final int responseCode;
-    private final String responseMessage;
     public int getResponseCode() {
         return responseCode;
     }
-    public String getResponseMessage() {
-        return responseMessage;
-    }
     public HTTPException(int responseCode, String responseMessage) {
+        super(responseMessage);
         this.responseCode = responseCode;
-        this.responseMessage = responseMessage;
     }
 }
