@@ -46,6 +46,12 @@ android {
             versionNameSuffix '-debug'
             applicationIdSuffix '.debug'
         }
+        pre {
+            applicationIdSuffix '.pre'
+            versionNameSuffix '-pre'
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
     buildToolsVersion '29.0.3'
