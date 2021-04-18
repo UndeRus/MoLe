@@ -35,10 +35,10 @@ abstract class NewTransactionItemViewHolder extends RecyclerView.ViewHolder {
         mProfile = Data.getProfile();
     }
     NewTransactionModel.Item getItem() {
-        return mAdapter.getItem(getAdapterPosition());
+        return mAdapter.getItem(getBindingAdapterPosition());
 //        return Objects.requireNonNull(mAdapter.model.getItems()
 //                                                    .getValue())
-//                      .get(getAdapterPosition());
+//                      .get(getBindingAdapterPosition());
     }
     abstract public void bind(NewTransactionModel.Item item);
 }

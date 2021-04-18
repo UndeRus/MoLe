@@ -81,12 +81,13 @@ public class ProfilesRecyclerViewAdapter
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
                 final List<Profile> profiles = new ArrayList<>(listDiffer.getCurrentList());
-                Collections.swap(profiles, viewHolder.getAdapterPosition(),
-                        target.getAdapterPosition());
+                Collections.swap(profiles, viewHolder.getBindingAdapterPosition(),
+                        target.getBindingAdapterPosition());
                 DB.get()
                   .getProfileDAO()
                   .updateOrder(profiles, null);
-//                notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+//                notifyItemMoved(viewHolder.getBindingAdapterPosition(), target
+//                .getBindingAdapterPosition());
                 return true;
             }
             @Override
@@ -171,7 +172,7 @@ public class ProfilesRecyclerViewAdapter
 
         holder.mEditButton.setOnClickListener(view -> {
             Profile p = listDiffer.getCurrentList()
-                                  .get(holder.getAdapterPosition());
+                                  .get(holder.getBindingAdapterPosition());
             ProfileDetailActivity.start(view.getContext(), p);
         });
 
@@ -253,7 +254,7 @@ public class ProfilesRecyclerViewAdapter
             if (editingProfiles())
                 return;
             Profile profile = listDiffer.getCurrentList()
-                                        .get(getAdapterPosition());
+                                        .get(getBindingAdapterPosition());
             if (Data.getProfile() != profile) {
                 debug("profiles", "Setting profile to " + profile.getName());
                 Data.drawerOpen.setValue(false);

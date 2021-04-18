@@ -81,7 +81,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
             public boolean canDropOver(@NonNull RecyclerView recyclerView,
                                        @NonNull RecyclerView.ViewHolder current,
                                        @NonNull RecyclerView.ViewHolder target) {
-                final int adapterPosition = target.getAdapterPosition();
+                final int adapterPosition = target.getBindingAdapterPosition();
 
                 // first item is immovable
                 if (adapterPosition == 0)
@@ -94,7 +94,7 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                                         @NonNull RecyclerView.ViewHolder viewHolder) {
                 int flags = makeFlag(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.END);
                 // the top (date and description) and the bottom (padding) items are always there
-                final int adapterPosition = viewHolder.getAdapterPosition();
+                final int adapterPosition = viewHolder.getBindingAdapterPosition();
                 if (adapterPosition > 0) {
                     flags |= makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
                             ItemTouchHelper.UP | ItemTouchHelper.DOWN) |
@@ -109,12 +109,13 @@ class NewTransactionItemsAdapter extends RecyclerView.Adapter<NewTransactionItem
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
 
-                model.moveItem(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                model.moveItem(viewHolder.getBindingAdapterPosition(),
+                        target.getBindingAdapterPosition());
                 return true;
             }
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int pos = viewHolder.getAdapterPosition();
+                int pos = viewHolder.getBindingAdapterPosition();
                 viewModel.removeItem(pos);
             }
         });

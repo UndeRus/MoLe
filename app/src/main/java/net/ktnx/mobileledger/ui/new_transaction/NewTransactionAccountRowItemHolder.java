@@ -31,6 +31,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.NewTransactionAccountRowBinding;
@@ -73,7 +74,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                 boolean wasSyncing = syncingData;
                 syncingData = true;
                 try {
-                    final int pos = getAdapterPosition();
+                    final int pos = getBindingAdapterPosition();
                     if (id == R.id.account_row_acc_name) {
                         adapter.noteFocusIsOnAccount(pos);
                     }
@@ -178,7 +179,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
             CurrencySelectorFragment cpf = new CurrencySelectorFragment();
             cpf.showPositionAndPadding();
             cpf.setOnCurrencySelectedListener(
-                    c -> adapter.setItemCurrency(getAdapterPosition(), c));
+                    c -> adapter.setItemCurrency(getBindingAdapterPosition(), c));
             cpf.show(activity.getSupportFragmentManager(), "currency-selector");
         });
 
@@ -221,7 +222,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
         ignoreFocusChanges = true;
         try {
             if (((focusInfo == null) || (focusInfo.element == null) ||
-                 focusInfo.position != getAdapterPosition()))
+                 focusInfo.position != getBindingAdapterPosition()))
                 return;
 
             NewTransactionModel.TransactionAccount acc = getItem().toTransactionAccount();
@@ -397,7 +398,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
             return false;
         }
 
-        if (getAdapterPosition() < 0) {
+        if (getBindingAdapterPosition() == RecyclerView.NO_POSITION) {
             // probably the row was swiped out
             Logger.debug("new-trans", "Ignoring request to suncData(): adapter position negative");
             return false;

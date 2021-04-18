@@ -138,7 +138,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             public boolean canDropOver(@NonNull RecyclerView recyclerView,
                                        @NonNull RecyclerView.ViewHolder current,
                                        @NonNull RecyclerView.ViewHolder target) {
-                final int adapterPosition = target.getAdapterPosition();
+                final int adapterPosition = target.getBindingAdapterPosition();
 
                 // first item is immovable
                 if (adapterPosition == 0)
@@ -151,7 +151,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                                         @NonNull RecyclerView.ViewHolder viewHolder) {
                 int flags = 0;
                 // the top item (transaction params) is always there
-                final int adapterPosition = viewHolder.getAdapterPosition();
+                final int adapterPosition = viewHolder.getBindingAdapterPosition();
                 if (adapterPosition > 0)
                     flags |= makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
                             ItemTouchHelper.UP | ItemTouchHelper.DOWN) |
@@ -165,8 +165,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                                   @NonNull RecyclerView.ViewHolder viewHolder,
                                   @NonNull RecyclerView.ViewHolder target) {
 
-                final int fromPosition = viewHolder.getAdapterPosition();
-                final int toPosition = target.getAdapterPosition();
+                final int fromPosition = viewHolder.getBindingAdapterPosition();
+                final int toPosition = target.getBindingAdapterPosition();
                 if (fromPosition == toPosition) {
                     Logger.debug("drag", String.format(Locale.US,
                             "Ignoring request to move an account from position %d to %d",
@@ -183,7 +183,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
             }
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int pos = viewHolder.getAdapterPosition();
+                int pos = viewHolder.getBindingAdapterPosition();
                 mModel.removeItem(pos);
             }
         });
@@ -421,7 +421,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         }
         @NotNull
         private TemplateDetailsItem.Header getItem() {
-            int pos = getAdapterPosition();
+            int pos = getBindingAdapterPosition();
             return differ.getCurrentList()
                          .get(pos)
                          .asHeaderItem();
@@ -476,7 +476,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     }
                 }
 
-                notifyItemChanged(getAdapterPosition());
+                notifyItemChanged(getBindingAdapterPosition());
             });
             final AppCompatActivity activity = (AppCompatActivity) v.getContext();
             sel.show(activity.getSupportFragmentManager(), "template-details-source-selector");
@@ -761,7 +761,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                 String groupNoText = resources.getString(R.string.template_item_match_group_source);
 
                 Logger.debug("drag", String.format(Locale.US, "Binding account id %d, pos %d at %d",
-                        item.getId(), item.getPosition(), getAdapterPosition()));
+                        item.getId(), item.getPosition(), getBindingAdapterPosition()));
                 TemplateDetailsItem.AccountRow accRow = item.asAccountRowItem();
                 b.patternAccountLabel.setText(String.format(Locale.US,
                         resources.getString(R.string.template_details_account_row_label),
@@ -837,7 +837,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
         }
         private @NotNull TemplateDetailsItem.AccountRow getItem() {
             return differ.getCurrentList()
-                         .get(getAdapterPosition())
+                         .get(getBindingAdapterPosition())
                          .asAccountRowItem();
         }
         private void selectAccountRowDetailSource(View v, AccDetail detail) {
@@ -879,7 +879,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     }
                 }
 
-                notifyItemChanged(getAdapterPosition());
+                notifyItemChanged(getBindingAdapterPosition());
             });
             final AppCompatActivity activity = (AppCompatActivity) v.getContext();
             sel.show(activity.getSupportFragmentManager(), "template-details-source-selector");

@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.NewTransactionHeaderRowBinding;
@@ -71,7 +72,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
                 boolean wasSyncing = syncingData;
                 syncingData = true;
                 try {
-                    final int pos = getAdapterPosition();
+                    final int pos = getBindingAdapterPosition();
                     if (id == R.id.transaction_comment) {
                         adapter.noteFocusIsOnTransactionComment(pos);
                     }
@@ -153,7 +154,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
         ignoreFocusChanges = true;
         try {
             if (((focusInfo == null) || (focusInfo.element == null) ||
-                 focusInfo.position != getAdapterPosition()))
+                 focusInfo.position != getBindingAdapterPosition()))
                 return;
 
             NewTransactionModel.Item head = getItem().toTransactionHead();
@@ -249,7 +250,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
             return false;
         }
 
-        if (getAdapterPosition() < 0) {
+        if (getBindingAdapterPosition() == RecyclerView.NO_POSITION) {
             // probably the row was swiped out
             Logger.debug("new-trans", "Ignoring request to suncData(): adapter position negative");
             return false;

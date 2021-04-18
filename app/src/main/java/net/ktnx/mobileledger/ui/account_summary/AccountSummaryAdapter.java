@@ -259,7 +259,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
         @NotNull
         private LedgerAccount getAccount() {
             return listDiffer.getCurrentList()
-                             .get(getAdapterPosition())
+                             .get(getBindingAdapterPosition())
                              .getAccount();
         }
         private void toggleAmountsExpanded() {
