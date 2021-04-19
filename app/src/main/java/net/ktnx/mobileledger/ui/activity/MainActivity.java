@@ -383,6 +383,12 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         mProfileListAdapter.setProfileList(newList);
 
         createShortcuts(newList);
+
+        Profile currentProfile = Data.getProfile();
+        if (currentProfile == null || !newList.contains(currentProfile)) {
+            Logger.debug(TAG, "Switching profile because the current is no longer available");
+            Data.setCurrentProfile(newList.get(0));
+        }
     }
     /**
      * called when the current profile has changed
