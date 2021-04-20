@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -48,8 +48,9 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
         List<TransactionListItem> transactions = Objects.requireNonNull(
                 param[0].model.getDisplayedTransactions()
                               .getValue());
+        final int transactionCount = transactions.size();
         Logger.debug("go-to-date",
-                String.format(Locale.US, "List contains %d transactions", transactions.size()));
+                String.format(Locale.US, "List contains %d transactions", transactionCount));
 
         TransactionListItem target = new TransactionListItem(date, true);
         int found =
@@ -57,7 +58,7 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
         if (found >= 0)
             return found;
         else
-            return 1 - found;
+            return -1 - found;
     }
 
     public static class Params {
@@ -72,9 +73,11 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
     static class TransactionListItemComparator implements Comparator<TransactionListItem> {
         @Override
         public int compare(@NotNull TransactionListItem a, @NotNull TransactionListItem b) {
-            if (a.getType() == TransactionListItem.Type.HEADER)
+            final TransactionListItem.Type aType = a.getType();
+            if (aType == TransactionListItem.Type.HEADER)
                 return +1;
-            if (b.getType() == TransactionListItem.Type.HEADER)
+            final TransactionListItem.Type bType = b.getType();
+            if (bType == TransactionListItem.Type.HEADER)
                 return -1;
             final SimpleDate aDate = a.getDate();
             final SimpleDate bDate = b.getDate();
@@ -82,14 +85,14 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
             if (res != 0)
                 return -res;    // transactions are reverse sorted by date
 
-            if (a.getType() == TransactionListItem.Type.DELIMITER) {
-                if (b.getType() == TransactionListItem.Type.DELIMITER)
+            if (aType == TransactionListItem.Type.DELIMITER) {
+                if (bType == TransactionListItem.Type.DELIMITER)
                     return 0;
                 else
                     return -1;
             }
             else {
-                if (b.getType() == TransactionListItem.Type.DELIMITER)
+                if (bType == TransactionListItem.Type.DELIMITER)
                     return +1;
                 else
                     return 0;
