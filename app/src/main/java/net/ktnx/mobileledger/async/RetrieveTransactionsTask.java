@@ -25,6 +25,7 @@ import android.os.OperationCanceledException;
 import androidx.annotation.NonNull;
 import androidx.room.Transaction;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
 import net.ktnx.mobileledger.App;
@@ -407,15 +408,16 @@ public class RetrieveTransactionsTask extends
             return retrieveAccountListForVersion(apiVersion);
         }
     }
-    private List<LedgerAccount> retrieveAccountListAnyVersion() throws ApiNotSupportedException {
+    private List<LedgerAccount> retrieveAccountListAnyVersion()
+            throws ApiNotSupportedException, IOException, HTTPException {
         for (API ver : API.allVersions) {
             try {
                 return retrieveAccountListForVersion(ver);
             }
-            catch (Exception e) {
+            catch (JsonParseException | RuntimeJsonMappingException e) {
                 Logger.debug("json",
                         String.format(Locale.US, "Error during account list retrieval using API %s",
-                                ver.getDescription()));
+                                ver.getDescription()), e);
             }
 
         }
