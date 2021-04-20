@@ -51,7 +51,6 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
 import java.io.BufferedReader;
@@ -662,7 +661,7 @@ public class RetrieveTransactionsTask extends
 
         DB.get()
           .getOptionDAO()
-          .insertSync(new Option(profile.getId(), MLDB.OPT_LAST_SCRAPE,
+          .insertSync(new Option(profile.getId(), Option.OPT_LAST_SCRAPE,
                   String.valueOf((new Date()).getTime())));
     }
     public void throwIfCancelled() {

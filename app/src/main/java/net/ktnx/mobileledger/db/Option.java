@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Entity(tableName = "options", primaryKeys = {"profile_id", "name"})
 public class Option {
+    public static final String OPT_LAST_SCRAPE = "last_scrape";
     @ColumnInfo(name = "profile_id")
     private long profileId;
     @NonNull

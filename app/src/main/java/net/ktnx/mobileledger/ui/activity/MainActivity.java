@@ -53,6 +53,7 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.databinding.ActivityMainBinding;
 import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Option;
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.FabManager;
@@ -65,7 +66,6 @@ import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MLDB;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -543,7 +543,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
 
         DB.get()
           .getOptionDAO()
-          .load(profile.getId(), MLDB.OPT_LAST_SCRAPE)
+          .load(profile.getId(), Option.OPT_LAST_SCRAPE)
           .observe(this, opt -> {
               long lastUpdate = 0;
               if (opt != null) {
