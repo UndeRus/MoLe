@@ -17,57 +17,52 @@
 
 package net.ktnx.mobileledger.async;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
-import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Profile;
+import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.ui.MainModel;
-import net.ktnx.mobileledger.utils.SimpleDate;
+import net.ktnx.mobileledger.utils.Logger;
+
+import java.util.List;
 
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
-    protected String doInBackground(MainModel[] model) {
+    protected String doInBackground(MainModel[] parentModel) {
         final Profile profile = Data.getProfile();
 
         long profile_id = profile.getId();
         Data.backgroundTaskStarted();
         try {
-            String sql;
-            String[] params;
+            Logger.debug("UTT", "Starting DB transaction list retrieval");
 
-            final String accFilter = model[0].getAccountFilter()
-                                             .getValue();
+            final MainModel model = parentModel[0];
+            final String accFilter = model.getAccountFilter()
+                                          .getValue();
+            final List<TransactionWithAccounts> transactions;
+
             if (accFilter == null) {
-                sql = "SELECT id, year, month, day FROM transactions WHERE profile_id=? ORDER BY " +
-                      "year desc, month desc, day desc, id desc";
-                params = new String[]{String.valueOf(profile_id)};
-
+                transactions = DB.get()
+                                 .getTransactionDAO()
+                                 .getAllWithAccountsSync(profile_id);
             }
             else {
-                sql = "SELECT distinct tr.id, tr.year, tr.month, tr.day from transactions tr " +
-                      "JOIN transaction_accounts ta ON ta.transaction_id=tr.id WHERE tr" +
-                      ".profile_id=? and ta.account_name LIKE ?||'%' AND ta.amount <> 0 ORDER " +
-                      "BY tr.year desc, tr.month desc, tr.day desc, tr.id " + "desc";
-                params = new String[]{String.valueOf(profile_id), accFilter};
+                transactions = DB.get()
+                                 .getTransactionDAO()
+                                 .getAllWithAccountsFilteredSync(profile_id, accFilter);
             }
 
-            debug("UTT", sql);
-            TransactionAccumulator accumulator = new TransactionAccumulator(model[0]);
+            TransactionAccumulator accumulator = new TransactionAccumulator(model);
 
-            SQLiteDatabase db = App.getDatabase();
-            try (Cursor cursor = db.rawQuery(sql, params)) {
-                while (cursor.moveToNext()) {
-                    if (isCancelled())
-                        return null;
+            for (TransactionWithAccounts tr : transactions) {
+                if (isCancelled())
+                    return null;
 
-                    accumulator.put(new LedgerTransaction(cursor.getInt(0)),
-                            new SimpleDate(cursor.getInt(1), cursor.getInt(2), cursor.getInt(3)));
-                }
+                accumulator.put(new LedgerTransaction(tr));
             }
 
             accumulator.done();

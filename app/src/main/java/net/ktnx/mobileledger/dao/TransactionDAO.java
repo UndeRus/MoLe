@@ -55,13 +55,6 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     @Delete
     public abstract void deleteSync(List<Transaction> items);
 
-    @Query("SELECT * FROM transactions")
-    public abstract LiveData<List<Transaction>> getAll();
-
-    //    not useful for now
-//    @Transaction
-//    @Query("SELECT * FROM patterns")
-//    List<PatternWithAccounts> getPatternsWithAccounts();
     @Query("SELECT * FROM transactions WHERE id = :id")
     public abstract LiveData<Transaction> getById(long id);
 
@@ -93,11 +86,26 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract TransactionWithAccounts getFirstByDescriptionHavingAccountSync(
             @NonNull String description, @NonNull String accountTerm);
 
-    @Query("SELECT * from transactions WHERE profile_id = :profileId")
+    @Query("SELECT * from transactions WHERE profile_id = :profileId ORDER BY " +
+           "year desc, month desc, day desc, id desc")
     public abstract List<Transaction> allForProfileSync(long profileId);
 
     @Query("SELECT generation FROM transactions WHERE profile_id = :profileId LIMIT 1")
     protected abstract TransactionGenerationContainer getGenerationPOJOSync(long profileId);
+
+    @androidx.room.Transaction
+    @Query("SELECT * FROM transactions WHERE profile_id = :profileId")
+    public abstract List<TransactionWithAccounts> getAllWithAccountsSync(long profileId);
+
+    @androidx.room.Transaction
+    @Query("SELECT distinct(tr.id), tr.ledger_id, tr.profile_id, tr.data_hash, tr.year, tr.month," +
+           " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
+           "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
+           ":accountName||'%' AND ta.amount <> 0 AND tr.profile_id = :profileId ORDER BY tr.year " +
+           "desc, tr.month desc, tr.day desc, tr.id desc")
+    public abstract List<TransactionWithAccounts> getAllWithAccountsFilteredSync(long profileId,
+                                                                                 String accountName);
+
     public long getGenerationSync(long profileId) {
         TransactionGenerationContainer result = getGenerationPOJOSync(profileId);
 
