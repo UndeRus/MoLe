@@ -113,6 +113,8 @@ public class MainModel extends ViewModel {
     public synchronized void stopTransactionsRetrieval() {
         if (retrieveTransactionsTask != null)
             retrieveTransactionsTask.cancel(true);
+        else
+            Data.backgroundTaskProgress.setValue(null);
     }
     public void transactionRetrievalDone() {
         retrieveTransactionsTask = null;

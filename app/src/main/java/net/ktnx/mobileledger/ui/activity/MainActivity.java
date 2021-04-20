@@ -615,14 +615,16 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
             b.transactionProgressLayout.setVisibility(View.GONE);
         }
     }
-    public void onRetrieveProgress(RetrieveTransactionsTask.Progress progress) {
-        if (progress.getState() == RetrieveTransactionsTask.ProgressState.FINISHED) {
+    public void onRetrieveProgress(@Nullable RetrieveTransactionsTask.Progress progress) {
+        if (progress == null ||
+            progress.getState() == RetrieveTransactionsTask.ProgressState.FINISHED)
+        {
             Logger.debug("progress", "Done");
             b.transactionProgressLayout.setVisibility(View.GONE);
 
             mainModel.transactionRetrievalDone();
 
-            String error = progress.getError();
+            String error = (progress == null) ? null : progress.getError();
             if (error != null) {
                 if (error.equals(RetrieveTransactionsTask.Result.ERR_JSON_PARSER_ERROR))
                     error = getResources().getString(R.string.err_json_parser_error);
