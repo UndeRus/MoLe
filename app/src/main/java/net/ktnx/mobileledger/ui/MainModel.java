@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui;
 
 import android.os.AsyncTask;
-import android.text.TextUtils;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -82,21 +81,6 @@ public class MainModel extends ViewModel {
     }
     public void setLastTransactionDate(SimpleDate latestDate) {
         this.lastTransactionDate = latestDate;
-    }
-    private void applyTransactionFilter(List<LedgerTransaction> list) {
-        final String accFilter = accountFilter.getValue();
-        ArrayList<TransactionListItem> newList = new ArrayList<>();
-
-        TransactionAccumulator accumulator = new TransactionAccumulator(this);
-        if (TextUtils.isEmpty(accFilter))
-            for (LedgerTransaction tr : list)
-                newList.add(new TransactionListItem(tr));
-        else
-            for (LedgerTransaction tr : list)
-                if (tr.hasAccountNamedLike(accFilter))
-                    newList.add(new TransactionListItem(tr));
-
-        displayedTransactions.postValue(newList);
     }
     public synchronized void scheduleTransactionListRetrieval() {
         if (retrieveTransactionsTask != null) {

@@ -106,7 +106,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
         root = view.findViewById(R.id.transaction_root);
         if (root == null)
             throw new RuntimeException("Can't get hold on the transaction value view");
-        modelAdapter = new TransactionListAdapter(model);
+        modelAdapter = new TransactionListAdapter();
         root.setAdapter(modelAdapter);
 
         mainActivity.fabShouldShow();

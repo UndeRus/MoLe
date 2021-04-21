@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.SimpleDate;
@@ -29,14 +30,17 @@ public class TransactionListItem {
     private SimpleDate date;
     private boolean monthShown;
     private LedgerTransaction transaction;
+    private String boldAccountName;
     public TransactionListItem(@NotNull SimpleDate date, boolean monthShown) {
         this.type = Type.DELIMITER;
         this.date = date;
         this.monthShown = monthShown;
     }
-    public TransactionListItem(@NotNull LedgerTransaction transaction) {
+    public TransactionListItem(@NotNull LedgerTransaction transaction,
+                               @Nullable String boldAccountName) {
         this.type = Type.TRANSACTION;
         this.transaction = transaction;
+        this.boldAccountName = boldAccountName;
     }
     public TransactionListItem() {
         this.type = Type.HEADER;
@@ -64,5 +68,21 @@ public class TransactionListItem {
                     String.format("Item type is not %s, but %s", Type.TRANSACTION, type));
         return transaction;
     }
-    public enum Type {TRANSACTION, DELIMITER, HEADER}
+    public @Nullable
+    String getBoldAccountName() {
+        return boldAccountName;
+    }
+    public enum Type {
+        TRANSACTION, DELIMITER, HEADER;
+        public static Type valueOf(int i) {
+            if (i == TRANSACTION.ordinal())
+                return TRANSACTION;
+            else if (i == DELIMITER.ordinal())
+                return DELIMITER;
+            else if (i == HEADER.ordinal())
+                return HEADER;
+            else
+                throw new IllegalStateException("Unexpected value: " + i);
+        }
+    }
 }

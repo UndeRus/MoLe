@@ -17,74 +17,101 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Typeface;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.databinding.TransactionListRowBinding;
+import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
+import net.ktnx.mobileledger.utils.Colors;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.Observer;
 
-class TransactionRowHolder extends RecyclerView.ViewHolder {
-    final TextView tvDescription;
-    final TextView tvComment;
-    final LinearLayout tableAccounts;
-    final ConstraintLayout row;
-    final ConstraintLayout vDelimiter;
-    final CardView vTransaction;
-    final TextView tvDelimiterMonth, tvDelimiterDate;
-    final View vDelimiterThick;
-    final View vHeader;
-    final TextView tvLastUpdate;
+class TransactionRowHolder extends TransactionRowHolderBase {
+    private final TransactionListRowBinding b;
     TransactionListItem.Type lastType;
     private Observer lastUpdateObserver;
-    public TransactionRowHolder(@NonNull View itemView) {
-        super(itemView);
-        this.row = itemView.findViewById(R.id.transaction_row);
-        this.tvDescription = itemView.findViewById(R.id.transaction_row_description);
-        this.tvComment = itemView.findViewById(R.id.transaction_comment);
-        this.tableAccounts = itemView.findViewById(R.id.transaction_row_acc_amounts);
-        this.vDelimiter = itemView.findViewById(R.id.transaction_delimiter);
-        this.vTransaction = itemView.findViewById(R.id.transaction_card_view);
-        this.tvDelimiterDate = itemView.findViewById(R.id.transaction_delimiter_date);
-        this.tvDelimiterMonth = itemView.findViewById(R.id.transaction_delimiter_month);
-        this.vDelimiterThick = itemView.findViewById(R.id.transaction_delimiter_thick);
-        this.vHeader = itemView.findViewById(R.id.last_update_container);
-        this.tvLastUpdate = itemView.findViewById(R.id.last_update_text);
+    public TransactionRowHolder(@NonNull TransactionListRowBinding binding) {
+        super(binding.getRoot());
+        b = binding;
     }
-    void setLastUpdateText(String text) {
-        tvLastUpdate.setText(text);
-    }
-    void setType(TransactionListItem.Type newType) {
-        if (newType == lastType)
-            return;
-
-        switch (newType) {
-            case TRANSACTION:
-                vHeader.setVisibility(View.GONE);
-                vTransaction.setVisibility(View.VISIBLE);
-                vDelimiter.setVisibility(View.GONE);
-                break;
-            case DELIMITER:
-                vHeader.setVisibility(View.GONE);
-                vTransaction.setVisibility(View.GONE);
-                vDelimiter.setVisibility(View.VISIBLE);
-                break;
-            case HEADER:
-                vHeader.setVisibility(View.VISIBLE);
-                vTransaction.setVisibility(View.GONE);
-                vDelimiter.setVisibility(View.GONE);
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + newType);
+    public void bind(@NonNull LedgerTransaction tr, @Nullable String boldAccountName) {
+        b.transactionRowDescription.setText(tr.getDescription());
+        String trComment = Misc.emptyIsNull(tr.getComment());
+        if (trComment == null)
+            b.transactionComment.setVisibility(View.GONE);
+        else {
+            b.transactionComment.setText(trComment);
+            b.transactionComment.setVisibility(View.VISIBLE);
         }
 
-        lastType = newType;
+        int rowIndex = 0;
+        Context ctx = b.getRoot()
+                       .getContext();
+        LayoutInflater inflater = ((Activity) ctx).getLayoutInflater();
+        for (LedgerTransactionAccount acc : tr.getAccounts()) {
+            LinearLayout row = (LinearLayout) b.transactionRowAccAmounts.getChildAt(rowIndex);
+            if (row == null) {
+                row = new LinearLayout(ctx);
+                inflater.inflate(R.layout.transaction_list_row_accounts_table_row, row);
+                b.transactionRowAccAmounts.addView(row);
+            }
+
+            TextView dummyText = row.findViewById(R.id.dummy_text);
+            TextView accName = row.findViewById(R.id.transaction_list_acc_row_acc_name);
+            TextView accComment = row.findViewById(R.id.transaction_list_acc_row_acc_comment);
+            TextView accAmount = row.findViewById(R.id.transaction_list_acc_row_acc_amount);
+
+            if ((boldAccountName != null) && acc.getAccountName()
+                                                .startsWith(boldAccountName))
+            {
+                accName.setTextColor(Colors.secondary);
+                accAmount.setTextColor(Colors.secondary);
+
+                SpannableString ss = new SpannableString(acc.getAccountName());
+                ss.setSpan(new StyleSpan(Typeface.BOLD), 0, boldAccountName.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                accName.setText(ss);
+            }
+            else {
+                @ColorInt int textColor = dummyText.getTextColors()
+                                                   .getDefaultColor();
+                accName.setTextColor(textColor);
+                accAmount.setTextColor(textColor);
+                accName.setText(acc.getAccountName());
+            }
+
+            String comment = acc.getComment();
+            if (comment != null && !comment.isEmpty()) {
+                accComment.setText(comment);
+                accComment.setVisibility(View.VISIBLE);
+            }
+            else {
+                accComment.setVisibility(View.GONE);
+            }
+            accAmount.setText(acc.toString());
+
+            rowIndex++;
+        }
+
+        if (b.transactionRowAccAmounts.getChildCount() > rowIndex) {
+            b.transactionRowAccAmounts.removeViews(rowIndex,
+                    b.transactionRowAccAmounts.getChildCount() - rowIndex);
+        }
     }
 }
