@@ -21,16 +21,13 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.profiles.ProfileDetailModel;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,14 +43,7 @@ public class App extends Application {
     public static final String PREF_PROFILE_ID = "profile-id";
     public static App instance;
     private static ProfileDetailModel profileModel;
-    private MobileLedgerDatabase dbHelper;
     private boolean monthNamesPrepared = false;
-    public static SQLiteDatabase getDatabase() {
-        if (instance == null)
-            throw new RuntimeException("Application not created yet");
-
-        return instance.getDB();
-    }
     public static void prepareMonthNames() {
         instance.prepareMonthNames(false);
     }
@@ -141,33 +131,10 @@ public class App extends Application {
         monthNamesPrepared = true;
     }
     @Override
-    public void onTerminate() {
-        Logger.debug("flow", "App onTerminate()");
-        if (dbHelper != null)
-            dbHelper.close();
-        super.onTerminate();
-    }
-    @Override
     public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         prepareMonthNames(true);
         Data.refreshCurrencyData(Locale.getDefault());
         Data.locale.setValue(Locale.getDefault());
-    }
-    public SQLiteDatabase getDB() {
-        if (dbHelper == null)
-            initDb();
-
-        return dbHelper.getWritableDatabase();
-    }
-    private synchronized void initDb() {
-        if (dbHelper != null)
-            return;
-
-        // Let Room do any possible migrations
-        // this method may be removed when all DB access is made via Room
-        DB.get()
-          .compileStatement("select count(*) from profiles");
-        dbHelper = new MobileLedgerDatabase(this);
     }
 }

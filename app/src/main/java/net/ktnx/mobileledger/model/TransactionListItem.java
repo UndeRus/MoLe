@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import org.jetbrains.annotations.NotNull;
@@ -53,9 +52,8 @@ public class TransactionListItem {
     public SimpleDate getDate() {
         if (date != null)
             return date;
-        if (type == Type.HEADER)
-            throw new IllegalStateException("Header item has no date");
-        transaction.loadData(App.getDatabase());
+        if (type != Type.TRANSACTION)
+            throw new IllegalStateException("Only transaction items have a date");
         return transaction.getDate();
     }
     public boolean isMonthShown() {

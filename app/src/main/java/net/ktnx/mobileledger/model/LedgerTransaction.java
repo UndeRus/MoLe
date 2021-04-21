@@ -17,13 +17,9 @@
 
 package net.ktnx.mobileledger.model;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.Transaction;
 import net.ktnx.mobileledger.db.TransactionAccount;
@@ -172,7 +168,6 @@ public class LedgerTransaction {
         return ledgerId;
     }
     protected void fillDataHash() {
-        loadData(App.getDatabase());
         if (dataHash != null)
             return;
         try {
@@ -205,40 +200,6 @@ public class LedgerTransaction {
             throw new RuntimeException(
                     String.format("Unable to get instance of %s digest", DIGEST_TYPE), e);
         }
-    }
-    public synchronized void loadData(SQLiteDatabase db) {
-        if (dataLoaded)
-            return;
-
-        try (Cursor cTr = db.rawQuery(
-                "SELECT year, month, day, description, comment from transactions WHERE id=?",
-                new String[]{String.valueOf(ledgerId)}))
-        {
-            if (cTr.moveToFirst()) {
-                date = new SimpleDate(cTr.getInt(0), cTr.getInt(1), cTr.getInt(2));
-                description = cTr.getString(3);
-                comment = cTr.getString(4);
-
-                accounts.clear();
-
-                try (Cursor cAcc = db.rawQuery(
-                        "SELECT account_name, amount, currency, comment FROM " +
-                        "transaction_accounts WHERE transaction_id = ?",
-                        new String[]{String.valueOf(ledgerId)}))
-                {
-                    while (cAcc.moveToNext()) {
-//                        debug("transactions",
-//                                String.format("Loaded %d: %s %1.2f %s", id, cAcc.getString(0),
-//                                        cAcc.getFloat(1), cAcc.getString(2)));
-                        addAccount(new LedgerTransactionAccount(cAcc.getString(0), cAcc.getFloat(1),
-                                cAcc.getString(2), cAcc.getString(3)));
-                    }
-
-                    finishLoading();
-                }
-            }
-        }
-
     }
     public String getDataHash() {
         fillDataHash();

@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.async;
 
 import android.annotation.SuppressLint;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 
@@ -28,7 +27,6 @@ import androidx.room.Transaction;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
-import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.dao.AccountDAO;
 import net.ktnx.mobileledger.dao.AccountValueDAO;
 import net.ktnx.mobileledger.dao.TransactionAccountDAO;
@@ -436,7 +434,6 @@ public class RetrieveTransactionsTask extends
                 throw new HTTPException(http.getResponseCode(), http.getResponseMessage());
         }
         publishProgress(Progress.indeterminate());
-        SQLiteDatabase db = App.getDatabase();
         ArrayList<LedgerAccount> list = new ArrayList<>();
         HashMap<String, LedgerAccount> map = new HashMap<>();
         throwIfCancelled();
