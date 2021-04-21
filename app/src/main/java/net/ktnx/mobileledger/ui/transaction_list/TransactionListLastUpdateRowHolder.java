@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.transaction_list;
 
 import net.ktnx.mobileledger.databinding.LastUpdateLayoutBinding;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.ui.activity.MainActivity;
 
 class TransactionListLastUpdateRowHolder extends TransactionRowHolderBase {
     private final LastUpdateLayoutBinding b;
@@ -30,6 +31,7 @@ class TransactionListLastUpdateRowHolder extends TransactionRowHolderBase {
         b.lastUpdateText.setText(text);
     }
     public void bind() {
-        b.lastUpdateText.setText(Data.lastTransactionsUpdateText.getValue());
+        Data.lastTransactionsUpdateText.observe((MainActivity) b.lastUpdateText.getContext(),
+                b.lastUpdateText::setText);
     }
 }
