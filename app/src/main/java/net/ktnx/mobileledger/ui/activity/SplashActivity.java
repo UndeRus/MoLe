@@ -28,6 +28,8 @@ import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
+import java.util.Locale;
+
 public class SplashActivity extends CrashReportingActivity {
     private static final long keepActiveForMS = 400;
     private long startupTime;
@@ -77,8 +79,11 @@ public class SplashActivity extends CrashReportingActivity {
         if (now > startupTime + keepActiveForMS)
             startMainActivity();
         else {
-            new Handler().postDelayed(this::startMainActivity,
-                    keepActiveForMS - (now - startupTime));
+            final long delay = keepActiveForMS - (now - startupTime);
+            Logger.debug("splash",
+                    String.format(Locale.ROOT, "Scheduling main activity start in %d milliseconds",
+                            delay));
+            new Handler().postDelayed(this::startMainActivity, delay);
         }
     }
     private void startMainActivity() {
