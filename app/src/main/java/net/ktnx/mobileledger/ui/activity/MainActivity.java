@@ -178,6 +178,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         markDrawerItemCurrent(R.id.nav_account_summary);
 
         b.mainPager.setAdapter(mSectionsPagerAdapter);
+        b.mainPager.setOffscreenPageLimit(1);
 
         if (pageChangeCallback == null) {
             pageChangeCallback = new ViewPager2.OnPageChangeCallback() {
