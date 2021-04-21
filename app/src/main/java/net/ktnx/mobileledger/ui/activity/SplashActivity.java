@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -51,9 +50,9 @@ public class SplashActivity extends CrashReportingActivity {
 
         startupTime = System.currentTimeMillis();
 
-        AsyncTask<Void, Void, Void> dbInitTask = new DatabaseInitTask();
+        DatabaseInitThread dbInitThread = new DatabaseInitThread();
         Logger.debug("splash", "starting dbInit task");
-        dbInitTask.execute();
+        dbInitThread.start();
     }
     @Override
     protected void onPause() {
@@ -96,18 +95,14 @@ public class SplashActivity extends CrashReportingActivity {
             finish();
         }
     }
-    private static class DatabaseInitTask extends AsyncTask<Void, Void, Void> {
+    private static class DatabaseInitThread extends Thread {
         @Override
-        protected Void doInBackground(Void... voids) {
-            long ignored = DB.get().getProfileDAO().getProfileCountSync();
+        public void run() {
+            long ignored = DB.get()
+                             .getProfileDAO()
+                             .getProfileCountSync();
 
-            return null;
-        }
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Logger.debug("splash", "DatabaseInitTask::onPostExecute()");
-            super.onPostExecute(aVoid);
-            MobileLedgerDatabase.initComplete.setValue(true);
+            MobileLedgerDatabase.initComplete.postValue(true);
         }
     }
 }
