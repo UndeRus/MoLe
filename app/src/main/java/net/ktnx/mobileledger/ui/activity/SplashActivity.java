@@ -26,7 +26,6 @@ import androidx.annotation.Nullable;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.MobileLedgerDatabase;
 
 import java.util.Locale;
 
@@ -41,8 +40,8 @@ public class SplashActivity extends CrashReportingActivity {
         setContentView(R.layout.splash_activity_layout);
         Logger.debug("splash", "onCreate()");
 
-        MobileLedgerDatabase.initComplete.setValue(false);
-        MobileLedgerDatabase.initComplete.observe(this, this::onDbInitDoneChanged);
+        DB.initComplete.setValue(false);
+        DB.initComplete.observe(this, this::onDbInitDoneChanged);
     }
     @Override
     protected void onStart() {
@@ -107,7 +106,7 @@ public class SplashActivity extends CrashReportingActivity {
                              .getProfileDAO()
                              .getProfileCountSync();
 
-            MobileLedgerDatabase.initComplete.postValue(true);
+            DB.initComplete.postValue(true);
         }
     }
 }

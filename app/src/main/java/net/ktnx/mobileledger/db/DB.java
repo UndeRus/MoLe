@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -59,6 +60,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 abstract public class DB extends RoomDatabase {
     public static final int REVISION = 59;
     public static final String DB_NAME = "MoLe.db";
+    public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static DB instance;
     public static DB get() {
         if (instance != null)
