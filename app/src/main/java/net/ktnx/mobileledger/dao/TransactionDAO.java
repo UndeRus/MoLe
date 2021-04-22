@@ -84,10 +84,11 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract TransactionWithAccounts getFirstByDescriptionSync(@NonNull String description);
 
     @androidx.room.Transaction
-    @Query("SELECT * from transactions tr JOIN transaction_accounts t_a ON t_a.transaction_id = " +
-           "tr.id WHERE tr.description = :description AND t_a.account_name LIKE " +
-           "'%'||:accountTerm||'%' ORDER BY year desc, month desc, day desc, tr.ledger_id desc " +
-           "LIMIT 1")
+    @Query("SELECT tr.id, tr.profile_id, tr.ledger_id, tr.description, tr.data_hash, tr.comment, " +
+           "tr.year, tr.month, tr.day, tr.generation from transactions tr JOIN " +
+           "transaction_accounts t_a ON t_a.transaction_id = tr.id WHERE tr.description = " +
+           ":description AND t_a.account_name LIKE '%'||:accountTerm||'%' ORDER BY year desc, " +
+           "month desc, day desc, tr.ledger_id desc LIMIT 1")
     public abstract TransactionWithAccounts getFirstByDescriptionHavingAccountSync(
             @NonNull String description, @NonNull String accountTerm);
 
