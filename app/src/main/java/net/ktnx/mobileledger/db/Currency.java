@@ -1,3 +1,20 @@
+/*
+ * Copyright © 2021 Damyan Ivanov.
+ * This file is part of MoLe.
+ * MoLe is free software: you can distribute it and/or modify it
+ * under the term of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your opinion), any later version.
+ *
+ * MoLe is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License terms for details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package net.ktnx.mobileledger.db;
 
 import androidx.annotation.NonNull;
@@ -8,8 +25,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "currencies")
 public class Currency {
     @PrimaryKey(autoGenerate = true)
-    @NonNull
-    private final Long id;
+    private long id;
     @NonNull
     private String name;
     @NonNull
@@ -17,16 +33,18 @@ public class Currency {
     @NonNull
     @ColumnInfo(name = "has_gap")
     private Boolean hasGap;
-    public Currency(@NonNull Long id, @NonNull String name, @NonNull String position,
+    public Currency(long id, @NonNull String name, @NonNull String position,
                     @NonNull Boolean hasGap) {
         this.id = id;
         this.name = name;
         this.position = position;
         this.hasGap = hasGap;
     }
-    @NonNull
-    public Long getId() {
+    public long getId() {
         return id;
+    }
+    public void setId(long id) {
+        this.id = id;
     }
     @NonNull
     public String getName() {

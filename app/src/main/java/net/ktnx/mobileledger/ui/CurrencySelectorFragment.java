@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -155,8 +155,8 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
             if (!currName.isEmpty()) {
                 DB.get()
                   .getCurrencyDAO()
-                  .insert(new net.ktnx.mobileledger.db.Currency(null,
-                          String.valueOf(tvNewCurrName.getText()), "after", false), null);
+                  .insert(new net.ktnx.mobileledger.db.Currency(0,
+                          String.valueOf(tvNewCurrName.getText()), "after", false));
                 // FIXME hardcoded position and gap setting
             }
 
