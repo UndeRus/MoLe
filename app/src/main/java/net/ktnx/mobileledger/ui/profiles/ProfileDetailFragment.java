@@ -399,7 +399,7 @@ public class ProfileDetailFragment extends Fragment {
         Profile profile = new Profile();
         model.updateProfile(profile);
         if (profile.getId() > 0) {
-            dao.update(profile, null);
+            dao.update(profile);
             debug("profiles", "profile stored in DB");
 //                debug("profiles", String.format("Selected item is %d", mProfile.getThemeHue()));
         }

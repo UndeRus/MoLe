@@ -21,32 +21,38 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
-abstract class BaseDAO<T> {
+public abstract class BaseDAO<T> {
     abstract long insertSync(T item);
-    public void insert(T item, @Nullable OnInsertedReceiver receiver) {
+    public void insert(T item) {
+        AsyncTask.execute(() -> insertSync(item));
+    }
+    public void insert(T item, @NonNull OnInsertedReceiver receiver) {
         AsyncTask.execute(() -> {
             long id = insertSync(item);
-            if (receiver != null)
-                new Handler(Looper.getMainLooper()).post(() -> receiver.onInsert(id));
+            new Handler(Looper.getMainLooper()).post(() -> receiver.onInsert(id));
         });
     }
 
     abstract void updateSync(T item);
-    public void update(T item, @Nullable Runnable onDone) {
+    public void update(T item) {
+        AsyncTask.execute(() -> updateSync(item));
+    }
+    public void update(T item, @NonNull Runnable onDone) {
         AsyncTask.execute(() -> {
             updateSync(item);
-            if (onDone != null)
-                new Handler(Looper.getMainLooper()).post(onDone);
+            new Handler(Looper.getMainLooper()).post(onDone);
         });
     }
     abstract void deleteSync(T item);
-    public void delete(T item, @Nullable Runnable onDone) {
+    public void delete(T item) {
+        AsyncTask.execute(() -> deleteSync(item));
+    }
+    public void delete(T item, @NonNull Runnable onDone) {
         AsyncTask.execute(() -> {
             deleteSync(item);
-            if (onDone != null)
-                new Handler(Looper.getMainLooper()).post(onDone);
+            new Handler(Looper.getMainLooper()).post(onDone);
         });
     }
     interface OnInsertedReceiver {
