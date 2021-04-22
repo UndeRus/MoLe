@@ -50,6 +50,7 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
+import net.ktnx.mobileledger.utils.Profiler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,6 +87,7 @@ public class RetrieveTransactionsTask extends
     private static final Pattern reEnd = Pattern.compile("\\bid=\"addmodal\"");
     private static final Pattern reDecimalPoint = Pattern.compile("\\.\\d\\d?$");
     private static final Pattern reDecimalComma = Pattern.compile(",\\d\\d?$");
+    private static final String TAG = "RTT";
     // %3A is '='
     private final Pattern reAccountName =
             Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
@@ -624,6 +626,7 @@ public class RetrieveTransactionsTask extends
         AccountValueDAO valDao = DB.get()
                                    .getAccountValueDAO();
 
+        Logger.debug(TAG, "Preparing account list");
         final List<AccountWithAmounts> list = new ArrayList<>();
         for (LedgerAccount acc : accounts) {
             final AccountWithAmounts a = acc.toDBOWithAmounts();
@@ -637,24 +640,39 @@ public class RetrieveTransactionsTask extends
 
             list.add(a);
         }
+        Logger.debug(TAG, "Account list prepared. Storing");
         accDao.storeAccountsSync(list, profile.getId());
+        Logger.debug(TAG, "Account list stored");
 
+        Profiler tranProfiler = new Profiler("transactions");
+        Profiler tranAccProfiler = new Profiler("transaction accounts");
+
+        Logger.debug(TAG, "Storing transactions");
         long trGen = trDao.getGenerationSync(profile.getId());
         for (LedgerTransaction tr : transactions) {
             TransactionWithAccounts tran = tr.toDBO();
             tran.transaction.setGeneration(trGen);
             tran.transaction.setProfileId(profile.getId());
 
+            tranProfiler.opStart();
             tran.transaction.setId(trDao.insertSync(tran.transaction));
+            tranProfiler.opEnd();
 
             for (TransactionAccount trAcc : tran.accounts) {
                 trAcc.setGeneration(trGen);
                 trAcc.setTransactionId(tran.transaction.getId());
+                tranAccProfiler.opStart();
                 trAcc.setId(trAccDao.insertSync(trAcc));
+                tranAccProfiler.opEnd();
             }
         }
 
+        tranProfiler.dumpStats();
+        tranAccProfiler.dumpStats();
+
+        Logger.debug(TAG, "Transactions stored. Purging old");
         trDao.purgeOldTransactionsSync(profile.getId(), trGen);
+        Logger.debug(TAG, "Old transactions purged");
 
         DB.get()
           .getOptionDAO()
