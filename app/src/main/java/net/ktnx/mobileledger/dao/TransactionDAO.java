@@ -82,12 +82,13 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     @androidx.room.Transaction
     @Query("SELECT * from transactions tr JOIN transaction_accounts t_a ON t_a.transaction_id = " +
            "tr.id WHERE tr.description = :description AND t_a.account_name LIKE " +
-           "'%'||:accountTerm||'%' ORDER BY year desc, month desc, day desc LIMIT 1")
+           "'%'||:accountTerm||'%' ORDER BY year desc, month desc, day desc, tr.ledger_id desc " +
+           "LIMIT 1")
     public abstract TransactionWithAccounts getFirstByDescriptionHavingAccountSync(
             @NonNull String description, @NonNull String accountTerm);
 
     @Query("SELECT * from transactions WHERE profile_id = :profileId ORDER BY " +
-           "year desc, month desc, day desc, id desc")
+           "year desc, month desc, day desc, ledger_id desc")
     public abstract List<Transaction> allForProfileSync(long profileId);
 
     @Query("SELECT generation FROM transactions WHERE profile_id = :profileId LIMIT 1")
@@ -102,7 +103,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
            "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
            ":accountName||'%' AND ta.amount <> 0 AND tr.profile_id = :profileId ORDER BY tr.year " +
-           "desc, tr.month desc, tr.day desc, tr.id desc")
+           "desc, tr.month desc, tr.day desc, tr.ledger_id desc")
     public abstract List<TransactionWithAccounts> getAllWithAccountsFilteredSync(long profileId,
                                                                                  String accountName);
 
