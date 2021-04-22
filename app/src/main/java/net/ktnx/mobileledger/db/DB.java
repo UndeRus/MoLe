@@ -69,30 +69,31 @@ abstract public class DB extends RoomDatabase {
             if (instance != null)
                 return instance;
 
-            return instance = Room.databaseBuilder(App.instance, DB.class, DB_NAME)
-                                  .addMigrations(new Migration[]{singleVersionMigration(17),
-                                                                 singleVersionMigration(18),
-                                                                 singleVersionMigration(19),
-                                                                 singleVersionMigration(20),
-                                                                 multiVersionMigration(20, 22),
-                                                                 multiVersionMigration(22, 30),
-                                                                 multiVersionMigration(30, 32),
-                                                                 multiVersionMigration(32, 34),
-                                                                 multiVersionMigration(34, 40),
-                                                                 singleVersionMigration(41),
-                                                                 multiVersionMigration(41, 58),
-                                                                 singleVersionMigration(59)
-                                  })
-                                  .addCallback(new Callback() {
-                                      @Override
-                                      public void onOpen(@NonNull SupportSQLiteDatabase db) {
-                                          super.onOpen(db);
-                                          db.execSQL("PRAGMA foreign_keys = ON");
-                                          db.execSQL("pragma case_sensitive_like=ON;");
+            RoomDatabase.Builder<DB> builder =
+                    Room.databaseBuilder(App.instance, DB.class, DB_NAME);
+            builder.addMigrations(
+                    new Migration[]{singleVersionMigration(17), singleVersionMigration(18),
+                                    singleVersionMigration(19), singleVersionMigration(20),
+                                    multiVersionMigration(20, 22), multiVersionMigration(22, 30),
+                                    multiVersionMigration(30, 32), multiVersionMigration(32, 34),
+                                    multiVersionMigration(34, 40), singleVersionMigration(41),
+                                    multiVersionMigration(41, 58), singleVersionMigration(59)
+                    })
+                   .addCallback(new Callback() {
+                       @Override
+                       public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                           super.onOpen(db);
+                           db.execSQL("PRAGMA foreign_keys = ON");
+                           db.execSQL("pragma case_sensitive_like" + "=ON;");
 
-                                      }
-                                  })
-                                  .build();
+                       }
+                   });
+
+//            if (BuildConfig.DEBUG)
+//                builder.setQueryCallback(((sqlQuery, bindArgs) -> Logger.debug("room", sqlQuery)),
+//                        Executors.newSingleThreadExecutor());
+
+            return instance = builder.build();
         }
     }
     private static Migration singleVersionMigration(int toVersion) {
