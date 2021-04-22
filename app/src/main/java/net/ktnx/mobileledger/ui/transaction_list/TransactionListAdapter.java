@@ -41,6 +41,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
     public TransactionListAdapter() {
         super();
 
+        setHasStableIds(true);
+
         listDiffer = new AsyncListDiffer<>(this, new DiffUtil.ItemCallback<TransactionListItem>() {
             @Override
             public boolean areItemsTheSame(@NonNull TransactionListItem oldItem,
@@ -86,6 +88,24 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                 }
             }
         });
+    }
+    @Override
+    public long getItemId(int position) {
+        TransactionListItem item = listDiffer.getCurrentList()
+                                             .get(position);
+        switch (item.getType()) {
+            case HEADER:
+                return -1;
+            case TRANSACTION:
+                return item.getTransaction()
+                           .getLedgerId();
+            case DELIMITER:
+                return -item.getDate()
+                            .toDate()
+                            .getTime();
+            default:
+                throw new IllegalStateException("Unexpected value: " + item.getType());
+        }
     }
     @Override
     public int getItemViewType(int position) {
