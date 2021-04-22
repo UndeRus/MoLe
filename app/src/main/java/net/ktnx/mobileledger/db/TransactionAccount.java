@@ -24,6 +24,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import net.ktnx.mobileledger.utils.Misc;
+
 @Entity(tableName = "transaction_accounts", foreignKeys = {
         @ForeignKey(entity = Transaction.class, parentColumns = {"id"},
                     childColumns = {"transaction_id"}, onDelete = ForeignKey.CASCADE,
@@ -109,7 +111,7 @@ public class TransactionAccount {
         transactionId = o.transactionId;
         orderNo = o.orderNo;
         accountName = o.accountName;
-        currency = o.currency;
+        currency = Misc.nullIsEmpty(o.currency);
         amount = o.amount;
         comment = o.comment;
         generation = o.generation;
