@@ -92,9 +92,8 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract TransactionWithAccounts getFirstByDescriptionHavingAccountSync(
             @NonNull String description, @NonNull String accountTerm);
 
-    @Query("SELECT * from transactions WHERE profile_id = :profileId ORDER BY " +
-           "year desc, month desc, day desc, ledger_id desc")
-    public abstract List<Transaction> allForProfileSync(long profileId);
+    @Query("SELECT * from transactions WHERE profile_id = :profileId")
+    public abstract List<Transaction> getAllForProfileUnorderedSync(long profileId);
 
     @Query("SELECT generation FROM transactions WHERE profile_id = :profileId LIMIT 1")
     protected abstract TransactionGenerationContainer getGenerationPOJOSync(long profileId);

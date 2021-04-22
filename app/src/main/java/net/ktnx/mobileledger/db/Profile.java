@@ -229,7 +229,7 @@ public class Profile {
 
         TransactionDAO trnDao = DB.get()
                                   .getTransactionDAO();
-        trnDao.deleteSync(trnDao.allForProfileSync(id));
+        trnDao.deleteSync(trnDao.getAllForProfileUnorderedSync(id));
 
         DescriptionHistoryDAO descDao = DB.get()
                                           .getDescriptionHistoryDAO();
