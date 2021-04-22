@@ -93,10 +93,10 @@ public class TemplateAccount extends TemplateBase {
     public void setNegateAmount(Boolean negateAmount) {
         this.negateAmount = negateAmount;
     }
-    public @NotNull Long getTemplateId() {
+    public long getTemplateId() {
         return templateId;
     }
-    public void setTemplateId(@NonNull Long templateId) {
+    public void setTemplateId(long templateId) {
         this.templateId = templateId;
     }
     @NonNull
