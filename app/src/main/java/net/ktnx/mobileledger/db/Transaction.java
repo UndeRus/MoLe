@@ -126,4 +126,16 @@ public class Transaction {
         this.generation = generation;
     }
 
+    public void copyDataFrom(Transaction o) {
+        // id = o.id;
+        ledgerId = o.ledgerId;
+        profileId = o.profileId;
+        dataHash = o.dataHash;
+        year = o.year;
+        month = o.month;
+        day = o.day;
+        description = o.description;
+        comment = o.comment;
+        generation = o.generation;
+    }
 }

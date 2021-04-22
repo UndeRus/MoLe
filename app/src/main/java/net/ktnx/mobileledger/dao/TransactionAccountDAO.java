@@ -45,4 +45,8 @@ public abstract class TransactionAccountDAO extends BaseDAO<TransactionAccount> 
 
     @Query("SELECT * FROM transaction_accounts WHERE id = :id")
     public abstract LiveData<TransactionAccount> getById(long id);
+
+    @Query("SELECT * FROM transaction_accounts WHERE transaction_id = :transactionId AND order_no" +
+           " = :orderNo")
+    public abstract TransactionAccount getByOrderNoSync(long transactionId, int orderNo);
 }

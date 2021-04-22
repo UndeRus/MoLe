@@ -27,11 +27,15 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Transaction;
+import net.ktnx.mobileledger.db.TransactionAccount;
 import net.ktnx.mobileledger.db.TransactionWithAccounts;
+import net.ktnx.mobileledger.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Dao
 public abstract class TransactionDAO extends BaseDAO<Transaction> {
@@ -116,7 +120,60 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     }
     @Query("DELETE FROM transactions WHERE profile_id = :profileId AND generation <> " +
            ":currentGeneration")
-    public abstract void purgeOldTransactionsSync(long profileId, long currentGeneration);
+    public abstract int purgeOldTransactionsSync(long profileId, long currentGeneration);
+
+    @Query("DELETE FROM transaction_accounts WHERE EXISTS (SELECT 1 FROM transactions tr WHERE tr" +
+           ".id=transaction_accounts.transaction_id AND tr.profile_id=:profileId) AND generation " +
+           "<> :currentGeneration")
+    public abstract int purgeOldTransactionAccountsSync(long profileId, long currentGeneration);
+    public void storeTransactionsSync(List<TransactionWithAccounts> list, long profileId) {
+        long generation = getGenerationSync(profileId) + 1;
+
+        for (TransactionWithAccounts tr : list) {
+            tr.transaction.setGeneration(generation);
+            tr.transaction.setProfileId(profileId);
+
+            storeSync(tr);
+        }
+
+        Logger.debug("Transaction", "Purging old transactions");
+        int removed = purgeOldTransactionsSync(profileId, generation);
+        Logger.debug("Transaction", String.format(Locale.ROOT, "Purged %d transactions", removed));
+
+        removed = purgeOldTransactionAccountsSync(profileId, generation);
+        Logger.debug("Transaction",
+                String.format(Locale.ROOT, "Purged %d transaction accounts", removed));
+    }
+    private void storeSync(TransactionWithAccounts rec) {
+        TransactionAccountDAO trAccDao = DB.get()
+                                           .getTransactionAccountDAO();
+
+        Transaction transaction = rec.transaction;
+        Transaction existing = getByLedgerId(transaction.getProfileId(), transaction.getLedgerId());
+        if (existing != null) {
+            existing.copyDataFrom(transaction);
+            updateSync(existing);
+            transaction = existing;
+        }
+        else
+            transaction.setId(insertSync(transaction));
+
+        for (TransactionAccount trAcc : rec.accounts) {
+            trAcc.setTransactionId(transaction.getId());
+            trAcc.setGeneration(transaction.getGeneration());
+            TransactionAccount existingAcc =
+                    trAccDao.getByOrderNoSync(trAcc.getTransactionId(), trAcc.getOrderNo());
+            if (existingAcc != null) {
+                existingAcc.copyDataFrom(trAcc);
+                trAccDao.updateSync(trAcc);
+                trAcc = existingAcc;
+            }
+            else
+                trAcc.setId(trAccDao.insertSync(trAcc));
+        }
+    }
+    @Query("SELECT * FROM transactions where profile_id = :profileId AND ledger_id = :ledgerId")
+    public abstract Transaction getByLedgerId(long profileId, long ledgerId);
     static class TransactionGenerationContainer {
         @ColumnInfo
         long generation;

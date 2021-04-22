@@ -22,21 +22,17 @@ import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 
 import androidx.annotation.NonNull;
-import androidx.room.Transaction;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
 import net.ktnx.mobileledger.dao.AccountDAO;
-import net.ktnx.mobileledger.dao.AccountValueDAO;
-import net.ktnx.mobileledger.dao.TransactionAccountDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.db.Account;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Option;
 import net.ktnx.mobileledger.db.Profile;
-import net.ktnx.mobileledger.db.TransactionAccount;
 import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.err.HTTPException;
 import net.ktnx.mobileledger.json.API;
@@ -50,7 +46,6 @@ import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
-import net.ktnx.mobileledger.utils.Profiler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -575,11 +570,11 @@ public class RetrieveTransactionsTask extends
                 retrieveTransactionListLegacy(accounts, transactions);
             }
 
-            storeAccountsAndTransactions(accounts, transactions);
-
             mainModel.updateDisplayedTransactionsFromWeb(transactions);
 
-            return new Result(accounts, transactions);
+            new AccountAndTransactionListSaver(accounts, transactions).start();
+
+            return new Result(null);
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
@@ -613,71 +608,6 @@ public class RetrieveTransactionsTask extends
         finally {
             Data.backgroundTaskFinished();
         }
-    }
-    @Transaction
-    private void storeAccountsAndTransactions(List<LedgerAccount> accounts,
-                                              List<LedgerTransaction> transactions) {
-        AccountDAO accDao = DB.get()
-                              .getAccountDAO();
-        TransactionDAO trDao = DB.get()
-                                 .getTransactionDAO();
-        TransactionAccountDAO trAccDao = DB.get()
-                                           .getTransactionAccountDAO();
-        AccountValueDAO valDao = DB.get()
-                                   .getAccountValueDAO();
-
-        Logger.debug(TAG, "Preparing account list");
-        final List<AccountWithAmounts> list = new ArrayList<>();
-        for (LedgerAccount acc : accounts) {
-            final AccountWithAmounts a = acc.toDBOWithAmounts();
-            Account existing = accDao.getByNameSync(profile.getId(), acc.getName());
-            if (existing != null) {
-                a.account.setExpanded(existing.isExpanded());
-                a.account.setAmountsExpanded(existing.isAmountsExpanded());
-                a.account.setId(
-                        existing.getId()); // not strictly needed, but since we have it anyway...
-            }
-
-            list.add(a);
-        }
-        Logger.debug(TAG, "Account list prepared. Storing");
-        accDao.storeAccountsSync(list, profile.getId());
-        Logger.debug(TAG, "Account list stored");
-
-        Profiler tranProfiler = new Profiler("transactions");
-        Profiler tranAccProfiler = new Profiler("transaction accounts");
-
-        Logger.debug(TAG, "Storing transactions");
-        long trGen = trDao.getGenerationSync(profile.getId());
-        for (LedgerTransaction tr : transactions) {
-            TransactionWithAccounts tran = tr.toDBO();
-            tran.transaction.setGeneration(trGen);
-            tran.transaction.setProfileId(profile.getId());
-
-            tranProfiler.opStart();
-            tran.transaction.setId(trDao.insertSync(tran.transaction));
-            tranProfiler.opEnd();
-
-            for (TransactionAccount trAcc : tran.accounts) {
-                trAcc.setGeneration(trGen);
-                trAcc.setTransactionId(tran.transaction.getId());
-                tranAccProfiler.opStart();
-                trAcc.setId(trAccDao.insertSync(trAcc));
-                tranAccProfiler.opEnd();
-            }
-        }
-
-        tranProfiler.dumpStats();
-        tranAccProfiler.dumpStats();
-
-        Logger.debug(TAG, "Transactions stored. Purging old");
-        trDao.purgeOldTransactionsSync(profile.getId(), trGen);
-        Logger.debug(TAG, "Old transactions purged");
-
-        DB.get()
-          .getOptionDAO()
-          .insertSync(new Option(profile.getId(), Option.OPT_LAST_SCRAPE,
-                  String.valueOf((new Date()).getTime())));
     }
     public void throwIfCancelled() {
         if (isCancelled())
@@ -774,6 +704,62 @@ public class RetrieveTransactionsTask extends
         Result(List<LedgerAccount> accounts, List<LedgerTransaction> transactions) {
             this.accounts = accounts;
             this.transactions = transactions;
+        }
+    }
+
+    private class AccountAndTransactionListSaver extends Thread {
+        private final List<LedgerAccount> accounts;
+        private final List<LedgerTransaction> transactions;
+        public AccountAndTransactionListSaver(List<LedgerAccount> accounts,
+                                              List<LedgerTransaction> transactions) {
+            this.accounts = accounts;
+            this.transactions = transactions;
+        }
+        private void storeAccountsAndTransactions(List<LedgerAccount> accounts,
+                                                  List<LedgerTransaction> transactions) {
+            AccountDAO accDao = DB.get()
+                                  .getAccountDAO();
+            TransactionDAO trDao = DB.get()
+                                     .getTransactionDAO();
+
+            Logger.debug(TAG, "Preparing account list");
+            final List<AccountWithAmounts> list = new ArrayList<>();
+            for (LedgerAccount acc : accounts) {
+                final AccountWithAmounts a = acc.toDBOWithAmounts();
+                Account existing = accDao.getByNameSync(profile.getId(), acc.getName());
+                if (existing != null) {
+                    a.account.setExpanded(existing.isExpanded());
+                    a.account.setAmountsExpanded(existing.isAmountsExpanded());
+                    a.account.setId(
+                            existing.getId()); // not strictly needed, but since we have it
+                    // anyway...
+                }
+
+                list.add(a);
+            }
+            Logger.debug(TAG, "Account list prepared. Storing");
+            accDao.storeAccountsSync(list, profile.getId());
+            Logger.debug(TAG, "Account list stored");
+
+            Logger.debug(TAG, "Preparing transaction list");
+            final List<TransactionWithAccounts> tranList = new ArrayList<>();
+
+            for (LedgerTransaction tr : transactions)
+                tranList.add(tr.toDBO());
+
+            Logger.debug(TAG, "Storing transaction list");
+            trDao.storeTransactionsSync(tranList, profile.getId());
+
+            Logger.debug(TAG, "Transactions stored");
+
+            DB.get()
+              .getOptionDAO()
+              .insertSync(new Option(profile.getId(), Option.OPT_LAST_SCRAPE,
+                      String.valueOf((new Date()).getTime())));
+        }
+        @Override
+        public void run() {
+            storeAccountsAndTransactions(accounts, transactions);
         }
     }
 }

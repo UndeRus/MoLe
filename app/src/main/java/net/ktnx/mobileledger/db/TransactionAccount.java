@@ -103,4 +103,15 @@ public class TransactionAccount {
     public void setGeneration(long generation) {
         this.generation = generation;
     }
+
+    public void copyDataFrom(TransactionAccount o) {
+        // id = o.id
+        transactionId = o.transactionId;
+        orderNo = o.orderNo;
+        accountName = o.accountName;
+        currency = o.currency;
+        amount = o.amount;
+        comment = o.comment;
+        generation = o.generation;
+    }
 }
