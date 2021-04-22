@@ -68,8 +68,7 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                                               @NonNull TransactionListItem newItem) {
                 switch (oldItem.getType()) {
                     case DELIMITER:
-                        // Delimiters items are "same" for same dates and the contents are the date
-                        return true;
+                        return oldItem.isMonthShown() == newItem.isMonthShown();
                     case TRANSACTION:
                         return oldItem.getTransaction()
                                       .equals(newItem.getTransaction()) &&
