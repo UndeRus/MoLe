@@ -170,8 +170,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
                     trAccDao.getByOrderNoSync(trAcc.getTransactionId(), trAcc.getOrderNo());
             if (existingAcc != null) {
                 existingAcc.copyDataFrom(trAcc);
-                trAccDao.updateSync(trAcc);
-                trAcc = existingAcc;
+                trAccDao.updateSync(existingAcc);
             }
             else
                 trAcc.setId(trAccDao.insertSync(trAcc));
