@@ -57,6 +57,9 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract void deleteSync(Transaction item);
 
     @Delete
+    public abstract void deleteSync(Transaction... items);
+
+    @Delete
     public abstract void deleteSync(List<Transaction> items);
 
     @Query("SELECT * FROM transactions WHERE id = :id")
@@ -144,6 +147,8 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         Logger.debug("Transaction",
                 String.format(Locale.ROOT, "Purged %d transaction accounts", removed));
     }
+    @Query("DELETE FROM transactions WHERE profile_id = :profileId")
+    public abstract int deleteAllSync(long profileId);
     private void storeSync(TransactionWithAccounts rec) {
         TransactionAccountDAO trAccDao = DB.get()
                                            .getTransactionAccountDAO();
