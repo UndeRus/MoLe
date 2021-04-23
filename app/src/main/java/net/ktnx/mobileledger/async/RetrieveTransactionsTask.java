@@ -574,6 +574,8 @@ public class RetrieveTransactionsTask extends
 
             new AccountAndTransactionListSaver(accounts, transactions).start();
 
+            Data.lastUpdateDate.postValue(new Date());
+
             return new Result(null);
         }
         catch (MalformedURLException e) {
