@@ -715,8 +715,8 @@ public class RetrieveTransactionsTask extends
             this.accounts = accounts;
             this.transactions = transactions;
         }
-        private void storeAccountsAndTransactions(List<LedgerAccount> accounts,
-                                                  List<LedgerTransaction> transactions) {
+        @Override
+        public void run() {
             AccountDAO accDao = DB.get()
                                   .getAccountDAO();
             TransactionDAO trDao = DB.get()
@@ -730,8 +730,7 @@ public class RetrieveTransactionsTask extends
                 if (existing != null) {
                     a.account.setExpanded(existing.isExpanded());
                     a.account.setAmountsExpanded(existing.isAmountsExpanded());
-                    a.account.setId(
-                            existing.getId()); // not strictly needed, but since we have it
+                    a.account.setId(existing.getId()); // not strictly needed, but since we have it
                     // anyway...
                 }
 
@@ -756,10 +755,6 @@ public class RetrieveTransactionsTask extends
               .getOptionDAO()
               .insertSync(new Option(profile.getId(), Option.OPT_LAST_SCRAPE,
                       String.valueOf((new Date()).getTime())));
-        }
-        @Override
-        public void run() {
-            storeAccountsAndTransactions(accounts, transactions);
         }
     }
 }
