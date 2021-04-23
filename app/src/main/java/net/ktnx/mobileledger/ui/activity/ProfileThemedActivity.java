@@ -118,6 +118,7 @@ public class ProfileThemedActivity extends CrashReportingActivity {
             profile = dao.getAnySync();
         }
 
+        Logger.debug(TAG, String.format(Locale.ROOT, "Profile %d loaded. posting", profileId));
         Data.postCurrentProfile(profile);
     }
 }

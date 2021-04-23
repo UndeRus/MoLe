@@ -127,7 +127,6 @@ public class MainModel extends ViewModel {
         @Override
         public void run() {
             List<LedgerAccount> newDisplayed = new ArrayList<>();
-            Logger.debug("dFilter", "waiting for synchronized block");
             Logger.debug("dFilter", String.format(Locale.US,
                     "entered synchronized block (about to examine %d transactions)", list.size()));
             String accNameFilter = model.getAccountFilter()
