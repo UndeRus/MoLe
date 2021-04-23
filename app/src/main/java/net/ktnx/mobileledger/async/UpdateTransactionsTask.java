@@ -27,15 +27,17 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static net.ktnx.mobileledger.db.Profile.NO_PROFILE_ID;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
     protected String doInBackground(MainModel[] parentModel) {
         final Profile profile = Data.getProfile();
 
-        long profile_id = profile.getId();
+        long profileId = (profile == null) ? NO_PROFILE_ID : profile.getId();
         Data.backgroundTaskStarted();
         try {
             Logger.debug("UTT", "Starting DB transaction list retrieval");
@@ -45,15 +47,17 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
                                           .getValue();
             final List<TransactionWithAccounts> transactions;
 
-            if (accFilter == null) {
+            if (profileId == NO_PROFILE_ID)
+                transactions = new ArrayList<>();
+            else if (accFilter == null) {
                 transactions = DB.get()
                                  .getTransactionDAO()
-                                 .getAllWithAccountsSync(profile_id);
+                                 .getAllWithAccountsSync(profileId);
             }
             else {
                 transactions = DB.get()
                                  .getTransactionDAO()
-                                 .getAllWithAccountsFilteredSync(profile_id, accFilter);
+                                 .getAllWithAccountsFilteredSync(profileId, accFilter);
             }
 
             TransactionAccumulator accumulator = new TransactionAccumulator(model);
