@@ -60,7 +60,7 @@ public final class Data {
     public static final MutableLiveData<String> lastTransactionsUpdateText =
             new MutableLiveData<>();
     public static final MutableLiveData<String> lastAccountsUpdateText = new MutableLiveData<>();
-    private static final MutableLiveData<Profile> profile = new InertMutableLiveData<>();
+    private static final MutableLiveData<Profile> profile = new MutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
     private static NumberFormat numberFormatter;
