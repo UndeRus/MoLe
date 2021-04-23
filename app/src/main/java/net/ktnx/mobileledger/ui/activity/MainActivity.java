@@ -80,6 +80,7 @@ import java.util.Objects;
  *  */
 
 public class MainActivity extends ProfileThemedActivity implements FabManager.FabHandler {
+    public static final String TAG = "main-act";
     public static final String STATE_CURRENT_PAGE = "current_page";
     public static final String BUNDLE_SAVED_STATE = "bundle_savedState";
     public static final String STATE_ACC_FILTER = "account_filter";
@@ -101,7 +102,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
     protected void onStart() {
         super.onStart();
 
-        Logger.debug("MainActivity", "onStart()");
+        Logger.debug(TAG, "onStart()");
 
         b.mainPager.setCurrentItem(mCurrentPage, false);
     }
@@ -133,9 +134,9 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Logger.debug("MainActivity", "onCreate()/entry");
+        Logger.debug(TAG, "onCreate()/entry");
         super.onCreate(savedInstanceState);
-        Logger.debug("MainActivity", "onCreate()/after super");
+        Logger.debug(TAG, "onCreate()/after super");
         b = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
@@ -193,8 +194,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                             markDrawerItemCurrent(R.id.nav_latest_transactions);
                             break;
                         default:
-                            Log.e("MainActivity",
-                                    String.format("Unexpected page index %d", position));
+                            Log.e(TAG, String.format("Unexpected page index %d", position));
                     }
 
                     super.onPageSelected(position);
@@ -473,7 +473,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         Data.lastUpdateAccountCount.removeObservers(this);
         Data.lastUpdateDate.removeObservers(this);
 
-        Logger.debug("MainActivity", "profileThemeChanged(): recreating activity");
+        Logger.debug(TAG, "profileThemeChanged(): recreating activity");
         recreate();
     }
     public void fabNewTransactionClicked(View view) {
@@ -531,7 +531,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                 mBackMeansToAccountList = false;
             }
             else {
-                Logger.debug("fragments", String.format(Locale.ENGLISH, "manager stack: %d",
+                Logger.debug(TAG, String.format(Locale.ENGLISH, "manager stack: %d",
                         getSupportFragmentManager().getBackStackEntryCount()));
 
                 super.onBackPressed();
@@ -593,7 +593,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
     }
     public void onStopTransactionRefreshClick(View view) {
-        Logger.debug("interactive", "Cancelling transactions refresh");
+        Logger.debug(TAG, "Cancelling transactions refresh");
         mainModel.stopTransactionsRetrieval();
         b.transactionListCancelDownload.setEnabled(false);
     }
@@ -620,7 +620,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         if (progress == null ||
             progress.getState() == RetrieveTransactionsTask.ProgressState.FINISHED)
         {
-            Logger.debug("progress", "Done");
+            Logger.debug(TAG, "progress: Done");
             b.transactionProgressLayout.setVisibility(View.GONE);
 
             mainModel.transactionRetrievalDone();
@@ -633,7 +633,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(error);
                 builder.setPositiveButton(R.string.btn_profile_options, (dialog, which) -> {
-                    Logger.debug("error", "will start profile editor");
+                    Logger.debug(TAG, "will start profile editor");
                     ProfileDetailActivity.start(this, profile);
                 });
                 builder.create()
@@ -657,14 +657,15 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
 
         if (progress.isIndeterminate() || (progress.getTotal() <= 0)) {
             b.transactionListProgressBar.setIndeterminate(true);
-            Logger.debug("progress", "indeterminate");
+            Logger.debug(TAG, "progress: indeterminate");
         }
         else {
             if (b.transactionListProgressBar.isIndeterminate()) {
                 b.transactionListProgressBar.setIndeterminate(false);
             }
-//            Logger.debug("progress",
-//                    String.format(Locale.US, "%d/%d", progress.getProgress(), progress.getTotal
+//            Logger.debug(TAG,
+//                    String.format(Locale.US, "progress: %d/%d", progress.getProgress(),
+//                    progress.getTotal
 //                    ()));
             b.transactionListProgressBar.setMax(progress.getTotal());
             // for some reason animation doesn't work - no progress is shown (stick at 0)
@@ -699,11 +700,10 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         @NotNull
         @Override
         public Fragment createFragment(int position) {
-            Logger.debug("main",
-                    String.format(Locale.ENGLISH, "Switching to fragment %d", position));
+            Logger.debug(TAG, String.format(Locale.ENGLISH, "Switching to fragment %d", position));
             switch (position) {
                 case 0:
-//                    debug("flow", "Creating account summary fragment");
+//                    debug(TAG, "Creating account summary fragment");
                     return new AccountSummaryFragment();
                 case 1:
                     return new TransactionListFragment();
