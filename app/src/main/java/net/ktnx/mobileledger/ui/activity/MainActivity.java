@@ -41,6 +41,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,11 +53,14 @@ import com.google.android.material.snackbar.Snackbar;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
+import net.ktnx.mobileledger.async.TransactionAccumulator;
 import net.ktnx.mobileledger.databinding.ActivityMainBinding;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Option;
 import net.ktnx.mobileledger.db.Profile;
+import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.ui.account_summary.AccountSummaryFragment;
@@ -457,9 +462,33 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
 
         mainModel.getAccountFilter()
-                 .observe(this, v -> {
+                 .observe(this, accFilter -> {
                      Logger.debug(TAG, "account filter changed, reloading transactions");
-                     mainModel.scheduleTransactionListReload();
+//                     mainModel.scheduleTransactionListReload();
+                     LiveData<List<TransactionWithAccounts>> transactions =
+                             new MutableLiveData<>(new ArrayList<TransactionWithAccounts>());
+                     if (profile != null) {
+                         if (accFilter == null || accFilter.isEmpty()) {
+                             transactions = DB.get()
+                                              .getTransactionDAO()
+                                              .getAllWithAccounts(profile.getId());
+                         }
+                         else {
+                             transactions = DB.get()
+                                              .getTransactionDAO()
+                                              .getAllWithAccountsFiltered(profile.getId(),
+                                                      accFilter);
+                         }
+                     }
+
+                     transactions.observe(this, list -> {
+                         TransactionAccumulator accumulator = new TransactionAccumulator(accFilter);
+
+                         for (TransactionWithAccounts tr : list)
+                             accumulator.put(new LedgerTransaction(tr));
+
+                         accumulator.publishResults(mainModel);
+                     });
                  });
 
         mainModel.stopTransactionsRetrieval();

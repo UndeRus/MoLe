@@ -25,7 +25,6 @@ import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.async.RetrieveTransactionsTask;
 import net.ktnx.mobileledger.async.TransactionAccumulator;
-import net.ktnx.mobileledger.async.UpdateTransactionsTask;
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
@@ -50,10 +49,6 @@ public class MainModel extends ViewModel {
     transient private RetrieveTransactionsTask retrieveTransactionsTask;
     transient private Thread displayedAccountsUpdater;
     private TransactionsDisplayedFilter displayedTransactionsUpdater;
-    public void scheduleTransactionListReload() {
-        UpdateTransactionsTask task = new UpdateTransactionsTask();
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this);
-    }
     public LiveData<Boolean> getUpdatingFlag() {
         return updatingFlag;
     }

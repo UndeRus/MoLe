@@ -570,8 +570,6 @@ public class RetrieveTransactionsTask extends
                 retrieveTransactionListLegacy(accounts, transactions);
             }
 
-            mainModel.updateDisplayedTransactionsFromWeb(transactions);
-
             new AccountAndTransactionListSaver(accounts, transactions).start();
 
             Data.lastUpdateDate.postValue(new Date());

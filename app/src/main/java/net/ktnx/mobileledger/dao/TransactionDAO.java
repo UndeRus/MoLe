@@ -107,6 +107,10 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract List<TransactionWithAccounts> getAllWithAccountsSync(long profileId);
 
     @androidx.room.Transaction
+    @Query("SELECT * FROM transactions WHERE profile_id = :profileId")
+    public abstract LiveData<List<TransactionWithAccounts>> getAllWithAccounts(long profileId);
+
+    @androidx.room.Transaction
     @Query("SELECT distinct(tr.id), tr.ledger_id, tr.profile_id, tr.data_hash, tr.year, tr.month," +
            " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
            "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
