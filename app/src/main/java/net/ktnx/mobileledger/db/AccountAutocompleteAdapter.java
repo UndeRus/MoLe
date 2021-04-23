@@ -29,11 +29,13 @@ import net.ktnx.mobileledger.utils.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.ktnx.mobileledger.db.Profile.NO_PROFILE_ID;
+
 public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
     private final AccountFilter filter = new AccountFilter();
     private final AccountDAO dao = DB.get()
                                      .getAccountDAO();
-    private long profileId;
+    private long profileId = NO_PROFILE_ID;
     public AccountAutocompleteAdapter(Context context) {
         super(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
     }
@@ -72,11 +74,12 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
             }
 
             Logger.debug("acc", String.format("Looking for account '%s'", constraint));
-            final List<String> matches = AccountDAO.unbox((profileId == 0) ? dao.lookupByNameSync(
-                    String.valueOf(constraint)
-                          .toUpperCase()) : dao.lookupInProfileByNameSync(profileId,
-                    String.valueOf(constraint)
-                          .toUpperCase()));
+            final List<String> matches = AccountDAO.unbox(
+                    (profileId == NO_PROFILE_ID) ? dao.lookupByNameSync(String.valueOf(constraint)
+                                                                              .toUpperCase())
+                                                 : dao.lookupInProfileByNameSync(profileId,
+                                                         String.valueOf(constraint)
+                                                               .toUpperCase()));
             results.values = matches;
             results.count = matches.size();
 
