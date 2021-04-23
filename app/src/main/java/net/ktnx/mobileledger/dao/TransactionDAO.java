@@ -32,6 +32,7 @@ import net.ktnx.mobileledger.db.Transaction;
 import net.ktnx.mobileledger.db.TransactionAccount;
 import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,6 +129,18 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
 
     @Query("SELECT * FROM transactions where profile_id = :profileId AND ledger_id = :ledgerId")
     public abstract Transaction getByLedgerId(long profileId, long ledgerId);
+
+    @Query("UPDATE transactions SET generation = :newGeneration WHERE id = :transactionId")
+    public abstract int updateGeneration(long transactionId, long newGeneration);
+
+    @Query("UPDATE transaction_accounts SET generation = :newGeneration WHERE transaction_id = " +
+           ":transactionId")
+    public abstract int updateAccountsGeneration(long transactionId, long newGeneration);
+    @androidx.room.Transaction
+    public void updateGenerationWithAccounts(long transactionId, long newGeneration) {
+        updateGeneration(transactionId, newGeneration);
+        updateAccountsGeneration(transactionId, newGeneration);
+    }
     public long getGenerationSync(long profileId) {
         TransactionGenerationContainer result = getGenerationPOJOSync(profileId);
 
@@ -160,8 +173,14 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         Transaction transaction = rec.transaction;
         Transaction existing = getByLedgerId(transaction.getProfileId(), transaction.getLedgerId());
         if (existing != null) {
+            if (Misc.equalStrings(transaction.getDataHash(), existing.getDataHash())) {
+                updateGenerationWithAccounts(existing.getId(), rec.transaction.getGeneration());
+                return;
+            }
+
             existing.copyDataFrom(transaction);
             updateSync(existing);
+
             transaction = existing;
         }
         else
