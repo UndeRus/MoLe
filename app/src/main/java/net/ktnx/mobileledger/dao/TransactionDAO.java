@@ -114,13 +114,6 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract List<TransactionWithAccounts> getAllWithAccountsFilteredSync(long profileId,
                                                                                  String accountName);
 
-    public long getGenerationSync(long profileId) {
-        TransactionGenerationContainer result = getGenerationPOJOSync(profileId);
-
-        if (result == null)
-            return 0;
-        return result.generation;
-    }
     @Query("DELETE FROM transactions WHERE profile_id = :profileId AND generation <> " +
            ":currentGeneration")
     public abstract int purgeOldTransactionsSync(long profileId, long currentGeneration);
@@ -129,6 +122,19 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            ".id=transaction_accounts.transaction_id AND tr.profile_id=:profileId) AND generation " +
            "<> :currentGeneration")
     public abstract int purgeOldTransactionAccountsSync(long profileId, long currentGeneration);
+
+    @Query("DELETE FROM transactions WHERE profile_id = :profileId")
+    public abstract int deleteAllSync(long profileId);
+
+    @Query("SELECT * FROM transactions where profile_id = :profileId AND ledger_id = :ledgerId")
+    public abstract Transaction getByLedgerId(long profileId, long ledgerId);
+    public long getGenerationSync(long profileId) {
+        TransactionGenerationContainer result = getGenerationPOJOSync(profileId);
+
+        if (result == null)
+            return 0;
+        return result.generation;
+    }
     public void storeTransactionsSync(List<TransactionWithAccounts> list, long profileId) {
         long generation = getGenerationSync(profileId) + 1;
 
@@ -147,8 +153,6 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         Logger.debug("Transaction",
                 String.format(Locale.ROOT, "Purged %d transaction accounts", removed));
     }
-    @Query("DELETE FROM transactions WHERE profile_id = :profileId")
-    public abstract int deleteAllSync(long profileId);
     private void storeSync(TransactionWithAccounts rec) {
         TransactionAccountDAO trAccDao = DB.get()
                                            .getTransactionAccountDAO();
@@ -176,8 +180,6 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
                 trAcc.setId(trAccDao.insertSync(trAcc));
         }
     }
-    @Query("SELECT * FROM transactions where profile_id = :profileId AND ledger_id = :ledgerId")
-    public abstract Transaction getByLedgerId(long profileId, long ledgerId);
     static class TransactionGenerationContainer {
         @ColumnInfo
         long generation;
