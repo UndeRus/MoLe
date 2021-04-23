@@ -26,16 +26,12 @@ import java.util.ArrayList;
 
 public class TransactionAccumulator {
     private final ArrayList<TransactionListItem> list = new ArrayList<>();
-    private final MainModel model;
     private final String boldAccountName;
     private SimpleDate earliestDate, latestDate;
     private SimpleDate lastDate;
     private boolean done;
-    public TransactionAccumulator(MainModel model) {
-        this.model = model;
-
-        boldAccountName = model.getAccountFilter()
-                               .getValue();
+    public TransactionAccumulator(String boldAccountName) {
+        this.boldAccountName = boldAccountName;
 
         list.add(new TransactionListItem());    // head item
     }
@@ -62,8 +58,7 @@ public class TransactionAccumulator {
 
         lastDate = date;
     }
-    public void done() {
-        done = true;
+    public void publishResults(MainModel model) {
         model.setDisplayedTransactions(list);
         model.setFirstTransactionDate(earliestDate);
         model.setLastTransactionDate(latestDate);

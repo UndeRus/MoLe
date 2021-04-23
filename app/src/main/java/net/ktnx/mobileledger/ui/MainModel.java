@@ -133,7 +133,7 @@ public class MainModel extends ViewModel {
             String accNameFilter = model.getAccountFilter()
                                         .getValue();
 
-            TransactionAccumulator acc = new TransactionAccumulator(model);
+            TransactionAccumulator acc = new TransactionAccumulator(accNameFilter);
             for (LedgerTransaction tr : list) {
                 if (isInterrupted()) {
                     return;
@@ -143,10 +143,12 @@ public class MainModel extends ViewModel {
                     acc.put(tr, tr.getDate());
                 }
             }
-            if (!isInterrupted()) {
-                acc.done();
-            }
-            Logger.debug("dFilter", "left synchronized block");
+
+            if (isInterrupted())
+                return;
+
+            acc.publishResults(model);
+            Logger.debug("dFilter", "transaction list updated");
         }
     }
 }

@@ -60,7 +60,7 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
                                  .getAllWithAccountsFilteredSync(profileId, accFilter);
             }
 
-            TransactionAccumulator accumulator = new TransactionAccumulator(model);
+            TransactionAccumulator accumulator = new TransactionAccumulator(accFilter);
 
             for (TransactionWithAccounts tr : transactions) {
                 if (isCancelled())
@@ -69,7 +69,8 @@ public class UpdateTransactionsTask extends AsyncTask<MainModel, Void, String> {
                 accumulator.put(new LedgerTransaction(tr));
             }
 
-            accumulator.done();
+            accumulator.publishResults(model);
+
             debug("UTT", "transaction list value updated");
 
             return null;
