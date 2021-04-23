@@ -115,6 +115,15 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract List<TransactionWithAccounts> getAllWithAccountsFilteredSync(long profileId,
                                                                                  String accountName);
 
+    @androidx.room.Transaction
+    @Query("SELECT distinct(tr.id), tr.ledger_id, tr.profile_id, tr.data_hash, tr.year, tr.month," +
+           " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
+           "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
+           ":accountName||'%' AND ta.amount <> 0 AND tr.profile_id = :profileId ORDER BY tr.year " +
+           "desc, tr.month desc, tr.day desc, tr.ledger_id desc")
+    public abstract LiveData<List<TransactionWithAccounts>> getAllWithAccountsFiltered(
+            long profileId, String accountName);
+
     @Query("DELETE FROM transactions WHERE profile_id = :profileId AND generation <> " +
            ":currentGeneration")
     public abstract int purgeOldTransactionsSync(long profileId, long currentGeneration);
