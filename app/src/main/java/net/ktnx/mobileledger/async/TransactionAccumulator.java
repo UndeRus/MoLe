@@ -17,12 +17,14 @@
 
 package net.ktnx.mobileledger.async;
 
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class TransactionAccumulator {
     private final ArrayList<TransactionListItem> list = new ArrayList<>();
@@ -65,6 +67,7 @@ public class TransactionAccumulator {
     public void done() {
         done = true;
         model.setDisplayedTransactions(list);
+        Data.lastUpdateDate.postValue(new Date());
         model.setFirstTransactionDate(earliestDate);
         model.setLastTransactionDate(latestDate);
     }
