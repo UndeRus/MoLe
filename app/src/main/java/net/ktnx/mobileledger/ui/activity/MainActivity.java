@@ -456,14 +456,14 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
             return;
         }
 
+        mainModel.getAccountFilter()
+                 .observe(this, v -> {
+                     Logger.debug(TAG, "account filter changed, reloading transactions");
+                     mainModel.scheduleTransactionListReload();
+                 });
+
         mainModel.stopTransactionsRetrieval();
-
         mainModel.clearTransactions();
-
-        if (haveProfile) {
-            Logger.debug("transactions", "requesting list reload");
-            mainModel.scheduleTransactionListReload();
-        }
     }
     private void profileThemeChanged() {
         // un-hook all observed LiveData

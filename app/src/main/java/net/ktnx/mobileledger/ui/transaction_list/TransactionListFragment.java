@@ -129,8 +129,8 @@ public class TransactionListFragment extends MobileLedgerListFragment
         vAccountFilter = view.findViewById(R.id.transaction_list_account_name_filter);
         accNameFilter = view.findViewById(R.id.transaction_filter_account_name);
 
-        Profile profile = Data.getProfile();
-        accNameFilter.setAdapter(new AccountAutocompleteAdapter(mainActivity, profile));
+        Data.observeProfile(getViewLifecycleOwner(), this::onProfileChanged);
+
         accNameFilter.setOnItemClickListener((parent, v, position, id) -> {
 //                debug("tmp", "direct onItemClick");
             model.getAccountFilter()
@@ -151,8 +151,6 @@ public class TransactionListFragment extends MobileLedgerListFragment
             .setOnClickListener(v -> {
                 model.getAccountFilter()
                      .setValue(null);
-                vAccountFilter.setVisibility(View.GONE);
-                menuTransactionListFilter.setVisible(true);
                 Globals.hideSoftKeyboard(mainActivity);
             });
 
@@ -165,24 +163,21 @@ public class TransactionListFragment extends MobileLedgerListFragment
             }
         });
     }
-    private void onAccountNameFilterChanged(String accName) {
-        final String fieldText = accNameFilter.getText()
-                                              .toString();
-        if ((accName == null) && (fieldText.equals("")))
+    private void onProfileChanged(Profile profile) {
+        if (profile == null)
             return;
 
-        if (accNameFilter != null) {
-            accNameFilter.setText(accName, false);
-        }
+        accNameFilter.setAdapter(new AccountAutocompleteAdapter(getContext(), profile));
+    }
+    private void onAccountNameFilterChanged(String accName) {
+        accNameFilter.setText(accName, false);
+
         final boolean filterActive = (accName != null) && !accName.isEmpty();
         if (vAccountFilter != null) {
             vAccountFilter.setVisibility(filterActive ? View.VISIBLE : View.GONE);
         }
         if (menuTransactionListFilter != null)
             menuTransactionListFilter.setVisible(!filterActive);
-
-        model.scheduleTransactionListReload();
-
     }
     @Override
     public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
@@ -192,18 +187,14 @@ public class TransactionListFragment extends MobileLedgerListFragment
         if ((menuTransactionListFilter == null))
             throw new AssertionError();
 
-        if ((model.getAccountFilter()
-                  .getValue() != null) || (vAccountFilter.getVisibility() == View.VISIBLE))
-        {
-            menuTransactionListFilter.setVisible(false);
-        }
+        model.getAccountFilter()
+             .observe(this, v -> menuTransactionListFilter.setVisible(v == null));
 
         super.onCreateOptionsMenu(menu, inflater);
 
         menuTransactionListFilter.setOnMenuItemClickListener(item -> {
             vAccountFilter.setVisibility(View.VISIBLE);
-            if (menuTransactionListFilter != null)
-                menuTransactionListFilter.setVisible(false);
+            menuTransactionListFilter.setVisible(false);
             accNameFilter.requestFocus();
             InputMethodManager imm =
                     (InputMethodManager) getMainActivity().getSystemService(INPUT_METHOD_SERVICE);

@@ -41,7 +41,7 @@ import java.util.Locale;
 public class MainModel extends ViewModel {
     public final MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
     private final MutableLiveData<Boolean> updatingFlag = new MutableLiveData<>(false);
-    private final MutableLiveData<String> accountFilter = new MutableLiveData<>();
+    private final MutableLiveData<String> accountFilter = new MutableLiveData<>(null);
     private final MutableLiveData<List<TransactionListItem>> displayedTransactions =
             new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> updateError = new MutableLiveData<>();
