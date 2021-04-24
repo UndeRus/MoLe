@@ -154,7 +154,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             saver.execute(tr);
         }
         catch (Exception e) {
-            debug("new-transaction", "Unknown error", e);
+            debug("new-transaction", "Unknown error: " + e);
 
             Bundle b = new Bundle();
             b.putString("error", "unknown error");
