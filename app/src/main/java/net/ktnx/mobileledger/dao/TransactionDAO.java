@@ -161,6 +161,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
             return 0;
         return result.generation;
     }
+    @androidx.room.Transaction
     public void storeTransactionsSync(List<TransactionWithAccounts> list, long profileId) {
         long generation = getGenerationSync(profileId) + 1;
 
@@ -179,7 +180,8 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         Logger.debug("Transaction",
                 String.format(Locale.ROOT, "Purged %d transaction accounts", removed));
     }
-    private void storeSync(TransactionWithAccounts rec) {
+    @androidx.room.Transaction
+    void storeSync(TransactionWithAccounts rec) {
         TransactionAccountDAO trAccDao = DB.get()
                                            .getTransactionAccountDAO();
 
