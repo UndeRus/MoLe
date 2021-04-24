@@ -71,6 +71,7 @@ import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListFragment;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -91,6 +92,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
     public static final String STATE_ACC_FILTER = "account_filter";
     private static final boolean FAB_HIDDEN = false;
     private static final boolean FAB_SHOWN = true;
+    private ConverterThread converterThread = null;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ProfilesRecyclerViewAdapter mProfileListAdapter;
     private int mCurrentPage;
@@ -471,37 +473,39 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
 
         mainModel.getAccountFilter()
-                 .observe(this, accFilter -> {
-                     Logger.debug(TAG, "account filter changed, reloading transactions");
-//                     mainModel.scheduleTransactionListReload();
-                     LiveData<List<TransactionWithAccounts>> transactions =
-                             new MutableLiveData<>(new ArrayList<TransactionWithAccounts>());
-                     if (profile != null) {
-                         if (accFilter == null || accFilter.isEmpty()) {
-                             transactions = DB.get()
-                                              .getTransactionDAO()
-                                              .getAllWithAccounts(profile.getId());
-                         }
-                         else {
-                             transactions = DB.get()
-                                              .getTransactionDAO()
-                                              .getAllWithAccountsFiltered(profile.getId(),
-                                                      accFilter);
-                         }
-                     }
-
-                     transactions.observe(this, list -> {
-                         TransactionAccumulator accumulator = new TransactionAccumulator(accFilter);
-
-                         for (TransactionWithAccounts tr : list)
-                             accumulator.put(new LedgerTransaction(tr));
-
-                         accumulator.publishResults(mainModel);
-                     });
-                 });
+                 .observe(this, this::onAccountFilterChanged);
 
         mainModel.stopTransactionsRetrieval();
         mainModel.clearTransactions();
+    }
+    private void onAccountFilterChanged(String accFilter) {
+        Logger.debug(TAG, "account filter changed, reloading transactions");
+//                     mainModel.scheduleTransactionListReload();
+        LiveData<List<TransactionWithAccounts>> transactions =
+                new MutableLiveData<>(new ArrayList<TransactionWithAccounts>());
+        if (profile != null) {
+            if (accFilter == null || accFilter.isEmpty()) {
+                transactions = DB.get()
+                                 .getTransactionDAO()
+                                 .getAllWithAccounts(profile.getId());
+            }
+            else {
+                transactions = DB.get()
+                                 .getTransactionDAO()
+                                 .getAllWithAccountsFiltered(profile.getId(), accFilter);
+            }
+        }
+
+        transactions.observe(this, list -> {
+            Logger.debug(TAG,
+                    String.format(Locale.ROOT, "got transaction list from DB (%d transactions)",
+                            list.size()));
+
+            if (converterThread != null)
+                converterThread.interrupt();
+            converterThread = new ConverterThread(mainModel, list, accFilter);
+            converterThread.start();
+        });
     }
     private void profileThemeChanged() {
         // un-hook all observed LiveData
@@ -754,6 +758,39 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         @Override
         public int getItemCount() {
             return 2;
+        }
+    }
+
+    static private class ConverterThread extends Thread {
+        private final List<TransactionWithAccounts> list;
+        private final MainModel model;
+        private final String accFilter;
+        public ConverterThread(@NonNull MainModel model,
+                               @NonNull List<TransactionWithAccounts> list, String accFilter) {
+            this.model = model;
+            this.list = list;
+            this.accFilter = accFilter;
+        }
+        @Override
+        public void run() {
+            TransactionAccumulator accumulator = new TransactionAccumulator(accFilter);
+
+            for (TransactionWithAccounts tr : list) {
+                if (isInterrupted()) {
+                    Logger.debug(TAG, "ConverterThread bailing out on interrupt");
+                    return;
+                }
+                accumulator.put(new LedgerTransaction(tr));
+            }
+
+            if (isInterrupted()) {
+                Logger.debug(TAG, "ConverterThread bailing out on interrupt");
+                return;
+            }
+
+            Logger.debug(TAG, "ConverterThread publishing results");
+
+            Misc.onMainThread(() -> accumulator.publishResults(model));
         }
     }
 }
