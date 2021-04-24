@@ -75,11 +75,11 @@ public abstract class AccountDAO extends BaseDAO<Account> {
     @Delete
     public abstract void deleteSync(List<Account> items);
 
-    @Query("SELECT * FROM accounts WHERE profile_id=:profileId")
+    @Query("SELECT * FROM accounts WHERE profile_id=:profileId ORDER BY name")
     public abstract LiveData<List<Account>> getAll(long profileId);
 
     @Transaction
-    @Query("SELECT * FROM accounts WHERE profile_id = :profileId")
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId ORDER BY name")
     public abstract LiveData<List<AccountWithAmounts>> getAllWithAmounts(long profileId);
 
     @Query("SELECT * FROM accounts WHERE id=:id")
