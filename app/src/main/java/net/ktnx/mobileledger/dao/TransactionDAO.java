@@ -103,11 +103,13 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     protected abstract TransactionGenerationContainer getGenerationPOJOSync(long profileId);
 
     @androidx.room.Transaction
-    @Query("SELECT * FROM transactions WHERE profile_id = :profileId")
+    @Query("SELECT * FROM transactions WHERE profile_id = :profileId ORDER BY year " +
+           " desc, month desc, day desc, ledger_id desc")
     public abstract List<TransactionWithAccounts> getAllWithAccountsSync(long profileId);
 
     @androidx.room.Transaction
-    @Query("SELECT * FROM transactions WHERE profile_id = :profileId")
+    @Query("SELECT * FROM transactions WHERE profile_id = :profileId ORDER BY year " +
+           " desc, month desc, day desc, ledger_id desc")
     public abstract LiveData<List<TransactionWithAccounts>> getAllWithAccounts(long profileId);
 
     @androidx.room.Transaction
