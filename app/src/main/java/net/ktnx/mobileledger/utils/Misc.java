@@ -19,6 +19,8 @@ package net.ktnx.mobileledger.utils;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.view.WindowManager;
 
@@ -101,5 +103,8 @@ public class Misc {
             return false;
 
         return a.equals(b);
+    }
+    public static void onMainThread(Runnable r) {
+        new Handler(Looper.getMainLooper()).post(r);
     }
 }

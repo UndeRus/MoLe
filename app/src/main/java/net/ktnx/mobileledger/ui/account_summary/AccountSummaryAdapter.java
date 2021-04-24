@@ -19,8 +19,6 @@ package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,7 +160,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
         return (position == 0) ? ITEM_TYPE_HEADER : ITEM_TYPE_ACCOUNT;
     }
     public void setAccounts(List<AccountListItem> newList) {
-        new Handler(Looper.getMainLooper()).post(() -> listDiffer.submitList(newList));
+        Misc.onMainThread(() -> listDiffer.submitList(newList));
     }
     static class Change {
         static final int NAME = 1;

@@ -18,8 +18,6 @@
 package net.ktnx.mobileledger.dao;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +34,7 @@ import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
+import net.ktnx.mobileledger.utils.Misc;
 
 import java.util.List;
 
@@ -47,9 +46,8 @@ public abstract class TemplateHeaderDAO {
     public void insertAsync(@NonNull TemplateHeader item, @Nullable Runnable callback) {
         AsyncTask.execute(() -> {
             insertSync(item);
-            if (callback != null) {
-                new Handler(Looper.getMainLooper()).post(callback);
-            }
+            if (callback != null)
+                Misc.onMainThread(callback);
         });
     }
 
@@ -62,7 +60,7 @@ public abstract class TemplateHeaderDAO {
     public void deleteAsync(@NonNull TemplateHeader item, @NonNull Runnable callback) {
         AsyncTask.execute(() -> {
             deleteSync(item);
-            new Handler(Looper.getMainLooper()).post(callback);
+            Misc.onMainThread(callback);
         });
     }
 
@@ -123,9 +121,8 @@ public abstract class TemplateHeaderDAO {
     public void insertAsync(@NonNull TemplateWithAccounts item, @Nullable Runnable callback) {
         AsyncTask.execute(() -> {
             insertSync(item);
-            if (callback != null) {
-                new Handler(Looper.getMainLooper()).post(callback);
-            }
+            if (callback != null)
+                Misc.onMainThread(callback);
         });
     }
     public void duplicateTemplateWitAccounts(@NonNull Long id, @Nullable
@@ -142,7 +139,7 @@ public abstract class TemplateHeaderDAO {
                 dupAcc.setId(accDao.insertSync(dupAcc));
             }
             if (callback != null)
-                new Handler(Looper.getMainLooper()).post(() -> callback.onResult(dup));
+                Misc.onMainThread(() -> callback.onResult(dup));
         });
     }
 

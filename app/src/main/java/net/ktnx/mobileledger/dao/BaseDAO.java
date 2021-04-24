@@ -18,10 +18,10 @@
 package net.ktnx.mobileledger.dao;
 
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
+
+import net.ktnx.mobileledger.utils.Misc;
 
 public abstract class BaseDAO<T> {
     abstract long insertSync(T item);
@@ -31,7 +31,7 @@ public abstract class BaseDAO<T> {
     public void insert(T item, @NonNull OnInsertedReceiver receiver) {
         AsyncTask.execute(() -> {
             long id = insertSync(item);
-            new Handler(Looper.getMainLooper()).post(() -> receiver.onInsert(id));
+            Misc.onMainThread(() -> receiver.onInsert(id));
         });
     }
 
@@ -42,7 +42,7 @@ public abstract class BaseDAO<T> {
     public void update(T item, @NonNull Runnable onDone) {
         AsyncTask.execute(() -> {
             updateSync(item);
-            new Handler(Looper.getMainLooper()).post(onDone);
+            Misc.onMainThread(onDone);
         });
     }
     abstract void deleteSync(T item);
@@ -52,7 +52,7 @@ public abstract class BaseDAO<T> {
     public void delete(T item, @NonNull Runnable onDone) {
         AsyncTask.execute(() -> {
             deleteSync(item);
-            new Handler(Looper.getMainLooper()).post(onDone);
+            Misc.onMainThread(onDone);
         });
     }
     interface OnInsertedReceiver {

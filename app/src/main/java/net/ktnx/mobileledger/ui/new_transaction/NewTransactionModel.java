@@ -18,8 +18,6 @@
 package net.ktnx.mobileledger.ui.new_transaction;
 
 import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -301,7 +299,7 @@ public class NewTransactionModel extends ViewModel {
                   newItems.add(accRow);
               }
 
-              new Handler(Looper.getMainLooper()).post(() -> replaceItems(newItems));
+              Misc.onMainThread(() -> replaceItems(newItems));
           });
     }
     private int extractIntFromMatches(MatchResult m, Integer group, Integer literal) {
@@ -523,7 +521,7 @@ public class NewTransactionModel extends ViewModel {
             moveItemLast(newList, singlePositiveIndex);
         }
 
-        new Handler(Looper.getMainLooper()).post(() -> {
+        Misc.onMainThread(() -> {
             setItems(newList);
             noteFocusChanged(1, FocusedElement.Amount);
         });
