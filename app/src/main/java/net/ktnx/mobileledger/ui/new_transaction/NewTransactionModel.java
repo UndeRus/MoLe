@@ -426,7 +426,6 @@ public class NewTransactionModel extends ViewModel {
         List<Item> list = Objects.requireNonNull(items.getValue());
         TransactionHead head = list.get(0)
                                    .toTransactionHead();
-        SimpleDate date = head.getDate();
         LedgerTransaction tr = head.asLedgerTransaction();
 
         tr.setComment(head.getComment());
@@ -1027,7 +1026,8 @@ public class NewTransactionModel extends ViewModel {
             return ItemType.generalData;
         }
         public LedgerTransaction asLedgerTransaction() {
-            return new LedgerTransaction(0, date, description, Data.getProfile());
+            return new LedgerTransaction(0, (date == null) ? SimpleDate.today() : date, description,
+                    Data.getProfile());
         }
         public boolean equalContents(TransactionHead other) {
             if (other == null)

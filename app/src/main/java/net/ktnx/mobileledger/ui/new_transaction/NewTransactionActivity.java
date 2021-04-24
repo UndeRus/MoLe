@@ -198,14 +198,23 @@ public class NewTransactionActivity extends ProfileThemedActivity
                 getResources().getDisplayMetrics()));
     }
     @Override
-    public void done(String error) {
+    public void done(String error, Object arg) {
         Bundle b = new Bundle();
         if (error != null) {
             b.putString("error", error);
             navController.navigate(R.id.action_newTransactionSavingFragment_Failure, b);
         }
-        else
+        else {
             navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
+
+            AsyncTask.execute(() -> commitToDb((LedgerTransaction) arg));
+        }
+    }
+    public void commitToDb(LedgerTransaction tr) {
+        TransactionWithAccounts dbTransaction = tr.toDBO();
+        DB.get()
+          .getTransactionDAO()
+          .appendSync(dbTransaction);
     }
     public boolean onToggleSimulateSaveMenuItemClicked(MenuItem item) {
         model.toggleSimulateSave();

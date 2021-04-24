@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.dao;
 
+import android.os.AsyncTask;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.room.ColumnInfo;
@@ -27,10 +29,13 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import net.ktnx.mobileledger.db.Account;
+import net.ktnx.mobileledger.db.AccountValue;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Transaction;
 import net.ktnx.mobileledger.db.TransactionAccount;
 import net.ktnx.mobileledger.db.TransactionWithAccounts;
+import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
@@ -151,6 +156,9 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     @Query("UPDATE transaction_accounts SET generation = :newGeneration WHERE transaction_id = " +
            ":transactionId")
     public abstract int updateAccountsGeneration(long transactionId, long newGeneration);
+
+    @Query("SELECT max(ledger_id) as ledger_id FROM transactions WHERE profile_id = :profileId")
+    public abstract LedgerIdContainer getMaxLedgerIdPOJOSync(long profileId);
     @androidx.room.Transaction
     public void updateGenerationWithAccounts(long transactionId, long newGeneration) {
         updateGeneration(transactionId, newGeneration);
@@ -162,6 +170,13 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         if (result == null)
             return 0;
         return result.generation;
+    }
+    public long getMaxLedgerIdSync(long profileId) {
+        LedgerIdContainer result = getMaxLedgerIdPOJOSync(profileId);
+
+        if (result == null)
+            return 0;
+        return result.ledgerId;
     }
     @androidx.room.Transaction
     public void storeTransactionsSync(List<TransactionWithAccounts> list, long profileId) {
@@ -216,11 +231,71 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
                 trAcc.setId(trAccDao.insertSync(trAcc));
         }
     }
+    public void storeLast(TransactionWithAccounts rec) {
+        AsyncTask.execute(() -> appendSync(rec));
+    }
+    @androidx.room.Transaction
+    public void appendSync(TransactionWithAccounts rec) {
+        TransactionAccountDAO trAccDao = DB.get()
+                                           .getTransactionAccountDAO();
+        AccountDAO accDao = DB.get()
+                              .getAccountDAO();
+        AccountValueDAO accValDao = DB.get()
+                                      .getAccountValueDAO();
+
+        Transaction transaction = rec.transaction;
+        final long profileId = transaction.getProfileId();
+        transaction.setGeneration(getGenerationSync(profileId));
+        transaction.setLedgerId(getMaxLedgerIdSync(profileId) + 1);
+        transaction.setId(insertSync(transaction));
+
+        for (TransactionAccount trAcc : rec.accounts) {
+            trAcc.setTransactionId(transaction.getId());
+            trAcc.setGeneration(transaction.getGeneration());
+            trAcc.setId(trAccDao.insertSync(trAcc));
+
+            Account acc = accDao.getByNameSync(profileId, trAcc.getAccountName());
+            if (acc == null) {
+                acc = new Account();
+                acc.setProfileId(profileId);
+                acc.setName(trAcc.getAccountName());
+                acc.setNameUpper(acc.getName()
+                                    .toUpperCase());
+                acc.setParentName(LedgerAccount.extractParentName(acc.getName()));
+                acc.setLevel(LedgerAccount.determineLevel(acc.getName()));
+                acc.setGeneration(trAcc.getGeneration());
+
+                acc.setId(accDao.insertSync(acc));
+            }
+
+            AccountValue accVal = accValDao.getByCurrencySync(acc.getId(), trAcc.getCurrency());
+            if (accVal == null) {
+                accVal = new AccountValue();
+                accVal.setAccountId(acc.getId());
+                accVal.setGeneration(trAcc.getGeneration());
+                accVal.setCurrency(trAcc.getCurrency());
+                accVal.setValue(trAcc.getAmount());
+                accVal.setId(accValDao.insertSync(accVal));
+            }
+            else {
+                accVal.setValue(accVal.getValue() + trAcc.getAmount());
+                accValDao.updateSync(accVal);
+            }
+        }
+    }
     static class TransactionGenerationContainer {
         @ColumnInfo
         long generation;
         public TransactionGenerationContainer(long generation) {
             this.generation = generation;
+        }
+    }
+
+    static class LedgerIdContainer {
+        @ColumnInfo(name = "ledger_id")
+        long ledgerId;
+        public LedgerIdContainer(long ledgerId) {
+            this.ledgerId = ledgerId;
         }
     }
 

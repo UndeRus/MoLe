@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class LedgerAccount {
+    private static final char ACCOUNT_DELIMITER = ':';
     static Pattern reHigherAccount = Pattern.compile("^[^:]+:");
     private final LedgerAccount parent;
     private long dbId;
@@ -51,7 +52,7 @@ public class LedgerAccount {
     }
     @Nullable
     public static String extractParentName(@NonNull String accName) {
-        int colonPos = accName.lastIndexOf(':');
+        int colonPos = accName.lastIndexOf(ACCOUNT_DELIMITER);
         if (colonPos < 0)
             return null;    // no parent account -- this is a top-level account
         else
@@ -72,6 +73,15 @@ public class LedgerAccount {
         }
 
         return res;
+    }
+    public static int determineLevel(String accName) {
+        int level = 0;
+        int delimiterPosition = accName.indexOf(ACCOUNT_DELIMITER);
+        while (delimiterPosition >= 0) {
+            level++;
+            delimiterPosition = accName.indexOf(ACCOUNT_DELIMITER, delimiterPosition + 1);
+        }
+        return level;
     }
     @Override
     public int hashCode() {
