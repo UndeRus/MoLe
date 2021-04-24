@@ -50,6 +50,7 @@ import static net.ktnx.mobileledger.db.Profile.NO_PROFILE_ID;
 public class ProfileDetailModel extends ViewModel {
     private static final String HTTPS_URL_START = "https://";
     private final MutableLiveData<String> profileName = new MutableLiveData<>();
+    private final MutableLiveData<Integer> orderNo = new MutableLiveData<>();
     private final MutableLiveData<Boolean> postingPermitted = new MutableLiveData<>(true);
     private final MutableLiveData<String> defaultCommodity = new MutableLiveData<>(null);
     private final MutableLiveData<FutureDates> futureDates =
@@ -231,6 +232,7 @@ public class ProfileDetailModel extends ViewModel {
         if (mProfile != null) {
             profileId.setValue(mProfile.getId());
             profileName.setValue(mProfile.getName());
+            orderNo.setValue(mProfile.getOrderNo());
             postingPermitted.setValue(mProfile.permitPosting());
             showCommentsByDefault.setValue(mProfile.getShowCommentsByDefault());
             showCommodityByDefault.setValue(mProfile.getShowCommodityByDefault());
@@ -256,6 +258,7 @@ public class ProfileDetailModel extends ViewModel {
         }
         else {
             profileId.setValue(NO_PROFILE_ID);
+            orderNo.setValue(-1);
             profileName.setValue(null);
             url.setValue(HTTPS_URL_START);
             postingPermitted.setValue(true);
@@ -273,6 +276,7 @@ public class ProfileDetailModel extends ViewModel {
     void updateProfile(Profile mProfile) {
         mProfile.setId(profileId.getValue());
         mProfile.setName(profileName.getValue());
+        mProfile.setOrderNo(orderNo.getValue());
         mProfile.setUrl(url.getValue());
         mProfile.setPermitPosting(postingPermitted.getValue());
         mProfile.setShowCommentsByDefault(showCommentsByDefault.getValue());
