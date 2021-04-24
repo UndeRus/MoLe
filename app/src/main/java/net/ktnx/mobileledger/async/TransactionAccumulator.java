@@ -29,7 +29,7 @@ public class TransactionAccumulator {
     private final String boldAccountName;
     private SimpleDate earliestDate, latestDate;
     private SimpleDate lastDate;
-    private boolean done;
+    private int transactionCount = 0;
     public TransactionAccumulator(String boldAccountName) {
         this.boldAccountName = boldAccountName;
 
@@ -39,8 +39,7 @@ public class TransactionAccumulator {
         put(transaction, transaction.getDate());
     }
     public void put(LedgerTransaction transaction, SimpleDate date) {
-        if (done)
-            throw new IllegalStateException("Can't put new items after done()");
+        transactionCount++;
 
         // first item
         if (null == latestDate)
@@ -59,7 +58,7 @@ public class TransactionAccumulator {
         lastDate = date;
     }
     public void publishResults(MainModel model) {
-        model.setDisplayedTransactions(list);
+        model.setDisplayedTransactions(list, transactionCount);
         model.setFirstTransactionDate(earliestDate);
         model.setLastTransactionDate(latestDate);
     }

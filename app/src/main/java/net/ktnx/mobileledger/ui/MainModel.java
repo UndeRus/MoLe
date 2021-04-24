@@ -58,9 +58,9 @@ public class MainModel extends ViewModel {
     public LiveData<List<TransactionListItem>> getDisplayedTransactions() {
         return displayedTransactions;
     }
-    public void setDisplayedTransactions(List<TransactionListItem> list) {
+    public void setDisplayedTransactions(List<TransactionListItem> list, int transactionCount) {
         displayedTransactions.postValue(list);
-        Data.lastUpdateTransactionCount.postValue(list.size());
+        Data.lastUpdateTransactionCount.postValue(transactionCount);
     }
     public SimpleDate getFirstTransactionDate() {
         return firstTransactionDate;
