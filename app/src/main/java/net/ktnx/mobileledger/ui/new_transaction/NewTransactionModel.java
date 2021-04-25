@@ -314,7 +314,7 @@ public class NewTransactionModel extends ViewModel {
 
         if (group != null) {
             int grp = group;
-            if (grp > 0 & grp <= m.groupCount())
+            if (grp > 0 && grp <= m.groupCount())
                 try {
                     return Integer.parseInt(m.group(grp));
                 }
@@ -331,7 +331,7 @@ public class NewTransactionModel extends ViewModel {
 
         if (group != null) {
             int grp = group;
-            if (grp > 0 & grp <= m.groupCount())
+            if (grp > 0 && grp <= m.groupCount())
                 return m.group(grp);
         }
 
@@ -343,7 +343,7 @@ public class NewTransactionModel extends ViewModel {
 
         if (group != null) {
             int grp = group;
-            if (grp > 0 & grp <= m.groupCount())
+            if (grp > 0 && grp <= m.groupCount())
                 try {
                     return Float.valueOf(m.group(grp));
                 }
