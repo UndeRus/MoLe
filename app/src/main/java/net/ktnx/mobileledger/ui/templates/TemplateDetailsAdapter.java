@@ -818,6 +818,8 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     b.templateDetailsNegateAmountText.setVisibility(View.VISIBLE);
                 }
 
+                // TODO: currency
+
                 b.templateAccountNameSourceLabel.setOnClickListener(
                         v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
                 b.templateDetailsAccountNameSource.setOnClickListener(

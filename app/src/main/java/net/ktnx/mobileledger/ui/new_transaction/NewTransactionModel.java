@@ -29,6 +29,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.BuildConfig;
+import net.ktnx.mobileledger.db.Currency;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.TemplateAccount;
@@ -290,17 +291,22 @@ public class NewTransactionModel extends ViewModel {
                   if (amount != null && acc.getNegateAmount() != null && acc.getNegateAmount())
                       amount = -amount;
 
-                  // TODO currency
                   TransactionAccount accRow = new TransactionAccount(accountName);
                   accRow.setComment(accountComment);
                   if (amount != null)
                       accRow.setAmount(amount);
+                  accRow.setCurrency(
+                          extractCurrencyFromMatches(matchResult, acc.getCurrencyMatchGroup(),
+                                  acc.getCurrencyObject()));
 
                   newItems.add(accRow);
               }
 
               Misc.onMainThread(() -> replaceItems(newItems));
           });
+    }
+    private String extractCurrencyFromMatches(MatchResult m, Integer group, Currency literal) {
+        return extractStringFromMatches(m, group, (literal == null) ? "" : literal.getName());
     }
     private int extractIntFromMatches(MatchResult m, Integer group, Integer literal) {
         if (literal != null)
