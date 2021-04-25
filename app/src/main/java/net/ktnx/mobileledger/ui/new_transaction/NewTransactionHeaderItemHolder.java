@@ -323,8 +323,9 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
                             (TransactionDescriptionAutocompleteAdapter) a);
                 }
 
-                b.transactionComment.setText(head.getComment());
-                //styleComment(b.transactionComment, head.getComment());
+                final String comment = head.getComment();
+                b.transactionComment.setText(comment);
+                styleComment(b.transactionComment, comment); // would hide or make it visible
 
                 setEditable(true);
 

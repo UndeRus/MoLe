@@ -526,7 +526,9 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                         acc.isAmountSet() ? String.format("%4.2f", acc.getAmount()) : null);
                 displayAmountValidity(true);
 
-                b.comment.setText(acc.getComment());
+                final String comment = acc.getComment();
+                b.comment.setText(comment);
+                styleComment(b.comment, comment);
 
                 setEditable(true);
 
