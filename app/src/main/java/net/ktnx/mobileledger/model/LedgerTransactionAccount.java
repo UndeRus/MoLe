@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -129,7 +129,7 @@ public class LedgerTransactionAccount {
         if (amountSet)
             dbo.setAmount(amount);
         dbo.setComment(comment);
-        dbo.setCurrency(currency);
+        dbo.setCurrency(Misc.nullIsEmpty(currency));
         dbo.setId(dbId);
 
         return dbo;
