@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,5 +18,5 @@
 package net.ktnx.mobileledger.async;
 
 public interface DescriptionSelectedCallback {
-    void descriptionSelected(String description);
+    void onDescriptionSelected(String description);
 }

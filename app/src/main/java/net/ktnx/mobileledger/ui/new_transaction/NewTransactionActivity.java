@@ -351,7 +351,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                .create()
                .show();
     }
-    public void descriptionSelected(String description) {
+    public void onDescriptionSelected(String description) {
         debug("description selected", description);
         if (!model.accountListIsEmpty())
             return;

@@ -101,7 +101,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
         b.newTransactionDescription.setAdapter(
                 new TransactionDescriptionAutocompleteAdapter(activity));
         b.newTransactionDescription.setOnItemClickListener(
-                (parent, view, position, id) -> activity.descriptionSelected(
+                (parent, view, position, id) -> activity.onDescriptionSelected(
                         parent.getItemAtPosition(position)
                               .toString()));
 
