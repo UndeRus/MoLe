@@ -482,7 +482,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         Logger.debug(TAG, "account filter changed, reloading transactions");
 //                     mainModel.scheduleTransactionListReload();
         LiveData<List<TransactionWithAccounts>> transactions =
-                new MutableLiveData<>(new ArrayList<TransactionWithAccounts>());
+                new MutableLiveData<>(new ArrayList<>());
         if (profile != null) {
             if (accFilter == null || accFilter.isEmpty()) {
                 transactions = DB.get()
