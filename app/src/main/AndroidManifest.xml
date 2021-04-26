@@ -58,7 +58,7 @@
             android:name=".ui.profiles.ProfileDetailActivity"
             android:label="@string/title_profile_details"
             android:parentActivityName=".ui.activity.MainActivity"
-            android:windowSoftInputMode="stateVisible" />
+            android:windowSoftInputMode="stateVisible|adjustResize" />
     </application>
 
 </manifest>
