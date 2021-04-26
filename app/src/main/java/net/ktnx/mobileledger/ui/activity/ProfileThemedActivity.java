@@ -75,7 +75,6 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         Data.observeProfile(this, profile -> {
             if (profile == null) {
                 Logger.debug(TAG, "No current profile, leaving");
-                finish();
                 return;
             }
 
@@ -118,7 +117,10 @@ public class ProfileThemedActivity extends CrashReportingActivity {
             profile = dao.getAnySync();
         }
 
-        Logger.debug(TAG, String.format(Locale.ROOT, "Profile %d loaded. posting", profileId));
+        if (profile == null)
+            Logger.debug(TAG, "No profile could be loaded");
+        else
+            Logger.debug(TAG, String.format(Locale.ROOT, "Profile %d loaded. posting", profileId));
         Data.postCurrentProfile(profile);
     }
 }

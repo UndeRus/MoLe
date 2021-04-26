@@ -411,11 +411,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
      * called when the current profile has changed
      */
     private void onProfileChanged(@Nullable Profile newProfile) {
-        if (this.profile == null) {
-            if (newProfile == null)
-                return;
-        }
-        else {
+        if (this.profile != null) {
             if (this.profile.equals(newProfile))
                 return;
         }
@@ -427,7 +423,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         else
             setTitle(R.string.app_name);
 
-        int newProfileTheme = haveProfile ? newProfile.getTheme() : -1;
+        int newProfileTheme = haveProfile ? newProfile.getTheme() : Colors.DEFAULT_HUE_DEG;
         if (newProfileTheme != Colors.profileThemeId) {
             Logger.debug("profiles",
                     String.format(Locale.ENGLISH, "profile theme %d → %d", Colors.profileThemeId,

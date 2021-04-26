@@ -108,6 +108,9 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.observeProfile(this, this::onProfileChanged);
     }
     private void onProfileChanged(Profile profile) {
+        if (profile == null)
+            return;
+
         DB.get()
           .getAccountDAO()
           .getAllWithAmounts(profile.getId())
