@@ -469,8 +469,12 @@ public class NewTransactionModel extends ViewModel {
         List<Item> newList = new ArrayList<>();
         Item.resetIdDispenser();
 
+        Item currentHead = items.getValue()
+                                .get(0);
         TransactionHead head = new TransactionHead(tr.transaction.getDescription());
         head.setComment(tr.transaction.getComment());
+        if (currentHead instanceof TransactionHead)
+            head.setDate(((TransactionHead) currentHead).date);
 
         newList.add(head);
 
