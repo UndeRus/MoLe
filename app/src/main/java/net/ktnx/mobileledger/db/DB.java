@@ -33,7 +33,6 @@ import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.dao.AccountDAO;
 import net.ktnx.mobileledger.dao.AccountValueDAO;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
-import net.ktnx.mobileledger.dao.DescriptionHistoryDAO;
 import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
@@ -54,11 +53,11 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 @Database(version = DB.REVISION,
           entities = {TemplateHeader.class, TemplateAccount.class, Currency.class, Account.class,
-                      Profile.class, Option.class, AccountValue.class, DescriptionHistory.class,
-                      Transaction.class, TransactionAccount.class
+                      Profile.class, Option.class, AccountValue.class, Transaction.class,
+                      TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
-    public static final int REVISION = 59;
+    public static final int REVISION = 60;
     public static final String DB_NAME = "MoLe.db";
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static DB instance;
@@ -77,7 +76,8 @@ abstract public class DB extends RoomDatabase {
                                     multiVersionMigration(20, 22), multiVersionMigration(22, 30),
                                     multiVersionMigration(30, 32), multiVersionMigration(32, 34),
                                     multiVersionMigration(34, 40), singleVersionMigration(41),
-                                    multiVersionMigration(41, 58), singleVersionMigration(59)
+                                    multiVersionMigration(41, 58), singleVersionMigration(59),
+                                    singleVersionMigration(60)
                     })
                    .addCallback(new Callback() {
                        @Override
@@ -213,8 +213,6 @@ abstract public class DB extends RoomDatabase {
     public abstract TransactionAccountDAO getTransactionAccountDAO();
 
     public abstract OptionDAO getOptionDAO();
-
-    public abstract DescriptionHistoryDAO getDescriptionHistoryDAO();
 
     public abstract ProfileDAO getProfileDAO();
 }

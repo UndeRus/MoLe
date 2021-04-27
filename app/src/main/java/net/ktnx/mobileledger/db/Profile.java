@@ -27,7 +27,6 @@ import androidx.room.PrimaryKey;
 import androidx.room.Transaction;
 
 import net.ktnx.mobileledger.dao.AccountDAO;
-import net.ktnx.mobileledger.dao.DescriptionHistoryDAO;
 import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.utils.Misc;
@@ -230,10 +229,6 @@ public class Profile {
         TransactionDAO trnDao = DB.get()
                                   .getTransactionDAO();
         trnDao.deleteSync(trnDao.getAllForProfileUnorderedSync(id));
-
-        DescriptionHistoryDAO descDao = DB.get()
-                                          .getDescriptionHistoryDAO();
-        descDao.sweepSync();
     }
     public void wipeAllData() {
         AsyncTask.execute(this::wipeAllDataSync);
