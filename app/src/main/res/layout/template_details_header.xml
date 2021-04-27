@@ -252,7 +252,7 @@
         android:id="@+id/year_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@+id/month_layout"
+        app:layout_constraintEnd_toEndOf="@id/year_source_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
@@ -269,8 +269,8 @@
         android:id="@+id/month_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@+id/day_layout"
-        app:layout_constraintStart_toEndOf="@id/year_layout"
+        app:layout_constraintEnd_toEndOf="@id/month_source_label"
+        app:layout_constraintStart_toStartOf="@id/month_source_label"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
@@ -288,7 +288,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/text_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/month_layout"
+        app:layout_constraintStart_toStartOf="@id/day_source_label"
         app:layout_constraintTop_toBottomOf="@id/barrier_before_date_inputs"
         >
         <com.google.android.material.textfield.TextInputEditText
