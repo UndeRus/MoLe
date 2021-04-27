@@ -50,7 +50,7 @@ public class TransactionDescriptionAutocompleteAdapter extends ArrayAdapter<Stri
                 return results;
             }
 
-            Logger.debug("acc", String.format("Looking for account '%s'", constraint));
+            Logger.debug("acc", String.format("Looking for description '%s'", constraint));
             final List<String> matches = TransactionDAO.unbox(dao.lookupDescriptionSync(
                     String.valueOf(constraint)
                           .toUpperCase()));
