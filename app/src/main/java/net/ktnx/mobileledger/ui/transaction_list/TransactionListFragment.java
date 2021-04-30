@@ -59,9 +59,11 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 public class TransactionListFragment extends MobileLedgerListFragment
         implements DatePickerFragment.DatePickedListener {
     private MenuItem menuTransactionListFilter;
+    private MenuItem menuGoToDate;
     private View vAccountFilter;
     private AutoCompleteTextView accNameFilter;
     private MainModel model;
+    private boolean fragmentActive = false;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,16 +78,31 @@ public class TransactionListFragment extends MobileLedgerListFragment
     @Override
     public void onResume() {
         super.onResume();
+        fragmentActive = true;
+        toggleMenuItems();
         debug("flow", "TransactionListFragment.onResume()");
+    }
+    private void toggleMenuItems() {
+        if (menuGoToDate != null)
+            menuGoToDate.setVisible(fragmentActive);
+        if (menuTransactionListFilter != null) {
+            final int filterVisibility = vAccountFilter.getVisibility();
+            menuTransactionListFilter.setVisible(
+                    fragmentActive && filterVisibility != View.VISIBLE);
+        }
     }
     @Override
     public void onStop() {
         super.onStop();
+        fragmentActive = false;
+        toggleMenuItems();
         debug("flow", "TransactionListFragment.onStop()");
     }
     @Override
     public void onPause() {
         super.onPause();
+        fragmentActive = false;
+        toggleMenuItems();
         debug("flow", "TransactionListFragment.onPause()");
     }
     @Override
@@ -172,7 +189,7 @@ public class TransactionListFragment extends MobileLedgerListFragment
     private void onAccountNameFilterChanged(String accName) {
         accNameFilter.setText(accName, false);
 
-        final boolean filterActive = (accName != null) && !accName.isEmpty();
+        boolean filterActive = (accName != null) && !accName.isEmpty();
         if (vAccountFilter != null) {
             vAccountFilter.setVisibility(filterActive ? View.VISIBLE : View.GONE);
         }
@@ -185,6 +202,9 @@ public class TransactionListFragment extends MobileLedgerListFragment
 
         menuTransactionListFilter = menu.findItem(R.id.menu_transaction_list_filter);
         if ((menuTransactionListFilter == null))
+            throw new AssertionError();
+        menuGoToDate = menu.findItem(R.id.menu_go_to_date);
+        if ((menuGoToDate == null))
             throw new AssertionError();
 
         model.getAccountFilter()
@@ -203,15 +223,15 @@ public class TransactionListFragment extends MobileLedgerListFragment
             return true;
         });
 
-        menu.findItem(R.id.menu_go_to_date)
-            .setOnMenuItemClickListener(item -> {
-                DatePickerFragment picker = new DatePickerFragment();
-                picker.setOnDatePickedListener(this);
-                picker.setDateRange(model.getFirstTransactionDate(),
-                        model.getLastTransactionDate());
-                picker.show(requireActivity().getSupportFragmentManager(), null);
-                return true;
-            });
+        menuGoToDate.setOnMenuItemClickListener(item -> {
+            DatePickerFragment picker = new DatePickerFragment();
+            picker.setOnDatePickedListener(this);
+            picker.setDateRange(model.getFirstTransactionDate(), model.getLastTransactionDate());
+            picker.show(requireActivity().getSupportFragmentManager(), null);
+            return true;
+        });
+
+        toggleMenuItems();
     }
     @Override
     public void onDatePicked(int year, int month, int day) {
