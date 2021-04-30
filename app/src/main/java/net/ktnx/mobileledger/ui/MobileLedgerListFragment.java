@@ -19,29 +19,28 @@ package net.ktnx.mobileledger.ui;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import net.ktnx.mobileledger.ui.activity.MainActivity;
 import net.ktnx.mobileledger.ui.transaction_list.TransactionListAdapter;
 import net.ktnx.mobileledger.utils.Colors;
 
-public class MobileLedgerListFragment extends Fragment {
-    public SwipeRefreshLayout refreshLayout;
+public abstract class MobileLedgerListFragment extends Fragment {
     public TransactionListAdapter modelAdapter;
-    protected RecyclerView root;
+    public abstract SwipeRefreshLayout getRefreshLayout();
     @NonNull
     public MainActivity getMainActivity() {
         return (MainActivity) requireActivity();
     }
     protected void themeChanged(Integer counter) {
-        refreshLayout.setColorSchemeColors(Colors.getSwipeCircleColors());
+        getRefreshLayout().setColorSchemeColors(Colors.getSwipeCircleColors());
     }
     public void onBackgroundTaskRunningChanged(Boolean isRunning) {
         if (getActivity() == null)
             return;
-        if (refreshLayout == null)
+        SwipeRefreshLayout l = getRefreshLayout();
+        if (l == null)
             return;
-        refreshLayout.setRefreshing(isRunning);
+        l.setRefreshing(isRunning);
     }
 }

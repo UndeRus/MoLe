@@ -30,8 +30,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.databinding.AccountSummaryFragmentBinding;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Profile;
@@ -54,6 +55,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryFragment extends MobileLedgerListFragment {
     public AccountSummaryAdapter modelAdapter;
+    private AccountSummaryFragmentBinding b;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +70,13 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         debug("flow", "AccountSummaryFragment.onCreateView()");
-        return inflater.inflate(R.layout.account_summary_fragment, container, false);
+        b = AccountSummaryFragmentBinding.inflate(inflater, container, false);
+        return b.getRoot();
     }
-
+    @Override
+    public SwipeRefreshLayout getRefreshLayout() {
+        return b.accountSwipeRefreshLayout;
+    }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         debug("flow", "AccountSummaryFragment.onActivityCreated()");
@@ -84,23 +90,21 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         modelAdapter = new AccountSummaryAdapter();
         MainActivity mainActivity = getMainActivity();
 
-        root = view.findViewById(R.id.account_root);
         LinearLayoutManager llm = new LinearLayoutManager(mainActivity);
         llm.setOrientation(RecyclerView.VERTICAL);
-        root.setLayoutManager(llm);
-        root.setAdapter(modelAdapter);
+        b.accountRoot.setLayoutManager(llm);
+        b.accountRoot.setAdapter(modelAdapter);
         DividerItemDecoration did =
                 new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL);
-        root.addItemDecoration(did);
+        b.accountRoot.addItemDecoration(did);
 
         mainActivity.fabShouldShow();
 
         if (mainActivity instanceof FabManager.FabHandler)
-            FabManager.handle(mainActivity, root);
+            FabManager.handle(mainActivity, b.accountRoot);
 
-        refreshLayout = view.findViewById(R.id.account_swipe_refresh_layout);
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
-        refreshLayout.setOnRefreshListener(() -> {
+        b.accountSwipeRefreshLayout.setOnRefreshListener(() -> {
             debug("ui", "refreshing accounts via swipe");
             model.scheduleTransactionListRetrieval();
         });
