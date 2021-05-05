@@ -1,4 +1,17 @@
 # Changes
+## [0.18.0] - 2020-05-05
+
+* NEW
+    + newly added transactions are visible in transaction list without a refresh
+* IMPROVEMENTS
+    + finished migration to fully asynchronous database layer
+    + better responsiveness when switching from the account list to the transaction list for the first time
+* FIXES
+    + fix layout glitches in template editor
+    + fix error handling while trying different JSON API versions
+    + stop resetting the date when an old transaction is loaded
+    + several smaller fixes
+
 ## [0.17.1] - 2020-03-24
 
 * FIXES
