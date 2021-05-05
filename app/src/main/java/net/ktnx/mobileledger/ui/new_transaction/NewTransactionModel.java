@@ -101,7 +101,9 @@ public class NewTransactionModel extends ViewModel {
      * make old items replaceable in-place. makes the new values visually blend in
      */
     private void renumberItems() {
-        final List<Item> list = items.getValue();
+        renumberItems(items.getValue());
+    }
+    private void renumberItems(List<Item> list) {
         if (list == null) {
             return;
         }
@@ -260,7 +262,6 @@ public class NewTransactionModel extends ViewModel {
         if (Misc.emptyIsNull(transactionComment) != null)
             head.setComment(transactionComment);
 
-        Item.resetIdDispenser();
         List<Item> newItems = new ArrayList<>();
 
         newItems.add(head);
@@ -302,6 +303,7 @@ public class NewTransactionModel extends ViewModel {
                   newItems.add(accRow);
               }
 
+              renumberItems(newItems);
               Misc.onMainThread(() -> replaceItems(newItems));
           });
     }
