@@ -307,7 +307,7 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        taskCallback.done(error, transaction);
+        taskCallback.onTransactionSaveDone(error, transaction);
     }
 
 }

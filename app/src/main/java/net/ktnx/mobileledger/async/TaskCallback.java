@@ -18,5 +18,5 @@
 package net.ktnx.mobileledger.async;
 
 public interface TaskCallback {
-    void done(String error, Object args);
+    void onTransactionSaveDone(String error, Object args);
 }
