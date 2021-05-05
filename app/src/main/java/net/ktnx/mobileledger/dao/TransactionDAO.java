@@ -253,32 +253,36 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
             trAcc.setGeneration(transaction.getGeneration());
             trAcc.setId(trAccDao.insertSync(trAcc));
 
-            Account acc = accDao.getByNameSync(profileId, trAcc.getAccountName());
-            if (acc == null) {
-                acc = new Account();
-                acc.setProfileId(profileId);
-                acc.setName(trAcc.getAccountName());
-                acc.setNameUpper(acc.getName()
-                                    .toUpperCase());
-                acc.setParentName(LedgerAccount.extractParentName(acc.getName()));
-                acc.setLevel(LedgerAccount.determineLevel(acc.getName()));
-                acc.setGeneration(trAcc.getGeneration());
+            String accName = trAcc.getAccountName();
+            while (accName != null) {
+                Account acc = accDao.getByNameSync(profileId, accName);
+                if (acc == null) {
+                    acc = new Account();
+                    acc.setProfileId(profileId);
+                    acc.setName(accName);
+                    acc.setNameUpper(accName.toUpperCase());
+                    acc.setParentName(LedgerAccount.extractParentName(accName));
+                    acc.setLevel(LedgerAccount.determineLevel(acc.getName()));
+                    acc.setGeneration(trAcc.getGeneration());
 
-                acc.setId(accDao.insertSync(acc));
-            }
+                    acc.setId(accDao.insertSync(acc));
+                }
 
-            AccountValue accVal = accValDao.getByCurrencySync(acc.getId(), trAcc.getCurrency());
-            if (accVal == null) {
-                accVal = new AccountValue();
-                accVal.setAccountId(acc.getId());
-                accVal.setGeneration(trAcc.getGeneration());
-                accVal.setCurrency(trAcc.getCurrency());
-                accVal.setValue(trAcc.getAmount());
-                accVal.setId(accValDao.insertSync(accVal));
-            }
-            else {
-                accVal.setValue(accVal.getValue() + trAcc.getAmount());
-                accValDao.updateSync(accVal);
+                AccountValue accVal = accValDao.getByCurrencySync(acc.getId(), trAcc.getCurrency());
+                if (accVal == null) {
+                    accVal = new AccountValue();
+                    accVal.setAccountId(acc.getId());
+                    accVal.setGeneration(trAcc.getGeneration());
+                    accVal.setCurrency(trAcc.getCurrency());
+                    accVal.setValue(trAcc.getAmount());
+                    accVal.setId(accValDao.insertSync(accVal));
+                }
+                else {
+                    accVal.setValue(accVal.getValue() + trAcc.getAmount());
+                    accValDao.updateSync(accVal);
+                }
+
+                accName = LedgerAccount.extractParentName(accName);
             }
         }
     }
