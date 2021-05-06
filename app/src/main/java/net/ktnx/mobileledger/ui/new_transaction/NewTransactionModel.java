@@ -192,8 +192,10 @@ public class NewTransactionModel extends ViewModel {
         List<Item> list = new ArrayList<>();
         Item.resetIdDispenser();
         list.add(new TransactionHead(""));
-        list.add(new TransactionAccount(""));
-        list.add(new TransactionAccount(""));
+        final String defaultCurrency = Objects.requireNonNull(Data.getProfile())
+                                              .getDefaultCommodity();
+        list.add(new TransactionAccount("", defaultCurrency));
+        list.add(new TransactionAccount("", defaultCurrency));
         noteFocusChanged(0, FocusedElement.Description);
         renumberItems();
         isSubmittable.setValue(false);
