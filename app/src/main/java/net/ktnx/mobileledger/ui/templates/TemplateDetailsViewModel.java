@@ -215,7 +215,8 @@ public class TemplateDetailsViewModel extends ViewModel {
                                                          .asHeaderItem();
 
             modelHeader.setName(Misc.trim(modelHeader.getName()));
-            if (modelHeader.getName().isEmpty())
+            if (modelHeader.getName()
+                           .isEmpty())
                 modelHeader.setName(getDefaultTemplateName());
 
             TemplateHeaderDAO headerDAO = DB.get()
