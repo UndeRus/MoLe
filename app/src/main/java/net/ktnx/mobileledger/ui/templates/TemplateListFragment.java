@@ -66,7 +66,6 @@ public class TemplateListFragment extends Fragment {
      *
      * @return A new instance of fragment TemplateListFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static TemplateListFragment newInstance() {
         TemplateListFragment fragment = new TemplateListFragment();
         Bundle args = new Bundle();
@@ -91,10 +90,6 @@ public class TemplateListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
     }
 
     @Override
