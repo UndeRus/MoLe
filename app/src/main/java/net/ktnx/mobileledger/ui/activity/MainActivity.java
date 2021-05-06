@@ -392,19 +392,23 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
 
         createShortcuts(newList);
 
-        Profile currentProfile = Data.getProfile();
-        boolean currentProfilePresent = false;
+        final Profile currentProfile = Data.getProfile();
+        Profile replacementProfile = null;
         if (currentProfile != null) {
             for (Profile p : newList) {
                 if (p.getId() == currentProfile.getId()) {
-                    currentProfilePresent = true;
+                    replacementProfile = p;
                     break;
                 }
             }
         }
-        if (!currentProfilePresent) {
+
+        if (replacementProfile == null) {
             Logger.debug(TAG, "Switching profile because the current is no longer available");
             Data.setCurrentProfile(newList.get(0));
+        }
+        else {
+            Data.setCurrentProfile(replacementProfile);
         }
     }
     /**
