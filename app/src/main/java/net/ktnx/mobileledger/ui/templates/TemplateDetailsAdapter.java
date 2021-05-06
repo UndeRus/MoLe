@@ -30,6 +30,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -40,8 +41,10 @@ import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.TemplateDetailsAccountBinding;
 import net.ktnx.mobileledger.databinding.TemplateDetailsHeaderBinding;
 import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
+import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.TemplateDetailsItem;
+import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
 import net.ktnx.mobileledger.ui.HelpDialog;
 import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.TemplateDetailSourceSelectorFragment;
@@ -277,7 +280,7 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
 
     private enum HeaderDetail {DESCRIPTION, COMMENT, DATE_YEAR, DATE_MONTH, DATE_DAY}
 
-    private enum AccDetail {ACCOUNT, COMMENT, AMOUNT}
+    private enum AccDetail {ACCOUNT, COMMENT, AMOUNT, CURRENCY}
 
     public abstract static class ViewHolder extends RecyclerView.ViewHolder {
         ViewHolder(@NonNull View itemView) {
@@ -818,7 +821,22 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                     b.templateDetailsNegateAmountText.setVisibility(View.VISIBLE);
                 }
 
-                // TODO: currency
+                if (accRow.hasLiteralCurrency()) {
+                    b.templateDetailsAccountCurrencySource.setText(
+                            R.string.template_details_source_literal);
+                    net.ktnx.mobileledger.db.Currency c = accRow.getCurrency();
+                    if (c == null)
+                        b.templateDetailsAccountCurrency.setText(R.string.btn_no_currency);
+                    else
+                        b.templateDetailsAccountCurrency.setText(c.getName());
+                    b.templateDetailsAccountCurrency.setVisibility(View.VISIBLE);
+                }
+                else {
+                    b.templateDetailsAccountCurrencySource.setText(
+                            String.format(Locale.US, groupNoText, accRow.getCurrencyMatchGroup(),
+                                    getMatchGroupText(accRow.getCurrencyMatchGroup())));
+                    b.templateDetailsAccountCurrency.setVisibility(View.GONE);
+                }
 
                 b.templateAccountNameSourceLabel.setOnClickListener(
                         v -> selectAccountRowDetailSource(v, AccDetail.ACCOUNT));
@@ -832,6 +850,32 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
                 b.templateDetailsAccountAmountSource.setOnClickListener(
                         v -> selectAccountRowDetailSource(v, AccDetail.AMOUNT));
+                b.templateDetailsAccountCurrencySource.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.CURRENCY));
+                b.templateAccountCurrencySourceLabel.setOnClickListener(
+                        v -> selectAccountRowDetailSource(v, AccDetail.CURRENCY));
+                if (accRow.hasLiteralCurrency())
+                    b.templateDetailsAccountCurrency.setOnClickListener(v -> {
+                        CurrencySelectorFragment cpf = CurrencySelectorFragment.newInstance(
+                                CurrencySelectorFragment.DEFAULT_COLUMN_COUNT, false);
+                        cpf.setOnCurrencySelectedListener(text -> {
+                            if (text == null) {
+                                b.templateDetailsAccountCurrency.setText(R.string.btn_no_currency);
+                                accRow.setCurrency(null);
+                            }
+                            else {
+                                b.templateDetailsAccountCurrency.setText(text);
+                                DB.get()
+                                  .getCurrencyDAO()
+                                  .getByName(text)
+                                  .observe((LifecycleOwner) b.getRoot()
+                                                             .getContext(), accRow::setCurrency);
+                            }
+                        });
+                        cpf.show(
+                                ((TemplatesActivity) b.templateDetailsAccountCurrency.getContext()).getSupportFragmentManager(),
+                                "currency-selector");
+                    });
             }
             finally {
                 enableUpdatePropagation();
@@ -861,6 +905,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                         case AMOUNT:
                             accRow.switchToLiteralAmount();
                             break;
+                        case CURRENCY:
+                            accRow.switchToLiteralCurrency();
+                            break;
                         default:
                             throw new IllegalStateException("Unexpected detail " + detail);
                     }
@@ -875,6 +922,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                             break;
                         case AMOUNT:
                             accRow.setAmountMatchGroup(group);
+                            break;
+                        case CURRENCY:
+                            accRow.setCurrencyMatchGroup(group);
                             break;
                         default:
                             throw new IllegalStateException("Unexpected detail " + detail);

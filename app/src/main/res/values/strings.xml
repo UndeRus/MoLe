@@ -197,4 +197,5 @@
     <string name="template_list_help_title">Templates</string>
     <string name="template_details_template_params_label">Template parameters</string>
     <string name="template_params_help_description">Show help on template parameters</string>
+    <string name="account_currency_source_label">Commodity source</string>
 </resources>

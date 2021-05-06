@@ -165,6 +165,7 @@
             android:selectAllOnFocus="true"
             />
     </com.google.android.material.textfield.TextInputLayout>
+
     <TextView
         android:id="@+id/template_details_negate_amount_label"
         android:layout_width="0dp"
@@ -198,4 +199,36 @@
         app:layout_constraintTop_toTopOf="@id/template_details_negate_amount_label"
         />
 
+    <TextView
+        android:id="@+id/template_account_currency_source_label"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/text_margin"
+        android:text="@string/account_currency_source_label"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintBottom_toTopOf="@+id/template_details_account_currency_source"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/negate_amount_switch"
+        />
+    <TextView
+        android:id="@+id/template_details_account_currency_source"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItemSecondary"
+        app:layout_constraintBottom_toTopOf="@+id/template_details_account_currency"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/template_account_currency_source_label"
+        />
+    <TextView
+        android:id="@+id/template_details_account_currency"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/half_text_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/template_details_account_currency_source"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

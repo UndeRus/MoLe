@@ -384,6 +384,7 @@ abstract public class TemplateDetailsItem {
         public boolean hasLiteralAccountComment() {
             return accountComment.hasLiteralValue();
         }
+        public boolean hasLiteralCurrency() { return currency.hasLiteralValue(); }
         public boolean equalContents(AccountRow o) {
             if (position != o.position) {
                 Logger.debug("cmpAcc",
@@ -397,6 +398,9 @@ abstract public class TemplateDetailsItem {
         }
         public void switchToLiteralAmount() {
             amount.switchToLiteral();
+        }
+        public void switchToLiteralCurrency() {
+            currency.switchToLiteral();
         }
         public void switchToLiteralAccountName() {
             accountName.switchToLiteral();
@@ -424,6 +428,14 @@ abstract public class TemplateDetailsItem {
             else {
                 result.setAmountMatchGroup(amount.getMatchGroup());
                 result.setNegateAmount(negateAmount ? true : null);
+            }
+
+            if (currency.hasLiteralValue()) {
+                net.ktnx.mobileledger.db.Currency c = currency.getValue();
+                result.setCurrency((c == null) ? null : c.getId());
+            }
+            else {
+                result.setCurrencyMatchGroup(currency.getMatchGroup());
             }
 
             return result;

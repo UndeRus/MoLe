@@ -188,4 +188,5 @@
     <string name="template_list_help_title">Макети</string>
     <string name="template_details_template_params_label">Параметри на макета</string>
     <string name="template_params_help_description">Помощна информация за пааметрите на макета</string>
+    <string name="account_currency_source_label">Източник на валутата</string>
 </resources>
