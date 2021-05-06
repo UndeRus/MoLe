@@ -197,8 +197,13 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
                                                                            visible ? View.VISIBLE
                                                                                    : View.GONE));
 
-        if ((savedInstanceState != null) ? savedInstanceState.getBoolean(ARG_SHOW_PARAMS,
-                DEFAULT_SHOW_PARAMS) : DEFAULT_SHOW_PARAMS)
+        final boolean showParams;
+        if (getArguments() == null)
+            showParams = DEFAULT_SHOW_PARAMS;
+        else
+            showParams = getArguments().getBoolean(ARG_SHOW_PARAMS, DEFAULT_SHOW_PARAMS);
+
+        if (showParams)
             model.showPositionAndPadding();
         else
             model.hidePositionAndPadding();
