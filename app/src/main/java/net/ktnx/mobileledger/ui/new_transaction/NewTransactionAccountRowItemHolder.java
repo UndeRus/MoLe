@@ -53,7 +53,6 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
     private String decimalSeparator;
     private boolean inUpdate = false;
     private boolean syncingData = false;
-    //TODO multiple amounts with different currencies per posting?
     NewTransactionAccountRowItemHolder(@NonNull NewTransactionAccountRowBinding b,
                                        NewTransactionItemsAdapter adapter) {
         super(b.getRoot());

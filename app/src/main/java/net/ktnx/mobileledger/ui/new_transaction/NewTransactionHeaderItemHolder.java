@@ -51,7 +51,6 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
     private String decimalSeparator;
     private boolean inUpdate = false;
     private boolean syncingData = false;
-    //TODO multiple amounts with different currencies per posting?
     NewTransactionHeaderItemHolder(@NonNull NewTransactionHeaderRowBinding b,
                                    NewTransactionItemsAdapter adapter) {
         super(b.getRoot());
