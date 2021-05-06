@@ -75,7 +75,7 @@ public class TemplateDetailsViewModel extends ViewModel {
 
         srcList = Collections.unmodifiableList(srcList);
 
-        {
+        if (BuildConfig.DEBUG) {
             Logger.debug(TAG, "Considering old list");
             for (TemplateDetailsItem item : srcList)
                 Logger.debug(TAG, String.format(Locale.US, " id %d pos %d", item.getId(),
