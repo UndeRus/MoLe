@@ -108,8 +108,8 @@ abstract public class DB extends RoomDatabase {
                 // SharedPreferences
                 if (toVersion == 59) {
                     try (Cursor c = db.query(
-                            "SELECT p.id, p.theme_hue FROM profiles p WHERE p.id=(SELECT o.value " +
-                            "FROM options WHERE o.profile_uid IS NULL AND o.name=?",
+                            "SELECT p.id, p.theme FROM profiles p WHERE p.id=(SELECT o.value " +
+                            "FROM options o WHERE o.profile_id=0 AND o.name=?)",
                             new Object[]{"profile_id"}))
                     {
                         if (c.moveToFirst()) {
