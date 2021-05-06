@@ -130,6 +130,8 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         final TextView tvNoCurrBtn = csd.findViewById(R.id.btn_no_currency);
         final TextView tvAddCurrOkBtn = csd.findViewById(R.id.btn_add_currency);
         final TextView tvAddCurrBtn = csd.findViewById(R.id.btn_add_new);
+        final SwitchMaterial gap = csd.findViewById(R.id.currency_gap);
+        final RadioGroup rgPosition = csd.findViewById(R.id.position_radio_group);
 
         tvNewCurrName.setVisibility(View.GONE);
         tvAddCurrOkBtn.setVisibility(View.GONE);
@@ -149,15 +151,14 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         });
 
         tvAddCurrOkBtn.setOnClickListener(v -> {
-
-
             String currName = String.valueOf(tvNewCurrName.getText());
             if (!currName.isEmpty()) {
                 DB.get()
                   .getCurrencyDAO()
                   .insert(new net.ktnx.mobileledger.db.Currency(0,
-                          String.valueOf(tvNewCurrName.getText()), "after", false));
-                // FIXME hardcoded position and gap setting
+                          String.valueOf(tvNewCurrName.getText()),
+                          (rgPosition.getCheckedRadioButtonId() == R.id.currency_position_left)
+                          ? "before" : "after", gap.isChecked()));
             }
 
             tvNewCurrName.setVisibility(View.GONE);
@@ -180,15 +181,12 @@ public class CurrencySelectorFragment extends AppCompatDialogFragment
         else
             rbPositionRight.toggle();
 
-        RadioGroup rgPosition = csd.findViewById(R.id.position_radio_group);
         rgPosition.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.currency_position_left)
                 Data.currencySymbolPosition.setValue(Currency.Position.before);
             else
                 Data.currencySymbolPosition.setValue(Currency.Position.after);
         });
-
-        SwitchMaterial gap = csd.findViewById(R.id.currency_gap);
 
         gap.setChecked(Data.currencyGap.getValue());
 
