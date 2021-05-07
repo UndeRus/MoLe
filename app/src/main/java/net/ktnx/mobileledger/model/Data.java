@@ -123,7 +123,6 @@ public final class Data {
         NumberFormat newNumberFormatter = NumberFormat.getNumberInstance();
         newNumberFormatter.setParseIntegerOnly(false);
         newNumberFormatter.setGroupingUsed(true);
-        newNumberFormatter.setGroupingUsed(true);
         newNumberFormatter.setMinimumIntegerDigits(1);
         newNumberFormatter.setMinimumFractionDigits(2);
 
