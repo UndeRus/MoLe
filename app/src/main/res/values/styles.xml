@@ -19,6 +19,8 @@
     <!-- Base application theme. -->
     <!-- base hue: 261.2245° -->
     <!-- target primary color: #935FF2 -->
+    <style name="MoLeMaterialAutoCompleteTextViewStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"></style>
+
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="windowActionBar">false</item>

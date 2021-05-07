@@ -73,7 +73,7 @@
         >
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/template_details_account_name"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/MoLeMaterialAutoCompleteTextViewStyle"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
