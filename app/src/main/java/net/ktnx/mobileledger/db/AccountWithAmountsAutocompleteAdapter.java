@@ -18,53 +18,63 @@
 package net.ktnx.mobileledger.db;
 
 import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static net.ktnx.mobileledger.db.Profile.NO_PROFILE_ID;
-
-public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
+public class AccountWithAmountsAutocompleteAdapter extends ArrayAdapter<AccountWithAmounts> {
     private final AccountFilter filter = new AccountFilter();
-    private final AccountDAO dao = DB.get()
-                                     .getAccountDAO();
-    private long profileId = NO_PROFILE_ID;
-    public AccountAutocompleteAdapter(Context context) {
-        super(context, android.R.layout.simple_dropdown_item_1line, new ArrayList<>());
-    }
-    public AccountAutocompleteAdapter(Context context, @NonNull Profile profile) {
-        this(context);
+    private final long profileId;
+    public AccountWithAmountsAutocompleteAdapter(Context context, @NonNull Profile profile) {
+        super(context, R.layout.account_autocomplete_row);
         profileId = profile.getId();
-    }
-    public void setProfileId(long profileId) {
-        this.profileId = profileId;
     }
     @NonNull
     @Override
     public Filter getFilter() {
         return filter;
     }
-    //    @NonNull
-//    @Override
-//    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-//        View view = convertView;
-//        if (view == null) {
-//            view = LayoutInflater.from(parent.getContext())
-//                                 .inflate(android.R.layout.simple_dropdown_item_1line, parent,
-//                                         false);
-//        }
-//        Account item = getItem(position);
-//        ((TextView) view.findViewById(android.R.id.text1)).setText(item.getName());
-//        return view;
-//    }
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        View view = convertView;
+        if (view == null) {
+            view = LayoutInflater.from(parent.getContext())
+                                 .inflate(R.layout.account_autocomplete_row, parent, false);
+        }
+        AccountWithAmounts item = getItem(position);
+        ((TextView) view.findViewById(R.id.account_name)).setText(item.account.getName());
+        StringBuilder amountsText = new StringBuilder();
+        for (AccountValue amt : item.amounts) {
+            if (amountsText.length() != 0)
+                amountsText.append('\n');
+            String currency = amt.getCurrency();
+            if (Misc.emptyIsNull(currency) != null)
+                amountsText.append(currency)
+                           .append(' ');
+            amountsText.append(Data.formatNumber(amt.getValue()));
+        }
+        ((TextView) view.findViewById(R.id.amounts)).setText(amountsText.toString());
+
+        return view;
+    }
     class AccountFilter extends Filter {
+        private final AccountDAO dao = DB.get()
+                                         .getAccountDAO();
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
@@ -74,12 +84,9 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
             }
 
             Logger.debug("acc", String.format("Looking for account '%s'", constraint));
-            final List<String> matches = AccountDAO.unbox(
-                    (profileId == NO_PROFILE_ID) ? dao.lookupNamesByNameSync(
-                            String.valueOf(constraint)
-                                  .toUpperCase()) : dao.lookupNamesInProfileByNameSync(profileId,
-                            String.valueOf(constraint)
-                                  .toUpperCase()));
+            final List<AccountWithAmounts> matches =
+                    dao.lookupWithAmountsInProfileByNameSync(profileId, String.valueOf(constraint)
+                                                                              .toUpperCase());
             results.values = matches;
             results.count = matches.size();
 
@@ -94,7 +101,7 @@ public class AccountAutocompleteAdapter extends ArrayAdapter<String> {
             else {
                 setNotifyOnChange(false);
                 clear();
-                addAll((List<String>) results.values);
+                addAll((List<AccountWithAmounts>) results.values);
                 notifyDataSetChanged();
             }
         }

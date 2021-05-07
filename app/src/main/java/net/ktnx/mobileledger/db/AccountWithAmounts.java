@@ -17,6 +17,7 @@
 
 package net.ktnx.mobileledger.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
@@ -27,4 +28,9 @@ public class AccountWithAmounts {
     public Account account;
     @Relation(parentColumn = "id", entityColumn = "account_id")
     public List<AccountValue> amounts;
+    @NonNull
+    @Override
+    public String toString() {
+        return account.getName();
+    }
 }

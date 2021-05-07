@@ -35,7 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.databinding.NewTransactionAccountRowBinding;
-import net.ktnx.mobileledger.db.AccountAutocompleteAdapter;
+import net.ktnx.mobileledger.db.AccountWithAmountsAutocompleteAdapter;
 import net.ktnx.mobileledger.model.Currency;
 import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.ui.CurrencySelectorFragment;
@@ -125,8 +125,9 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
         NewTransactionActivity activity = (NewTransactionActivity) b.getRoot()
                                                                     .getContext();
 
-        b.accountRowAccName.setAdapter(new AccountAutocompleteAdapter(b.getRoot()
-                                                                       .getContext(), mProfile));
+        b.accountRowAccName.setAdapter(new AccountWithAmountsAutocompleteAdapter(b.getRoot()
+                                                                                  .getContext(),
+                mProfile));
 
         decimalSeparator = "";
         Data.locale.observe(activity, locale -> decimalSeparator = String.valueOf(
@@ -497,8 +498,8 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                                     presentAccountName, incomingAccountName,
                                     acc.getAccountNameCursorPosition()));
                     // avoid triggering completion pop-up
-                    AccountAutocompleteAdapter a =
-                            (AccountAutocompleteAdapter) b.accountRowAccName.getAdapter();
+                    AccountWithAmountsAutocompleteAdapter a =
+                            (AccountWithAmountsAutocompleteAdapter) b.accountRowAccName.getAdapter();
                     try {
                         b.accountRowAccName.setAdapter(null);
                         b.accountRowAccName.setText(incomingAccountName);
