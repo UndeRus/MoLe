@@ -364,15 +364,11 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
             TransactionWithAccounts tr;
 
-            if (Misc.emptyIsNull(accFilter) != null) {
+            if (Misc.emptyIsNull(accFilter) != null)
                 tr = trDao.getFirstByDescriptionHavingAccountSync(description, accFilter);
-                if (tr != null) {
-                    model.loadTransactionIntoModel(tr);
-                    return;
-                }
-            }
+            else
+                tr = trDao.getFirstByDescriptionSync(description);
 
-            tr = trDao.getFirstByDescriptionSync(description);
             if (tr != null)
                 model.loadTransactionIntoModel(tr);
         });
