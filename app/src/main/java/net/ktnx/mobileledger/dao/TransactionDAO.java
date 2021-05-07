@@ -83,7 +83,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            "               WHEN description LIKE '%%:'||:term||'%%' THEN 2 " +
            "               WHEN description LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END AS ordering FROM transactions " +
-           "WHERE description LIKE '%%'||:term||'%%' " + "ORDER BY ordering, description, rowid ")
+           "WHERE description LIKE '%%'||:term||'%%' ORDER BY ordering, description, rowid ")
     public abstract List<DescriptionContainer> lookupDescriptionSync(@NonNull String term);
 
     @androidx.room.Transaction
