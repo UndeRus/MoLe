@@ -91,8 +91,8 @@ class TransactionRowHolder extends TransactionRowHolderBase {
             if ((boldAccountName != null) && acc.getAccountName()
                                                 .startsWith(boldAccountName))
             {
-                accName.setTextColor(Colors.secondary);
-                accAmount.setTextColor(Colors.secondary);
+                accName.setTextColor(Colors.primary);
+                accAmount.setTextColor(Colors.primary);
 
                 SpannableString ss = new SpannableString(acc.getAccountName());
                 ss.setSpan(new StyleSpan(Typeface.BOLD), 0, boldAccountName.length(),

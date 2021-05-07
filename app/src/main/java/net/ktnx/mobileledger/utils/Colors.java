@@ -68,7 +68,7 @@ public class Colors {
              };
     private static final HashMap<Integer, Integer> themePrimaryColor = new HashMap<>();
     public static @ColorInt
-    int secondary;
+    int primary;
     @ColorInt
     public static int tableRowDarkBG;
     public static int profileThemeId = DEFAULT_HUE_DEG;
@@ -76,8 +76,8 @@ public class Colors {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
         tableRowDarkBG = tv.data;
-        theme.resolveAttribute(R.attr.colorSecondary, tv, true);
-        secondary = tv.data;
+        theme.resolveAttribute(R.attr.colorPrimary, tv, true);
+        primary = tv.data;
 
         if (themePrimaryColor.size() == 0) {
             for (int themeId : themeIDs) {
