@@ -25,7 +25,6 @@
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorOnPrimary">@android:color/white</item>
-        <item name="drawer_background">?android:attr/popupBackground</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="textColor">#ffffff</item>
