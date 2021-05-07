@@ -19,6 +19,10 @@
     <!-- Base application theme. -->
     <!-- base hue: 261.2245° -->
     <!-- target primary color: #935FF2 -->
+    <style name="MoLeAutoCompleteTextViewStyle" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:popupBackground">#272727</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorOnPrimary">@android:color/white</item>
         <item name="drawer_background">?android:attr/popupBackground</item>
@@ -33,6 +37,7 @@
         <item name="textInputStyle">
             @style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense
         </item>
+        <item name="autoCompleteTextViewStyle">@style/MoLeAutoCompleteTextViewStyle</item>
         <item name="colorError">#FFE1E2</item>
         <item name="colorOnError">#CD1609</item>
         <item name="main_header_shadow_height">12dp</item>
