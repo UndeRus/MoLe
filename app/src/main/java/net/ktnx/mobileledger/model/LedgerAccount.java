@@ -58,6 +58,9 @@ public class LedgerAccount {
         else
             return accName.substring(0, colonPos);
     }
+    public static boolean isParentOf(@NonNull String possibleParent, @NonNull String accountName) {
+        return accountName.startsWith(possibleParent + ':');
+    }
     @NonNull
     static public LedgerAccount fromDBO(AccountWithAmounts in, LedgerAccount parent) {
         LedgerAccount res = new LedgerAccount(in.account.getName(), parent);

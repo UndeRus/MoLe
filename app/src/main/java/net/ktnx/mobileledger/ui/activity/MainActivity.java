@@ -773,7 +773,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
         @Override
         public void run() {
-            TransactionAccumulator accumulator = new TransactionAccumulator(accFilter);
+            TransactionAccumulator accumulator = new TransactionAccumulator(accFilter, accFilter);
 
             for (TransactionWithAccounts tr : list) {
                 if (isInterrupted()) {

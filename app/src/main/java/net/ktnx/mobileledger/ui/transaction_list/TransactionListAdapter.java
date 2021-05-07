@@ -129,9 +129,8 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
 
         switch (newType) {
             case TRANSACTION:
-                LedgerTransaction tr = item.getTransaction();
                 holder.asTransaction()
-                      .bind(tr, item.getBoldAccountName());
+                      .bind(item, item.getBoldAccountName());
 
                 break;
             case DELIMITER:

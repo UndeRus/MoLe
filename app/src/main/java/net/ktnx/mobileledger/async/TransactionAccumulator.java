@@ -17,21 +17,34 @@
 
 package net.ktnx.mobileledger.async;
 
+import androidx.annotation.Nullable;
+
+import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
+import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.ui.MainModel;
+import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.SimpleDate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TransactionAccumulator {
     private final ArrayList<TransactionListItem> list = new ArrayList<>();
     private final String boldAccountName;
+    private final String accumulateAccount;
+    private final HashMap<String, BigDecimal> runningTotal = new HashMap<>();
     private SimpleDate earliestDate, latestDate;
     private SimpleDate lastDate;
     private int transactionCount = 0;
-    public TransactionAccumulator(String boldAccountName) {
+    public TransactionAccumulator(@Nullable String boldAccountName,
+                                  @Nullable String accumulateAccount) {
         this.boldAccountName = boldAccountName;
+        this.accumulateAccount = accumulateAccount;
 
         list.add(new TransactionListItem());    // head item
     }
@@ -42,22 +55,60 @@ public class TransactionAccumulator {
         transactionCount++;
 
         // first item
-        if (null == latestDate)
-            latestDate = date;
-        earliestDate = date;
+        if (null == earliestDate)
+            earliestDate = date;
+        latestDate = date;
 
-        if (!date.equals(lastDate)) {
-            if (lastDate == null)
-                lastDate = SimpleDate.today();
+        if (lastDate != null && !date.equals(lastDate)) {
             boolean showMonth = date.month != lastDate.month || date.year != lastDate.year;
-            list.add(new TransactionListItem(date, showMonth));
+            list.add(1, new TransactionListItem(lastDate, showMonth));
         }
 
-        list.add(new TransactionListItem(transaction, boldAccountName));
+        String currentTotal = null;
+        if (accumulateAccount != null) {
+            for (LedgerTransactionAccount acc : transaction.getAccounts()) {
+                if (acc.getAccountName()
+                       .equals(accumulateAccount) ||
+                    LedgerAccount.isParentOf(accumulateAccount, acc.getAccountName()))
+                {
+                    BigDecimal amt = runningTotal.get(acc.getCurrency());
+                    if (amt == null)
+                        amt = BigDecimal.ZERO;
+                    BigDecimal newAmount = BigDecimal.valueOf(acc.getAmount());
+                    newAmount = newAmount.setScale(2, RoundingMode.HALF_EVEN);
+                    amt = amt.add(newAmount);
+                    runningTotal.put(acc.getCurrency(), amt);
+                }
+            }
+
+            currentTotal = summarizeRunningTotal(runningTotal);
+        }
+        list.add(1, new TransactionListItem(transaction, boldAccountName, currentTotal));
 
         lastDate = date;
     }
+    private String summarizeRunningTotal(HashMap<String, BigDecimal> runningTotal) {
+        StringBuilder b = new StringBuilder();
+        for (String currency : runningTotal.keySet()) {
+            if (b.length() != 0)
+                b.append('\n');
+            if (Misc.emptyIsNull(currency) != null)
+                b.append(currency)
+                 .append(' ');
+            BigDecimal val = runningTotal.get(currency);
+            b.append(Data.formatNumber((val == null) ? 0f : val.floatValue()));
+        }
+        return b.toString();
+    }
     public void publishResults(MainModel model) {
+        if (lastDate != null) {
+            SimpleDate today = SimpleDate.today();
+            if (!lastDate.equals(today)) {
+                boolean showMonth = today.month != lastDate.month || today.year != lastDate.year;
+                list.add(1, new TransactionListItem(lastDate, showMonth));
+            }
+        }
+
         model.setDisplayedTransactions(list, transactionCount);
         model.setFirstTransactionDate(earliestDate);
         model.setLastTransactionDate(latestDate);

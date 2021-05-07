@@ -30,19 +30,24 @@ public class TransactionListItem {
     private boolean monthShown;
     private LedgerTransaction transaction;
     private String boldAccountName;
+    private String runningTotal;
     public TransactionListItem(@NotNull SimpleDate date, boolean monthShown) {
         this.type = Type.DELIMITER;
         this.date = date;
         this.monthShown = monthShown;
     }
     public TransactionListItem(@NotNull LedgerTransaction transaction,
-                               @Nullable String boldAccountName) {
+                               @Nullable String boldAccountName, @Nullable String runningTotal) {
         this.type = Type.TRANSACTION;
         this.transaction = transaction;
         this.boldAccountName = boldAccountName;
+        this.runningTotal = runningTotal;
     }
     public TransactionListItem() {
         this.type = Type.HEADER;
+    }
+    public String getRunningTotal() {
+        return runningTotal;
     }
     @NonNull
     public Type getType() {

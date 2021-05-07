@@ -108,12 +108,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
 
     @androidx.room.Transaction
     @Query("SELECT * FROM transactions WHERE profile_id = :profileId ORDER BY year " +
-           " desc, month desc, day desc, ledger_id desc")
-    public abstract List<TransactionWithAccounts> getAllWithAccountsSync(long profileId);
-
-    @androidx.room.Transaction
-    @Query("SELECT * FROM transactions WHERE profile_id = :profileId ORDER BY year " +
-           " desc, month desc, day desc, ledger_id desc")
+           " asc, month asc, day asc, ledger_id asc")
     public abstract LiveData<List<TransactionWithAccounts>> getAllWithAccounts(long profileId);
 
     @androidx.room.Transaction
@@ -121,16 +116,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
            " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
            "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
            ":accountName||'%' AND ta.amount <> 0 AND tr.profile_id = :profileId ORDER BY tr.year " +
-           "desc, tr.month desc, tr.day desc, tr.ledger_id desc")
-    public abstract List<TransactionWithAccounts> getAllWithAccountsFilteredSync(long profileId,
-                                                                                 String accountName);
-
-    @androidx.room.Transaction
-    @Query("SELECT distinct(tr.id), tr.ledger_id, tr.profile_id, tr.data_hash, tr.year, tr.month," +
-           " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
-           "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
-           ":accountName||'%' AND ta.amount <> 0 AND tr.profile_id = :profileId ORDER BY tr.year " +
-           "desc, tr.month desc, tr.day desc, tr.ledger_id desc")
+           "asc, tr.month asc, tr.day asc, tr.ledger_id asc")
     public abstract LiveData<List<TransactionWithAccounts>> getAllWithAccountsFiltered(
             long profileId, String accountName);
 

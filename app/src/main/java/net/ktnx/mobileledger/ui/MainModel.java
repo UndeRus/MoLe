@@ -127,7 +127,7 @@ public class MainModel extends ViewModel {
             String accNameFilter = model.getAccountFilter()
                                         .getValue();
 
-            TransactionAccumulator acc = new TransactionAccumulator(accNameFilter);
+            TransactionAccumulator acc = new TransactionAccumulator(accNameFilter, accNameFilter);
             for (LedgerTransaction tr : list) {
                 if (isInterrupted()) {
                     return;

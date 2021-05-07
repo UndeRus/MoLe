@@ -47,7 +47,7 @@
 
             <LinearLayout
                 android:id="@+id/transaction_row_head"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -78,11 +78,11 @@
 
             <LinearLayout
                 android:id="@+id/transaction_row_acc_amounts"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/transaction_running_total"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/transaction_row_head"
                 >
@@ -91,6 +91,31 @@
                 <include layout="@layout/transaction_list_row_accounts_table_row" />
 
             </LinearLayout>
+            <TextView
+                android:id="@+id/transaction_running_total"
+                style="@style/transaction_list_comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/half_text_margin"
+                android:gravity="top|end"
+                android:text="one two"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/transaction_row_acc_amounts"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/transaction_row_acc_amounts"
+                app:layout_goneMarginStart="0dp"
+                />
+            <View
+                android:id="@+id/transaction_running_total_divider"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:background="?commentColor"
+                android:layout_marginStart="@dimen/quarter_text_margin"
+                app:layout_goneMarginStart="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/transaction_running_total"
+                app:layout_constraintStart_toEndOf="@id/transaction_row_acc_amounts"
+                app:layout_constraintTop_toTopOf="@id/transaction_running_total"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

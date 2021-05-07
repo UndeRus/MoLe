@@ -50,7 +50,8 @@ class TransactionRowHolder extends TransactionRowHolderBase {
         super(binding.getRoot());
         b = binding;
     }
-    public void bind(@NonNull LedgerTransaction tr, @Nullable String boldAccountName) {
+    public void bind(@NonNull TransactionListItem item, @Nullable String boldAccountName) {
+        LedgerTransaction tr = item.getTransaction();
         b.transactionRowDescription.setText(tr.getDescription());
         String trComment = Misc.emptyIsNull(tr.getComment());
         if (trComment == null)
@@ -58,6 +59,16 @@ class TransactionRowHolder extends TransactionRowHolderBase {
         else {
             b.transactionComment.setText(trComment);
             b.transactionComment.setVisibility(View.VISIBLE);
+        }
+
+        if (Misc.emptyIsNull(item.getRunningTotal()) != null) {
+            b.transactionRunningTotal.setText(item.getRunningTotal());
+            b.transactionRunningTotal.setVisibility(View.VISIBLE);
+            b.transactionRunningTotalDivider.setVisibility(View.VISIBLE);
+        }
+        else {
+            b.transactionRunningTotal.setVisibility(View.GONE);
+            b.transactionRunningTotalDivider.setVisibility(View.GONE);
         }
 
         int rowIndex = 0;
