@@ -94,8 +94,9 @@ class TransactionRowHolder extends TransactionRowHolderBase {
                 accName.setTextColor(Colors.primary);
                 accAmount.setTextColor(Colors.primary);
 
-                SpannableString ss = new SpannableString(acc.getAccountName());
-                ss.setSpan(new StyleSpan(Typeface.BOLD), 0, boldAccountName.length(),
+                SpannableString ss = new SpannableString(Misc.addWrapHints(acc.getAccountName()));
+                ss.setSpan(new StyleSpan(Typeface.BOLD), 0, Misc.addWrapHints(boldAccountName)
+                                                                .length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 accName.setText(ss);
             }
@@ -104,7 +105,7 @@ class TransactionRowHolder extends TransactionRowHolderBase {
                                                    .getDefaultColor();
                 accName.setTextColor(textColor);
                 accAmount.setTextColor(textColor);
-                accName.setText(acc.getAccountName());
+                accName.setText(Misc.addWrapHints(acc.getAccountName()));
             }
 
             String comment = acc.getComment();

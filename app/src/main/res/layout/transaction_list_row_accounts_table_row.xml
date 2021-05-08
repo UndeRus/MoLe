@@ -40,10 +40,12 @@
             android:id="@+id/transaction_list_acc_row_acc_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="another acc name"
+            android:breakStrategy="high_quality"
             android:textAlignment="viewStart"
             android:textAppearance="@android:style/TextAppearance.Material.Small"
             tools:ignore="HardcodedText"
+            android:hyphenationFrequency="full"
+            android:text="one:very:long:account:name:that:needs:to:wrap:to:more:tnan:one:line:two:would:be:nice:but:the:more:the:better:and:the:better:"
             />
 
         <TextView

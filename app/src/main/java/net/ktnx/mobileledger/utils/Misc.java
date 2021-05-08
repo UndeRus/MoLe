@@ -31,6 +31,7 @@ import androidx.fragment.app.FragmentActivity;
 import org.jetbrains.annotations.Contract;
 
 public class Misc {
+    public static final char ZERO_WIDTH_SPACE = '\u200B';
     public static boolean isZero(float f) {
         return (f < 0.005) && (f > -0.005);
     }
@@ -106,5 +107,23 @@ public class Misc {
     }
     public static void onMainThread(Runnable r) {
         new Handler(Looper.getMainLooper()).post(r);
+    }
+    public static String addWrapHints(String input) {
+        if (input == null)
+            return null;
+        StringBuilder result = new StringBuilder();
+        int lastPos = 0;
+        int pos = input.indexOf(':');
+
+        while (pos >= 0) {
+            result.append(input.substring(lastPos, pos + 1))
+                  .append(ZERO_WIDTH_SPACE);
+            lastPos = pos + 1;
+            pos = input.indexOf(':', lastPos + 1);
+        }
+        if (lastPos > 0)
+            result.append(input.substring(lastPos));
+
+        return result.toString();
     }
 }
