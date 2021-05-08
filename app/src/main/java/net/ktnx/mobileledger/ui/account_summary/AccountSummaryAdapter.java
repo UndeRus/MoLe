@@ -322,7 +322,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
 
             if (changes.has(Change.LEVEL)) {
                 ConstraintLayout.LayoutParams lp =
-                        (ConstraintLayout.LayoutParams) b.accountNameLayout.getLayoutParams();
+                        (ConstraintLayout.LayoutParams) b.flowWrapper.getLayoutParams();
                 lp.setMarginStart(
                         acc.getLevel() * rm.getDimensionPixelSize(R.dimen.thumb_row_height) / 3);
             }

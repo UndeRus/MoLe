@@ -25,16 +25,14 @@
     android:layout_height="wrap_content"
     android:animateLayoutChanges="true"
     android:longClickable="true"
+    android:minHeight="@dimen/default_account_row_height"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/account_name_layout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@+id/account_row_acc_amounts"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintHorizontal_weight="3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+
         >
         <TextView
             android:id="@+id/account_row_acc_name"
@@ -43,18 +41,16 @@
             android:layout_marginStart="8dp"
             android:gravity="center_vertical"
             android:longClickable="true"
-            android:minHeight="@dimen/default_account_row_height"
             android:paddingStart="8dp"
             android:text="AccountName"
             android:textAppearance="@android:style/TextAppearance.Material.Medium"
             app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/account_expander_container"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="wrap"
-            app:layout_constraintWidth_percent=".67"
             tools:ignore="HardcodedText"
             />
 
@@ -89,20 +85,14 @@
     <TextView
         android:id="@+id/account_row_acc_amounts"
         style="@style/account_summary_amounts"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
-        android:minHeight="@dimen/default_account_row_height"
         android:text="USD 123,45\n678,90\nIRAUSD -17 000.00"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintStart_toEndOf="@id/account_name_layout"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_min="90sp"
         tools:ignore="HardcodedText"
         />
@@ -115,7 +105,20 @@
         app:layout_constraintBottom_toBottomOf="@id/account_row_acc_amounts"
         app:layout_constraintEnd_toEndOf="@id/account_row_acc_amounts"
         app:layout_constraintStart_toStartOf="@id/account_row_acc_amounts"
-        >
-
-    </FrameLayout>
+        />
+    <androidx.constraintlayout.helper.widget.Flow
+        android:id="@+id/flow_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/default_account_row_height"
+        app:constraint_referenced_ids="account_name_layout,account_row_acc_amounts"
+        app:flow_firstHorizontalBias="0"
+        app:flow_firstHorizontalStyle="spread_inside"
+        app:flow_horizontalBias="1"
+        app:flow_verticalStyle="spread_inside"
+        app:flow_wrapMode="chain"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
