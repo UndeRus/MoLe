@@ -25,26 +25,32 @@
 
     <TextView
         android:id="@+id/account_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView\non two lines"
+        android:text="TextView with a very long account name. a really long account name that needs to one\non two lines"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         />
     <TextView
         android:id="@+id/amounts"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/text_margin"
         android:gravity="end"
-        android:text="TextView"
+        android:text="LongCurrencyName 1 234 567,89"
         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_name"
+        android:textColor="?commentColor"
         app:layout_goneMarginStart="0dp"
+        />
+    <androidx.constraintlayout.helper.widget.Flow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="account_name,amounts"
+        app:flow_firstHorizontalBias="0"
+        app:flow_firstHorizontalStyle="spread_inside"
+        app:flow_horizontalBias="1"
+        app:flow_verticalStyle="spread_inside"
+        app:flow_wrapMode="chain"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>
