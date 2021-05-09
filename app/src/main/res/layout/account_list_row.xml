@@ -88,7 +88,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginEnd="8dp"
         android:gravity="center_vertical"
         android:text="USD 123,45\n678,90\nIRAUSD -17 000.00"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -120,5 +119,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="@dimen/half_text_margin"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>
