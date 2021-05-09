@@ -33,6 +33,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -97,6 +98,10 @@ public class TemplateListFragment extends Fragment {
                              Bundle savedInstanceState) {
         Logger.debug("flow", "PatternListFragment.onCreateView()");
         b = FragmentTemplateListBinding.inflate(inflater);
+        FragmentActivity activity = requireActivity();
+
+        if (activity instanceof FabManager.FabHandler)
+            FabManager.handle((FabManager.FabHandler) activity, b.templateList);
 
         TemplatesRecyclerViewAdapter modelAdapter = new TemplatesRecyclerViewAdapter();
 
@@ -108,10 +113,9 @@ public class TemplateListFragment extends Fragment {
         LinearLayoutManager llm = new LinearLayoutManager(getContext());
         llm.setOrientation(RecyclerView.VERTICAL);
         b.templateList.setLayoutManager(llm);
-
-        FragmentActivity activity = requireActivity();
-        if (activity instanceof FabManager.FabHandler)
-            FabManager.handle((FabManager.FabHandler) activity, b.templateList);
+        DividerItemDecoration did =
+                new TemplateListDivider(activity, DividerItemDecoration.VERTICAL);
+        b.templateList.addItemDecoration(did);
 
         return b.getRoot();
     }

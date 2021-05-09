@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TemplatesRecyclerViewAdapter extends RecyclerView.Adapter<BaseTemplateViewHolder> {
-    private static final int ITEM_TYPE_TEMPLATE = 1;
-    private static final int ITEM_TYPE_DIVIDER = 2;
+    static final int ITEM_TYPE_TEMPLATE = 1;
+    static final int ITEM_TYPE_DIVIDER = 2;
     private final AsyncListDiffer<BaseTemplateItem> listDiffer;
 
     public TemplatesRecyclerViewAdapter() {
