@@ -1,4 +1,17 @@
 # Changes
+## [0.19.0] - 2020-05-10
+* NEW
+    + add commodity support to the templates
+    + display running totals when filtering transaction list by account
+    + show current balance in account chooser (new transactions)
+* IMPROVEMENTS
+    + more prominent background for auto-complete pop-ups in dark mode
+    + better placement of account balances with very long/deep account names
+* FIXES
+    + honor default commodity setting in new transaction screen
+    + honor changes in currently active profile
+    + fix propagation of speculative account updates to parent accounts
+
 ## [0.18.0] - 2020-05-05
 
 * NEW
