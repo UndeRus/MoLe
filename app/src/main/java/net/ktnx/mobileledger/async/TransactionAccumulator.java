@@ -69,7 +69,7 @@ public class TransactionAccumulator {
             for (LedgerTransactionAccount acc : transaction.getAccounts()) {
                 if (acc.getAccountName()
                        .equals(accumulateAccount) ||
-                    LedgerAccount.isParentOf(acc.getAccountName(), accumulateAccount))
+                    LedgerAccount.isParentOf(accumulateAccount, acc.getAccountName()))
                 {
                     BigDecimal amt = runningTotal.get(acc.getCurrency());
                     if (amt == null)
