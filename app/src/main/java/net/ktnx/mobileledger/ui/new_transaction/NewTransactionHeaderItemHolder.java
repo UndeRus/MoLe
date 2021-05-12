@@ -255,7 +255,7 @@ class NewTransactionHeaderItemHolder extends NewTransactionItemViewHolder
 
         if (getBindingAdapterPosition() == RecyclerView.NO_POSITION) {
             // probably the row was swiped out
-            Logger.debug("new-trans", "Ignoring request to suncData(): adapter position negative");
+            Logger.debug("new-trans", "Ignoring request to syncData(): adapter position negative");
             return false;
         }
 
