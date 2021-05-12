@@ -309,8 +309,10 @@ public class NewTransactionModel extends ViewModel {
               Misc.onMainThread(() -> replaceItems(newItems));
           });
     }
+    @NonNull
     private String extractCurrencyFromMatches(MatchResult m, Integer group, Currency literal) {
-        return extractStringFromMatches(m, group, (literal == null) ? "" : literal.getName());
+        return Misc.nullIsEmpty(
+                extractStringFromMatches(m, group, (literal == null) ? "" : literal.getName()));
     }
     private int extractIntFromMatches(MatchResult m, Integer group, Integer literal) {
         if (literal != null)
@@ -329,6 +331,7 @@ public class NewTransactionModel extends ViewModel {
 
         return 0;
     }
+    @Nullable
     private String extractStringFromMatches(MatchResult m, Integer group, String literal) {
         if (literal != null)
             return literal;
@@ -405,10 +408,10 @@ public class NewTransactionModel extends ViewModel {
         // visual changes -- the currency fields will be hidden or reset to default anyway
         // still, there may be changes in the submittable state
         final List<Item> list = Objects.requireNonNull(this.items.getValue());
+        final Profile profile = Objects.requireNonNull(Data.getProfile());
         for (int i = 1; i < list.size(); i++) {
-            ((TransactionAccount) list.get(i)).setCurrency(newValue ? Data.getProfile()
-                                                                          .getDefaultCommodity()
-                                                                    : null);
+            ((TransactionAccount) list.get(i)).setCurrency(
+                    newValue ? profile.getDefaultCommodity() : "");
         }
         checkTransactionSubmittable(null);
         showCurrency.setValue(newValue);
@@ -473,8 +476,8 @@ public class NewTransactionModel extends ViewModel {
         List<Item> newList = new ArrayList<>();
         Item.resetIdDispenser();
 
-        Item currentHead = items.getValue()
-                                .get(0);
+        Item currentHead = Objects.requireNonNull(items.getValue())
+                                  .get(0);
         TransactionHead head = new TransactionHead(tr.transaction.getDescription());
         head.setComment(tr.transaction.getComment());
         if (currentHead instanceof TransactionHead)
@@ -592,6 +595,8 @@ public class NewTransactionModel extends ViewModel {
                 submittable = false;
             }
 
+            boolean hasInvalidAmount = false;
+
             for (int i = 1; i < list.size(); i++) {
                 TransactionAccount item = list.get(i)
                                               .toTransactionAccount();
@@ -621,16 +626,19 @@ public class NewTransactionModel extends ViewModel {
                     itemsWithAccountForCurrency.add(currName, item);
                 }
 
-                if (!item.isAmountValid()) {
-                    Logger.debug("submittable",
-                            String.format("Not submittable: row %d has an invalid amount", i + 1));
-                    submittable = false;
-                }
-                else if (item.isAmountSet()) {
+                if (item.isAmountSet()) {
                     itemsWithAmountForCurrency.add(currName, item);
                     balance.add(currName, item.getAmount());
                 }
                 else {
+                    if (!item.isAmountValid()) {
+                        Logger.debug("submittable",
+                                String.format("Not submittable: row %d has an invalid amount",
+                                        i + 1));
+                        submittable = false;
+                        hasInvalidAmount = true;
+                    }
+
                     itemsWithEmptyAmountForCurrency.add(currName, item);
 
                     if (!accName.isEmpty())
@@ -687,11 +695,11 @@ public class NewTransactionModel extends ViewModel {
                         if (BuildConfig.DEBUG) {
                             if (balanceReceiversCount == 0)
                                 Logger.debug("submittable", String.format(
-                                        "Transaction not submittable [%s]: non-zero balance " +
+                                        "Transaction not submittable [curr:%s]: non-zero balance " +
                                         "with no empty amounts with accounts", balCurrency));
                             else
                                 Logger.debug("submittable", String.format(
-                                        "Transaction not submittable [%s]: non-zero balance " +
+                                        "Transaction not submittable [curr:%s]: non-zero balance " +
                                         "with multiple empty amounts with accounts", balCurrency));
                         }
                         submittable = false;
@@ -745,16 +753,17 @@ public class NewTransactionModel extends ViewModel {
 
             // 5) a row with an empty account name or empty amount is guaranteed to exist for
             // each commodity
-            for (String balCurrency : balance.currencies()) {
-                int currEmptyRows = itemsWithEmptyAccountForCurrency.size(balCurrency);
-                int currRows = itemsForCurrency.size(balCurrency);
-                int currAccounts = itemsWithAccountForCurrency.size(balCurrency);
-                int currAmounts = itemsWithAmountForCurrency.size(balCurrency);
-                if ((currEmptyRows == 0) &&
-                    ((currRows == currAccounts) || (currRows == currAmounts)))
-                {
-                    // perhaps there already is an unused empty row for another currency that
-                    // is not used?
+            if (!hasInvalidAmount) {
+                for (String balCurrency : balance.currencies()) {
+                    int currEmptyRows = itemsWithEmptyAccountForCurrency.size(balCurrency);
+                    int currRows = itemsForCurrency.size(balCurrency);
+                    int currAccounts = itemsWithAccountForCurrency.size(balCurrency);
+                    int currAmounts = itemsWithAmountForCurrency.size(balCurrency);
+                    if ((currEmptyRows == 0) &&
+                        ((currRows == currAccounts) || (currRows == currAmounts)))
+                    {
+                        // perhaps there already is an unused empty row for another currency that
+                        // is not used?
 //                        boolean foundIt = false;
 //                        for (Item item : emptyRows) {
 //                            Currency itemCurrency = item.getCurrency();
@@ -770,15 +779,16 @@ public class NewTransactionModel extends ViewModel {
 //                        }
 //
 //                        if (!foundIt)
-                    final TransactionAccount newAcc = new TransactionAccount("", balCurrency);
-                    final float bal = balance.get(balCurrency);
-                    if (!Misc.isZero(bal) && currAmounts == currRows)
-                        newAcc.setAmountHint(String.format("%4.2f", -bal));
-                    Logger.debug("submittable",
-                            String.format("Adding new item with %s for currency %s",
-                                    newAcc.getAmountHint(), balCurrency));
-                    list.add(newAcc);
-                    listChanged = true;
+                        final TransactionAccount newAcc = new TransactionAccount("", balCurrency);
+                        final float bal = balance.get(balCurrency);
+                        if (!Misc.isZero(bal) && currAmounts == currRows)
+                            newAcc.setAmountHint(String.format("%4.2f", -bal));
+                        Logger.debug("submittable",
+                                String.format("Adding new item with %s for currency %s",
+                                        newAcc.getAmountHint(), balCurrency));
+                        list.add(newAcc);
+                        listChanged = true;
+                    }
                 }
             }
 
@@ -1041,7 +1051,7 @@ public class NewTransactionModel extends ViewModel {
         }
         public LedgerTransaction asLedgerTransaction() {
             return new LedgerTransaction(0, (date == null) ? SimpleDate.today() : date, description,
-                    Data.getProfile());
+                    Objects.requireNonNull(Data.getProfile()));
         }
         public boolean equalContents(TransactionHead other) {
             if (other == null)
@@ -1057,7 +1067,7 @@ public class NewTransactionModel extends ViewModel {
         private String accountName;
         private String amountHint;
         private String comment;
-        private String currency;
+        private String currency = "";
         private float amount;
         private boolean amountSet;
         private boolean amountValid = true;
@@ -1088,7 +1098,7 @@ public class NewTransactionModel extends ViewModel {
             super();
             this.accountName = accountName;
         }
-        public TransactionAccount(String accountName, String currency) {
+        public TransactionAccount(String accountName, @NotNull String currency) {
             super();
             this.accountName = accountName;
             this.currency = currency;
@@ -1134,11 +1144,12 @@ public class NewTransactionModel extends ViewModel {
         public void setComment(String comment) {
             this.comment = comment;
         }
+        @NotNull
         public String getCurrency() {
             return currency;
         }
-        public void setCurrency(String currency) {
-            this.currency = currency;
+        public void setCurrency(@org.jetbrains.annotations.Nullable String currency) {
+            this.currency = Misc.nullIsEmpty(currency);
         }
         public boolean isAmountValid() {
             return amountValid;
@@ -1237,9 +1248,9 @@ public class NewTransactionModel extends ViewModel {
     }
 
     private static class ItemsForCurrency {
-        private final HashMap<String, List<Item>> hashMap = new HashMap<>();
+        private final HashMap<@NotNull String, List<Item>> hashMap = new HashMap<>();
         @NonNull
-        List<NewTransactionModel.Item> getList(@Nullable String currencyName) {
+        List<NewTransactionModel.Item> getList(@NotNull String currencyName) {
             List<NewTransactionModel.Item> list = hashMap.get(currencyName);
             if (list == null) {
                 list = new ArrayList<>();
@@ -1247,11 +1258,11 @@ public class NewTransactionModel extends ViewModel {
             }
             return list;
         }
-        void add(@Nullable String currencyName, @NonNull NewTransactionModel.Item item) {
-            getList(currencyName).add(item);
+        void add(@NotNull String currencyName, @NonNull NewTransactionModel.Item item) {
+            getList(Objects.requireNonNull(currencyName)).add(item);
         }
-        int size(@Nullable String currencyName) {
-            return this.getList(currencyName)
+        int size(@NotNull String currencyName) {
+            return this.getList(Objects.requireNonNull(currencyName))
                        .size();
         }
         Set<String> currencies() {

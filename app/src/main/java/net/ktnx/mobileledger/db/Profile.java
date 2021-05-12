@@ -31,6 +31,8 @@ import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.utils.Misc;
 
+import org.jetbrains.annotations.NotNull;
+
 @Entity(tableName = "profiles")
 public class Profile {
     public static final long NO_PROFILE_ID = 0;
@@ -161,11 +163,12 @@ public class Profile {
     public void setShowCommodityByDefault(boolean showCommodityByDefault) {
         this.showCommodityByDefault = showCommodityByDefault;
     }
+    @NotNull
     public String getDefaultCommodity() {
         return defaultCommodity;
     }
-    public void setDefaultCommodity(String defaultCommodity) {
-        this.defaultCommodity = defaultCommodity;
+    public void setDefaultCommodity(@org.jetbrains.annotations.Nullable String defaultCommodity) {
+        this.defaultCommodity = Misc.nullIsEmpty(defaultCommodity);
     }
     public boolean getShowCommentsByDefault() {
         return showCommentsByDefault;
