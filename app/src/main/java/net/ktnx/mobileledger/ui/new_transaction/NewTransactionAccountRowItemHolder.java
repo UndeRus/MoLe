@@ -455,6 +455,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                             "input was '%s'", amount));
                     if (acc.isAmountValid())
                         significantChange = true;
+                    acc.resetAmount();
                     acc.setAmountValid(false);
                 }
                 final String curr = String.valueOf(b.currency.getText());
