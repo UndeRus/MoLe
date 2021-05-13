@@ -119,6 +119,7 @@ public abstract class AccountDAO extends BaseDAO<Account> {
     public abstract List<AccountNameContainer> lookupNamesInProfileByNameSync(long profileId,
                                                                               @NonNull String term);
 
+    @Transaction
     @Query("SELECT * FROM accounts " +
            "WHERE profile_id=:profileId AND name_upper LIKE '%%'||:term||'%%' " +
            "ORDER BY  CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
@@ -126,8 +127,7 @@ public abstract class AccountDAO extends BaseDAO<Account> {
            "               WHEN name_upper LIKE '%% '||:term||'%%' THEN 3 " +
            "               ELSE 9 END, name_upper, rowid ")
     public abstract List<AccountWithAmounts> lookupWithAmountsInProfileByNameSync(long profileId,
-                                                                                  @NonNull
-                                                                                          String term);
+                                                                                  @NonNull String term);
 
     @Query("SELECT DISTINCT name, CASE WHEN name_upper LIKE :term||'%%' THEN 1 " +
            "               WHEN name_upper LIKE '%%:'||:term||'%%' THEN 2 " +
