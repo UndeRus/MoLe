@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
@@ -82,7 +83,7 @@ public class SplashActivity extends CrashReportingActivity {
             Logger.debug("splash",
                     String.format(Locale.ROOT, "Scheduling main activity start in %d milliseconds",
                             delay));
-            new Handler().postDelayed(this::startMainActivity, delay);
+            new Handler(Looper.getMainLooper()).postDelayed(this::startMainActivity, delay);
         }
     }
     private void startMainActivity() {
