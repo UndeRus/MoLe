@@ -497,8 +497,8 @@ public class NewTransactionModel extends ViewModel {
         int negativeCount = 0;
         for (int i = 0; i < accounts.size(); i++) {
             LedgerTransactionAccount acc = accounts.get(i);
-            TransactionAccount item =
-                    new TransactionAccount(acc.getAccountName(), acc.getCurrency());
+            TransactionAccount item = new TransactionAccount(acc.getAccountName(),
+                    Misc.nullIsEmpty(acc.getCurrency()));
             newList.add(item);
 
             item.setAccountName(acc.getAccountName());
@@ -1067,6 +1067,7 @@ public class NewTransactionModel extends ViewModel {
         private String accountName;
         private String amountHint;
         private String comment;
+        @NotNull
         private String currency = "";
         private float amount;
         private boolean amountSet;
@@ -1091,7 +1092,7 @@ public class NewTransactionModel extends ViewModel {
         }
         public TransactionAccount(LedgerTransactionAccount account) {
             super();
-            currency = account.getCurrency();
+            currency = Misc.nullIsEmpty(account.getCurrency());
             amount = account.getAmount();
         }
         public TransactionAccount(String accountName) {
@@ -1175,6 +1176,7 @@ public class NewTransactionModel extends ViewModel {
         }
         @SuppressLint("DefaultLocale")
         @Override
+        @NotNull
         public String toString() {
             StringBuilder b = new StringBuilder();
             b.append(String.format("id:%d/%s", id, Integer.toHexString(hashCode())));

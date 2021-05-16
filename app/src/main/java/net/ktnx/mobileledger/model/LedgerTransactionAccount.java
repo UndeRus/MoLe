@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.db.TransactionAccount;
 import net.ktnx.mobileledger.utils.Misc;
@@ -29,6 +30,7 @@ public class LedgerTransactionAccount {
     private String shortAccountName;
     private float amount;
     private boolean amountSet = false;
+    @Nullable
     private String currency;
     private String comment;
     private boolean amountValid = true;
@@ -103,6 +105,7 @@ public class LedgerTransactionAccount {
         return amountSet;
     }
     public boolean isAmountValid() { return amountValid; }
+    @Nullable
     public String getCurrency() {
         return currency;
     }
