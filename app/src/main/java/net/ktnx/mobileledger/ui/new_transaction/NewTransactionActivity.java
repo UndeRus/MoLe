@@ -362,11 +362,11 @@ public class NewTransactionActivity extends ProfileThemedActivity
             TransactionDAO trDao = DB.get()
                                      .getTransactionDAO();
 
-            TransactionWithAccounts tr;
+            TransactionWithAccounts tr = null;
 
             if (Misc.emptyIsNull(accFilter) != null)
                 tr = trDao.getFirstByDescriptionHavingAccountSync(description, accFilter);
-            else
+            if (tr == null)
                 tr = trDao.getFirstByDescriptionSync(description);
 
             if (tr != null)
