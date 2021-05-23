@@ -98,7 +98,7 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                             boolean wasSyncingData = syncingData;
                             syncingData = true;
                             try {
-                                // FIXME this needs to reach the model somehow
+                                // there is a listener that will propagate the change to the model
                                 b.accountRowAccAmounts.setText(newText);
                             }
                             finally {
