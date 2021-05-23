@@ -44,13 +44,11 @@ import net.ktnx.mobileledger.utils.DimensionUtils;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
 
-import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 
 class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
-    private final String decimalDot = ".";
     private final NewTransactionAccountRowBinding b;
     private boolean ignoreFocusChanges = false;
-    private String decimalSeparator;
     private boolean inUpdate = false;
     private boolean syncingData = false;
     NewTransactionAccountRowItemHolder(@NonNull NewTransactionAccountRowBinding b,
@@ -94,12 +92,13 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                 if (id == R.id.account_row_acc_amounts) {
                     try {
                         String input = String.valueOf(b.accountRowAccAmounts.getText());
-                        input = input.replace(decimalSeparator, decimalDot);
-                        final String newText = String.format("%4.2f", Float.parseFloat(input));
+                        input = input.replace(Data.getDecimalSeparator(), Data.decimalDot);
+                        final String newText = Data.formatNumber(Float.parseFloat(input));
                         if (!newText.equals(input)) {
                             boolean wasSyncingData = syncingData;
                             syncingData = true;
                             try {
+                                // FIXME this needs to reach the model somehow
                                 b.accountRowAccAmounts.setText(newText);
                             }
                             finally {
@@ -128,11 +127,6 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
         b.accountRowAccName.setAdapter(new AccountWithAmountsAutocompleteAdapter(b.getRoot()
                                                                                   .getContext(),
                 mProfile));
-
-        decimalSeparator = "";
-        Data.locale.observe(activity, locale -> decimalSeparator = String.valueOf(
-                DecimalFormatSymbols.getInstance(locale)
-                                    .getMonetaryDecimalSeparator()));
 
         final TextWatcher tw = new TextWatcher() {
             @Override
@@ -252,14 +246,21 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
         }
     }
     public void checkAmountValid(String s) {
+        // FIXME this needs to be done in the model only
         boolean valid = true;
         try {
             if (s.length() > 0) {
-                float ignored = Float.parseFloat(s.replace(decimalSeparator, decimalDot));
+                float ignored =
+                        Float.parseFloat(s.replace(Data.getDecimalSeparator(), Data.decimalDot));
             }
         }
         catch (NumberFormatException ex) {
-            valid = false;
+            try {
+                float ignored = Data.parseNumber(s);
+            }
+            catch (ParseException ex2) {
+                valid = false;
+            }
         }
 
         displayAmountValidity(valid);
@@ -432,45 +433,23 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
             acc.setComment(String.valueOf(b.comment.getText()));
 
             String amount = String.valueOf(b.accountRowAccAmounts.getText());
-            amount = amount.trim();
 
-            if (amount.isEmpty()) {
-                if (acc.isAmountSet())
-                    significantChange = true;
-                acc.resetAmount();
-                acc.setAmountValid(true);
-            }
-            else {
-                try {
-                    amount = amount.replace(decimalSeparator, decimalDot);
-                    final float parsedAmount = Float.parseFloat(amount);
-                    if (!acc.isAmountSet() || !Misc.equalFloats(parsedAmount, acc.getAmount()))
-                        significantChange = true;
-                    acc.setAmount(parsedAmount);
-                    acc.setAmountValid(true);
-                }
-                catch (NumberFormatException e) {
-                    Logger.debug("new-trans", String.format(
-                            "assuming amount is not set due to number format exception. " +
-                            "input was '%s'", amount));
-                    if (acc.isAmountValid())
-                        significantChange = true;
-                    acc.resetAmount();
-                    acc.setAmountValid(false);
-                }
-                final String curr = String.valueOf(b.currency.getText());
-                final String currValue;
-                if (curr.equals(b.currency.getContext()
-                                          .getResources()
-                                          .getString(R.string.currency_symbol)) || curr.isEmpty())
-                    currValue = null;
-                else
-                    currValue = curr;
+            if (acc.setAndCheckAmountText(Misc.nullIsEmpty(amount)))
+                significantChange = true;
+            displayAmountValidity(!acc.isAmountSet() || acc.isAmountValid());
 
-                if (!significantChange && !Misc.equalStrings(acc.getCurrency(), currValue))
-                    significantChange = true;
-                acc.setCurrency(currValue);
-            }
+            final String curr = String.valueOf(b.currency.getText());
+            final String currValue;
+            if (curr.equals(b.currency.getContext()
+                                      .getResources()
+                                      .getString(R.string.currency_symbol)) || curr.isEmpty())
+                currValue = null;
+            else
+                currValue = curr;
+
+            if (!significantChange && !Misc.equalStrings(acc.getCurrency(), currValue))
+                significantChange = true;
+            acc.setCurrency(currValue);
 
             return significantChange;
         }
@@ -523,9 +502,8 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
                         acc.isLast() ? EditorInfo.IME_ACTION_DONE : EditorInfo.IME_ACTION_NEXT);
 
                 setCurrencyString(acc.getCurrency());
-                b.accountRowAccAmounts.setText(
-                        acc.isAmountSet() ? String.format("%4.2f", acc.getAmount()) : null);
-                displayAmountValidity(true);
+                b.accountRowAccAmounts.setText(acc.getAmountText());
+                displayAmountValidity(!acc.isAmountSet() || acc.isAmountValid());
 
                 final String comment = acc.getComment();
                 b.comment.setText(comment);

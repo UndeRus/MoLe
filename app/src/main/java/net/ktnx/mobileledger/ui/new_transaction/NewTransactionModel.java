@@ -162,7 +162,7 @@ public class NewTransactionModel extends ViewModel {
         return copy;
     }
     private List<Item> shallowCopyList() {
-        return new ArrayList<>(items.getValue());
+        return new ArrayList<>(Objects.requireNonNull(items.getValue()));
     }
     LiveData<Boolean> getShowComments() {
         return showComments;
@@ -626,15 +626,14 @@ public class NewTransactionModel extends ViewModel {
                     itemsWithAccountForCurrency.add(currName, item);
                 }
 
-                if (item.isAmountSet()) {
+                if (item.isAmountSet() && item.isAmountValid()) {
                     itemsWithAmountForCurrency.add(currName, item);
                     balance.add(currName, item.getAmount());
                 }
                 else {
                     if (!item.isAmountValid()) {
                         Logger.debug("submittable",
-                                String.format("Not submittable: row %d has an invalid amount",
-                                        i + 1));
+                                String.format("Not submittable: row %d has an invalid amount", i));
                         submittable = false;
                         hasInvalidAmount = true;
                     }
@@ -725,7 +724,7 @@ public class NewTransactionModel extends ViewModel {
                             continue;
 
                         if (item == receiver) {
-                            final String hint = String.format("%1.2f", -currencyBalance);
+                            final String hint = Data.formatNumber(-currencyBalance);
                             if (!acc.isAmountHintSet() ||
                                 !Misc.equalStrings(acc.getAmountHint(), hint))
                             {
@@ -772,7 +771,7 @@ public class NewTransactionModel extends ViewModel {
 //                            if (Misc.isZero(balance.get(itemCurrencyName))) {
 //                                item.setCurrency(Currency.loadByName(balCurrency));
 //                                item.setAmountHint(
-//                                        String.format("%1.2f", -balance.get(balCurrency)));
+//                                        Data.formatNumber(-balance.get(balCurrency)));
 //                                foundIt = true;
 //                                break;
 //                            }
@@ -782,7 +781,7 @@ public class NewTransactionModel extends ViewModel {
                         final TransactionAccount newAcc = new TransactionAccount("", balCurrency);
                         final float bal = balance.get(balCurrency);
                         if (!Misc.isZero(bal) && currAmounts == currRows)
-                            newAcc.setAmountHint(String.format("%4.2f", -bal));
+                            newAcc.setAmountHint(Data.formatNumber(-bal));
                         Logger.debug("submittable",
                                 String.format("Adding new item with %s for currency %s",
                                         newAcc.getAmountHint(), balCurrency));
@@ -1072,6 +1071,8 @@ public class NewTransactionModel extends ViewModel {
         private float amount;
         private boolean amountSet;
         private boolean amountValid = true;
+        @NotNull
+        private String amountText = "";
         private FocusedElement focusedElement = FocusedElement.Account;
         private boolean amountHintIsSet = false;
         private boolean isLast = false;
@@ -1083,17 +1084,13 @@ public class NewTransactionModel extends ViewModel {
             amountSet = origin.amountSet;
             amountHint = origin.amountHint;
             amountHintIsSet = origin.amountHintIsSet;
+            amountText = origin.amountText;
             comment = origin.comment;
             currency = origin.currency;
             amountValid = origin.amountValid;
             focusedElement = origin.focusedElement;
             isLast = origin.isLast;
             accountNameCursorPosition = origin.accountNameCursorPosition;
-        }
-        public TransactionAccount(LedgerTransactionAccount account) {
-            super();
-            currency = Misc.nullIsEmpty(account.getCurrency());
-            amount = account.getAmount();
         }
         public TransactionAccount(String accountName) {
             super();
@@ -1103,6 +1100,46 @@ public class NewTransactionModel extends ViewModel {
             super();
             this.accountName = accountName;
             this.currency = currency;
+        }
+        public @NotNull String getAmountText() {
+            return amountText;
+        }
+        public void setAmountText(@NotNull String amountText) {
+            this.amountText = amountText;
+        }
+        public boolean setAndCheckAmountText(@NotNull String amountText) {
+            String amtText = amountText.trim();
+            this.amountText = amtText;
+
+            boolean significantChange = false;
+
+            if (amtText.isEmpty()) {
+                if (amountSet) {
+                    significantChange = true;
+                }
+                resetAmount();
+            }
+            else {
+                try {
+                    amtText = amtText.replace(Data.getDecimalSeparator(), Data.decimalDot);
+                    final float parsedAmount = Float.parseFloat(amtText);
+                    if (!amountSet || !amountValid || !Misc.equalFloats(parsedAmount, amount))
+                        significantChange = true;
+                    amount = parsedAmount;
+                    amountSet = true;
+                    amountValid = true;
+                }
+                catch (NumberFormatException e) {
+                    Logger.debug("new-trans", String.format(
+                            "assuming amount is not set due to number format exception. " +
+                            "input was '%s'", amtText));
+                    if (amountValid) // it was valid and now it's not
+                        significantChange = true;
+                    amountValid = false;
+                }
+            }
+
+            return significantChange;
         }
         public boolean isLast() {
             return isLast;
@@ -1124,9 +1161,13 @@ public class NewTransactionModel extends ViewModel {
         public void setAmount(float amount) {
             this.amount = amount;
             amountSet = true;
+            amountValid = true;
+            amountText = Data.formatNumber(amount);
         }
         public void resetAmount() {
             amountSet = false;
+            amountValid = true;
+            amountText = "";
         }
         @Override
         public ItemType getType() {
@@ -1184,9 +1225,13 @@ public class NewTransactionModel extends ViewModel {
                 b.append(String.format(" acc'%s'", accountName));
 
             if (amountSet)
-                b.append(String.format(" %4.2f", amount));
+                b.append(amountText)
+                 .append(" [")
+                 .append(amountValid ? "valid" : "invalid")
+                 .append("] ")
+                 .append(String.format(Locale.ROOT, " {raw %4.2f}", amount));
             else if (amountHintIsSet)
-                b.append(String.format(" (%s)", amountHint));
+                b.append(String.format(" (hint %s)", amountHint));
 
             if (!TextUtils.isEmpty(currency))
                 b.append(" ")
@@ -1206,7 +1251,9 @@ public class NewTransactionModel extends ViewModel {
 
             boolean equal = Misc.equalStrings(accountName, other.accountName);
             equal = equal && Misc.equalStrings(comment, other.comment) &&
-                    (amountSet ? other.amountSet && amount == other.amount : !other.amountSet);
+                    (amountSet ? other.amountSet && amountValid == other.amountValid &&
+                                 Misc.equalStrings(amountText, other.amountText)
+                               : !other.amountSet);
 
             // compare amount hint only if there is no amount
             if (!amountSet)
