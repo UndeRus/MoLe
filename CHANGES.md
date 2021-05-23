@@ -1,5 +1,14 @@
 # Changes
+
+## [0.19.1] - 2020-05-23
+
+* FIXES
+    + fix a bug in new transaction screen when an invalid amount is entered
+    + fix loading a previous transaction by description (again)
+    + fix crash when parsing of hledger version with only two components
+
 ## [0.19.0] - 2020-05-10
+
 * NEW
     + add commodity support to the templates
     + display running totals when filtering transaction list by account
