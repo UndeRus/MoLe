@@ -338,8 +338,9 @@ public class ProfileDetailModel extends ViewModel {
                 if (m.matches()) {
                     int major = Integer.parseInt(Objects.requireNonNull(m.group(1)));
                     int minor = Integer.parseInt(Objects.requireNonNull(m.group(2)));
-                    final boolean hasPatch = m.groupCount() >= 3;
-                    int patch = hasPatch ? Integer.parseInt(Objects.requireNonNull(m.group(3))) : 0;
+                    final String patchText = m.group(3);
+                    final boolean hasPatch = patchText != null;
+                    int patch = hasPatch ? Integer.parseInt(patchText) : 0;
 
                     return hasPatch ? new HledgerVersion(major, minor, patch)
                                     : new HledgerVersion(major, minor);
