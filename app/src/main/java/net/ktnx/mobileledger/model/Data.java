@@ -30,6 +30,9 @@ import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.utils.Locker;
 import net.ktnx.mobileledger.utils.Logger;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -60,15 +63,21 @@ public final class Data {
     public static final MutableLiveData<String> lastTransactionsUpdateText =
             new MutableLiveData<>();
     public static final MutableLiveData<String> lastAccountsUpdateText = new MutableLiveData<>();
+    public static final String decimalDot = ".";
+
     private static final MutableLiveData<Profile> profile = new MutableLiveData<>();
     private static final AtomicInteger backgroundTaskCount = new AtomicInteger(0);
     private static final Locker profilesLocker = new Locker();
     private static NumberFormat numberFormatter;
+    private static String decimalSeparator = "";
 
     static {
         locale.setValue(Locale.getDefault());
     }
 
+    public static String getDecimalSeparator() {
+        return decimalSeparator;
+    }
     @Nullable
     public static Profile getProfile() {
         return profile.getValue();
@@ -127,11 +136,16 @@ public final class Data {
         newNumberFormatter.setMinimumFractionDigits(2);
 
         numberFormatter = newNumberFormatter;
+
+        decimalSeparator = String.valueOf(DecimalFormatSymbols.getInstance(locale)
+                                                              .getMonetaryDecimalSeparator());
     }
+    @NotNull
     public static String formatCurrency(float number) {
         NumberFormat formatter = NumberFormat.getCurrencyInstance(locale.getValue());
         return formatter.format(number);
     }
+    @NotNull
     public static String formatNumber(float number) {
         return numberFormatter.format(number);
     }
