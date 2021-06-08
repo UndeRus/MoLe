@@ -61,10 +61,20 @@ public class Transaction {
     @ColumnInfo(collate = ColumnInfo.NOCASE)
     @NonNull
     private String description;
+    @ColumnInfo(name = "description_uc")
+    @NonNull
+    private String descriptionUpper;
     @ColumnInfo
     private String comment;
     @ColumnInfo
     private long generation = 0;
+    @NonNull
+    public String getDescriptionUpper() {
+        return descriptionUpper;
+    }
+    public void setDescriptionUpper(@NonNull String descriptionUpper) {
+        this.descriptionUpper = descriptionUpper;
+    }
     public long getLedgerId() {
         return ledgerId;
     }
@@ -112,6 +122,7 @@ public class Transaction {
     }
     public void setDescription(String description) {
         this.description = description;
+        setDescriptionUpper(description.toUpperCase());
     }
     public String getComment() {
         return comment;
