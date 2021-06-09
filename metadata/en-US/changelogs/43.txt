@@ -1,0 +1,2 @@
+* FIXES
+    + fix auto-completion of transaction names with non-ASCII characters on some Android variants/versions (broken in 0.18.0)

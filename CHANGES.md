@@ -1,5 +1,10 @@
 # Changes
 
+## [0.19.2] - 2020-06-09
+
+* FIXES
+    + fix auto-completion of transaction names with non-ASCII characters on some Android variants/versions (broken in 0.18.0)
+
 ## [0.19.1] - 2020-05-23
 
 * FIXES
