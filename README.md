@@ -17,7 +17,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License terms for details.
 
 You should have received a copy of the GNU General Public License
-along with Mobile-Ledger. If not, see <https://www.gnu.org/licenses/>.
+along with Mobile-Ledger in a file named COPYING.txt. If not, see
+<https://www.gnu.org/licenses/>.
 
 ## Libraries
 
@@ -34,10 +35,12 @@ Apache (Software) License, version 2.0 ("the License").
 See the License for details about distribution rights, and the
 specific rights regarding derivate works.
 
-You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
+Apache license is in Apache-2.0.txt. You may obtain a copy at:
+http://www.apache.org/licenses/LICENSE-2.0
 
 ## Other items
 
-Some icons taken from the Android open-source project are 
-Copyright Google Inc and/or Android open-source project and licensed under the
-Apache License, version 2.0 (https://www.apache.org/licenses/LICENSE-2.0)
+Some icons taken from the Android open-source project are Copyright Google Inc
+and/or Android open-source project and licensed under the Apache License,
+version 2.0 (See Apache-2.0.txt or
+<https://www.apache.org/licenses/LICENSE-2.0>)
