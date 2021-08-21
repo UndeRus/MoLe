@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.Transaction;
 
@@ -33,7 +34,10 @@ import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName = "profiles")
+import java.util.UUID;
+
+@Entity(tableName = "profiles",
+        indices = {@Index(name = "profiles_uuid_idx", unique = true, value = "uuid")})
 public class Profile {
     public static final long NO_PROFILE_ID = 0;
     @ColumnInfo
@@ -42,8 +46,9 @@ public class Profile {
     @NonNull
     @ColumnInfo
     private String name = "";
-    @ColumnInfo(name = "deprecated_uuid")
-    private String deprecatedUUID;
+    @NonNull
+    @ColumnInfo()
+    private String uuid;
     @NonNull
     @ColumnInfo
     private String url = "";
@@ -77,11 +82,15 @@ public class Profile {
     private int detectedVersionMajor;
     @ColumnInfo(name = "detected_version_minor")
     private int detectedVersionMinor;
-    public String getDeprecatedUUID() {
-        return deprecatedUUID;
+    public Profile() {
+        uuid = UUID.randomUUID()
+                   .toString();
     }
-    public void setDeprecatedUUID(String deprecatedUUID) {
-        this.deprecatedUUID = deprecatedUUID;
+    public String getUuid() {
+        return uuid;
+    }
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
     public long getId() {
         return id;
@@ -204,8 +213,7 @@ public class Profile {
         if (!(o instanceof Profile))
             return false;
         Profile p = (Profile) o;
-        return id == p.id && Misc.equalStrings(name, p.name) &&
-               Misc.equalStrings(deprecatedUUID, p.deprecatedUUID) &&
+        return id == p.id && Misc.equalStrings(name, p.name) && Misc.equalStrings(uuid, p.uuid) &&
                Misc.equalStrings(url, p.url) && useAuthentication == p.useAuthentication &&
                Misc.equalStrings(authUser, p.authUser) &&
                Misc.equalStrings(authPassword, p.authPassword) && orderNo == p.orderNo &&
