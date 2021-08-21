@@ -35,6 +35,12 @@ public class Currency {
     @NonNull
     @ColumnInfo(name = "has_gap")
     private Boolean hasGap;
+    public Currency() {
+        id = 0;
+        name = "";
+        position = "after";
+        hasGap = true;
+    }
     public Currency(long id, @NonNull String name, @NonNull String position,
                     @NonNull Boolean hasGap) {
         this.id = id;

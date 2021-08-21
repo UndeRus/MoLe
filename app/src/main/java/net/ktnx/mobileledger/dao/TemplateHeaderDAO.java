@@ -70,6 +70,9 @@ public abstract class TemplateHeaderDAO {
     @Query("SELECT * FROM templates WHERE id = :id")
     public abstract LiveData<TemplateHeader> getTemplate(Long id);
 
+    @Query("SELECT * FROM templates WHERE id = :id")
+    public abstract TemplateHeader getTemplateSync(Long id);
+
     public void getTemplateAsync(@NonNull Long id,
                                  @NonNull AsyncResultCallback<TemplateHeader> callback) {
         LiveData<TemplateHeader> resultReceiver = getTemplate(id);
@@ -92,6 +95,14 @@ public abstract class TemplateHeaderDAO {
     @Transaction
     @Query("SELECT * FROM templates WHERE id = :id")
     public abstract TemplateWithAccounts getTemplateWithAccountsSync(@NonNull Long id);
+
+    @Transaction
+    @Query("SELECT * FROM templates WHERE uuid = :uuid")
+    public abstract TemplateWithAccounts getTemplateWithAccountsByUuidSync(String uuid);
+
+    @Transaction
+    @Query("SELECT * FROM templates")
+    public abstract List<TemplateWithAccounts> getAllTemplatesWithAccountsSync();
 
     @Transaction
     public void insertSync(TemplateWithAccounts templateWithAccounts) {

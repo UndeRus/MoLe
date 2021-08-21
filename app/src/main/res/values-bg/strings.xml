@@ -189,4 +189,14 @@
     <string name="template_details_template_params_label">Параметри на макета</string>
     <string name="template_params_help_description">Помощна информация за пааметрите на макета</string>
     <string name="account_currency_source_label">Източник на валутата</string>
+    <string name="action_import_export">Резервно копие</string>
+    <string name="backup_header">Резервно копие</string>
+    <string name="backup_button_label">Създаване</string>
+    <string name="restore_header">Възстановяване от резервно копие</string>
+    <string name="restore_button_label">Възстановяване</string>
+    <string name="backups_activity_label">Резервно копие</string>
+    <string name="backup_explanation">Записване на данните за профили и макети във файл във формат JSON, който може да се използва за възстановяване на настройките на друго устройство или след нулиране. Данните за трансакциите и сметките не се записват, а следва да бъдат изтеглени от сървъра при възстановяване на настройките.</string>
+    <string name="config_saved">Настройките са записани</string>
+    <string name="restore_explanation">Зареждане на настройките на профилите и макетите от резервно копие, създадено по-рано. Съществуващите записи не се променят. Ако искате да върнете някой запис (профил или макет) към състоянитето от резервното копие, първо го изтрийте.</string>
+    <string name="config_restored">Успешно възстановяване на настройките</string>
 </resources>

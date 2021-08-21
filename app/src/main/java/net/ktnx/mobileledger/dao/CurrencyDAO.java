@@ -43,6 +43,9 @@ public abstract class CurrencyDAO extends BaseDAO<Currency> {
     @Query("SELECT * FROM currencies")
     public abstract LiveData<List<Currency>> getAll();
 
+    @Query("SELECT * FROM currencies")
+    public abstract List<Currency> getAllSync();
+
     @Query("SELECT * FROM currencies WHERE id = :id")
     abstract LiveData<Currency> getById(long id);
 
@@ -51,6 +54,9 @@ public abstract class CurrencyDAO extends BaseDAO<Currency> {
 
     @Query("SELECT * FROM currencies WHERE name = :name")
     public abstract LiveData<Currency> getByName(String name);
+
+    @Query("SELECT * FROM currencies WHERE name = :name")
+    public abstract Currency getByNameSync(String name);
 
 //    not useful for now
 //    @Transaction

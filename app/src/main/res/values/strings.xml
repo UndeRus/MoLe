@@ -198,4 +198,14 @@
     <string name="template_details_template_params_label">Template parameters</string>
     <string name="template_params_help_description">Show help on template parameters</string>
     <string name="account_currency_source_label">Commodity source</string>
+    <string name="action_import_export">Backup/Restore</string>
+    <string name="backup_header">Backup</string>
+    <string name="backup_explanation">Exports all profile configuration and templates to a JSON file which can later be used to restore the settings on a different device or after a device reset. Data about transactions and accounts are not exported. Instead, these are supposed to be fetched from the remote backend when the configuration is restored.</string>
+    <string name="backup_button_label">Backup</string>
+    <string name="restore_header">Restore</string>
+    <string name="restore_explanation">Restores all profiles and templates from a previous backup. Entries that already exist are kept without changes. If you want to restore some entry to a previous state remove it first.</string>
+    <string name="restore_button_label">Restore</string>
+    <string name="config_saved">Configuration saved successfully</string>
+    <string name="backups_activity_label">Backup / Restore</string>
+    <string name="config_restored">Configuration restored successfully</string>
 </resources>

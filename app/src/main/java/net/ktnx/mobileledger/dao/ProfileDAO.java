@@ -72,6 +72,12 @@ public abstract class ProfileDAO extends BaseDAO<Profile> {
     @Query("SELECT * FROM profiles LIMIT 1")
     public abstract Profile getAnySync();
 
+    @Query("SELECT * FROM profiles WHERE uuid=:uuid")
+    public abstract LiveData<Profile> getByUuid(String uuid);
+
+    @Query("SELECT * FROM profiles WHERE uuid=:uuid")
+    public abstract Profile getByUuidSync(String uuid);
+
     @Query("SELECT MAX(order_no) FROM profiles")
     public abstract int getProfileCountSync();
     public void updateOrderSync(List<Profile> list) {
