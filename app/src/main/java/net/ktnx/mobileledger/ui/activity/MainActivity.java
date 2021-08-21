@@ -220,6 +220,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
 
         b.btnNoProfilesAdd.setOnClickListener(v -> ProfileDetailActivity.start(this, null));
+        b.btnRestore.setOnClickListener(v -> BackupsActivity.start(this));
 
         b.btnAddTransaction.setOnClickListener(this::fabNewTransactionClicked);
 

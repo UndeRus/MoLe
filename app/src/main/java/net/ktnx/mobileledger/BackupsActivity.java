@@ -33,6 +33,7 @@ import com.google.android.material.snackbar.Snackbar;
 import net.ktnx.mobileledger.async.ConfigReader;
 import net.ktnx.mobileledger.async.ConfigWriter;
 import net.ktnx.mobileledger.databinding.FragmentBackupsBinding;
+import net.ktnx.mobileledger.model.Data;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -67,6 +68,17 @@ public class BackupsActivity extends AppCompatActivity {
         restoreChooserLauncher =
                 registerForActivityResult(new ActivityResultContracts.OpenDocument(),
                         this::readConfig);
+
+        Data.observeProfile(this, p -> {
+            if (p == null) {
+                b.backupButton.setEnabled(false);
+                b.backupExplanationText.setEnabled(false);
+            }
+            else {
+                b.backupButton.setEnabled(true);
+                b.backupExplanationText.setEnabled(true);
+            }
+        });
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
