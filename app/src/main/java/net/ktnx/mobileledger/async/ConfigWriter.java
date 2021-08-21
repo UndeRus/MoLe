@@ -105,6 +105,8 @@ public class ConfigWriter extends ConfigIO {
         w.name("templates")
          .beginArray();
         for (TemplateWithAccounts t : templates) {
+            w.beginObject();
+
             w.name(Keys.UUID)
              .value(t.header.getUuid());
             w.name(Keys.NAME)
@@ -128,6 +130,8 @@ public class ConfigWriter extends ConfigIO {
                 w.name(Keys.ACCOUNTS)
                  .beginArray();
                 for (TemplateAccount a : t.accounts) {
+                    w.beginObject();
+
                     writeKey(w, Keys.NAME, a.getAccountName());
                     writeKey(w, Keys.NAME_GROUP, a.getAccountNameMatchGroup());
                     writeKey(w, Keys.COMMENT, a.getAccountComment());
@@ -137,9 +141,13 @@ public class ConfigWriter extends ConfigIO {
                     writeKey(w, Keys.NEGATE_AMOUNT, a.getNegateAmount());
                     writeKey(w, Keys.CURRENCY, a.getCurrency());
                     writeKey(w, Keys.CURRENCY_GROUP, a.getCurrencyMatchGroup());
+
+                    w.endObject();
                 }
                 w.endArray();
             }
+
+            w.endObject();
         }
         w.endArray();
     }
