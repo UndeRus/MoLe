@@ -57,7 +57,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
                       TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
-    public static final int REVISION = 61;
+    public static final int REVISION = 62;
     public static final String DB_NAME = "MoLe.db";
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static DB instance;
@@ -77,7 +77,8 @@ abstract public class DB extends RoomDatabase {
                                     multiVersionMigration(30, 32), multiVersionMigration(32, 34),
                                     multiVersionMigration(34, 40), singleVersionMigration(41),
                                     multiVersionMigration(41, 58), singleVersionMigration(59),
-                                    singleVersionMigration(60), singleVersionMigration(61)
+                                    singleVersionMigration(60), singleVersionMigration(61),
+                                    singleVersionMigration(62)
                     })
                    .addCallback(new Callback() {
                        @Override

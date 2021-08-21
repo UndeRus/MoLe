@@ -20,9 +20,11 @@ package net.ktnx.mobileledger.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "currencies")
+@Entity(tableName = "currencies",
+        indices = {@Index(name = "currency_name_idx", unique = true, value = "name")})
 public class Currency {
     @PrimaryKey(autoGenerate = true)
     private long id;
