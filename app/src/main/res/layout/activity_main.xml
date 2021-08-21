@@ -91,10 +91,24 @@
                 android:drawablePadding="16dp"
                 android:text="@string/create_profile_label"
                 android:textColor="@color/design_default_color_on_primary"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/btn_restore"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView3"
+                />
+            <Button
+                android:id="@+id/btn_restore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="24dp"
+                android:drawableStart="@drawable/ic_baseline_restore_24"
+                android:drawablePadding="@dimen/text_margin"
+                android:text="@string/restore_button_label"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_no_profiles_add"
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -246,8 +260,8 @@
                             style="@style/nav_button"
                             android:layout_weight="1"
                             android:text="@string/action_settings"
-                            app:drawableStartCompat="@drawable/ic_settings_black_24dp"
                             android:visibility="gone"
+                            app:drawableStartCompat="@drawable/ic_settings_black_24dp"
                             />
                         <TextView
                             android:id="@+id/nav_backup_restore"

@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger;
 
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -45,6 +47,10 @@ public class BackupsActivity extends AppCompatActivity {
     private FragmentBackupsBinding b;
     private ActivityResultLauncher<String> backupChooserLauncher;
     private ActivityResultLauncher<String[]> restoreChooserLauncher;
+    public static void start(Context context) {
+        Intent starter = new Intent(context, BackupsActivity.class);
+        context.startActivity(starter);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
