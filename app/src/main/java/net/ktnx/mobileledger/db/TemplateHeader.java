@@ -21,19 +21,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import net.ktnx.mobileledger.utils.Misc;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName = "templates")
+import java.util.UUID;
+
+@Entity(tableName = "templates",
+        indices = {@Index(name = "templates_uuid_idx", unique = true, value = "uuid")})
 public class TemplateHeader extends TemplateBase {
     @PrimaryKey(autoGenerate = true)
     private long id;
     @ColumnInfo(name = "name")
     @NonNull
     private String name;
+    @NonNull
+    @ColumnInfo
+    private String uuid;
     @NonNull
     @ColumnInfo(name = "regular_expression")
     private String regularExpression;
@@ -66,10 +73,13 @@ public class TemplateHeader extends TemplateBase {
         this.id = id;
         this.name = name;
         this.regularExpression = regularExpression;
+        this.uuid = UUID.randomUUID()
+                        .toString();
     }
     public TemplateHeader(TemplateHeader origin) {
         id = origin.id;
         name = origin.name;
+        uuid = origin.uuid;
         regularExpression = origin.regularExpression;
         testText = origin.testText;
         transactionDescription = origin.transactionDescription;
@@ -83,6 +93,13 @@ public class TemplateHeader extends TemplateBase {
         dateDay = origin.dateDay;
         dateDayMatchGroup = origin.dateDayMatchGroup;
         isFallback = origin.isFallback;
+    }
+    @NonNull
+    public String getUuid() {
+        return uuid;
+    }
+    public void setUuid(@NonNull String uuid) {
+        this.uuid = uuid;
     }
     public boolean isFallback() {
         return isFallback;

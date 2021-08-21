@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,7 +58,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
                       TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
-    public static final int REVISION = 62;
+    public static final int REVISION = 63;
     public static final String DB_NAME = "MoLe.db";
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static DB instance;
@@ -78,7 +79,7 @@ abstract public class DB extends RoomDatabase {
                                     multiVersionMigration(34, 40), singleVersionMigration(41),
                                     multiVersionMigration(41, 58), singleVersionMigration(59),
                                     singleVersionMigration(60), singleVersionMigration(61),
-                                    singleVersionMigration(62)
+                                    singleVersionMigration(62), singleVersionMigration(63)
                     })
                    .addCallback(new Callback() {
                        @Override
@@ -120,6 +121,14 @@ abstract public class DB extends RoomDatabase {
                             if (currentProfileId >= 0 && currentTheme >= 0) {
                                 App.storeStartupProfileAndTheme(currentProfileId, currentTheme);
                             }
+                        }
+                    }
+                }
+                if (toVersion == 63) {
+                    try (Cursor c = db.query("SELECT id FROM templates")) {
+                        while (c.moveToNext()) {
+                            db.execSQL("UPDATE templates SET uuid=? WHERE id=?",
+                                    new Object[]{UUID.randomUUID().toString(), c.getLong(0)});
                         }
                     }
                 }
