@@ -208,4 +208,5 @@
     <string name="config_saved">Configuration saved successfully</string>
     <string name="backups_activity_label">Backup / Restore</string>
     <string name="config_restored">Configuration restored successfully</string>
+    <string name="no_profile_restore_hint">… or, you may restore from backup</string>
 </resources>
