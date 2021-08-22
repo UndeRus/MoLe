@@ -54,6 +54,7 @@ import net.ktnx.mobileledger.model.MatchedTemplate;
 import net.ktnx.mobileledger.ui.FabManager;
 import net.ktnx.mobileledger.ui.QR;
 import net.ktnx.mobileledger.ui.activity.ProfileThemedActivity;
+import net.ktnx.mobileledger.ui.activity.SplashActivity;
 import net.ktnx.mobileledger.ui.templates.TemplatesActivity;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -83,8 +84,17 @@ public class NewTransactionActivity extends ProfileThemedActivity
         b = ActivityNewTransactionBinding.inflate(getLayoutInflater(), null, false);
         setContentView(b.getRoot());
         setSupportActionBar(b.toolbar);
-        Data.observeProfile(this,
-                mobileLedgerProfile -> b.toolbar.setSubtitle(mobileLedgerProfile.getName()));
+        Data.observeProfile(this, profile -> {
+            if (profile == null) {
+                Logger.debug("new-t-act", "no active profile. Redirecting to SplashActivity");
+                Intent intent = new Intent(this, SplashActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+            else
+                b.toolbar.setSubtitle(profile.getName());
+        });
 
         NavHostFragment navHostFragment = (NavHostFragment) Objects.requireNonNull(
                 getSupportFragmentManager().findFragmentById(R.id.new_transaction_nav));

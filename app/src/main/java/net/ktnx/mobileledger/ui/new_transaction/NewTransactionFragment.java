@@ -231,10 +231,12 @@ public class NewTransactionFragment extends Fragment {
         outState.putBoolean("keep", true);
         final NewTransactionModel.FocusInfo focusInfo = viewModel.getFocusInfo()
                                                                  .getValue();
-        final int focusedItem = focusInfo.position;
-        if (focusedItem >= 0)
-            outState.putInt("focused-item", focusedItem);
-        outState.putString("focused-element", focusInfo.element.toString());
+        if (focusInfo != null) {
+            final int focusedItem = focusInfo.position;
+            if (focusedItem >= 0)
+                outState.putInt("focused-item", focusedItem);
+            outState.putString("focused-element", focusInfo.element.toString());
+        }
     }
 
     @Override

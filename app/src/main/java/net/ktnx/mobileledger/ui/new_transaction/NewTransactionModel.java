@@ -74,8 +74,10 @@ public class NewTransactionModel extends ViewModel {
     private final AtomicInteger busyCounter = new AtomicInteger(0);
     private final MutableLiveData<Boolean> busyFlag = new InertMutableLiveData<>(false);
     private final Observer<Profile> profileObserver = profile -> {
-        showCurrency.postValue(profile.getShowCommodityByDefault());
-        showComments.postValue(profile.getShowCommentsByDefault());
+        if (profile != null) {
+            showCurrency.postValue(profile.getShowCommodityByDefault());
+            showComments.postValue(profile.getShowCommentsByDefault());
+        }
     };
     private final MutableLiveData<FocusInfo> focusInfo = new MutableLiveData<>();
     private boolean observingDataProfile;
