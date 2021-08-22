@@ -97,7 +97,7 @@ public class ConfigReader extends ConfigIO {
                           .getProfileDAO()
                           .getByUuidSync(currentProfile);
             if (p != null)
-                Data.setCurrentProfile(p);
+                Data.postCurrentProfile(p);
         }
 
         if (onDoneListener != null)
