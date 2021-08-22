@@ -92,10 +92,16 @@ public class ConfigReader extends ConfigIO {
         restoreProfiles(profiles);
         restoreTemplates(templates);
 
-        if (Data.getProfile() == null && currentProfile != null) {
-            Profile p = DB.get()
-                          .getProfileDAO()
-                          .getByUuidSync(currentProfile);
+        if (Data.getProfile() == null) {
+            Profile p = null;
+            final ProfileDAO dao = DB.get()
+                                     .getProfileDAO();
+            if (currentProfile != null)
+                p = dao.getByUuidSync(currentProfile);
+
+            if (p == null)
+                dao.getAnySync();
+
             if (p != null)
                 Data.postCurrentProfile(p);
         }
