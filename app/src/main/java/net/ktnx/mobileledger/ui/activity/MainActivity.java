@@ -345,7 +345,7 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
             mainModel.scheduleTransactionListRetrieval();
         }
     }
-    private void createShortcuts(List<Profile> list) {
+    private void createShortcuts(@NotNull List<Profile> list) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N_MR1)
             return;
 
@@ -377,8 +377,10 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
         }
         sm.setDynamicShortcuts(shortcuts);
     }
-    private void onProfileListChanged(List<Profile> newList) {
-        if ((newList == null) || newList.isEmpty()) {
+    private void onProfileListChanged(@NotNull List<Profile> newList) {
+        createShortcuts(newList);
+
+        if (newList.isEmpty()) {
             b.noProfilesLayout.setVisibility(View.VISIBLE);
             b.mainAppLayout.setVisibility(View.GONE);
             return;
@@ -392,8 +394,6 @@ public class MainActivity extends ProfileThemedActivity implements FabManager.Fa
 
         Logger.debug("profiles", "profile list changed");
         mProfileListAdapter.setProfileList(newList);
-
-        createShortcuts(newList);
 
         final Profile currentProfile = Data.getProfile();
         Profile replacementProfile = null;
