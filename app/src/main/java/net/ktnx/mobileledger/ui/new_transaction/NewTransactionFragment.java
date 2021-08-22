@@ -195,8 +195,13 @@ public class NewTransactionFragment extends Fragment {
             element = FocusedElement.valueOf(savedInstanceState.getString("focused-element"));
         }
 
-        if (!keep)
-            viewModel.reset();
+        if (!keep) {
+            // we need the DB up and running
+            Data.observeProfile(getViewLifecycleOwner(), p -> {
+                if (p != null)
+                    viewModel.reset();
+            });
+        }
         else {
             viewModel.noteFocusChanged(focused, element);
         }
