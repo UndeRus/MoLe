@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.model;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
@@ -96,10 +95,10 @@ public final class Data {
                         cnt));
         backgroundTasksRunning.postValue(cnt > 0);
     }
-    public static void setCurrentProfile(@NonNull Profile newProfile) {
+    public static void setCurrentProfile(Profile newProfile) {
         profile.setValue(newProfile);
     }
-    public static void postCurrentProfile(@NonNull Profile newProfile) {
+    public static void postCurrentProfile(Profile newProfile) {
         profile.postValue(newProfile);
     }
     public static void refreshCurrencyData(Locale locale) {
