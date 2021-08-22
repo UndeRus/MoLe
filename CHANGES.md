@@ -1,5 +1,12 @@
 # Changes
 
+## [0.20.0] = 2021-08-22
+
+* NEW
+    + backup/restore of profile/template configuration to a file
+* FIXES
+    + fix a couple of crashes related to starting new transaction via shortcut
+
 ## [0.19.2] - 2020-06-09
 
 * FIXES

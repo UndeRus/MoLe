@@ -24,8 +24,8 @@ android {
         minSdkVersion 22
         targetSdkVersion 30
         vectorDrawables.useSupportLibrary true
-        versionCode 43
-        versionName '0.19.2'
+        versionCode 44
+        versionName '0.20.0'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {

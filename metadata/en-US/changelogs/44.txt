@@ -1,0 +1,4 @@
+* NEW
+    + backup/restore of profile/template configuration to a file
+* FIXES
+    + fix a couple of crashes related to starting new transaction via shortcut
