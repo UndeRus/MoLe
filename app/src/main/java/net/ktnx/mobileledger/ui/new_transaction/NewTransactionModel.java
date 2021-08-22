@@ -80,7 +80,6 @@ public class NewTransactionModel extends ViewModel {
     private final MutableLiveData<FocusInfo> focusInfo = new MutableLiveData<>();
     private boolean observingDataProfile;
     public NewTransactionModel() {
-        reset();
     }
     public LiveData<Boolean> getShowCurrency() {
         return showCurrency;
