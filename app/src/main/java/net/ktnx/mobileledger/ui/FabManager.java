@@ -23,6 +23,7 @@ import android.animation.TimeInterpolator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
@@ -185,7 +186,7 @@ public class FabManager {
             generation++;
             int thisGeneration = generation;
             fabHandler.hideManagedFab();
-            new Handler().postDelayed(() -> {
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (generation != thisGeneration)
                     return;
 
