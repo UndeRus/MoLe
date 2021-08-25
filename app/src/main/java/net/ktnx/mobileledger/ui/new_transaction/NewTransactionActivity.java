@@ -39,8 +39,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
-import net.ktnx.mobileledger.async.AsyncCrasher;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
+import net.ktnx.mobileledger.async.GeneralBackgroundTasks;
 import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.dao.TransactionDAO;
@@ -173,7 +173,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
     }
     public boolean onSimulateCrashMenuItemClicked(MenuItem item) {
         debug("crash", "Will crash intentionally");
-        new AsyncCrasher().execute();
+        GeneralBackgroundTasks.run(() -> { throw new RuntimeException("Simulated crash");});
         return true;
     }
     public boolean onCreateOptionsMenu(Menu menu) {
