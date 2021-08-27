@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.new_transaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.AbstractCursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFormatException;
 import android.util.TypedValue;
@@ -43,6 +42,7 @@ import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.async.GeneralBackgroundTasks;
 import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
+import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.databinding.ActivityNewTransactionBinding;
 import net.ktnx.mobileledger.db.DB;
@@ -217,7 +217,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         else {
             navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
 
-            AsyncTask.execute(() -> commitToDb((LedgerTransaction) arg));
+            BaseDAO.runAsync(() -> commitToDb((LedgerTransaction) arg));
         }
     }
     public void commitToDb(LedgerTransaction tr) {
@@ -366,7 +366,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         if (!model.accountListIsEmpty())
             return;
 
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             String accFilter = mProfile.getPreferredAccountsFilter();
 
             TransactionDAO trDao = DB.get()

@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.db;
 
-import android.os.AsyncTask;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -28,6 +26,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.Transaction;
 
 import net.ktnx.mobileledger.dao.AccountDAO;
+import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.dao.OptionDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.utils.Misc;
@@ -242,7 +241,7 @@ public class Profile {
         trnDao.deleteSync(trnDao.getAllForProfileUnorderedSync(id));
     }
     public void wipeAllData() {
-        AsyncTask.execute(this::wipeAllDataSync);
+        BaseDAO.runAsync(this::wipeAllDataSync);
     }
 
 }

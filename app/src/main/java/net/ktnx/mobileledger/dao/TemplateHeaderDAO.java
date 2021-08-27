@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.dao;
 
-import android.os.AsyncTask;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
@@ -44,7 +42,7 @@ public abstract class TemplateHeaderDAO {
     public abstract long insertSync(TemplateHeader item);
 
     public void insertAsync(@NonNull TemplateHeader item, @Nullable Runnable callback) {
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             insertSync(item);
             if (callback != null)
                 Misc.onMainThread(callback);
@@ -58,7 +56,7 @@ public abstract class TemplateHeaderDAO {
     public abstract void deleteSync(TemplateHeader item);
 
     public void deleteAsync(@NonNull TemplateHeader item, @NonNull Runnable callback) {
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             deleteSync(item);
             Misc.onMainThread(callback);
         });
@@ -130,7 +128,7 @@ public abstract class TemplateHeaderDAO {
         });
     }
     public void insertAsync(@NonNull TemplateWithAccounts item, @Nullable Runnable callback) {
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             insertSync(item);
             if (callback != null)
                 Misc.onMainThread(callback);
@@ -138,7 +136,7 @@ public abstract class TemplateHeaderDAO {
     }
     public void duplicateTemplateWitAccounts(@NonNull Long id, @Nullable
             AsyncResultCallback<TemplateWithAccounts> callback) {
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             TemplateWithAccounts src = getTemplateWithAccountsSync(id);
             TemplateWithAccounts dup = src.createDuplicate();
             dup.header.setName(dup.header.getName());

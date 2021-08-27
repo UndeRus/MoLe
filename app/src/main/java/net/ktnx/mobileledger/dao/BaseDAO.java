@@ -17,19 +17,24 @@
 
 package net.ktnx.mobileledger.dao;
 
-import android.os.AsyncTask;
-
 import androidx.annotation.NonNull;
 
 import net.ktnx.mobileledger.utils.Misc;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public abstract class BaseDAO<T> {
+    private final static Executor asyncRunner = Executors.newSingleThreadExecutor();
+    public static void runAsync(Runnable runnable) {
+        asyncRunner.execute(runnable);
+    }
     abstract long insertSync(T item);
     public void insert(T item) {
-        AsyncTask.execute(() -> insertSync(item));
+        asyncRunner.execute(() -> insertSync(item));
     }
     public void insert(T item, @NonNull OnInsertedReceiver receiver) {
-        AsyncTask.execute(() -> {
+        asyncRunner.execute(() -> {
             long id = insertSync(item);
             Misc.onMainThread(() -> receiver.onInsert(id));
         });
@@ -37,20 +42,20 @@ public abstract class BaseDAO<T> {
 
     abstract void updateSync(T item);
     public void update(T item) {
-        AsyncTask.execute(() -> updateSync(item));
+        asyncRunner.execute(() -> updateSync(item));
     }
     public void update(T item, @NonNull Runnable onDone) {
-        AsyncTask.execute(() -> {
+        asyncRunner.execute(() -> {
             updateSync(item);
             Misc.onMainThread(onDone);
         });
     }
     abstract void deleteSync(T item);
     public void delete(T item) {
-        AsyncTask.execute(() -> deleteSync(item));
+        asyncRunner.execute(() -> deleteSync(item));
     }
     public void delete(T item, @NonNull Runnable onDone) {
-        AsyncTask.execute(() -> {
+        asyncRunner.execute(() -> {
             deleteSync(item);
             Misc.onMainThread(onDone);
         });

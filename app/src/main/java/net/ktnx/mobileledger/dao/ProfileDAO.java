@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.dao;
 
-import android.os.AsyncTask;
-
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -44,7 +42,7 @@ public abstract class ProfileDAO extends BaseDAO<Profile> {
         return insertSync(item);
     }
     public void insertLast(Profile item, OnInsertedReceiver onInsertedReceiver) {
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             long id = insertLastSync(item);
             if (onInsertedReceiver != null)
                 onInsertedReceiver.onInsert(id);
@@ -90,7 +88,7 @@ public abstract class ProfileDAO extends BaseDAO<Profile> {
         }
     }
     public void updateOrder(List<Profile> list, Runnable onDone) {
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             updateOrderSync(list);
             if (onDone != null)
                 onDone.run();

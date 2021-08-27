@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +32,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.databinding.AccountListRowBinding;
 import net.ktnx.mobileledger.databinding.AccountListSummaryRowBinding;
 import net.ktnx.mobileledger.db.Account;
@@ -243,7 +243,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                 return;
             debug("accounts", "Account expander clicked");
 
-            AsyncTask.execute(() -> {
+            BaseDAO.runAsync(() -> {
                 Account dbo = account.toDBO();
                 dbo.setExpanded(!dbo.isExpanded());
                 Logger.debug("accounts",
@@ -275,7 +275,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                 b.accountRowAmountsExpanderContainer.setVisibility(View.VISIBLE);
             }
 
-            AsyncTask.execute(() -> {
+            BaseDAO.runAsync(() -> {
                 Account dbo = account.toDBO();
                 DB.get()
                   .getAccountDAO()

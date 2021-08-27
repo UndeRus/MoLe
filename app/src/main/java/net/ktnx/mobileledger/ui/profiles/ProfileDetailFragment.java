@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.profiles;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,6 +45,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
+import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.databinding.ProfileDetailBinding;
 import net.ktnx.mobileledger.db.DB;
@@ -126,10 +126,11 @@ public class ProfileDetailFragment extends Fragment {
             dao.getById(profileId)
                .observe(getViewLifecycleOwner(), profile -> {
                    if (profile != null)
-                       AsyncTask.execute(() -> {
-                           dao.deleteSync(profile);
-                           dao.updateOrderSync(dao.getAllOrderedSync());
-                       });
+                       BaseDAO.runAsync(() -> DB.get()
+                                                .runInTransaction(() -> {
+                                                    dao.deleteSync(profile);
+                                                    dao.updateOrderSync(dao.getAllOrderedSync());
+                                                }));
                });
 
             final FragmentActivity activity = getActivity();

@@ -17,14 +17,13 @@
 
 package net.ktnx.mobileledger.ui.templates;
 
-import android.os.AsyncTask;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import net.ktnx.mobileledger.BuildConfig;
+import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.dao.TemplateAccountDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
 import net.ktnx.mobileledger.db.DB;
@@ -208,7 +207,7 @@ public class TemplateDetailsViewModel extends ViewModel {
         Logger.debug("flow", "PatternDetailsViewModel.onSavePattern(); model=" + this);
         final List<TemplateDetailsItem> list = Objects.requireNonNull(items.getValue());
 
-        AsyncTask.execute(() -> {
+        BaseDAO.runAsync(() -> {
             boolean newPattern = mPatternId == null || mPatternId <= 0;
 
             TemplateDetailsItem.Header modelHeader = list.get(0)

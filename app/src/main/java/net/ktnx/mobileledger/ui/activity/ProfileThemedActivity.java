@@ -18,12 +18,12 @@
 package net.ktnx.mobileledger.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
 import net.ktnx.mobileledger.App;
+import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Profile;
@@ -103,7 +103,7 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         initProfile(profileId);
     }
     protected void initProfile(long profileId) {
-        AsyncTask.execute(() -> initProfileAsync(profileId));
+        BaseDAO.runAsync(() -> initProfileSync(profileId));
     }
     private void initProfileAsync(long profileId) {
         ProfileDAO dao = DB.get()

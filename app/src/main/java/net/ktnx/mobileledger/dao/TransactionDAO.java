@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.dao;
 
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -217,7 +216,7 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
         }
     }
     public void storeLast(TransactionWithAccounts rec) {
-        AsyncTask.execute(() -> appendSync(rec));
+        BaseDAO.runAsync(() -> appendSync(rec));
     }
     @androidx.room.Transaction
     public void appendSync(TransactionWithAccounts rec) {
