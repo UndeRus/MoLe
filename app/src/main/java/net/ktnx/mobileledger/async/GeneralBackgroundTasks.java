@@ -33,7 +33,7 @@ public class GeneralBackgroundTasks {
     public static void run(@NotNull Runnable runnable, @NotNull Runnable onSuccess) {
         runner.execute(() -> {
             runnable.run();
-            onSuccess.run();
+            Misc.onMainThread(onSuccess);
         });
     }
     public static void run(@NotNull Runnable runnable, @Nullable Runnable onSuccess,
