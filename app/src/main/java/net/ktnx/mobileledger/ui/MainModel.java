@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.ui;
 
-import android.os.AsyncTask;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -84,14 +82,14 @@ public class MainModel extends ViewModel {
         }
         Profile profile = Data.getProfile();
 
-        retrieveTransactionsTask = new RetrieveTransactionsTask(this, profile);
+        retrieveTransactionsTask = new RetrieveTransactionsTask(profile);
         Logger.debug("db", "Created a background transaction retrieval task");
 
-        retrieveTransactionsTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        retrieveTransactionsTask.start();
     }
     public synchronized void stopTransactionsRetrieval() {
         if (retrieveTransactionsTask != null)
-            retrieveTransactionsTask.cancel(true);
+            retrieveTransactionsTask.interrupt();
         else
             Data.backgroundTaskProgress.setValue(null);
     }

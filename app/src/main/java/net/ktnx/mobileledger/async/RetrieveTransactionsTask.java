@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.async;
 
 import android.annotation.SuppressLint;
-import android.os.AsyncTask;
 import android.os.OperationCanceledException;
 
 import androidx.annotation.NonNull;
@@ -43,7 +42,6 @@ import net.ktnx.mobileledger.model.Data;
 import net.ktnx.mobileledger.model.LedgerAccount;
 import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
-import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 
@@ -67,8 +65,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class RetrieveTransactionsTask extends
-        AsyncTask<Void, RetrieveTransactionsTask.Progress, RetrieveTransactionsTask.Result> {
+public class RetrieveTransactionsTask extends Thread {
     private static final int MATCHING_TRANSACTIONS_LIMIT = 150;
     private static final Pattern reComment = Pattern.compile("^\\s*;");
     private static final Pattern reTransactionStart = Pattern.compile(
@@ -88,11 +85,9 @@ public class RetrieveTransactionsTask extends
             Pattern.compile("/register\\?q=inacct%3A([a-zA-Z0-9%]+)\"");
     private final Pattern reAccountValue = Pattern.compile(
             "<span class=\"[^\"]*\\bamount\\b[^\"]*\">\\s*([-+]?[\\d.,]+)(?:\\s+(\\S+))?</span>");
-    private final MainModel mainModel;
     private final Profile profile;
     private int expectedPostingsCount = -1;
-    public RetrieveTransactionsTask(@NonNull MainModel mainModel, @NonNull Profile profile) {
-        this.mainModel = mainModel;
+    public RetrieveTransactionsTask(@NonNull Profile profile) {
         this.profile = profile;
     }
     private static void L(String msg) {
@@ -125,25 +120,19 @@ public class RetrieveTransactionsTask extends
             return null;
         }
     }
-    @Override
-    protected void onProgressUpdate(Progress... values) {
-        super.onProgressUpdate(values);
-        Data.backgroundTaskProgress.postValue(values[0]);
+    private void publishProgress(Progress progress) {
+        Data.backgroundTaskProgress.postValue(progress);
     }
-    @Override
-    protected void onPostExecute(Result result) {
-        super.onPostExecute(result);
+    private void finish(Result result) {
         Progress progress = new Progress();
         progress.setState(ProgressState.FINISHED);
         progress.setError(result.error);
-        onProgressUpdate(progress);
+        publishProgress(progress);
     }
-    @Override
-    protected void onCancelled() {
-        super.onCancelled();
+    private void cancel() {
         Progress progress = new Progress();
         progress.setState(ProgressState.FINISHED);
-        onProgressUpdate(progress);
+        publishProgress(progress);
     }
     private void retrieveTransactionListLegacy(List<LedgerAccount> accounts,
                                                List<LedgerTransaction> transactions)
@@ -549,7 +538,7 @@ public class RetrieveTransactionsTask extends
 
     @SuppressLint("DefaultLocale")
     @Override
-    protected Result doInBackground(Void... params) {
+    public void run() {
         Data.backgroundTaskStarted();
         List<LedgerAccount> accounts;
         List<LedgerTransaction> transactions;
@@ -574,43 +563,43 @@ public class RetrieveTransactionsTask extends
 
             Data.lastUpdateDate.postValue(new Date());
 
-            return new Result(null);
+            finish(new Result(null));
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
-            return new Result("Invalid server URL");
+            finish(new Result("Invalid server URL"));
         }
         catch (HTTPException e) {
             e.printStackTrace();
-            return new Result(
-                    String.format("HTTP error %d: %s", e.getResponseCode(), e.getMessage()));
+            finish(new Result(
+                    String.format("HTTP error %d: %s", e.getResponseCode(), e.getMessage())));
         }
         catch (IOException e) {
             e.printStackTrace();
-            return new Result(e.getLocalizedMessage());
+            finish(new Result(e.getLocalizedMessage()));
         }
         catch (RuntimeJsonMappingException e) {
             e.printStackTrace();
-            return new Result(Result.ERR_JSON_PARSER_ERROR);
+            finish(new Result(Result.ERR_JSON_PARSER_ERROR));
         }
         catch (ParseException e) {
             e.printStackTrace();
-            return new Result("Network error");
+            finish(new Result("Network error"));
         }
         catch (OperationCanceledException e) {
             e.printStackTrace();
-            return new Result("Operation cancelled");
+            finish(new Result("Operation cancelled"));
         }
         catch (ApiNotSupportedException e) {
             e.printStackTrace();
-            return new Result("Server version not supported");
+            finish(new Result("Server version not supported"));
         }
         finally {
             Data.backgroundTaskFinished();
         }
     }
     public void throwIfCancelled() {
-        if (isCancelled())
+        if (isInterrupted())
             throw new OperationCanceledException(null);
     }
     private enum ParserState {

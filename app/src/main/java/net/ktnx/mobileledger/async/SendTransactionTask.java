@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.async;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import net.ktnx.mobileledger.db.Profile;
@@ -28,6 +27,7 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
+import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 import net.ktnx.mobileledger.utils.SimpleDate;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static android.os.SystemClock.sleep;
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /* TODO: get rid of the custom session/cookie and auth code?
@@ -54,25 +53,21 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
  *       at which point the HTML form emulation can be dropped entirely
  */
 
-public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void> {
+public class SendTransactionTask extends Thread {
     private final TaskCallback taskCallback;
     private final Profile mProfile;
     private final boolean simulate;
+    private final LedgerTransaction transaction;
     protected String error;
     private String token;
     private String session;
-    private LedgerTransaction transaction;
 
     public SendTransactionTask(TaskCallback callback, Profile profile,
-                               boolean simulate) {
+                               LedgerTransaction transaction, boolean simulate) {
         taskCallback = callback;
         mProfile = profile;
+        this.transaction = transaction;
         this.simulate = simulate;
-    }
-    public SendTransactionTask(TaskCallback callback, Profile profile) {
-        taskCallback = callback;
-        mProfile = profile;
-        simulate = false;
     }
     private void sendOK(API apiVersion) throws IOException, ApiNotSupportedException {
         HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
@@ -248,11 +243,9 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
         }
     }
     @Override
-    protected Void doInBackground(LedgerTransaction... ledgerTransactions) {
+    public void run() {
         error = null;
         try {
-            transaction = ledgerTransactions[0];
-
             final API profileApiVersion = API.valueOf(mProfile.getApiVersion());
             switch (profileApiVersion) {
                 case auto:
@@ -293,7 +286,9 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             error = e.getMessage();
         }
 
-        return null;
+        Misc.onMainThread(()->{
+            taskCallback.onTransactionSaveDone(error, transaction);
+        });
     }
     private void legacySendOkWithRetry() throws IOException {
         int tried = 0;
@@ -301,13 +296,13 @@ public class SendTransactionTask extends AsyncTask<LedgerTransaction, Void, Void
             tried++;
             if (tried >= 2)
                 throw new IOException(String.format("aborting after %d tries", tried));
-            sleep(100);
+            try {
+                sleep(100);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
         }
     }
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        taskCallback.onTransactionSaveDone(error, transaction);
-    }
-
 }

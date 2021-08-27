@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.ui.transaction_list;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -230,9 +229,8 @@ public class TransactionListFragment extends MobileLedgerListFragment
     @Override
     public void onDatePicked(int year, int month, int day) {
         RecyclerView list = requireActivity().findViewById(R.id.transaction_root);
-        AsyncTask<TransactionDateFinder.Params, Void, Integer> finder = new TransactionDateFinder();
+        TransactionDateFinder finder = new TransactionDateFinder(model, new SimpleDate(year, month + 1, day));
 
-        finder.execute(
-                new TransactionDateFinder.Params(model, new SimpleDate(year, month + 1, day)));
+        finder.start();
     }
 }

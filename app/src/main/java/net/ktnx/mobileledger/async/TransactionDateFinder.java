@@ -17,8 +17,6 @@
 
 package net.ktnx.mobileledger.async;
 
-import android.os.AsyncTask;
-
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.ui.MainModel;
 import net.ktnx.mobileledger.utils.Logger;
@@ -32,22 +30,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Params, Void, Integer> {
-    private MainModel model;
-    @Override
-    protected void onPostExecute(Integer pos) {
-        model.foundTransactionItemIndex.setValue(pos);
+public class TransactionDateFinder extends Thread {
+    private final MainModel model;
+    private final SimpleDate date;
+    public TransactionDateFinder(MainModel model, SimpleDate date) {
+        this.model = model;
+        this.date = date;
     }
     @Override
-    protected Integer doInBackground(Params... param) {
-        this.model = param[0].model;
-        SimpleDate date = param[0].date;
+    public void run() {
         Logger.debug("go-to-date",
                 String.format(Locale.US, "Looking for date %04d-%02d-%02d", date.year, date.month,
                         date.day));
         List<TransactionListItem> transactions = Objects.requireNonNull(
-                param[0].model.getDisplayedTransactions()
-                              .getValue());
+                model.getDisplayedTransactions()
+                     .getValue());
         final int transactionCount = transactions.size();
         Logger.debug("go-to-date",
                 String.format(Locale.US, "List contains %d transactions", transactionCount));
@@ -55,19 +52,10 @@ public class TransactionDateFinder extends AsyncTask<TransactionDateFinder.Param
         TransactionListItem target = new TransactionListItem(date, true);
         int found =
                 Collections.binarySearch(transactions, target, new TransactionListItemComparator());
-        if (found >= 0)
-            return found;
-        else
-            return -1 - found;
-    }
+        if (found < 0)
+            found = -1 - found;
 
-    public static class Params {
-        public final MainModel model;
-        public final SimpleDate date;
-        public Params(@NotNull MainModel model, @NotNull SimpleDate date) {
-            this.model = model;
-            this.date = date;
-        }
+        model.foundTransactionItemIndex.postValue(found);
     }
 
     static class TransactionListItemComparator implements Comparator<TransactionListItem> {

@@ -160,8 +160,8 @@ public class NewTransactionActivity extends ProfileThemedActivity
         try {
 
             SendTransactionTask saver =
-                    new SendTransactionTask(this, mProfile, model.getSimulateSaveFlag());
-            saver.execute(tr);
+                    new SendTransactionTask(this, mProfile, tr, model.getSimulateSaveFlag());
+            saver.start();
         }
         catch (Exception e) {
             debug("new-transaction", "Unknown error: " + e);
