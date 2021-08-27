@@ -18,7 +18,6 @@
 package net.ktnx.mobileledger.ui.account_summary;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import net.ktnx.mobileledger.async.GeneralBackgroundTasks;
 import net.ktnx.mobileledger.databinding.AccountSummaryFragmentBinding;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
 import net.ktnx.mobileledger.db.DB;
@@ -118,7 +118,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         DB.get()
           .getAccountDAO()
           .getAllWithAmounts(profile.getId())
-          .observe(getViewLifecycleOwner(), list -> AsyncTask.execute(() -> {
+          .observe(getViewLifecycleOwner(), list -> GeneralBackgroundTasks.run(() -> {
               List<AccountListItem> adapterList = new ArrayList<>();
               adapterList.add(new AccountListItem.Header(Data.lastAccountsUpdateText));
               HashMap<String, LedgerAccount> accMap = new HashMap<>();
