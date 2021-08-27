@@ -25,8 +25,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+/**
+ * suitable for short tasks, not involving network communication
+ */
 public class GeneralBackgroundTasks {
-    private static final Executor runner = Executors.newCachedThreadPool();
+    private static final Executor runner = Executors.newFixedThreadPool(Runtime.getRuntime()
+                                                                               .availableProcessors());
     public static void run(@NotNull Runnable runnable) {
         runner.execute(runnable);
     }
