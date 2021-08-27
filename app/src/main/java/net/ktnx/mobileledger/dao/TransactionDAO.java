@@ -17,7 +17,6 @@
 
 package net.ktnx.mobileledger.dao;
 
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.room.ColumnInfo;
@@ -91,9 +90,9 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     public abstract TransactionWithAccounts getFirstByDescriptionSync(@NonNull String description);
 
     @androidx.room.Transaction
-    @Query("SELECT tr.id, tr.profile_id, tr.ledger_id, tr.description, tr.data_hash, tr.comment, " +
-           "tr.year, tr.month, tr.day, tr.generation from transactions tr JOIN " +
-           "transaction_accounts t_a ON t_a.transaction_id = tr.id WHERE tr.description = " +
+    @Query("SELECT tr.id, tr.profile_id, tr.ledger_id, tr.description, tr.description_uc, tr" +
+           ".data_hash, tr.comment, tr.year, tr.month, tr.day, tr.generation from transactions tr" +
+           " JOIN transaction_accounts t_a ON t_a.transaction_id = tr.id WHERE tr.description = " +
            ":description AND t_a.account_name LIKE '%'||:accountTerm||'%' ORDER BY year desc, " +
            "month desc, day desc, tr.ledger_id desc LIMIT 1")
     public abstract TransactionWithAccounts getFirstByDescriptionHavingAccountSync(
@@ -112,10 +111,10 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
 
     @androidx.room.Transaction
     @Query("SELECT distinct(tr.id), tr.ledger_id, tr.profile_id, tr.data_hash, tr.year, tr.month," +
-           " tr.day, tr.description, tr.comment, tr.generation FROM transactions tr JOIN " +
-           "transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta.account_name LIKE " +
-           ":accountName||'%' AND ta.amount <> 0 AND tr.profile_id = :profileId ORDER BY tr.year " +
-           "asc, tr.month asc, tr.day asc, tr.ledger_id asc")
+           " tr.day, tr.description, tr.description_uc, tr.comment, tr.generation FROM " +
+           "transactions tr JOIN transaction_accounts ta ON ta.transaction_id=tr.id WHERE ta" +
+           ".account_name LIKE :accountName||'%' AND ta.amount <> 0 AND tr.profile_id = " +
+           ":profileId ORDER BY tr.year asc, tr.month asc, tr.day asc, tr.ledger_id asc")
     public abstract LiveData<List<TransactionWithAccounts>> getAllWithAccountsFiltered(
             long profileId, String accountName);
 
