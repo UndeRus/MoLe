@@ -105,7 +105,7 @@ public class ProfileThemedActivity extends CrashReportingActivity {
     protected void initProfile(long profileId) {
         BaseDAO.runAsync(() -> initProfileSync(profileId));
     }
-    private void initProfileAsync(long profileId) {
+    private void initProfileSync(long profileId) {
         ProfileDAO dao = DB.get()
                            .getProfileDAO();
         Profile profile = dao.getByIdSync(profileId);
