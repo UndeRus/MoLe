@@ -20,7 +20,6 @@ package net.ktnx.mobileledger.ui.new_transaction;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.renderscript.RSInvalidStateException;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -128,7 +127,7 @@ public class NewTransactionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         FragmentActivity activity = getActivity();
         if (activity == null)
-            throw new RSInvalidStateException(
+            throw new IllegalStateException(
                     "getActivity() returned null within onActivityCreated()");
 
         viewModel = new ViewModelProvider(activity).get(NewTransactionModel.class);
