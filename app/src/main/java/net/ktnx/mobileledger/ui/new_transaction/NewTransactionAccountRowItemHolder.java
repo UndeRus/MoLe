@@ -127,6 +127,9 @@ class NewTransactionAccountRowItemHolder extends NewTransactionItemViewHolder {
         b.accountRowAccName.setAdapter(new AccountWithAmountsAutocompleteAdapter(b.getRoot()
                                                                                   .getContext(),
                 mProfile));
+        b.accountRowAccName.setOnItemClickListener((parent, view, position, id) -> {
+            adapter.noteFocusIsOnAmount(position);
+        });
 
         final TextWatcher tw = new TextWatcher() {
             @Override
