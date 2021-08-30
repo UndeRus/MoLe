@@ -370,7 +370,7 @@ public class NewTransactionModel extends ViewModel {
             noteFocusChanged(fi.position - 1, fi.element);
         setItems(newList);
     }
-    void noteFocusChanged(int position, FocusedElement element) {
+    void noteFocusChanged(int position, @Nullable FocusedElement element) {
         FocusInfo present = focusInfo.getValue();
         if (present == null || present.position != position || present.element != element)
             focusInfo.setValue(new FocusInfo(position, element));
@@ -896,7 +896,7 @@ public class NewTransactionModel extends ViewModel {
     public static class FocusInfo {
         int position;
         FocusedElement element;
-        public FocusInfo(int position, FocusedElement element) {
+        public FocusInfo(int position, @Nullable FocusedElement element) {
             this.position = position;
             this.element = element;
         }

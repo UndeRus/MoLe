@@ -191,7 +191,9 @@ public class NewTransactionFragment extends Fragment {
         if (savedInstanceState != null) {
             keep |= savedInstanceState.getBoolean("keep", true);
             focused = savedInstanceState.getInt("focused-item", 0);
-            element = FocusedElement.valueOf(savedInstanceState.getString("focused-element"));
+            final String focusedElementString = savedInstanceState.getString("focused-element");
+            if (focusedElementString != null)
+                element = FocusedElement.valueOf(focusedElementString);
         }
 
         if (!keep) {
@@ -234,7 +236,8 @@ public class NewTransactionFragment extends Fragment {
             final int focusedItem = focusInfo.position;
             if (focusedItem >= 0)
                 outState.putInt("focused-item", focusedItem);
-            outState.putString("focused-element", focusInfo.element.toString());
+            if (focusInfo.element != null)
+                outState.putString("focused-element", focusInfo.element.toString());
         }
     }
 
