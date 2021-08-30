@@ -69,6 +69,10 @@ public class ConfigReader extends ConfigIO {
         r.beginObject();
         while (r.hasNext()) {
             String item = r.nextName();
+            if (r.peek() == JsonToken.NULL) {
+                r.nextNull();
+                continue;
+            }
             switch (item) {
                 case Keys.COMMODITIES:
                     commodities = readCommodities(r);
@@ -150,6 +154,10 @@ public class ConfigReader extends ConfigIO {
         TemplateAccount result = new TemplateAccount(0L, 0L, 0L);
         while (r.peek() != JsonToken.END_OBJECT) {
             String item = r.nextName();
+            if (r.peek() == JsonToken.NULL) {
+                r.nextNull();
+                continue;
+            }
             switch (item) {
                 case Keys.NAME:
                     result.setAccountName(r.nextString());
@@ -195,6 +203,10 @@ public class ConfigReader extends ConfigIO {
 
         while (r.peek() != JsonToken.END_OBJECT) {
             String item = r.nextName();
+            if (r.peek() == JsonToken.NULL) {
+                r.nextNull();
+                continue;
+            }
             switch (item) {
                 case Keys.UUID:
                     t.setUuid(r.nextString());
@@ -280,6 +292,10 @@ public class ConfigReader extends ConfigIO {
             r.beginObject();
             while (r.peek() != JsonToken.END_OBJECT) {
                 final String item = r.nextName();
+                if (r.peek() == JsonToken.NULL) {
+                    r.nextNull();
+                    continue;
+                }
                 switch (item) {
                     case Keys.NAME:
                         c.setName(r.nextString());
@@ -314,6 +330,10 @@ public class ConfigReader extends ConfigIO {
             r.beginObject();
             while (r.peek() != JsonToken.END_OBJECT) {
                 String item = r.nextName();
+                if (r.peek() == JsonToken.NULL) {
+                    r.nextNull();
+                    continue;
+                }
 
                 switch (item) {
                     case Keys.UUID:
