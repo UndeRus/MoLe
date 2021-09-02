@@ -587,8 +587,8 @@ public class RetrieveTransactionsTask extends Thread {
             finish(new Result("Network error"));
         }
         catch (OperationCanceledException e) {
-            e.printStackTrace();
-            finish(new Result("Operation cancelled"));
+            Logger.debug("RTT", "Retrieval was cancelled", e);
+            finish(new Result(null));
         }
         catch (ApiNotSupportedException e) {
             e.printStackTrace();
