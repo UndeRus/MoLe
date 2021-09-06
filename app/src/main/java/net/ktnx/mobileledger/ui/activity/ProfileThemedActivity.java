@@ -83,6 +83,9 @@ public class ProfileThemedActivity extends CrashReportingActivity {
 
             if (hue != mThemeHue) {
                 storeProfilePref(profile);
+                Logger.debug(TAG,
+                        String.format(Locale.US, "profile observer calling setupProfileColors(%d)",
+                                hue));
                 setupProfileColors(hue);
             }
         });
@@ -98,6 +101,8 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         if (profileId == -1)
             mThemeHue = Colors.DEFAULT_HUE_DEG;
 
+        Logger.debug(TAG,
+                String.format(Locale.US, "initProfile() calling setupProfileColors(%d)", hue));
         setupProfileColors(hue);
 
         initProfile(profileId);
