@@ -57,8 +57,11 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         Colors.setupTheme(this, mThemeHue);
 
         if (themeSetUp) {
-            Logger.debug(TAG, "setupProfileColors(): theme already set up, recreating activity");
-            this.recreate();
+            Logger.debug(TAG,
+                    "setupProfileColors(): theme already set up, supposedly the activity will be " +
+                    "recreated");
+//            this.recreate();
+            return;
         }
         themeSetUp = true;
 
@@ -79,10 +82,10 @@ public class ProfileThemedActivity extends CrashReportingActivity {
             }
 
             mProfile = profile;
+            storeProfilePref(profile);
             int hue = profile.getTheme();
 
             if (hue != mThemeHue) {
-                storeProfilePref(profile);
                 Logger.debug(TAG,
                         String.format(Locale.US, "profile observer calling setupProfileColors(%d)",
                                 hue));
@@ -111,6 +114,7 @@ public class ProfileThemedActivity extends CrashReportingActivity {
         BaseDAO.runAsync(() -> initProfileSync(profileId));
     }
     private void initProfileSync(long profileId) {
+        Logger.debug(TAG, String.format(Locale.US, "Loading profile %d", profileId));
         ProfileDAO dao = DB.get()
                            .getProfileDAO();
         Profile profile = dao.getByIdSync(profileId);
