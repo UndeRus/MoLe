@@ -1,5 +1,14 @@
 # Changes
 
+## [0.20.1] = 2021-09-09
+
+* FIXES
+    + New transaction: focus amount upon account selection
+    + New transaction: fix a crash when returning to the activity with no focused input field
+    + fix a crash in DB upgrade introduced in v0.20.0
+    + fix config restore with null values
+    + move away from deprecated AsyncTask
+
 ## [0.20.0] = 2021-08-22
 
 * NEW
