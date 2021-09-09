@@ -13,7 +13,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with MoLe. If not, see <https://www.gnu.org/licenses/>.
 
--- migrate from revision 60 to revision 61
+-- migrate from revision 61 to revision 62
 
 -- pragmas need to be outside of transaction control
 -- foreign_keys is needed so that foreign key constraints are redirected
@@ -22,5 +22,8 @@ commit transaction;
 pragma foreign_keys = on;
 
 begin transaction;
+
+delete from currencies c
+where id not in (select min(id) from currencies group by name);
 
 create unique index currency_name_idx on currencies(name);
