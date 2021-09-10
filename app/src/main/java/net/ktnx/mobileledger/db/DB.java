@@ -41,6 +41,8 @@ import net.ktnx.mobileledger.dao.TransactionAccountDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.utils.Logger;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +60,7 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
                       TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
-    public static final int REVISION = 64;
+    public static final int REVISION = 65;
     public static final String DB_NAME = "MoLe.db";
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static DB instance;
@@ -80,7 +82,23 @@ abstract public class DB extends RoomDatabase {
                                     multiVersionMigration(41, 58), singleVersionMigration(59),
                                     singleVersionMigration(60), singleVersionMigration(61),
                                     singleVersionMigration(62), singleVersionMigration(63),
-                                    singleVersionMigration(64)
+                                    singleVersionMigration(64), new Migration(64, 65) {
+                        @Override
+                        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
+                            try (Cursor c = database.query(
+                                    "SELECT id, description FROM transactions"))
+                            {
+                                while (c.moveToNext()) {
+                                    final long id = c.getLong(0);
+                                    final String description = c.getString(1);
+                                    database.execSQL(
+                                            "UPDATE transactions SET description_uc=? WHERE id=?",
+                                            new Object[]{description.toUpperCase(), id
+                                            });
+                                }
+                            }
+                        }
+                    }
                     })
                    .addCallback(new Callback() {
                        @Override
