@@ -40,6 +40,9 @@ public abstract class CurrencyDAO extends BaseDAO<Currency> {
     @Delete
     public abstract void deleteSync(Currency item);
 
+    @Query("DELETE FROM currencies")
+    public abstract void deleteAllSync();
+
     @Query("SELECT * FROM currencies")
     public abstract LiveData<List<Currency>> getAll();
 

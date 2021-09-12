@@ -40,6 +40,9 @@ public interface TemplateAccountDAO {
     @Delete
     void deleteSync(TemplateAccount item);
 
+    @Query("DELETE FROM template_accounts")
+    void deleteAllSync();
+
     @Query("SELECT * FROM template_accounts WHERE template_id=:template_id")
     LiveData<List<TemplateAccount>> getTemplateAccounts(Long template_id);
 

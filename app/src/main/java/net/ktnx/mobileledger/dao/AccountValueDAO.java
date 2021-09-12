@@ -41,6 +41,9 @@ public abstract class AccountValueDAO extends BaseDAO<AccountValue> {
     @Delete
     public abstract void deleteSync(AccountValue item);
 
+    @Query("DELETE FROM account_values")
+    public abstract void deleteAllSync();
+
     @Query("SELECT * FROM account_values WHERE account_id=:accountId")
     public abstract LiveData<List<AccountValue>> getAll(long accountId);
 

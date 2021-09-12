@@ -244,4 +244,17 @@ abstract public class DB extends RoomDatabase {
     public abstract OptionDAO getOptionDAO();
 
     public abstract ProfileDAO getProfileDAO();
+
+    @androidx.room.Transaction
+    public void deleteAllSync() {
+        getTransactionAccountDAO().deleteAllSync();
+        getTransactionDAO().deleteAllSync();
+        getAccountValueDAO().deleteAllSync();
+        getAccountDAO().deleteAllSync();
+        getTemplateAccountDAO().deleteAllSync();
+        getTemplateDAO().deleteAllSync();
+        getCurrencyDAO().deleteAllSync();
+        getOptionDAO().deleteAllSync();
+        getProfileDAO().deleteAllSync();
+    }
 }

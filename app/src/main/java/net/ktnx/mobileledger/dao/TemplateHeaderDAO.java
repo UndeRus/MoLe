@@ -62,6 +62,9 @@ public abstract class TemplateHeaderDAO {
         });
     }
 
+    @Query("DELETE FROM templates")
+    public abstract void deleteAllSync();
+
     @Query("SELECT * FROM templates ORDER BY is_fallback, UPPER(name)")
     public abstract LiveData<List<TemplateHeader>> getTemplates();
 

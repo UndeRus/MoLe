@@ -43,6 +43,9 @@ public abstract class OptionDAO extends BaseDAO<Option> {
     @Delete
     public abstract void deleteSync(List<Option> items);
 
+    @Query("DELETE from options")
+    public abstract void deleteAllSync();
+
     @Query("SELECT * FROM options WHERE profile_id = :profileId AND name = :name")
     public abstract LiveData<Option> load(long profileId, String name);
 

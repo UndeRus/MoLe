@@ -43,6 +43,9 @@ public abstract class TransactionAccountDAO extends BaseDAO<TransactionAccount> 
     @Delete
     public abstract void deleteSync(List<TransactionAccount> items);
 
+    @Query("DELETE FROM transaction_accounts")
+    public abstract void deleteAllSync();
+
     @Query("SELECT * FROM transaction_accounts WHERE id = :id")
     public abstract LiveData<TransactionAccount> getById(long id);
 

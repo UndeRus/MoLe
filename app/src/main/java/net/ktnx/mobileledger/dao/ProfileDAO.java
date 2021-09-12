@@ -55,6 +55,9 @@ public abstract class ProfileDAO extends BaseDAO<Profile> {
     @Delete
     public abstract void deleteSync(Profile item);
 
+    @Query("DELETE FROM profiles")
+    public abstract void deleteAllSync();
+
     @Query("select * from profiles where id = :profileId")
     public abstract Profile getByIdSync(long profileId);
 
