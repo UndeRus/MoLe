@@ -15,12 +15,11 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.async;
+package net.ktnx.mobileledger.backup;
 
-import android.content.Context;
-import android.net.Uri;
 import android.util.JsonWriter;
 
+import net.ktnx.mobileledger.backup.ConfigIO.Keys;
 import net.ktnx.mobileledger.db.Currency;
 import net.ktnx.mobileledger.db.DB;
 import net.ktnx.mobileledger.db.Profile;
@@ -28,73 +27,54 @@ import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
 import net.ktnx.mobileledger.json.API;
 import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.utils.Misc;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-public class ConfigWriter extends ConfigIO {
-    private final OnDoneListener onDoneListener;
-    private JsonWriter w;
-    public ConfigWriter(Context context, Uri uri, OnErrorListener onErrorListener,
-                        OnDoneListener onDoneListener) throws FileNotFoundException {
-        super(context, uri, onErrorListener);
-
-        this.onDoneListener = onDoneListener;
-    }
-    @Override
-    protected String getStreamMode() {
-        return "w";
-    }
-    @Override
-    protected void initStream() {
-        w = new JsonWriter(new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(pfd.getFileDescriptor()))));
+public class RawConfigWriter {
+    private final JsonWriter w;
+    public RawConfigWriter(OutputStream outputStream) {
+        w = new JsonWriter(new BufferedWriter(new OutputStreamWriter(outputStream)));
         w.setIndent("  ");
     }
-    @Override
-    protected void processStream() throws IOException {
+    public void writeConfig() throws IOException {
         w.beginObject();
-        writeCommodities(w);
-        writeProfiles(w);
-        writeCurrentProfile(w);
-        writeConfigTemplates(w);
+        writeCommodities();
+        writeProfiles();
+        writeCurrentProfile();
+        writeConfigTemplates();
         w.endObject();
         w.flush();
-
-        if (onDoneListener != null)
-            Misc.onMainThread(onDoneListener::done);
     }
-    private void writeKey(JsonWriter w, String key, String value) throws IOException {
+    private void writeKey(String key, String value) throws IOException {
         if (value != null)
             w.name(key)
              .value(value);
     }
-    private void writeKey(JsonWriter w, String key, Integer value) throws IOException {
+    private void writeKey(String key, Integer value) throws IOException {
         if (value != null)
             w.name(key)
              .value(value);
     }
-    private void writeKey(JsonWriter w, String key, Long value) throws IOException {
+    private void writeKey(String key, Long value) throws IOException {
         if (value != null)
             w.name(key)
              .value(value);
     }
-    private void writeKey(JsonWriter w, String key, Float value) throws IOException {
+    private void writeKey(String key, Float value) throws IOException {
         if (value != null)
             w.name(key)
              .value(value);
     }
-    private void writeKey(JsonWriter w, String key, Boolean value) throws IOException {
+    private void writeKey(String key, Boolean value) throws IOException {
         if (value != null)
             w.name(key)
              .value(value);
     }
-    private void writeConfigTemplates(JsonWriter w) throws IOException {
+    private void writeConfigTemplates() throws IOException {
         List<TemplateWithAccounts> templates = DB.get()
                                                  .getTemplateDAO()
                                                  .getAllTemplatesWithAccountsSync();
@@ -113,17 +93,17 @@ public class ConfigWriter extends ConfigIO {
              .value(t.header.getName());
             w.name(Keys.REGEX)
              .value(t.header.getRegularExpression());
-            writeKey(w, Keys.TEST_TEXT, t.header.getTestText());
-            writeKey(w, Keys.DATE_YEAR, t.header.getDateYear());
-            writeKey(w, Keys.DATE_YEAR_GROUP, t.header.getDateYearMatchGroup());
-            writeKey(w, Keys.DATE_MONTH, t.header.getDateMonth());
-            writeKey(w, Keys.DATE_MONTH_GROUP, t.header.getDateMonthMatchGroup());
-            writeKey(w, Keys.DATE_DAY, t.header.getDateDay());
-            writeKey(w, Keys.DATE_DAY_GROUP, t.header.getDateDayMatchGroup());
-            writeKey(w, Keys.TRANSACTION, t.header.getTransactionDescription());
-            writeKey(w, Keys.TRANSACTION_GROUP, t.header.getTransactionDescriptionMatchGroup());
-            writeKey(w, Keys.COMMENT, t.header.getTransactionComment());
-            writeKey(w, Keys.COMMENT_GROUP, t.header.getTransactionCommentMatchGroup());
+            writeKey(Keys.TEST_TEXT, t.header.getTestText());
+            writeKey(ConfigIO.Keys.DATE_YEAR, t.header.getDateYear());
+            writeKey(Keys.DATE_YEAR_GROUP, t.header.getDateYearMatchGroup());
+            writeKey(Keys.DATE_MONTH, t.header.getDateMonth());
+            writeKey(Keys.DATE_MONTH_GROUP, t.header.getDateMonthMatchGroup());
+            writeKey(Keys.DATE_DAY, t.header.getDateDay());
+            writeKey(Keys.DATE_DAY_GROUP, t.header.getDateDayMatchGroup());
+            writeKey(Keys.TRANSACTION, t.header.getTransactionDescription());
+            writeKey(Keys.TRANSACTION_GROUP, t.header.getTransactionDescriptionMatchGroup());
+            writeKey(Keys.COMMENT, t.header.getTransactionComment());
+            writeKey(Keys.COMMENT_GROUP, t.header.getTransactionCommentMatchGroup());
             w.name(Keys.IS_FALLBACK)
              .value(t.header.isFallback());
             if (t.accounts.size() > 0) {
@@ -132,15 +112,15 @@ public class ConfigWriter extends ConfigIO {
                 for (TemplateAccount a : t.accounts) {
                     w.beginObject();
 
-                    writeKey(w, Keys.NAME, a.getAccountName());
-                    writeKey(w, Keys.NAME_GROUP, a.getAccountNameMatchGroup());
-                    writeKey(w, Keys.COMMENT, a.getAccountComment());
-                    writeKey(w, Keys.COMMENT_GROUP, a.getAccountCommentMatchGroup());
-                    writeKey(w, Keys.AMOUNT, a.getAmount());
-                    writeKey(w, Keys.AMOUNT_GROUP, a.getAmountMatchGroup());
-                    writeKey(w, Keys.NEGATE_AMOUNT, a.getNegateAmount());
-                    writeKey(w, Keys.CURRENCY, a.getCurrency());
-                    writeKey(w, Keys.CURRENCY_GROUP, a.getCurrencyMatchGroup());
+                    writeKey(Keys.NAME, a.getAccountName());
+                    writeKey(Keys.NAME_GROUP, a.getAccountNameMatchGroup());
+                    writeKey(Keys.COMMENT, a.getAccountComment());
+                    writeKey(Keys.COMMENT_GROUP, a.getAccountCommentMatchGroup());
+                    writeKey(Keys.AMOUNT, a.getAmount());
+                    writeKey(Keys.AMOUNT_GROUP, a.getAmountMatchGroup());
+                    writeKey(Keys.NEGATE_AMOUNT, a.getNegateAmount());
+                    writeKey(Keys.CURRENCY, a.getCurrency());
+                    writeKey(Keys.CURRENCY_GROUP, a.getCurrencyMatchGroup());
 
                     w.endObject();
                 }
@@ -151,7 +131,7 @@ public class ConfigWriter extends ConfigIO {
         }
         w.endArray();
     }
-    private void writeCommodities(JsonWriter w) throws IOException {
+    private void writeCommodities() throws IOException {
         List<Currency> list = DB.get()
                                 .getCurrencyDAO()
                                 .getAllSync();
@@ -161,14 +141,14 @@ public class ConfigWriter extends ConfigIO {
          .beginArray();
         for (Currency c : list) {
             w.beginObject();
-            writeKey(w, Keys.NAME, c.getName());
-            writeKey(w, Keys.POSITION, c.getPosition());
-            writeKey(w, Keys.HAS_GAP, c.getHasGap());
+            writeKey(Keys.NAME, c.getName());
+            writeKey(Keys.POSITION, c.getPosition());
+            writeKey(Keys.HAS_GAP, c.getHasGap());
             w.endObject();
         }
         w.endArray();
     }
-    private void writeProfiles(JsonWriter w) throws IOException {
+    private void writeProfiles() throws IOException {
         List<Profile> profiles = DB.get()
                                    .getProfileDAO()
                                    .getAllOrderedSync();
@@ -221,16 +201,12 @@ public class ConfigWriter extends ConfigIO {
         }
         w.endArray();
     }
-    private void writeCurrentProfile(JsonWriter w) throws IOException {
+    private void writeCurrentProfile() throws IOException {
         Profile currentProfile = Data.getProfile();
         if (currentProfile == null)
             return;
 
         w.name(Keys.CURRENT_PROFILE)
          .value(currentProfile.getUuid());
-    }
-
-    abstract static public class OnDoneListener {
-        public abstract void done();
     }
 }

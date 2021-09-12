@@ -32,8 +32,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
-import net.ktnx.mobileledger.async.ConfigReader;
-import net.ktnx.mobileledger.async.ConfigWriter;
+import net.ktnx.mobileledger.backup.ConfigReader;
+import net.ktnx.mobileledger.backup.ConfigWriter;
 import net.ktnx.mobileledger.databinding.FragmentBackupsBinding;
 import net.ktnx.mobileledger.model.Data;
 

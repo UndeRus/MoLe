@@ -15,13 +15,12 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package net.ktnx.mobileledger.async;
+package net.ktnx.mobileledger.backup;
 
-import android.content.Context;
-import android.net.Uri;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
+import net.ktnx.mobileledger.backup.ConfigIO.Keys;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
 import net.ktnx.mobileledger.dao.ProfileDAO;
 import net.ktnx.mobileledger.dao.TemplateHeaderDAO;
@@ -31,41 +30,40 @@ import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
-import net.ktnx.mobileledger.model.Data;
-import net.ktnx.mobileledger.utils.Misc;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfigReader extends ConfigIO {
-    private final OnDoneListener onDoneListener;
-    private JsonReader r;
-    public ConfigReader(Context context, Uri uri, OnErrorListener onErrorListener,
-                        OnDoneListener onDoneListener) throws FileNotFoundException {
-        super(context, uri, onErrorListener);
-
-        this.onDoneListener = onDoneListener;
+public class RawConfigReader {
+    private final JsonReader r;
+    private List<Currency> commodities;
+    private List<Profile> profiles;
+    private List<TemplateWithAccounts> templates;
+    private String currentProfile;
+    public RawConfigReader(InputStream inputStream) {
+        r = new JsonReader(new BufferedReader(new InputStreamReader(inputStream)));
     }
-    @Override
-    protected String getStreamMode() {
-        return "r";
+    public List<Currency> getCommodities() {
+        return commodities;
     }
-    @Override
-    protected void initStream() {
-        r = new JsonReader(new BufferedReader(
-                new InputStreamReader(new FileInputStream(pfd.getFileDescriptor()))));
+    public List<Profile> getProfiles() {
+        return profiles;
     }
-    @Override
-    protected void processStream() throws IOException {
-        List<Currency> commodities = null;
-        List<Profile> profiles = null;
-        List<TemplateWithAccounts> templates = null;
-        String currentProfile = null;
+    public List<TemplateWithAccounts> getTemplates() {
+        return templates;
+    }
+    public String getCurrentProfile() {
+        return currentProfile;
+    }
+    public void readConfig() throws IOException {
+        commodities = null;
+        profiles = null;
+        templates = null;
+        currentProfile = null;
         r.beginObject();
         while (r.hasNext()) {
             String item = r.nextName();
@@ -75,13 +73,13 @@ public class ConfigReader extends ConfigIO {
             }
             switch (item) {
                 case Keys.COMMODITIES:
-                    commodities = readCommodities(r);
+                    commodities = readCommodities();
                     break;
                 case Keys.PROFILES:
-                    profiles = readProfiles(r);
+                    profiles = readProfiles();
                     break;
                 case Keys.TEMPLATES:
-                    templates = readTemplates(r);
+                    templates = readTemplates();
                     break;
                 case Keys.CURRENT_PROFILE:
                     currentProfile = r.nextString();
@@ -91,65 +89,8 @@ public class ConfigReader extends ConfigIO {
             }
         }
         r.endObject();
-
-        restoreCommodities(commodities);
-        restoreProfiles(profiles);
-        restoreTemplates(templates);
-
-        if (Data.getProfile() == null) {
-            Profile p = null;
-            final ProfileDAO dao = DB.get()
-                                     .getProfileDAO();
-            if (currentProfile != null)
-                p = dao.getByUuidSync(currentProfile);
-
-            if (p == null)
-                dao.getAnySync();
-
-            if (p != null)
-                Data.postCurrentProfile(p);
-        }
-
-        if (onDoneListener != null)
-            Misc.onMainThread(onDoneListener::done);
     }
-    private void restoreTemplates(List<TemplateWithAccounts> list) {
-        if (list == null)
-            return;
-
-        TemplateHeaderDAO dao = DB.get()
-                                  .getTemplateDAO();
-
-        for (TemplateWithAccounts t : list) {
-            if (dao.getTemplateWithAccountsByUuidSync(t.header.getUuid()) == null)
-                dao.insertSync(t);
-        }
-    }
-    private void restoreProfiles(List<Profile> list) {
-        if (list == null)
-            return;
-
-        ProfileDAO dao = DB.get()
-                           .getProfileDAO();
-
-        for (Profile p : list) {
-            if (dao.getByUuidSync(p.getUuid()) == null)
-                dao.insert(p);
-        }
-    }
-    private void restoreCommodities(List<Currency> list) {
-        if (list == null)
-            return;
-
-        CurrencyDAO dao = DB.get()
-                            .getCurrencyDAO();
-
-        for (Currency c : list) {
-            if (dao.getByNameSync(c.getName()) == null)
-                dao.insert(c);
-        }
-    }
-    private TemplateAccount readTemplateAccount(JsonReader r) throws IOException {
+    private TemplateAccount readTemplateAccount() throws IOException {
         r.beginObject();
         TemplateAccount result = new TemplateAccount(0L, 0L, 0L);
         while (r.peek() != JsonToken.END_OBJECT) {
@@ -256,7 +197,7 @@ public class ConfigReader extends ConfigIO {
                 case Keys.ACCOUNTS:
                     r.beginArray();
                     while (r.peek() == JsonToken.BEGIN_OBJECT) {
-                        accounts.add(readTemplateAccount(r));
+                        accounts.add(readTemplateAccount());
                     }
                     r.endArray();
                     break;
@@ -271,7 +212,7 @@ public class ConfigReader extends ConfigIO {
         result.accounts = accounts;
         return result;
     }
-    private List<TemplateWithAccounts> readTemplates(JsonReader r) throws IOException {
+    private List<TemplateWithAccounts> readTemplates() throws IOException {
         List<TemplateWithAccounts> list = new ArrayList<>();
 
         r.beginArray();
@@ -282,7 +223,7 @@ public class ConfigReader extends ConfigIO {
 
         return list;
     }
-    private List<Currency> readCommodities(JsonReader r) throws IOException {
+    private List<Currency> readCommodities() throws IOException {
         List<Currency> list = new ArrayList<>();
 
         r.beginArray();
@@ -322,7 +263,7 @@ public class ConfigReader extends ConfigIO {
 
         return list;
     }
-    private List<Profile> readProfiles(JsonReader r) throws IOException {
+    private List<Profile> readProfiles() throws IOException {
         List<Profile> list = new ArrayList<>();
         r.beginArray();
         while (r.peek() == JsonToken.BEGIN_OBJECT) {
@@ -392,7 +333,45 @@ public class ConfigReader extends ConfigIO {
 
         return list;
     }
-    abstract static public class OnDoneListener {
-        public abstract void done();
+    public void restoreAll() {
+        restoreCommodities();
+        restoreProfiles();
+        restoreTemplates();
+    }
+    private void restoreTemplates() {
+        if (templates == null)
+            return;
+
+        TemplateHeaderDAO dao = DB.get()
+                                  .getTemplateDAO();
+
+        for (TemplateWithAccounts t : templates) {
+            if (dao.getTemplateWithAccountsByUuidSync(t.header.getUuid()) == null)
+                dao.insertSync(t);
+        }
+    }
+    private void restoreProfiles() {
+        if (profiles == null)
+            return;
+
+        ProfileDAO dao = DB.get()
+                           .getProfileDAO();
+
+        for (Profile p : profiles) {
+            if (dao.getByUuidSync(p.getUuid()) == null)
+                dao.insert(p);
+        }
+    }
+    private void restoreCommodities() {
+        if (commodities == null)
+            return;
+
+        CurrencyDAO dao = DB.get()
+                            .getCurrencyDAO();
+
+        for (Currency c : commodities) {
+            if (dao.getByNameSync(c.getName()) == null)
+                dao.insert(c);
+        }
     }
 }

@@ -19,6 +19,7 @@ package net.ktnx.mobileledger.ui.profiles;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.backup.BackupManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -407,6 +408,8 @@ public class ProfileDetailFragment extends Fragment {
         else {
             dao.insertLast(profile, null);
         }
+
+        BackupManager.dataChanged(BuildConfig.APPLICATION_ID);
 
         Activity activity = getActivity();
         if (activity != null)
