@@ -23,7 +23,7 @@ pragma foreign_keys = on;
 
 begin transaction;
 
-delete from currencies c
+delete from currencies
 where id not in (select min(id) from currencies group by name);
 
 create unique index currency_name_idx on currencies(name);
