@@ -1,0 +1,4 @@
+* NEW
+    + cloud backup
+* FIXES
+    + two database problems fixed, one causing crashes at startup

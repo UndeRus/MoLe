@@ -1,6 +1,13 @@
 # Changes
 
-## [0.20.1] = 2021-09-09
+## [0.20.2] - 2021-09-23
+
+* NEW
+    + cloud backup
+* FIXES
+    + two database problems fixed, one causing crashes at startup
+
+## [0.20.1] - 2021-09-09
 
 * FIXES
     + New transaction: focus amount upon account selection
@@ -9,7 +16,7 @@
     + fix config restore with null values
     + move away from deprecated AsyncTask
 
-## [0.20.0] = 2021-08-22
+## [0.20.0] - 2021-08-22
 
 * NEW
     + backup/restore of profile/template configuration to a file
