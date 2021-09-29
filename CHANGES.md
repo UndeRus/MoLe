@@ -1,5 +1,10 @@
 # Changes
 
+## [0.20.3] - 2021-09-29
+
+* FIXES
+    + another fix to DB migration from v0.16.0
+
 ## [0.20.2] - 2021-09-23
 
 * NEW

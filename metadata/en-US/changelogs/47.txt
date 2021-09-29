@@ -1,0 +1,2 @@
+* FIXES
+    + another fix to DB migration from v0.16.0
