@@ -43,7 +43,8 @@ insert into profiles_new(
  show_commodity_by_default, default_commodity, show_comments_by_default,
  detected_version_pre_1_19, detected_version_major, detected_version_minor)
 select uuid, name, url, use_authentication, auth_user, auth_password, order_no,
- permit_posting, theme, preferred_accounts_filter, future_dates, api_version,
+ permit_posting, theme, preferred_accounts_filter, coalesce(future_dates,-1),
+ coalesce(api_version,0),
  show_commodity_by_default, default_commodity, show_comments_by_default,
  coalesce(detected_version_pre_1_19,0), coalesce(detected_version_major,0),
  coalesce(detected_version_minor,0)
