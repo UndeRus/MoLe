@@ -146,6 +146,7 @@ public class Transaction {
         month = o.month;
         day = o.day;
         description = o.description;
+        descriptionUpper = o.description.toUpperCase();
         comment = o.comment;
         generation = o.generation;
     }
