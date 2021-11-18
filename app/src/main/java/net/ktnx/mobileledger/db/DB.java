@@ -60,10 +60,22 @@ import static net.ktnx.mobileledger.utils.Logger.debug;
                       TransactionAccount.class
           })
 abstract public class DB extends RoomDatabase {
-    public static final int REVISION = 65;
+    public static final int REVISION = 66;
     public static final String DB_NAME = "MoLe.db";
     public static final MutableLiveData<Boolean> initComplete = new MutableLiveData<>(false);
     private static DB instance;
+    private static void fixTransactionDescriptionUpper(
+            @NonNull @NotNull SupportSQLiteDatabase database) {
+        try (Cursor c = database.query("SELECT id, description FROM transactions")) {
+            while (c.moveToNext()) {
+                final long id = c.getLong(0);
+                final String description = c.getString(1);
+                database.execSQL("UPDATE transactions SET description_uc=? WHERE id=?",
+                        new Object[]{description.toUpperCase(), id
+                        });
+            }
+        }
+    }
     public static DB get() {
         if (instance != null)
             return instance;
@@ -85,18 +97,17 @@ abstract public class DB extends RoomDatabase {
                                     singleVersionMigration(64), new Migration(64, 65) {
                         @Override
                         public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
-                            try (Cursor c = database.query(
-                                    "SELECT id, description FROM transactions"))
-                            {
-                                while (c.moveToNext()) {
-                                    final long id = c.getLong(0);
-                                    final String description = c.getString(1);
-                                    database.execSQL(
-                                            "UPDATE transactions SET description_uc=? WHERE id=?",
-                                            new Object[]{description.toUpperCase(), id
-                                            });
-                                }
-                            }
+                            fixTransactionDescriptionUpper(database);
+                        }
+                    }, new Migration(64, 66) {
+                        @Override
+                        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
+                            fixTransactionDescriptionUpper(database);
+                        }
+                    }, new Migration(65, 66) {
+                        @Override
+                        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
+                            fixTransactionDescriptionUpper(database);
                         }
                     }
                     })
