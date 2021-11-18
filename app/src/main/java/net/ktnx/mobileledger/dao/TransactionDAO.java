@@ -80,11 +80,11 @@ public abstract class TransactionDAO extends BaseDAO<Transaction> {
     @Query("SELECT * FROM transactions WHERE id = :transactionId")
     public abstract TransactionWithAccounts getByIdWithAccountsSync(long transactionId);
 
-    @Query("SELECT DISTINCT description, CASE WHEN description_uc LIKE :term||'%%' THEN 1 " +
-           "               WHEN description_uc LIKE '%%:'||:term||'%%' THEN 2 " +
-           "               WHEN description_uc LIKE '%% '||:term||'%%' THEN 3 " +
+    @Query("SELECT DISTINCT description, CASE WHEN description_uc LIKE :term||'%' THEN 1 " +
+           "               WHEN description_uc LIKE '%:'||:term||'%' THEN 2 " +
+           "               WHEN description_uc LIKE '% '||:term||'%' THEN 3 " +
            "               ELSE 9 END AS ordering FROM transactions " +
-           "WHERE description_uc LIKE '%%'||:term||'%%' ORDER BY ordering, description_uc, rowid ")
+           "WHERE description_uc LIKE '%'||:term||'%' ORDER BY ordering, description_uc, rowid ")
     public abstract List<DescriptionContainer> lookupDescriptionSync(@NonNull String term);
 
     @androidx.room.Transaction
