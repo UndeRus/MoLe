@@ -3,7 +3,7 @@
 ## [0.20.4] - 2021-11-18
 
 * KNOWN PROBLEMS
-    + Incompatibility with hledger-web 1.23
+    + Incompatibility with hledger-web 1.23+
 * FIXES
     + fix auto-completion of transaction description
 
