@@ -23,9 +23,9 @@ import android.util.SparseArray;
 import net.ktnx.mobileledger.R;
 
 public enum API {
-    auto(0), html(-1), v1_14(-2), v1_15(-3), v1_19_1(-4);
+    auto(0), html(-1), v1_14(-2), v1_15(-3), v1_19_1(-4), v1_23(-5);
     private static final SparseArray<API> map = new SparseArray<>();
-    public static API[] allVersions = {v1_19_1, v1_15, v1_14};
+    public static API[] allVersions = {v1_23, v1_19_1, v1_15, v1_14};
 
     static {
         for (API item : API.values()) {
@@ -56,6 +56,8 @@ public enum API {
                 return resources.getString(R.string.api_1_15);
             case v1_19_1:
                 return resources.getString(R.string.api_1_19_1);
+            case v1_23:
+                return resources.getString(R.string.api_1_23);
             default:
                 throw new IllegalStateException("Unexpected value: " + value);
         }
@@ -72,6 +74,8 @@ public enum API {
                 return "1.15";
             case v1_19_1:
                 return "1.19.1";
+            case v1_23:
+                return "1.23";
             default:
                 throw new IllegalStateException("Unexpected value: " + this);
         }

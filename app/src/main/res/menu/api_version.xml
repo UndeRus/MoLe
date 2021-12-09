@@ -22,6 +22,10 @@
         android:title="@string/api_auto"
         />
     <item
+        android:id="@+id/api_version_menu_1_23"
+        android:title="@string/api_1_23"
+        />
+    <item
         android:id="@+id/api_version_menu_1_19_1"
         android:title="@string/api_1_19_1"
         />

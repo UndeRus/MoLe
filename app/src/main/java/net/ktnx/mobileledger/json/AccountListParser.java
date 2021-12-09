@@ -39,6 +39,8 @@ abstract public class AccountListParser {
                 return new net.ktnx.mobileledger.json.v1_15.AccountListParser(input);
             case v1_19_1:
                 return new net.ktnx.mobileledger.json.v1_19_1.AccountListParser(input);
+            case v1_23:
+                return new net.ktnx.mobileledger.json.v1_23.AccountListParser(input);
             default:
                 throw new RuntimeException("Unsupported version " + version.toString());
         }

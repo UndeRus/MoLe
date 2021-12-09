@@ -341,6 +341,9 @@ public class ProfileDetailFragment extends Fragment {
             if (itemId == R.id.api_version_menu_html) {
                 apiVer = API.html;
             }
+            else if (itemId == R.id.api_version_menu_1_23) {
+                apiVer = API.v1_23;
+            }
             else if (itemId == R.id.api_version_menu_1_19_1) {
                 apiVer = API.v1_19_1;
             }

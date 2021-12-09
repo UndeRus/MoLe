@@ -201,4 +201,5 @@
     <string name="config_restored">Успешно възстановяване на настройките</string>
     <string name="no_profile_restore_hint">… а може и да възстановите настройките от резервно копие</string>
     <string name="profile_not_available">Недостъпен профил</string>
+    <string name="api_1_23">Версия 1.23</string>
 </resources>

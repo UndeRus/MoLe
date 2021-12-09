@@ -210,4 +210,5 @@
     <string name="config_restored">Configuration restored successfully</string>
     <string name="no_profile_restore_hint">… or, you may restore from backup</string>
     <string name="profile_not_available">Profile not available</string>
+    <string name="api_1_23">Version 1.23</string>
 </resources>
