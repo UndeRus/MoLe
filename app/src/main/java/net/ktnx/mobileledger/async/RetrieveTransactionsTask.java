@@ -466,9 +466,9 @@ public class RetrieveTransactionsTask extends Thread {
                 return retrieveTransactionListForVersion(ver);
             }
             catch (Exception e) {
-                Logger.debug("json",
-                        String.format(Locale.US, "Error during account list retrieval using API %s",
-                                ver.getDescription()));
+                Logger.debug("json", String.format(Locale.US,
+                        "Error during transaction list retrieval using API %s",
+                        ver.getDescription()), e);
             }
 
         }
