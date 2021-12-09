@@ -1,5 +1,12 @@
 # Changes
 
+## [0.21.0] - 2021-12-09
+
+* NEW
+    + Add support for hledger-web 1.23
+* FIXES
+    + Ship database support file missed in v0.20.4
+
 ## [0.20.4] - 2021-11-18
 
 * KNOWN PROBLEMS
