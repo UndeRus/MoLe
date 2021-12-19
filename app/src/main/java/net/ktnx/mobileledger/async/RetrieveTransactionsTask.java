@@ -532,7 +532,7 @@ public class RetrieveTransactionsTask extends Thread {
                             apiVersion.getDescription()));
         }
 
-        // json interface returns transactions if file order and the rest of the machinery
+        // json interface returns transactions in file order and the rest of the machinery
         // expects them in reverse chronological order
         Collections.sort(trList, (o1, o2) -> {
             int res = o2.getDate()
