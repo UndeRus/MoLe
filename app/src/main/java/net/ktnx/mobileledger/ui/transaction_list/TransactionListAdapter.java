@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.ktnx.mobileledger.databinding.LastUpdateLayoutBinding;
 import net.ktnx.mobileledger.databinding.TransactionDelimiterBinding;
 import net.ktnx.mobileledger.databinding.TransactionListRowBinding;
-import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Logger;
 import net.ktnx.mobileledger.utils.Misc;
@@ -75,7 +74,9 @@ public class TransactionListAdapter extends RecyclerView.Adapter<TransactionRowH
                         return oldItem.getTransaction()
                                       .equals(newItem.getTransaction()) &&
                                Misc.equalStrings(oldItem.getBoldAccountName(),
-                                       newItem.getBoldAccountName());
+                                       newItem.getBoldAccountName()) &&
+                               Misc.equalStrings(oldItem.getRunningTotal(),
+                                       newItem.getRunningTotal());
                     case HEADER:
                         // headers don't differ in their contents. they observe the last update
                         // date and react to its changes
