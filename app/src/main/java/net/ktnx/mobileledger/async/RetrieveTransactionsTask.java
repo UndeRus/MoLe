@@ -439,6 +439,10 @@ public class RetrieveTransactionsTask extends Thread {
                 list.add(acc);
             }
             throwIfCancelled();
+
+            Logger.warn("accounts",
+                    String.format(Locale.US, "Got %d accounts using protocol %s", list.size(),
+                            version.getDescription()));
         }
 
         return list;
@@ -522,6 +526,10 @@ public class RetrieveTransactionsTask extends Thread {
             }
 
             throwIfCancelled();
+
+            Logger.warn("transactions",
+                    String.format(Locale.US, "Got %d transactions using protocol %s", trList.size(),
+                            apiVersion.getDescription()));
         }
 
         // json interface returns transactions if file order and the rest of the machinery
