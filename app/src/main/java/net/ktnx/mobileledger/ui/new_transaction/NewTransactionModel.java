@@ -443,7 +443,7 @@ public class NewTransactionModel extends ViewModel {
         LedgerTransaction tr = head.asLedgerTransaction();
 
         tr.setComment(head.getComment());
-        LedgerTransactionAccount emptyAmountAccount = null;
+        List<LedgerTransactionAccount> emptyAmountAccounts = new ArrayList<>();
         float emptyAmountAccountBalance = 0;
         for (int i = 1; i < list.size(); i++) {
             TransactionAccount item = list.get(i)
@@ -462,14 +462,20 @@ public class NewTransactionModel extends ViewModel {
                 emptyAmountAccountBalance += item.getAmount();
             }
             else {
-                emptyAmountAccount = acc;
+                emptyAmountAccounts.add(acc);
             }
 
             tr.addAccount(acc);
         }
 
-        if (emptyAmountAccount != null)
-            emptyAmountAccount.setAmount(-emptyAmountAccountBalance);
+        if (emptyAmountAccounts.size() > 0) {
+            if (emptyAmountAccounts.size() > 1 && !Misc.isZero(emptyAmountAccountBalance))
+                throw new RuntimeException(String.format(Locale.US,
+                        "Should not happen. %d accounts with non zero amount to distribute (%5" +
+                        ".3f)"));
+            for (LedgerTransactionAccount a : emptyAmountAccounts)
+                a.setAmount(-emptyAmountAccountBalance);
+        }
 
         return tr;
     }
