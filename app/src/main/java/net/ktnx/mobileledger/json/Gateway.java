@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 Damyan Ivanov.
+ * Copyright © 2021 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -30,8 +30,11 @@ abstract public class Gateway {
                 return new net.ktnx.mobileledger.json.v1_15.Gateway();
             case v1_19_1:
                 return new net.ktnx.mobileledger.json.v1_19_1.Gateway();
+            case v1_23:
+                return new net.ktnx.mobileledger.json.v1_23.Gateway();
             default:
-                throw new RuntimeException("Unsupported JSON API version " + apiVersion);
+                throw new RuntimeException(
+                        "JSON API version " + apiVersion + " save implementation missing");
         }
     }
     public abstract String transactionSaveRequest(LedgerTransaction ledgerTransaction)
