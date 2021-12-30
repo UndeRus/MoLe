@@ -1,5 +1,12 @@
 # Changes
 
+## [0.21.1] - 2021-12-30
+
+* FIXES
+    + add hledger-web 1.23 support when adding transactions too
+    + correct running total when a matching transaction is added in the past
+    + fix crash when sending transaction containing only empty amounts
+
 ## [0.21.0] - 2021-12-09
 
 * NEW
