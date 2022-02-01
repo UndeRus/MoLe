@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package net.ktnx.mobileledger.ui.new_transaction;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -443,14 +444,14 @@ public class NewTransactionModel extends ViewModel {
         LedgerTransaction tr = head.asLedgerTransaction();
 
         tr.setComment(head.getComment());
-        List<LedgerTransactionAccount> emptyAmountAccounts = new ArrayList<>();
-        float emptyAmountAccountBalance = 0;
+        HashMap<String, List<LedgerTransactionAccount>> emptyAmountAccounts = new HashMap<>();
+        HashMap<String, Float> emptyAmountAccountBalance = new HashMap<>();
         for (int i = 1; i < list.size(); i++) {
             TransactionAccount item = list.get(i)
                                           .toTransactionAccount();
+            String currency = item.getCurrency();
             LedgerTransactionAccount acc = new LedgerTransactionAccount(item.getAccountName()
-                                                                            .trim(),
-                    item.getCurrency());
+                                                                            .trim(), currency);
             if (acc.getAccountName()
                    .isEmpty())
                 continue;
@@ -459,22 +460,49 @@ public class NewTransactionModel extends ViewModel {
 
             if (item.isAmountSet()) {
                 acc.setAmount(item.getAmount());
-                emptyAmountAccountBalance += item.getAmount();
+                Float emptyCurrBalance = emptyAmountAccountBalance.get(currency);
+                if (emptyCurrBalance == null) {
+                    emptyAmountAccountBalance.put(currency, item.getAmount());
+                }
+                else {
+                    emptyAmountAccountBalance.put(currency, emptyCurrBalance + item.getAmount());
+                }
             }
             else {
-                emptyAmountAccounts.add(acc);
+                List<LedgerTransactionAccount> emptyCurrAccounts =
+                        emptyAmountAccounts.get(currency);
+                if (emptyCurrAccounts == null)
+                    emptyAmountAccounts.put(currency, emptyCurrAccounts = new ArrayList<>());
+                emptyCurrAccounts.add(acc);
             }
 
             tr.addAccount(acc);
         }
 
         if (emptyAmountAccounts.size() > 0) {
-            if (emptyAmountAccounts.size() > 1 && !Misc.isZero(emptyAmountAccountBalance))
-                throw new RuntimeException(String.format(Locale.US,
-                        "Should not happen. %d accounts with non zero amount to distribute (%5" +
-                        ".3f)"));
-            for (LedgerTransactionAccount a : emptyAmountAccounts)
-                a.setAmount(-emptyAmountAccountBalance);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                emptyAmountAccounts.forEach((currency, accounts) -> {
+                    if (accounts.size() != 1)
+                        throw new RuntimeException(String.format(Locale.US,
+                                "Should not happen: approved transaction has %d accounts for " +
+                                "currency %s", accounts.size(), currency));
+                    accounts.get(0)
+                            .setAmount(-emptyAmountAccountBalance.get(currency));
+                });
+            }
+            else {
+                for (String currency : emptyAmountAccounts.keySet()) {
+                    List<LedgerTransactionAccount> accounts =
+                            Objects.requireNonNull(emptyAmountAccounts.get(currency));
+
+                    if (accounts.size() != 1)
+                        throw new RuntimeException(String.format(Locale.US,
+                                "Should not happen: approved transaction has %d accounts for " +
+                                "currency %s", accounts.size(), currency));
+                    accounts.get(0)
+                            .setAmount(-emptyAmountAccountBalance.get(currency));
+                }
+            }
         }
 
         return tr;
