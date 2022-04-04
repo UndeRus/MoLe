@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -219,6 +219,8 @@ public class TemplateHeader extends TemplateBase {
     public TemplateHeader createDuplicate() {
         TemplateHeader dup = new TemplateHeader(this);
         dup.id = 0;
+        dup.uuid = UUID.randomUUID()
+                       .toString();
 
         return dup;
     }
