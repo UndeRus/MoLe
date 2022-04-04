@@ -530,6 +530,7 @@ public class NewTransactionModel extends ViewModel {
         int singleNegativeIndex = -1;
         int singlePositiveIndex = -1;
         int negativeCount = 0;
+        boolean hasCurrency = false;
         for (int i = 0; i < accounts.size(); i++) {
             LedgerTransactionAccount acc = accounts.get(i);
             TransactionAccount item = new TransactionAccount(acc.getAccountName(),
@@ -559,6 +560,10 @@ public class NewTransactionModel extends ViewModel {
             }
             else
                 item.resetAmount();
+
+            if (item.getCurrency()
+                    .length() > 0)
+                hasCurrency = true;
         }
         if (BuildConfig.DEBUG)
             dumpItemList("Loaded previous transaction", newList);
@@ -572,9 +577,12 @@ public class NewTransactionModel extends ViewModel {
             moveItemLast(newList, singlePositiveIndex);
         }
 
+        final boolean foundTransactionHasCurrency = hasCurrency;
         Misc.onMainThread(() -> {
             setItems(newList);
             noteFocusChanged(1, FocusedElement.Amount);
+            if (foundTransactionHasCurrency)
+                showCurrency.setValue(true);
         });
     }
     /**
@@ -764,8 +772,8 @@ public class NewTransactionModel extends ViewModel {
                                 !Misc.equalStrings(acc.getAmountHint(), hint))
                             {
                                 Logger.debug("submittable",
-                                        String.format("Setting amount hint of {%s} to %s [%s]",
-                                                acc.toString(), hint, balCurrency));
+                                        String.format("Setting amount hint of {%s} to %s [%s]", acc,
+                                                hint, balCurrency));
                                 acc.setAmountHint(hint);
                                 listChanged = true;
                             }
@@ -1060,7 +1068,7 @@ public class NewTransactionModel extends ViewModel {
                 b.append(String.format(" '%s'", description));
 
             if (date != null)
-                b.append(String.format("@%s", date.toString()));
+                b.append(String.format("@%s", date));
 
             if (!TextUtils.isEmpty(comment))
                 b.append(String.format(" /%s/", comment));
@@ -1298,8 +1306,7 @@ public class NewTransactionModel extends ViewModel {
             equal = equal && Misc.equalStrings(currency, other.currency) && isLast == other.isLast;
 
             Logger.debug("new-trans",
-                    String.format("Comparing {%s} and {%s}: %s", this.toString(), other.toString(),
-                            equal));
+                    String.format("Comparing {%s} and {%s}: %s", this, other, equal));
             return equal;
         }
         public int getAccountNameCursorPosition() {
