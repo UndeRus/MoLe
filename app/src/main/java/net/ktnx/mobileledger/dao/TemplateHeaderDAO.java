@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -137,7 +137,7 @@ public abstract class TemplateHeaderDAO {
                 Misc.onMainThread(callback);
         });
     }
-    public void duplicateTemplateWitAccounts(@NonNull Long id, @Nullable
+    public void duplicateTemplateWithAccounts(@NonNull Long id, @Nullable
             AsyncResultCallback<TemplateWithAccounts> callback) {
         BaseDAO.runAsync(() -> {
             TemplateWithAccounts src = getTemplateWithAccountsSync(id);

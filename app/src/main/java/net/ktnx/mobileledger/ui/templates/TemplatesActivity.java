@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -119,7 +119,7 @@ public class TemplatesActivity extends CrashReportingActivity
     public void onDuplicateTemplate(long id) {
         DB.get()
           .getTemplateDAO()
-          .duplicateTemplateWitAccounts(id, null);
+          .duplicateTemplateWithAccounts(id, null);
     }
     @Override
     public void onEditTemplate(Long id) {
