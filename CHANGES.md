@@ -1,5 +1,14 @@
 # Changes
 
+## [0.21.2] = 2022-04-04
+
+* FIXES
+    + fix crash when auto-balancing multi currency transaction
+    + fix crash when duplicating template
+    + fix crash when restoring configuration backup
+* IMPROVEMENTS
+    + new transaction: turn on commodity setting when loading previous transaction with commodities
+
 ## [0.21.1] - 2021-12-30
 
 * FIXES
