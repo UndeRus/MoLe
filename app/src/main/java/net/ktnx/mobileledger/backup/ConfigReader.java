@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -45,7 +45,7 @@ public class ConfigReader extends ConfigIO {
     }
     @Override
     protected void initStream() {
-        RawConfigReader r = new RawConfigReader(new FileInputStream(pfd.getFileDescriptor()));
+        r = new RawConfigReader(new FileInputStream(pfd.getFileDescriptor()));
     }
     @Override
     protected void processStream() throws IOException {
