@@ -1,6 +1,15 @@
 # Changes
 
-## [0.21.2] = 2022-04-04
+## [0.21.3] - 2022-04-06
+
+* FIXES
+    + sync gradle version requirements
+* OTHERS
+    + bump version of several dependent libraries
+    + bump SDK version to 31
+    + adjust deprecated constructor usage
+
+## [0.21.2] - 2022-04-04
 
 * FIXES
     + fix crash when auto-balancing multi currency transaction

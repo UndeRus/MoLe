@@ -1,0 +1,6 @@
+* FIXES
+    + sync gradle version requirements
+* OTHERS
+    + bump version of several dependent libraries
+    + bump SDK version to 31
+    + adjust deprecated constructor usage
