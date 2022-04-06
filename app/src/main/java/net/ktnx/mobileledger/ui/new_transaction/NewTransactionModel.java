@@ -487,7 +487,8 @@ public class NewTransactionModel extends ViewModel {
                                 "Should not happen: approved transaction has %d accounts for " +
                                 "currency %s", accounts.size(), currency));
                     accounts.get(0)
-                            .setAmount(-emptyAmountAccountBalance.get(currency));
+                            .setAmount(-Objects.requireNonNull(
+                                    emptyAmountAccountBalance.get(currency)));
                 });
             }
             else {
@@ -500,7 +501,8 @@ public class NewTransactionModel extends ViewModel {
                                 "Should not happen: approved transaction has %d accounts for " +
                                 "currency %s", accounts.size(), currency));
                     accounts.get(0)
-                            .setAmount(-emptyAmountAccountBalance.get(currency));
+                            .setAmount(-Objects.requireNonNull(
+                                    emptyAmountAccountBalance.get(currency)));
                 }
             }
         }
