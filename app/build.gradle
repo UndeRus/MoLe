@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     defaultConfig {
         applicationId "net.ktnx.mobileledger"
         minSdkVersion 22
-        targetSdkVersion 30
+        targetSdkVersion 31
         vectorDrawables.useSupportLibrary true
         versionCode 51
         versionName '0.21.2'
