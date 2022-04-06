@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -68,9 +68,8 @@ public class BackupsActivity extends AppCompatActivity {
         b.restoreButton.setOnClickListener(this::restoreClicked);
 
 
-        backupChooserLauncher =
-                registerForActivityResult(new ActivityResultContracts.CreateDocument(),
-                        this::storeConfig);
+        backupChooserLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("application/json"), this::storeConfig);
         restoreChooserLauncher =
                 registerForActivityResult(new ActivityResultContracts.OpenDocument(),
                         this::readConfig);
