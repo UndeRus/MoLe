@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -15,23 +15,6 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-//
-// Substantial portions taken from DividerItemDecoration subject to the following license terms:
-//
-// Copyright 2018 The Android Open Source Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
 package net.ktnx.mobileledger.ui.templates;
 
 import android.content.Context;
@@ -94,7 +77,8 @@ class TemplateListDivider extends DividerItemDecoration {
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
             final int childAdapterPosition = parent.getChildAdapterPosition(child);
-            if (adapter.getItemViewType(childAdapterPosition) ==
+            if (childAdapterPosition == RecyclerView.NO_POSITION ||
+                adapter.getItemViewType(childAdapterPosition) ==
                 TemplatesRecyclerViewAdapter.ITEM_TYPE_DIVIDER ||
                 childAdapterPosition + 1 < itemCount &&
                 adapter.getItemViewType(childAdapterPosition + 1) ==
@@ -110,6 +94,10 @@ class TemplateListDivider extends DividerItemDecoration {
     }
 
     private void drawHorizontal(Canvas canvas, RecyclerView parent) {
+        final RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+        if (layoutManager == null)
+            return;
+
         canvas.save();
         final int top;
         final int bottom;
@@ -133,14 +121,16 @@ class TemplateListDivider extends DividerItemDecoration {
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
             final int childAdapterPosition = parent.getChildAdapterPosition(child);
-            if (adapter.getItemViewType(childAdapterPosition) ==
+            if (childAdapterPosition == RecyclerView.NO_POSITION ||
+                adapter.getItemViewType(childAdapterPosition) ==
                 TemplatesRecyclerViewAdapter.ITEM_TYPE_DIVIDER ||
                 childAdapterPosition + 1 < itemCount &&
                 adapter.getItemViewType(childAdapterPosition + 1) ==
                 TemplatesRecyclerViewAdapter.ITEM_TYPE_DIVIDER)
+            {
                 continue;
-            parent.getLayoutManager()
-                  .getDecoratedBoundsWithMargins(child, mBounds);
+            }
+            layoutManager.getDecoratedBoundsWithMargins(child, mBounds);
             final int right = mBounds.right + Math.round(child.getTranslationX());
             final int left = right - divider.getIntrinsicWidth();
             divider.setBounds(left, top, right, bottom);
@@ -156,7 +146,8 @@ class TemplateListDivider extends DividerItemDecoration {
                 (TemplatesRecyclerViewAdapter) Objects.requireNonNull(parent.getAdapter());
         final int itemCount = adapter.getItemCount();
 
-        if (adapter.getItemViewType(childAdapterPosition) ==
+        if (childAdapterPosition == RecyclerView.NO_POSITION ||
+            adapter.getItemViewType(childAdapterPosition) ==
             TemplatesRecyclerViewAdapter.ITEM_TYPE_DIVIDER ||
             childAdapterPosition + 1 < itemCount &&
             adapter.getItemViewType(childAdapterPosition + 1) ==
