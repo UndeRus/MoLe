@@ -59,7 +59,7 @@ public class ParsedPosting extends net.ktnx.mobileledger.json.ParsedPosting {
         ParsedStyle style = new ParsedStyle();
         style.setAscommodityside(getCommoditySide());
         style.setAscommodityspaced(getCommoditySpaced());
-        style.setAsprecision(new ParsedPrecision(2));
+        style.setAsprecision(2);
         style.setAsdecimalpoint('.');
         amt.setAstyle(style);
         if (acc.getCurrency() != null)

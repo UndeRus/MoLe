@@ -21,13 +21,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedStyle extends net.ktnx.mobileledger.json.ParsedStyle {
-    private ParsedPrecision asprecision;
+    private int asprecision;
     public ParsedStyle() {
     }
-    public ParsedPrecision getAsprecision() {
+    public int getAsprecision() {
         return asprecision;
     }
-    public void setAsprecision(ParsedPrecision asprecision) {
+    public void setAsprecision(int asprecision) {
         this.asprecision = asprecision;
     }
 }
