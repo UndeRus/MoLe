@@ -18,9 +18,9 @@
 package net.ktnx.mobileledger.json.v1_23;
 
 class ParsedSourcePos {
-    private String sourceName;
-    private int sourceLine;
-    private int sourceColumn;
+    private String sourceName = "";
+    private int sourceLine = 1;
+    private int sourceColumn = 1;
     public ParsedSourcePos() {
     }
     public String getSourceName() {

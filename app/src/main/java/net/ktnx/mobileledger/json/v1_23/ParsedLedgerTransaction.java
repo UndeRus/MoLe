@@ -43,6 +43,12 @@ public class ParsedLedgerTransaction implements net.ktnx.mobileledger.json.Parse
     private List<List<String>> ttags = new ArrayList<>();
     private List<ParsedSourcePos> tsourcepos = new ArrayList<>();
     public ParsedLedgerTransaction() {
+        ParsedSourcePos startPos = new ParsedSourcePos();
+        ParsedSourcePos endPos = new ParsedSourcePos();
+        endPos.setSourceLine(2);
+
+        tsourcepos.add(startPos);
+        tsourcepos.add(endPos);
     }
     public static ParsedLedgerTransaction fromLedgerTransaction(LedgerTransaction tr) {
         ParsedLedgerTransaction result = new ParsedLedgerTransaction();
