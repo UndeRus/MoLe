@@ -482,27 +482,28 @@ public class NewTransactionModel extends ViewModel {
         if (emptyAmountAccounts.size() > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 emptyAmountAccounts.forEach((currency, accounts) -> {
-                    if (accounts.size() != 1)
+                    final Float balance = emptyAmountAccountBalance.get(currency);
+
+                    if (balance != null && !Misc.isZero(balance) && accounts.size() != 1) {
                         throw new RuntimeException(String.format(Locale.US,
-                                "Should not happen: approved transaction has %d accounts for " +
-                                "currency %s", accounts.size(), currency));
-                    accounts.get(0)
-                            .setAmount(-Objects.requireNonNull(
-                                    emptyAmountAccountBalance.get(currency)));
+                                "Should not happen: approved transaction has %d accounts " +
+                                "without amounts for currency '%s'", accounts.size(), currency));
+                    }
+                    accounts.forEach(acc -> acc.setAmount(balance == null ? 0 : -balance));
                 });
             }
             else {
                 for (String currency : emptyAmountAccounts.keySet()) {
                     List<LedgerTransactionAccount> accounts =
                             Objects.requireNonNull(emptyAmountAccounts.get(currency));
-
-                    if (accounts.size() != 1)
+                    final Float balance = emptyAmountAccountBalance.get(currency);
+                    if (balance != null && !Misc.isZero(balance) && accounts.size() != 1)
                         throw new RuntimeException(String.format(Locale.US,
                                 "Should not happen: approved transaction has %d accounts for " +
                                 "currency %s", accounts.size(), currency));
-                    accounts.get(0)
-                            .setAmount(-Objects.requireNonNull(
-                                    emptyAmountAccountBalance.get(currency)));
+                    for (LedgerTransactionAccount acc : accounts) {
+                        acc.setAmount(balance == null ? 0 : -balance);
+                    }
                 }
             }
         }
