@@ -1,5 +1,12 @@
 # Changes
 
+## [0.21.4] - 2022-06-18
+
+* FIXES
+    + fix compatibility wuth hledger-web 1.23+ when submitting new transactions. Thanks to Faye Duxovni for the patch!
+    + fix a crash when deleting templates
+    + fix a rare crash when submitting transactions with multiple accounts with no amounts with zero remaining balance
+
 ## [0.21.3] - 2022-04-06
 
 * FIXES
