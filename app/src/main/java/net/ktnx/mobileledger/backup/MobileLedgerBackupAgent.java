@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2022 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 package net.ktnx.mobileledger.backup;
 
-import android.app.backup.BackupAgentHelper;
+import android.app.backup.BackupAgent;
 import android.app.backup.BackupDataInput;
 import android.app.backup.BackupDataOutput;
 import android.os.ParcelFileDescriptor;
@@ -29,13 +29,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-class MobileLedgerBackupAgent extends BackupAgentHelper {
+public class MobileLedgerBackupAgent extends BackupAgent {
     private static final int READ_BUF_LEN = 10;
     public static String SETTINGS_KEY = "settings";
     @Override
     public void onBackup(ParcelFileDescriptor oldState, BackupDataOutput data,
                          ParcelFileDescriptor newState) throws IOException {
-        super.onBackup(oldState, data, newState);
+        Logger.debug("backup", "onBackup()");
         backupSettings(data);
         newState.close();
     }
