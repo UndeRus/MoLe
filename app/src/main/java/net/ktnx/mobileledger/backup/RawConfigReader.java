@@ -20,6 +20,7 @@ package net.ktnx.mobileledger.backup;
 import android.util.JsonReader;
 import android.util.JsonToken;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.backup.ConfigIO.Keys;
 import net.ktnx.mobileledger.dao.CurrencyDAO;
 import net.ktnx.mobileledger.dao.ProfileDAO;
@@ -30,6 +31,8 @@ import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.TemplateAccount;
 import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.db.TemplateWithAccounts;
+import net.ktnx.mobileledger.model.Data;
+import net.ktnx.mobileledger.utils.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -337,6 +340,7 @@ public class RawConfigReader {
         restoreCommodities();
         restoreProfiles();
         restoreTemplates();
+        restoreCurrentProfile();
     }
     private void restoreTemplates() {
         if (templates == null)
@@ -372,6 +376,26 @@ public class RawConfigReader {
         for (Currency c : commodities) {
             if (dao.getByNameSync(c.getName()) == null)
                 dao.insert(c);
+        }
+    }
+    private void restoreCurrentProfile() {
+        if (currentProfile == null) {
+            Logger.debug("backup", "Not restoring current profile (not present in backup)");
+            return;
+        }
+
+        ProfileDAO dao = DB.get()
+                           .getProfileDAO();
+
+        Profile p = dao.getByUuidSync(currentProfile);
+
+        if (p != null) {
+            Logger.debug("backup", "Restoring current profile "+p.getName());
+            Data.postCurrentProfile(p);
+            App.storeStartupProfileAndTheme(p.getId(), p.getTheme());
+        }
+        else {
+            Logger.debug("backup", "Not restoring profile "+currentProfile+": not found in DB");
         }
     }
 }
