@@ -1,5 +1,10 @@
 # Changes
 
+## [0.21.6] - 2023-06-20
+
+* FIXES
+    + fix sending transations to hledger-web 1.23+
+
 ## [0.21.5] - 2022-09-03
 
 * FIXES

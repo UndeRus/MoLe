@@ -1,0 +1,2 @@
+* FIXES:
+    + fixed sending of transactions to hledger-web 1.23+

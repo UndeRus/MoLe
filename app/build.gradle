@@ -1,5 +1,5 @@
 /*
- * Copyright © 2022 Damyan Ivanov.
+ * Copyright © 2023 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -24,8 +24,8 @@ android {
         minSdkVersion 22
         targetSdkVersion 31
         vectorDrawables.useSupportLibrary true
-        versionCode 54
-        versionName '0.21.5'
+        versionCode 55
+        versionName '0.21.6'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
