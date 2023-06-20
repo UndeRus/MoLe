@@ -287,9 +287,7 @@ public class SendTransactionTask extends Thread {
             error = e.getMessage();
         }
 
-        Misc.onMainThread(()->{
-            taskCallback.onTransactionSaveDone(error, transaction);
-        });
+        Misc.onMainThread(() -> taskCallback.onTransactionSaveDone(error, transaction));
     }
     private void legacySendOkWithRetry() throws IOException {
         int tried = 0;
