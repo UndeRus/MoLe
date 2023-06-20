@@ -17,6 +17,8 @@
 
 package net.ktnx.mobileledger.async;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 import android.util.Log;
 
 import net.ktnx.mobileledger.db.Profile;
@@ -44,8 +46,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static net.ktnx.mobileledger.utils.Logger.debug;
 
 /* TODO: get rid of the custom session/cookie and auth code?
  *       (the last problem with the POST was the missing content-length header)
