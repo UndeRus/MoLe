@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2023 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -275,6 +275,7 @@ public class SendTransactionTask extends Thread {
                 case v1_14:
                 case v1_15:
                 case v1_19_1:
+                case v1_23:
                     sendOK(profileApiVersion);
                     break;
                 default:
