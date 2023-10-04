@@ -21,4 +21,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ParsedQuantity extends net.ktnx.mobileledger.json.ParsedQuantity {
+    public ParsedQuantity(String s) {
+        super(s);
+    }
+
+    public ParsedQuantity() {
+        super();
+    }
 }
