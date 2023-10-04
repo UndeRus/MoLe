@@ -27,25 +27,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.core.view.MenuCompat;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import net.ktnx.mobileledger.BuildConfig;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.DescriptionSelectedCallback;
 import net.ktnx.mobileledger.async.GeneralBackgroundTasks;
-import net.ktnx.mobileledger.async.SendTransactionTask;
 import net.ktnx.mobileledger.async.TaskCallback;
 import net.ktnx.mobileledger.dao.BaseDAO;
 import net.ktnx.mobileledger.dao.TransactionDAO;
 import net.ktnx.mobileledger.databinding.ActivityNewTransactionBinding;
 import net.ktnx.mobileledger.db.DB;
+import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.TemplateHeader;
 import net.ktnx.mobileledger.db.TransactionWithAccounts;
 import net.ktnx.mobileledger.model.Data;
@@ -65,6 +58,18 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.core.view.MenuCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class NewTransactionActivity extends ProfileThemedActivity
@@ -77,6 +82,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
     private ActivityResultLauncher<Void> qrScanLauncher;
     private ActivityNewTransactionBinding b;
     private FabManager fabManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +97,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                 intent.setFlags(Intent.FLAG_ACTIVITY_TASK_ON_HOME | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
-            }
-            else
+            } else
                 b.toolbar.setSubtitle(profile.getName());
         });
 
@@ -101,7 +106,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
         navController = navHostFragment.getNavController();
 
         Objects.requireNonNull(getSupportActionBar())
-               .setDisplayHomeAsUpEnabled(true);
+                .setDisplayHomeAsUpEnabled(true);
 
         model = new ViewModelProvider(this).get(NewTransactionModel.class);
 
@@ -110,18 +115,18 @@ public class NewTransactionActivity extends ProfileThemedActivity
         fabManager = new FabManager(b.fabAdd);
 
         model.isSubmittable()
-             .observe(this, isSubmittable -> {
-                 if (isSubmittable) {
-                     fabManager.showFab();
-                 }
-                 else {
-                     fabManager.hideFab();
-                 }
-             });
+                .observe(this, isSubmittable -> {
+                    if (isSubmittable) {
+                        fabManager.showFab();
+                    } else {
+                        fabManager.hideFab();
+                    }
+                });
 //        viewModel.checkTransactionSubmittable(listAdapter);
 
         b.fabAdd.setOnClickListener(v -> onFabPressed());
     }
+
     @Override
     protected void initProfile() {
         long profileId = getIntent().getLongExtra(PARAM_PROFILE_ID, 0);
@@ -142,11 +147,13 @@ public class NewTransactionActivity extends ProfileThemedActivity
         setupProfileColors(profileHue);
         initProfile(profileId);
     }
+
     @Override
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.dummy, R.anim.slide_out_down);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -155,27 +162,38 @@ public class NewTransactionActivity extends ProfileThemedActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void onTransactionSave(LedgerTransaction tr) {
         navController.navigate(R.id.action_newTransactionFragment_to_newTransactionSavingFragment);
-        try {
+        //TODO: rework here to WorkManager
 
-            SendTransactionTask saver =
-                    new SendTransactionTask(this, mProfile, tr, model.getSimulateSaveFlag());
-            saver.start();
-        }
-        catch (Exception e) {
-            debug("new-transaction", "Unknown error: " + e);
-
-            Bundle b = new Bundle();
-            b.putString("error", "unknown error");
-            navController.navigate(R.id.newTransactionFragment, b);
-        }
+        queueTransaction(mProfile, tr, model.getSimulateSaveFlag());
     }
+
+    private void queueTransaction(Profile profile, LedgerTransaction transaction, boolean simulateSave) {
+        WorkManager workManager = WorkManager.getInstance(this);
+        //workManager.enqueue(new OneTimeWorkRequest.Builder(new NewTransactionWorker()));
+
+        OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(NewTransactionWorker.class)
+                .setInputData(NewTransactionWorker.createInputData(profile, transaction, simulateSave))
+                .setConstraints(new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .build();
+        workManager.enqueue(request);
+        workManager.getWorkInfoByIdLiveData(request.getId()).observe(this, workInfo -> {
+            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                onTransactionSaveDone(null, transaction);
+            }
+        });
+    }
+
     public boolean onSimulateCrashMenuItemClicked(MenuItem item) {
         debug("crash", "Will crash intentionally");
-        GeneralBackgroundTasks.run(() -> { throw new RuntimeException("Simulated crash");});
+        GeneralBackgroundTasks.run(() -> {
+            throw new RuntimeException("Simulated crash");
+        });
         return true;
     }
+
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
 
@@ -188,16 +206,16 @@ public class NewTransactionActivity extends ProfileThemedActivity
         MenuCompat.setGroupDividerEnabled(menu, true);
 
         menu.findItem(R.id.action_simulate_save)
-            .setOnMenuItemClickListener(this::onToggleSimulateSaveMenuItemClicked);
+                .setOnMenuItemClickListener(this::onToggleSimulateSaveMenuItemClicked);
         menu.findItem(R.id.action_simulate_crash)
-            .setOnMenuItemClickListener(this::onSimulateCrashMenuItemClicked);
+                .setOnMenuItemClickListener(this::onSimulateCrashMenuItemClicked);
 
         model.getSimulateSave()
-             .observe(this, state -> {
-                 menu.findItem(R.id.action_simulate_save)
-                     .setChecked(state);
-                 b.simulationLabel.setVisibility(state ? View.VISIBLE : View.GONE);
-             });
+                .observe(this, state -> {
+                    menu.findItem(R.id.action_simulate_save)
+                            .setChecked(state);
+                    b.simulationLabel.setVisibility(state ? View.VISIBLE : View.GONE);
+                });
 
         return true;
     }
@@ -207,25 +225,27 @@ public class NewTransactionActivity extends ProfileThemedActivity
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                 getResources().getDisplayMetrics()));
     }
+
     @Override
     public void onTransactionSaveDone(String error, Object arg) {
         Bundle b = new Bundle();
         if (error != null) {
             b.putString("error", error);
             navController.navigate(R.id.action_newTransactionSavingFragment_Failure, b);
-        }
-        else {
+        } else {
             navController.navigate(R.id.action_newTransactionSavingFragment_Success, b);
 
             BaseDAO.runAsync(() -> commitToDb((LedgerTransaction) arg));
         }
     }
+
     public void commitToDb(LedgerTransaction tr) {
         TransactionWithAccounts dbTransaction = tr.toDBO();
         DB.get()
-          .getTransactionDAO()
-          .appendSync(dbTransaction);
+                .getTransactionDAO()
+                .appendSync(dbTransaction);
     }
+
     public boolean onToggleSimulateSaveMenuItemClicked(MenuItem item) {
         model.toggleSimulateSave();
         return true;
@@ -235,21 +255,24 @@ public class NewTransactionActivity extends ProfileThemedActivity
     public void triggerQRScan() {
         qrScanLauncher.launch(null);
     }
+
     private void startNewPatternActivity(String scanned) {
         Intent intent = new Intent(this, TemplatesActivity.class);
         Bundle args = new Bundle();
         args.putString(TemplatesActivity.ARG_ADD_TEMPLATE, scanned);
         startActivity(intent, args);
     }
+
     private void alertNoTemplateMatch(String scanned) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setCancelable(true)
-               .setMessage(R.string.no_template_matches)
-               .setPositiveButton(R.string.add_button,
-                       (dialog, which) -> startNewPatternActivity(scanned))
-               .create()
-               .show();
+                .setMessage(R.string.no_template_matches)
+                .setPositiveButton(R.string.add_button,
+                        (dialog, which) -> startNewPatternActivity(scanned))
+                .create()
+                .show();
     }
+
     public void onQRScanResult(String text) {
         Logger.debug("qr", String.format("Got QR scan result [%s]", text));
 
@@ -257,8 +280,8 @@ public class NewTransactionActivity extends ProfileThemedActivity
             return;
 
         LiveData<List<TemplateHeader>> allTemplates = DB.get()
-                                                        .getTemplateDAO()
-                                                        .getTemplates();
+                .getTemplateDAO()
+                .getTemplates();
         allTemplates.observe(this, templateHeaders -> {
             ArrayList<MatchedTemplate> matchingFallbackTemplates = new ArrayList<>();
             ArrayList<MatchedTemplate> matchingTemplates = new ArrayList<>();
@@ -281,8 +304,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                                 new MatchedTemplate(ph, matcher.toMatchResult()));
                     else
                         matchingTemplates.add(new MatchedTemplate(ph, matcher.toMatchResult()));
-                }
-                catch (ParcelFormatException e) {
+                } catch (ParcelFormatException e) {
                     // ignored
                     Logger.debug("pattern",
                             String.format("Error compiling regular expression '%s'", patternSource),
@@ -301,6 +323,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                 chooseTemplate(matchingTemplates, text);
         });
     }
+
     private void chooseTemplate(ArrayList<MatchedTemplate> matchingTemplates, String matchedText) {
         final String templateNameColumn = "name";
         AbstractCursor cursor = new AbstractCursor() {
@@ -308,42 +331,51 @@ public class NewTransactionActivity extends ProfileThemedActivity
             public int getCount() {
                 return matchingTemplates.size();
             }
+
             @Override
             public String[] getColumnNames() {
                 return new String[]{"_id", templateNameColumn};
             }
+
             @Override
             public String getString(int column) {
                 if (column == 0)
                     return String.valueOf(getPosition());
                 return matchingTemplates.get(getPosition()).templateHead.getName();
             }
+
             @Override
             public short getShort(int column) {
                 if (column == 0)
                     return (short) getPosition();
                 return -1;
             }
+
             @Override
             public int getInt(int column) {
                 return getShort(column);
             }
+
             @Override
             public long getLong(int column) {
                 return getShort(column);
             }
+
             @Override
             public float getFloat(int column) {
                 return getShort(column);
             }
+
             @Override
             public double getDouble(int column) {
                 return getShort(column);
             }
+
             @Override
             public boolean isNull(int column) {
                 return false;
             }
+
             @Override
             public int getColumnCount() {
                 return 2;
@@ -352,15 +384,16 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
         builder.setCancelable(true)
-               .setTitle(R.string.choose_template_to_apply)
-               .setIcon(R.drawable.ic_baseline_auto_graph_24)
-               .setSingleChoiceItems(cursor, -1, templateNameColumn, (dialog, which) -> {
-                   model.applyTemplate(matchingTemplates.get(which), matchedText);
-                   dialog.dismiss();
-               })
-               .create()
-               .show();
+                .setTitle(R.string.choose_template_to_apply)
+                .setIcon(R.drawable.ic_baseline_auto_graph_24)
+                .setSingleChoiceItems(cursor, -1, templateNameColumn, (dialog, which) -> {
+                    model.applyTemplate(matchingTemplates.get(which), matchedText);
+                    dialog.dismiss();
+                })
+                .create()
+                .show();
     }
+
     public void onDescriptionSelected(String description) {
         debug("description selected", description);
         if (!model.accountListIsEmpty())
@@ -370,7 +403,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
             String accFilter = mProfile.getPreferredAccountsFilter();
 
             TransactionDAO trDao = DB.get()
-                                     .getTransactionDAO();
+                    .getTransactionDAO();
 
             TransactionWithAccounts tr = null;
 
@@ -383,6 +416,7 @@ public class NewTransactionActivity extends ProfileThemedActivity
                 model.loadTransactionIntoModel(tr);
         });
     }
+
     private void onFabPressed() {
         fabManager.hideFab();
         Misc.hideSoftKeyboard(this);
@@ -391,16 +425,19 @@ public class NewTransactionActivity extends ProfileThemedActivity
 
         onTransactionSave(tr);
     }
+
     @Override
     public Context getContext() {
         return this;
     }
+
     @Override
     public void showManagedFab() {
         if (Objects.requireNonNull(model.isSubmittable()
-                                        .getValue()))
+                .getValue()))
             fabManager.showFab();
     }
+
     @Override
     public void hideManagedFab() {
         fabManager.hideFab();

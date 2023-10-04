@@ -115,14 +115,18 @@ public class Misc {
         int lastPos = 0;
         int pos = input.indexOf(':');
 
-        while (pos >= 0) {
-            result.append(input.substring(lastPos, pos + 1))
-                  .append(ZERO_WIDTH_SPACE);
-            lastPos = pos + 1;
-            pos = input.indexOf(':', lastPos + 1);
+        if (pos != -1) {
+            while (pos >= 0) {
+                result.append(input.substring(lastPos, pos + 1))
+                        .append(ZERO_WIDTH_SPACE);
+                lastPos = pos + 1;
+                pos = input.indexOf(':', lastPos + 1);
+            }
+            if (lastPos > 0)
+                result.append(input.substring(lastPos));
+        } else {
+            result.append(input);
         }
-        if (lastPos > 0)
-            result.append(input.substring(lastPos));
 
         return result.toString();
     }

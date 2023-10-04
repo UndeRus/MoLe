@@ -17,8 +17,7 @@
 
 package net.ktnx.mobileledger.model;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import com.google.gson.annotations.Expose;
 
 import net.ktnx.mobileledger.db.Profile;
 import net.ktnx.mobileledger.db.Transaction;
@@ -35,9 +34,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class LedgerTransaction {
     private static final String DIGEST_TYPE = "SHA-256";
-    public final Comparator<LedgerTransactionAccount> comparator = (o1, o2) -> {
+
+    @Expose (serialize = false, deserialize = false)
+    public final transient Comparator<LedgerTransactionAccount> comparator = (o1, o2) -> {
         int res = o1.getAccountName()
                     .compareTo(o2.getAccountName());
         if (res != 0)

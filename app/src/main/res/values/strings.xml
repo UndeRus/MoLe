@@ -211,4 +211,11 @@
     <string name="no_profile_restore_hint">… or, you may restore from backup</string>
     <string name="profile_not_available">Profile not available</string>
     <string name="api_1_23">Version 1.23</string>
+    <string name="notification_channel_id" translatable="false">notification_channel_id</string>
+    <string name="notification_title" translatable="false">Notification title</string>
+    <string name="send_transaction">Send transaction</string>
+    <string name="cancel_transaction">Cancel transaction</string>
+    <string name="channel_name" translatable="false">Notification channel</string>
+    <string name="channel_description" translatable="false">Main notifications</string>
+
 </resources>

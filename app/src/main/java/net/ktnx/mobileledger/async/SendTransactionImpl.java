@@ -1,23 +1,4 @@
-/*
- * Copyright © 2023 Damyan Ivanov.
- * This file is part of MoLe.
- * MoLe is free software: you can distribute it and/or modify it
- * under the term of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your opinion), any later version.
- *
- * MoLe is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License terms for details.
- *
- * You should have received a copy of the GNU General Public License
- * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package net.ktnx.mobileledger.async;
-
-import static net.ktnx.mobileledger.utils.Logger.debug;
 
 import android.util.Log;
 
@@ -29,7 +10,6 @@ import net.ktnx.mobileledger.model.LedgerTransaction;
 import net.ktnx.mobileledger.model.LedgerTransactionAccount;
 import net.ktnx.mobileledger.utils.Globals;
 import net.ktnx.mobileledger.utils.Logger;
-import net.ktnx.mobileledger.utils.Misc;
 import net.ktnx.mobileledger.utils.NetworkUtil;
 import net.ktnx.mobileledger.utils.SimpleDate;
 import net.ktnx.mobileledger.utils.UrlEncodedFormData;
@@ -47,30 +27,70 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* TODO: get rid of the custom session/cookie and auth code?
- *       (the last problem with the POST was the missing content-length header)
- *       This will resolve itself when hledger-web 1.14+ is released with Debian/stable,
- *       at which point the HTML form emulation can be dropped entirely
- */
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
-public class SendTransactionTask extends Thread {
-    private final TaskCallback taskCallback;
-    private final Profile mProfile;
-    private final boolean simulate;
-    private final LedgerTransaction transaction;
+public class SendTransactionImpl implements SendTransaction {
     protected String error;
+    protected boolean sendOK = false;
+
     private String token;
     private String session;
 
-    public SendTransactionTask(TaskCallback callback, Profile profile,
-                               LedgerTransaction transaction, boolean simulate) {
-        taskCallback = callback;
-        mProfile = profile;
-        this.transaction = transaction;
-        this.simulate = simulate;
+    @Override
+    public String getError() {
+        return error;
     }
-    private void sendOK(API apiVersion) throws IOException, ApiNotSupportedException {
-        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
+
+    @Override
+    public void send(Profile profile, LedgerTransaction transaction, boolean simulate, TaskCallback taskCallback) {
+        error = null;
+        try {
+            final API profileApiVersion = API.valueOf(profile.getApiVersion());
+            switch (profileApiVersion) {
+                case auto:
+                    sendOK = false;
+                    for (API ver : API.allVersions) {
+                        Logger.debug("network", "Trying version " + ver);
+                        try {
+                            sendOK(ver, profile, transaction, simulate);
+                            sendOK = true;
+                            Logger.debug("network", "Version " + ver + " request succeeded");
+
+                            break;
+                        }
+                        catch (ApiNotSupportedException e) {
+                            Logger.debug("network", "Version " + ver + " seems not supported");
+                        }
+                    }
+
+                    if (!sendOK) {
+                        Logger.debug("network", "Trying HTML form emulation");
+                        legacySendOkWithRetry(profile, transaction);
+                    }
+                    break;
+                case html:
+                    legacySendOkWithRetry(profile, transaction);
+                    break;
+                case v1_14:
+                case v1_15:
+                case v1_19_1:
+                case v1_23:
+                    sendOK(profileApiVersion, profile, transaction, simulate);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected API version: " + profileApiVersion);
+            }
+        }
+        catch (ApiNotSupportedException | Exception e) {
+            e.printStackTrace();
+            error = e.getMessage();
+        }
+
+        taskCallback.onTransactionSaveDone(error, transaction);
+    }
+
+    private void sendOK(API apiVersion, Profile profile, LedgerTransaction transaction, boolean simulate) throws IOException, ApiNotSupportedException {
+        HttpURLConnection http = NetworkUtil.prepareConnection(profile, "add");
         http.setRequestMethod("PUT");
         http.setRequestProperty("Content-Type", "application/json");
         http.setRequestProperty("Accept", "*/*");
@@ -79,9 +99,10 @@ public class SendTransactionTask extends Thread {
         String body = gateway.transactionSaveRequest(transaction);
 
         Logger.debug("network", "Sending using API " + apiVersion);
-        sendRequest(http, body);
+        sendRequest(http, body, simulate);
     }
-    private void sendRequest(HttpURLConnection http, String body)
+
+    private void sendRequest(HttpURLConnection http, String body, boolean simulate)
             throws IOException, ApiNotSupportedException {
         if (simulate) {
             debug("network", "The request would be: " + body);
@@ -103,7 +124,7 @@ public class SendTransactionTask extends Thread {
         http.addRequestProperty("Content-Length", String.valueOf(bodyBytes.length));
 
         debug("network", "request header: " + http.getRequestProperties()
-                                                  .toString());
+                .toString());
 
         try (OutputStream req = http.getOutputStream()) {
             debug("network", "Request body: " + body);
@@ -148,8 +169,25 @@ public class SendTransactionTask extends Thread {
             }
         }
     }
-    private boolean legacySendOK() throws IOException {
-        HttpURLConnection http = NetworkUtil.prepareConnection(mProfile, "add");
+
+    private void legacySendOkWithRetry(Profile profile, LedgerTransaction transaction) throws IOException {
+        int tried = 0;
+        while (!legacySendOK(profile, transaction)) {
+            tried++;
+            if (tried >= 2)
+                throw new IOException(String.format("aborting after %d tries", tried));
+            try {
+                Thread.sleep(100);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+    }
+
+    private boolean legacySendOK(Profile profile, LedgerTransaction transaction) throws IOException {
+        HttpURLConnection http = NetworkUtil.prepareConnection(profile, "add");
         http.setRequestMethod("POST");
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         http.setRequestProperty("Accept", "*/*");
@@ -182,7 +220,7 @@ public class SendTransactionTask extends Thread {
         http.addRequestProperty("Content-Length", String.valueOf(body.length()));
 
         debug("network", "request header: " + http.getRequestProperties()
-                                                  .toString());
+                .toString());
 
         try (OutputStream req = http.getOutputStream()) {
             debug("network", "Request body: " + body);
@@ -239,68 +277,6 @@ public class SendTransactionTask extends Thread {
                     throw new IOException(
                             String.format("Error response code %d", http.getResponseCode()));
                 }
-            }
-        }
-    }
-    @Override
-    public void run() {
-        error = null;
-        try {
-            final API profileApiVersion = API.valueOf(mProfile.getApiVersion());
-            switch (profileApiVersion) {
-                case auto:
-                    boolean sendOK = false;
-                    for (API ver : API.allVersions) {
-                        Logger.debug("network", "Trying version " + ver);
-                        try {
-                            sendOK(ver);
-                            sendOK = true;
-                            Logger.debug("network", "Version " + ver + " request succeeded");
-
-                            break;
-                        }
-                        catch (ApiNotSupportedException e) {
-                            Logger.debug("network", "Version " + ver + " seems not supported");
-                        }
-                    }
-
-                    if (!sendOK) {
-                        Logger.debug("network", "Trying HTML form emulation");
-                        legacySendOkWithRetry();
-                    }
-                    break;
-                case html:
-                    legacySendOkWithRetry();
-                    break;
-                case v1_14:
-                case v1_15:
-                case v1_19_1:
-                case v1_23:
-                    sendOK(profileApiVersion);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected API version: " + profileApiVersion);
-            }
-        }
-        catch (ApiNotSupportedException | Exception e) {
-            e.printStackTrace();
-            error = e.getMessage();
-        }
-
-        Misc.onMainThread(() -> taskCallback.onTransactionSaveDone(error, transaction));
-    }
-    private void legacySendOkWithRetry() throws IOException {
-        int tried = 0;
-        while (!legacySendOK()) {
-            tried++;
-            if (tried >= 2)
-                throw new IOException(String.format("aborting after %d tries", tried));
-            try {
-                sleep(100);
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-                break;
             }
         }
     }
