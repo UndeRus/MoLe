@@ -182,7 +182,7 @@ abstract public class TemplateDetailsItem {
         return type;
     }
     public enum Type {
-        HEADER(TYPE.header), ACCOUNT_ITEM(TYPE.accountItem);
+        HEADER(TYPE_INT.header), ACCOUNT_ITEM(TYPE_INT.accountItem);
         final int index;
         Type(int i) {
             index = i;
@@ -286,7 +286,7 @@ abstract public class TemplateDetailsItem {
         }
     }
 
-    public static class TYPE {
+    public static class TYPE_INT {
         public static final int header = 0;
         public static final int accountItem = 1;
     }

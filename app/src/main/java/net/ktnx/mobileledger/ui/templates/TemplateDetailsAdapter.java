@@ -227,9 +227,9 @@ class TemplateDetailsAdapter extends RecyclerView.Adapter<TemplateDetailsAdapter
                                                                 int viewType) {
         final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case TemplateDetailsItem.TYPE.header:
+            case TemplateDetailsItem.TYPE_INT.header:
                 return new Header(TemplateDetailsHeaderBinding.inflate(inflater, parent, false));
-            case TemplateDetailsItem.TYPE.accountItem:
+            case TemplateDetailsItem.TYPE_INT.accountItem:
                 return new AccountRow(
                         TemplateDetailsAccountBinding.inflate(inflater, parent, false));
             default:

@@ -76,7 +76,7 @@ public class Colors {
         TypedValue tv = new TypedValue();
         theme.resolveAttribute(R.attr.table_row_dark_bg, tv, true);
         tableRowDarkBG = tv.data;
-        theme.resolveAttribute(R.attr.colorPrimary, tv, true);
+        theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, tv, true);
         primary = tv.data;
 
         if (themePrimaryColor.size() == 0) {
@@ -84,7 +84,7 @@ public class Colors {
                 Resources.Theme tmpTheme = theme.getResources()
                                                 .newTheme();
                 tmpTheme.applyStyle(themeId, true);
-                tmpTheme.resolveAttribute(R.attr.colorPrimary, tv, false);
+                tmpTheme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, tv, false);
                 themePrimaryColor.put(themeId, tv.data);
             }
         }

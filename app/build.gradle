@@ -15,14 +15,19 @@
  * along with MoLe. If not, see <https://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android' version '1.8.0' apply false
+}
+
 
 android {
-    compileSdkVersion 31
+
     defaultConfig {
         applicationId "net.ktnx.mobileledger"
         minSdkVersion 22
-        targetSdkVersion 31
+        compileSdk 33
+        targetSdkVersion 33
         vectorDrawables.useSupportLibrary true
         versionCode 55
         versionName '0.21.6'
@@ -55,18 +60,23 @@ android {
     }
     sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     productFlavors {
     }
-    buildFeatures.viewBinding = true
-    buildToolsVersion '30.0.3'
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+    buildToolsVersion = '33.0.1'
+    namespace 'net.ktnx.mobileledger'
 }
 
 dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
+    implementation 'androidx.work:work-runtime:2.7.0'
     def room_version = '2.4.2'
     implementation "androidx.room:room-runtime:2.4.2"
     annotationProcessor "androidx.room:room-compiler:$room_version"
@@ -85,6 +95,7 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation 'androidx.appcompat:appcompat:1.6.0-alpha01'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 allprojects {
