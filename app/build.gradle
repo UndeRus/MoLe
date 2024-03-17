@@ -62,6 +62,7 @@ android {
     }
     buildFeatures.viewBinding = true
     buildToolsVersion '30.0.3'
+    namespace 'net.ktnx.mobileledger'
 }
 
 dependencies {
