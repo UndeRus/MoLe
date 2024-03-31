@@ -107,8 +107,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
 
         mainActivity.fabShouldShow();
 
-        if (mainActivity instanceof FabManager.FabHandler)
-            FabManager.handle(mainActivity, b.accountRoot);
+        FabManager.handle(mainActivity, b.accountRoot);
 
         Colors.themeWatch.observe(getViewLifecycleOwner(), this::themeChanged);
         b.accountSwipeRefreshLayout.setOnRefreshListener(() -> {
