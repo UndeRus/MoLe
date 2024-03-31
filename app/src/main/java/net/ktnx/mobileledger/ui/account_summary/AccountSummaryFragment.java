@@ -204,8 +204,8 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             }
 
             if (last != null) {
-                if (last.getType() != AccountListItem.Type.ACCOUNT ||
-                    !((AccountListItem.Account) last).allAmountsAreZero())
+                if (!last.isAccount() || !last.toAccount()
+                                              .allAmountsAreZero())
                 {
                     newList.add(last);
                 }
