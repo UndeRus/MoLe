@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import net.ktnx.mobileledger.App;
 import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.GeneralBackgroundTasks;
 import net.ktnx.mobileledger.databinding.AccountSummaryFragmentBinding;
@@ -118,6 +119,8 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         Data.observeProfile(this, profile -> onProfileChanged(profile, Boolean.TRUE.equals(
                 model.getShowZeroBalanceAccounts()
                      .getValue())));
+        model.getShowZeroBalanceAccounts()
+             .setValue(App.getShowZeroBalanceAccounts());
     }
     @Override
     public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
@@ -138,6 +141,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
              .observe(this, v -> {
                  menuShowZeroBalances.setChecked(v);
                  onProfileChanged(Data.getProfile(), v);
+                 App.storeShowZeroBalanceAccounts(v);
              });
 
         super.onCreateOptionsMenu(menu, inflater);
