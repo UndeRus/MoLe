@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -78,12 +78,19 @@ public abstract class AccountDAO extends BaseDAO<Account> {
     @Query("DELETE FROM accounts")
     public abstract void deleteAllSync();
 
-    @Query("SELECT * FROM accounts WHERE profile_id=:profileId ORDER BY name")
-    public abstract LiveData<List<Account>> getAll(long profileId);
+    @Query("SELECT * FROM accounts WHERE profile_id=:profileId AND IIF(:includeZeroBalances=1, 1," +
+           " (EXISTS(SELECT 1 FROM account_values av WHERE av.account_id=accounts.id AND av.value" +
+           " <> 0) OR EXISTS(SELECT 1 FROM accounts a WHERE a.parent_name = accounts.name))) " +
+           "ORDER BY name")
+    public abstract LiveData<List<Account>> getAll(long profileId, boolean includeZeroBalances);
 
     @Transaction
-    @Query("SELECT * FROM accounts WHERE profile_id = :profileId ORDER BY name")
-    public abstract LiveData<List<AccountWithAmounts>> getAllWithAmounts(long profileId);
+    @Query("SELECT * FROM accounts WHERE profile_id = :profileId AND IIF(:includeZeroBalances=1, " +
+           "1, (EXISTS(SELECT 1 FROM account_values av WHERE av.account_id=accounts.id AND av" +
+           ".value <> 0) OR EXISTS(SELECT 1 FROM accounts a WHERE a.parent_name = accounts.name))" +
+           ") ORDER BY name")
+    public abstract LiveData<List<AccountWithAmounts>> getAllWithAmounts(long profileId,
+                                                                         boolean includeZeroBalances);
 
     @Query("SELECT * FROM accounts WHERE id=:id")
     public abstract Account getByIdSync(long id);

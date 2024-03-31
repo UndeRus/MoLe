@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -17,9 +17,14 @@
 
 package net.ktnx.mobileledger.ui.account_summary;
 
+import static net.ktnx.mobileledger.utils.Logger.debug;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,6 +36,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import net.ktnx.mobileledger.R;
 import net.ktnx.mobileledger.async.GeneralBackgroundTasks;
 import net.ktnx.mobileledger.databinding.AccountSummaryFragmentBinding;
 import net.ktnx.mobileledger.db.AccountWithAmounts;
@@ -51,11 +57,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static net.ktnx.mobileledger.utils.Logger.debug;
-
 public class AccountSummaryFragment extends MobileLedgerListFragment {
     public AccountSummaryAdapter modelAdapter;
     private AccountSummaryFragmentBinding b;
+    private MenuItem menuShowZeroBalances;
+    private MainModel model;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +88,7 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
         debug("flow", "AccountSummaryFragment.onActivityCreated()");
         super.onViewCreated(view, savedInstanceState);
 
-        MainModel model = new ViewModelProvider(requireActivity()).get(MainModel.class);
+        model = new ViewModelProvider(requireActivity()).get(MainModel.class);
 
         Data.backgroundTasksRunning.observe(this.getViewLifecycleOwner(),
                 this::onBackgroundTaskRunningChanged);
@@ -109,15 +115,40 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
             model.scheduleTransactionListRetrieval();
         });
 
-        Data.observeProfile(this, this::onProfileChanged);
+        Data.observeProfile(this, profile -> onProfileChanged(profile, Boolean.TRUE.equals(
+                model.getShowZeroBalanceAccounts()
+                     .getValue())));
     }
-    private void onProfileChanged(Profile profile) {
+    @Override
+    public void onCreateOptionsMenu(@NotNull Menu menu, @NotNull MenuInflater inflater) {
+        inflater.inflate(R.menu.account_list, menu);
+
+        menuShowZeroBalances = menu.findItem(R.id.menu_account_list_show_zero_balances);
+        if ((menuShowZeroBalances == null))
+            throw new AssertionError();
+
+        menuShowZeroBalances.setOnMenuItemClickListener(menuItem -> {
+            model.getShowZeroBalanceAccounts()
+                 .setValue(Boolean.FALSE.equals(model.getShowZeroBalanceAccounts()
+                                                     .getValue()));
+            return true;
+        });
+
+        model.getShowZeroBalanceAccounts()
+             .observe(this, v -> {
+                 menuShowZeroBalances.setChecked(v);
+                 onProfileChanged(Data.getProfile(), v);
+             });
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+    private void onProfileChanged(Profile profile, boolean showZeroBalanceAccounts) {
         if (profile == null)
             return;
 
         DB.get()
           .getAccountDAO()
-          .getAllWithAmounts(profile.getId())
+          .getAllWithAmounts(profile.getId(), showZeroBalanceAccounts)
           .observe(getViewLifecycleOwner(), list -> GeneralBackgroundTasks.run(() -> {
               List<AccountListItem> adapterList = new ArrayList<>();
               adapterList.add(new AccountListItem.Header(Data.lastAccountsUpdateText));
@@ -134,8 +165,57 @@ public class AccountSummaryFragment extends MobileLedgerListFragment {
                       adapterList.add(new AccountListItem.Account(account));
                   accMap.put(dbAcc.account.getName(), account);
               }
+
+              if (!showZeroBalanceAccounts) {
+                  removeZeroAccounts(adapterList);
+              }
               modelAdapter.setAccounts(adapterList);
               Data.lastUpdateAccountCount.postValue(adapterList.size() - 1);
           }));
+    }
+    private void removeZeroAccounts(List<AccountListItem> list) {
+        boolean removed = true;
+
+        while (removed) {
+            AccountListItem last = null;
+            removed = false;
+            List<AccountListItem> newList = new ArrayList<>();
+
+            for (AccountListItem item : list) {
+                if (last == null) {
+                    last = item;
+                    continue;
+                }
+
+                if (!last.isAccount() || !last.toAccount()
+                                              .allAmountsAreZero() || last.toAccount()
+                                                                          .getAccount()
+                                                                          .isParentOf(
+                                                                                  item.toAccount()
+                                                                                      .getAccount()))
+                {
+                    newList.add(last);
+                }
+                else {
+                    removed = true;
+                }
+
+                last = item;
+            }
+
+            if (last != null) {
+                if (last.getType() != AccountListItem.Type.ACCOUNT ||
+                    !((AccountListItem.Account) last).allAmountsAreZero())
+                {
+                    newList.add(last);
+                }
+                else {
+                    removed = true;
+                }
+            }
+
+            list.clear();
+            list.addAll(newList);
+        }
     }
 }

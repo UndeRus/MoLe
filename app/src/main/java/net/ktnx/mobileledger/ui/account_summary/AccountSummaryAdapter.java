@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.ktnx.mobileledger.ui.account_summary;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 import android.content.res.Resources;
 import android.view.LayoutInflater;
@@ -47,8 +49,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Locale;
-
-import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.RowHolder> {
     public static final int AMOUNT_LIMIT = 3;

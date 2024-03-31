@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -46,7 +46,6 @@ public class MainModel extends ViewModel {
     private SimpleDate firstTransactionDate;
     private SimpleDate lastTransactionDate;
     transient private RetrieveTransactionsTask retrieveTransactionsTask;
-    transient private Thread displayedAccountsUpdater;
     private TransactionsDisplayedFilter displayedTransactionsUpdater;
     public LiveData<Boolean> getUpdatingFlag() {
         return updatingFlag;
@@ -83,6 +82,7 @@ public class MainModel extends ViewModel {
             return;
         }
         Profile profile = Data.getProfile();
+        assert profile != null;
 
         retrieveTransactionsTask = new RetrieveTransactionsTask(profile);
         Logger.debug("db", "Created a background transaction retrieval task");

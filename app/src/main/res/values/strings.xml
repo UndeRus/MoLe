@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2021 Damyan Ivanov.
+  ~ Copyright © 2024 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -211,4 +211,6 @@
     <string name="no_profile_restore_hint">… or, you may restore from backup</string>
     <string name="profile_not_available">Profile not available</string>
     <string name="api_1_23">Version 1.23</string>
+    <string name="accounts_menu_show_zero">Show zero balances</string>
+    <string name="accounts_menu_show_zero_condensed">Zero balances</string>
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -201,12 +201,20 @@ public class LedgerAccount {
         if (amounts != null)
             amounts.clear();
     }
-    public boolean amountsExpanded() { return amountsExpanded; }
-    public void setAmountsExpanded(boolean flag) { amountsExpanded = flag; }
-    public void toggleAmountsExpanded() { amountsExpanded = !amountsExpanded; }
+    public boolean amountsExpanded() {return amountsExpanded;}
+    public void setAmountsExpanded(boolean flag) {amountsExpanded = flag;}
+    public void toggleAmountsExpanded() {amountsExpanded = !amountsExpanded;}
     public void propagateAmountsTo(LedgerAccount acc) {
         for (LedgerAmount a : amounts)
             a.propagateToAccount(acc);
+    }
+    public boolean allAmountsAreZero() {
+        for (LedgerAmount a : amounts) {
+            if (a.getAmount() != 0)
+                return false;
+        }
+
+        return true;
     }
     public List<LedgerAmount> getAmounts() {
         return amounts;

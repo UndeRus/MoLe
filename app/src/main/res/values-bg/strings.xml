@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright © 2021 Damyan Ivanov.
+  ~ Copyright © 2024 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -202,4 +202,6 @@
     <string name="no_profile_restore_hint">… а може и да възстановите настройките от резервно копие</string>
     <string name="profile_not_available">Недостъпен профил</string>
     <string name="api_1_23">Версия 1.23</string>
+    <string name="accounts_menu_show_zero">Сметки с нулев баланс</string>
+    <string name="accounts_menu_show_zero_condensed">Нулеви сметки</string>
 </resources>
