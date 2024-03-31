@@ -34,12 +34,19 @@ public abstract class AccountListItem {
         else
             throw new RuntimeException("Unsupported sub-class " + this);
     }
-    @NotNull
-    public LedgerAccount getAccount() {
-        if (this instanceof Account)
-            return ((Account) this).account;
-
-        throw new IllegalStateException(String.format("Item type is not Account, but %s", this));
+    public boolean isAccount() {
+        return this instanceof Account;
+    }
+    public Account toAccount() {
+        assert isAccount();
+        return ((Account) this);
+    }
+    public boolean isHeader() {
+        return this instanceof Header;
+    }
+    public Header toHeader() {
+        assert isHeader();
+        return ((Header) this);
     }
     public enum Type {ACCOUNT, HEADER}
 
@@ -58,6 +65,10 @@ public abstract class AccountListItem {
                    ((Account) other).account.getLevel() == account.getLevel() &&
                    ((Account) other).account.getAmountsString()
                                             .equals(account.getAmountsString());
+        }
+        @NotNull
+        public LedgerAccount getAccount() {
+            return account;
         }
     }
 

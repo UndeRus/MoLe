@@ -38,6 +38,7 @@ import java.util.Locale;
 public class MainModel extends ViewModel {
     public final MutableLiveData<Integer> foundTransactionItemIndex = new MutableLiveData<>(null);
     private final MutableLiveData<Boolean> updatingFlag = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> showZeroBalanceAccounts = new MutableLiveData<>(true);
     private final MutableLiveData<String> accountFilter = new MutableLiveData<>(null);
     private final MutableLiveData<List<TransactionListItem>> displayedTransactions =
             new MutableLiveData<>(new ArrayList<>());
@@ -66,6 +67,7 @@ public class MainModel extends ViewModel {
     public void setFirstTransactionDate(SimpleDate earliestDate) {
         this.firstTransactionDate = earliestDate;
     }
+    public MutableLiveData<Boolean> getShowZeroBalanceAccounts() {return showZeroBalanceAccounts;}
     public MutableLiveData<String> getAccountFilter() {
         return accountFilter;
     }
