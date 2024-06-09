@@ -18,11 +18,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     defaultConfig {
         applicationId "net.ktnx.mobileledger"
         minSdkVersion 22
-        targetSdkVersion 31
+        targetSdkVersion 33
         vectorDrawables.useSupportLibrary true
         versionCode 56
         versionName '0.21.7'
