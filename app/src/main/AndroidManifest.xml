@@ -29,6 +29,7 @@
         android:roundIcon="@drawable/app_icon_round"
         android:supportsRtl="true"
         android:backupAgent=".backup.MobileLedgerBackupAgent"
+        android:enableOnBackInvokedCallback="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".BackupsActivity"
