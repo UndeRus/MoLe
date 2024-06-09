@@ -85,7 +85,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.module:jackson-modules-java8:2.17.1'
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
-    implementation 'androidx.appcompat:appcompat:1.6.0-alpha01'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 
 allprojects {
