@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   sodipodi:docname="app-icon-adaptive.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   id="svg4620"
+   version="1.1"
+   viewBox="0 0 108 108"
+   height="108"
+   width="108"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <title
+     id="title921">MoLe app icon</title>
+  <defs
+     id="defs4614" />
+  <sodipodi:namedview
+     units="px"
+     inkscape:document-rotation="0"
+     inkscape:snap-to-guides="true"
+     inkscape:bbox-paths="true"
+     inkscape:bbox-nodes="true"
+     inkscape:snap-bbox="true"
+     inkscape:pagecheckerboard="true"
+     inkscape:window-maximized="0"
+     inkscape:window-y="10"
+     inkscape:window-x="12"
+     inkscape:window-height="1014"
+     inkscape:window-width="1890"
+     showborder="true"
+     inkscape:snap-object-midpoints="true"
+     inkscape:guide-bbox="true"
+     showguides="true"
+     inkscape:snap-page="true"
+     showgrid="false"
+     inkscape:current-layer="layer1"
+     inkscape:document-units="px"
+     inkscape:cy="46.080652"
+     inkscape:cx="47.195507"
+     inkscape:zoom="5.3818683"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     inkscape:showpageshadow="0"
+     inkscape:deskcolor="#d1d1d1">
+    <sodipodi:guide
+       inkscape:color="rgb(0,0,255)"
+       inkscape:label=""
+       inkscape:locked="false"
+       id="guide1407"
+       orientation="-1,0"
+       position="21,-37.820936" />
+    <sodipodi:guide
+       inkscape:color="rgb(0,0,255)"
+       inkscape:locked="false"
+       inkscape:label=""
+       id="guide31"
+       orientation="0,1"
+       position="-10.658475,87" />
+    <sodipodi:guide
+       position="-11.893959,21"
+       orientation="0,1"
+       id="guide8469"
+       inkscape:locked="false"
+       inkscape:label=""
+       inkscape:color="rgb(0,134,229)" />
+    <sodipodi:guide
+       position="87,-37.820936"
+       orientation="-1,0"
+       id="guide11759"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata4617">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>MoLe app icon</dc:title>
+        <cc:license
+           rdf:resource="https://spdx.org/licenses/GPL-3.0-or-later.html" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Damyan Ivanov &lt;dam+mole@ktnx.net&gt;</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Copyright © 2019 Damyan Ivanov &lt;dam+mole@ktnx.net&gt;. All rights reserved.</dc:title>
+          </cc:Agent>
+        </dc:rights>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="фон"
+     id="layer3"
+     inkscape:groupmode="layer">
+    <rect
+       ry="8.6399994"
+       y="0"
+       x="0"
+       height="108"
+       width="108"
+       id="rect5267"
+       style="opacity:1;fill:#935ff2;fill-opacity:1;stroke:none;stroke-width:7.02;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.0885827;stroke-opacity:1;paint-order:markers stroke fill" />
+  </g>
+  <g
+     style="opacity:1"
+     transform="translate(0,-197)"
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <g
+       transform="matrix(1.7368422,0,0,1.7368422,12.315788,-135.70585)"
+       id="g892">
+      <path
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2.30303;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.0885827;stroke-opacity:1"
+         id="path5171"
+         sodipodi:type="arc"
+         sodipodi:cx="24"
+         sodipodi:cy="216.88385"
+         sodipodi:rx="6.1715264"
+         sodipodi:ry="6.1723976"
+         sodipodi:start="3.9269908"
+         sodipodi:end="5.4977871"
+         d="m 19.636072,212.51931 a 6.1715264,6.1723976 0 0 1 8.727856,0"
+         sodipodi:arc-type="arc"
+         sodipodi:open="true" />
+      <path
+         sodipodi:open="true"
+         d="m 15.272143,208.40876 a 12.343053,12.344795 0 0 1 17.455713,0"
+         sodipodi:end="5.4977871"
+         sodipodi:start="3.9269908"
+         sodipodi:ry="12.344795"
+         sodipodi:rx="12.343053"
+         sodipodi:cy="217.13785"
+         sodipodi:cx="24"
+         sodipodi:type="arc"
+         id="path5179"
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2.30303;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.0885827;stroke-opacity:1"
+         sodipodi:arc-type="arc" />
+      <path
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2.03818;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.0885827;stroke-opacity:1"
+         d="m 28.145643,216.2905 c 0,0 3.647627,-0.38031 5.476763,-0.35202 2.521183,0.039 7.530262,0.71841 7.530262,0.71841 0.456729,0.0418 0.82814,0.35465 0.82814,0.79521 v 19.96076 c 0,0.44055 -0.369351,0.79522 -0.82814,0.79522 0,0 -5.007349,-0.71629 -7.530262,-0.74156 -3.216849,-0.0323 -9.619664,0.75293 -9.619664,0.75293 0,0 -6.180328,-0.7732 -9.286648,-0.75293 -2.635263,0.0172 -7.8687611,0.74156 -7.8687611,0.74156 -0.458791,0 -0.828142,-0.35467 -0.828142,-0.79522 V 217.4521 c 0,-0.44056 0.369351,-0.79521 0.828142,-0.79521 0,0 5.2350911,-0.68943 7.8687611,-0.71841 1.722646,-0.019 5.155938,0.35654 5.155938,0.35654"
+         id="rect5165"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cassssacassssac" />
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 24,237.67988 V 220.77219"
+         id="path5167"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 9,228 H 21"
+         id="path5216"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cc" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5218"
+         d="M 15,234 V 222"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5220"
+         d="M 27,228 H 39"
+         style="fill:none;fill-rule:evenodd;stroke:#ffffff;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0.0885827;stroke-opacity:1;paint-order:markers stroke fill;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+         d="m 24,215.0707 c 0.807623,0 1.559999,0.75332 1.56,1.56 2e-6,0.80669 -0.752376,1.55829 -1.56,1.55829 -0.807624,0 -1.560002,-0.7516 -1.56,-1.55829 10e-7,-0.80668 0.752377,-1.56 1.56,-1.56 z"
+         id="path5169"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

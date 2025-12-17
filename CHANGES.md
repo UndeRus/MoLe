@@ -1,5 +1,12 @@
 # Changes
 
+## [0.21.7] = 2024-03-19
+
+* FIXES:
+    + allow user certificates in network security config
+* OTHERS:
+    + bump gradle version
+
 ## [0.21.6] - 2023-06-20
 
 * FIXES

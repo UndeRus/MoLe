@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.ktnx.mobileledger.ui.account_summary;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 import android.content.res.Resources;
 import android.view.LayoutInflater;
@@ -48,8 +50,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Locale;
 
-import static net.ktnx.mobileledger.utils.Logger.debug;
-
 public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAdapter.RowHolder> {
     public static final int AMOUNT_LIMIT = 3;
     private static final int ITEM_TYPE_HEADER = 1;
@@ -66,8 +66,10 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                                            @NonNull AccountListItem newItem) {
                 Change changes = new Change();
 
-                final LedgerAccount oldAcc = oldItem.getAccount();
-                final LedgerAccount newAcc = newItem.getAccount();
+                final LedgerAccount oldAcc = oldItem.toAccount()
+                                                    .getAccount();
+                final LedgerAccount newAcc = newItem.toAccount()
+                                                    .getAccount();
 
                 if (!Misc.equalStrings(oldAcc.getName(), newAcc.getName()))
                     changes.add(Change.NAME);
@@ -97,8 +99,10 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
                 if (oldType == AccountListItem.Type.HEADER)
                     return true;
 
-                return oldItem.getAccount()
-                              .getId() == newItem.getAccount()
+                return oldItem.toAccount()
+                              .getAccount()
+                              .getId() == newItem.toAccount()
+                                                 .getAccount()
                                                  .getId();
             }
             @Override
@@ -114,6 +118,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
             return 0;
         return listDiffer.getCurrentList()
                          .get(position)
+                         .toAccount()
                          .getAccount()
                          .getId();
     }
@@ -258,6 +263,7 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
         private LedgerAccount getAccount() {
             return listDiffer.getCurrentList()
                              .get(getBindingAdapterPosition())
+                             .toAccount()
                              .getAccount();
         }
         private void toggleAmountsExpanded() {
@@ -301,7 +307,8 @@ public class AccountSummaryAdapter extends RecyclerView.Adapter<AccountSummaryAd
         }
         @Override
         public void bind(AccountListItem item, @Nullable List<Object> payloads) {
-            LedgerAccount acc = item.getAccount();
+            LedgerAccount acc = item.toAccount()
+                                    .getAccount();
 
             Change changes = new Change();
             if (payloads != null) {

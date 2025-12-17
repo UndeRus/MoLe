@@ -40,12 +40,9 @@ import net.ktnx.mobileledger.model.TransactionListItem;
 import net.ktnx.mobileledger.utils.Colors;
 import net.ktnx.mobileledger.utils.Misc;
 
-import java.util.Observer;
-
 class TransactionRowHolder extends TransactionRowHolderBase {
     private final TransactionListRowBinding b;
     TransactionListItem.Type lastType;
-    private Observer lastUpdateObserver;
     public TransactionRowHolder(@NonNull TransactionListRowBinding binding) {
         super(binding.getRoot());
         b = binding;

@@ -1,0 +1,7 @@
+* Easy way to add tag:value pairs to transactions and transaction accounts
+
+* Filter by tag:value pairs
+
+* Refresh button in account/transaction list
+
+* Top button in account/transaction list

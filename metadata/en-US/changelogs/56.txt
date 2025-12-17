@@ -1,0 +1,4 @@
+* FIXES:
+    + allow user certificates in network security config
+* OTHERS:
+    + bump gradle version

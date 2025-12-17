@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright © 2021 Damyan Ivanov.
+  ~ Copyright © 2024 Damyan Ivanov.
   ~ This file is part of MoLe.
   ~ MoLe is free software: you can distribute it and/or modify it
   ~ under the term of the GNU General Public License as published by
@@ -218,4 +218,6 @@
     <string name="channel_name" translatable="false">Notification channel</string>
     <string name="channel_description" translatable="false">Main notifications</string>
 
+    <string name="accounts_menu_show_zero">Show zero balances</string>
+    <string name="accounts_menu_show_zero_condensed">Zero balances</string>
 </resources>

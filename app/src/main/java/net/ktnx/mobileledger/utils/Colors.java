@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.ktnx.mobileledger.utils;
+
+import static net.ktnx.mobileledger.utils.Logger.debug;
 
 import android.app.Activity;
 import android.content.res.ColorStateList;
@@ -37,8 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-
-import static net.ktnx.mobileledger.utils.Logger.debug;
 
 public class Colors {
     public static final int DEFAULT_HUE_DEG = 261;
@@ -180,7 +180,7 @@ public class Colors {
                         huesSB.append(", ");
                     huesSB.append(h);
                 }
-                debug("profiles", String.format("used hues: %s", huesSB.toString()));
+                debug("profiles", String.format("used hues: %s", huesSB));
             }
             hues.add(hues.get(0));
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2021 Damyan Ivanov.
+ * Copyright © 2024 Damyan Ivanov.
  * This file is part of MoLe.
  * MoLe is free software: you can distribute it and/or modify it
  * under the term of the GNU General Public License as published by
@@ -41,6 +41,7 @@ public class App extends Application {
     public static final String PREF_NAME = "MoLe";
     public static final String PREF_THEME_HUE = "theme-hue";
     public static final String PREF_PROFILE_ID = "profile-id";
+    public static final String PREF_SHOW_ZERO_BALANCE_ACCOUNTS = "show-zero-balance-accounts";
     public static App instance;
     private static ProfileDetailModel profileModel;
     private boolean monthNamesPrepared = false;
@@ -67,6 +68,16 @@ public class App extends Application {
     public static int getStartupTheme() {
         SharedPreferences prefs = instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         return prefs.getInt(PREF_THEME_HUE, Colors.DEFAULT_HUE_DEG);
+    }
+    public static boolean getShowZeroBalanceAccounts() {
+        SharedPreferences prefs = instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        return prefs.getBoolean(PREF_SHOW_ZERO_BALANCE_ACCOUNTS, true);
+    }
+    public static void storeShowZeroBalanceAccounts(boolean value) {
+        SharedPreferences prefs = instance.getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREF_SHOW_ZERO_BALANCE_ACCOUNTS, value);
+        editor.apply();
     }
     private String getAuthURL() {
         if (profileModel != null)
