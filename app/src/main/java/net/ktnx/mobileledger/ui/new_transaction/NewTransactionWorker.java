@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 
 import com.google.gson.Gson;
@@ -94,7 +95,12 @@ public class NewTransactionWorker extends Worker {
                 .addAction(android.R.drawable.ic_delete, cancel, intent)
                 .build();
 
-        return new ForegroundInfo(8800, notification);
+        int notificationId = 8800;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new ForegroundInfo(notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        } else {
+            return new ForegroundInfo(notificationId, notification);
+        }
     }
 
     private void createChannel() {

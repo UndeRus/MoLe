@@ -62,6 +62,11 @@
             android:label="@string/title_profile_details"
             android:parentActivityName=".ui.activity.MainActivity"
             android:windowSoftInputMode="stateVisible|adjustResize" />
+
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="mediaPlayback"
+            tools:node="merge" />
     </application>
 
 </manifest>
